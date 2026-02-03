@@ -3,6 +3,10 @@
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
   import type { ActionType } from '$lib/models/types';
+  import AlchemyPanel from './AlchemyPanel.svelte';
+  import ExpeditionPanel from './ExpeditionPanel.svelte';
+  import ShopPanel from './ShopPanel.svelte';
+  import QuestPanel from './QuestPanel.svelte';
 
   export let action: ActionType;
   export let onBack: () => void;
@@ -40,34 +44,16 @@
   <button class="back-btn" on:click={onBack}>← 戻る</button>
 
   {#if action === 'alchemy'}
-    <h2>⚗️ 調合</h2>
-    <p class="placeholder">調合システムは次のフェーズで実装予定</p>
-    <p class="hint">素材を組み合わせてアイテムを作成します。</p>
+    <AlchemyPanel {onBack} />
 
   {:else if action === 'quest'}
-    <h2>📜 依頼</h2>
-    <p class="placeholder">依頼システムは次のフェーズで実装予定</p>
-    <div class="quest-info">
-      <p>受注中の依頼: {$gameState.activeQuests.length}件</p>
-      <p>掲示板の依頼: {$gameState.availableQuests.length}件</p>
-    </div>
+    <QuestPanel {onBack} />
 
   {:else if action === 'expedition'}
-    <h2>🏕️ 採取隊派遣</h2>
-    <p class="placeholder">採取隊システムは次のフェーズで実装予定</p>
-    {#if $gameState.expedition}
-      <p class="status">
-        現在「{$gameState.expedition.areaId}」に派遣中
-        （帰還まで{$gameState.expedition.startDay + $gameState.expedition.duration - $gameState.day}日）
-      </p>
-    {:else}
-      <p class="hint">採取隊を派遣して素材を集めてもらいます。</p>
-    {/if}
+    <ExpeditionPanel {onBack} />
 
   {:else if action === 'shop'}
-    <h2>🏪 ショップ</h2>
-    <p class="placeholder">ショップシステムは次のフェーズで実装予定</p>
-    <p class="hint">アイテムの売買ができます。</p>
+    <ShopPanel {onBack} />
 
   {:else if action === 'rest'}
     <h2>😴 休息</h2>

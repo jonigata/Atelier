@@ -22,7 +22,7 @@ function createInitialState(): GameState {
       { itemId: 'water_01', quality: 55 },
       { itemId: 'water_01', quality: 42 },
     ],
-    knownRecipes: ['potion_01'],
+    knownRecipes: [],
 
     activeQuests: [],
     availableQuests: [],
