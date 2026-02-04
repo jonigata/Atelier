@@ -6,6 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 サーバは基本的に起動しっぱなしなので、いちいち立ち上げ直す必要はありません
 コミットは頼まれたときだけやってください
 
+# 画像
+
+falで画像生成するときは
+背景透過のもの(アイコンなど)はgpt-image-1.5(medium, transparent)で。
+背景透過でないものはflux.2.kleinで。
+同じ種別のもの（例えば素材アイコン）を作るときに同じスタイルプロンプトを使うため、image-prompts.mdを参照・更新して下さい。
+
+
 ## Project Overview
 
 Atelier-style resource management simulation game (web-based). Player manages an alchemy workshop over 365 in-game days, crafting items, completing quests, and building reputation.
