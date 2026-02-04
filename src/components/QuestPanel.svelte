@@ -10,7 +10,7 @@
     incrementCompletedQuests,
     setAvailableQuests,
   } from '$lib/stores/game';
-  import { getItem } from '$lib/data/items';
+  import { getItem, getItemIcon } from '$lib/data/items';
   import { removeItemsFromInventory } from '$lib/services/inventory';
   import type { QuestDef, ActiveQuest, OwnedItem } from '$lib/models/types';
 
@@ -158,6 +158,7 @@
             <p class="quest-desc">{quest.description}</p>
             <div class="quest-details">
               <span class="requirement">
+                <img class="item-icon-small" src={getItemIcon(quest.requiredItemId)} alt={itemDef?.name || quest.requiredItemId} />
                 {itemDef?.name || quest.requiredItemId}
                 ×{quest.requiredQuantity}
                 {#if quest.requiredQuality}
@@ -201,6 +202,7 @@
             </div>
             <div class="quest-details">
               <span class="requirement">
+                <img class="item-icon-small" src={getItemIcon(quest.requiredItemId)} alt={itemDef?.name || quest.requiredItemId} />
                 {itemDef?.name || quest.requiredItemId}
                 ×{quest.requiredQuantity}
                 {#if quest.requiredQuality}
@@ -372,6 +374,15 @@
 
   .requirement {
     color: #e0e0f0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .item-icon-small {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
   }
 
   .deadline, .progress {

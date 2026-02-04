@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getItem } from '$lib/data/items';
+  import { getItem, getItemIcon } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
   import type { OwnedItem, Ingredient } from '$lib/models/types';
 
@@ -32,6 +32,7 @@
       {#each items as item}
         {@const def = getItem(item.itemId)}
         <button class="item-btn" on:click={() => onSelect(item)}>
+          <img class="item-icon" src={getItemIcon(item.itemId)} alt={def?.name || item.itemId} />
           <span class="item-name">{def?.name || item.itemId}</span>
           <span class="item-quality">品質 {item.quality}</span>
         </button>
@@ -62,6 +63,7 @@
   .item-btn {
     display: flex;
     flex-direction: column;
+    align-items: center;
     padding: 0.5rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid #4a4a6a;
@@ -69,6 +71,13 @@
     color: #e0e0f0;
     cursor: pointer;
     font-size: 0.85rem;
+  }
+
+  .item-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    margin-bottom: 0.25rem;
   }
 
   .item-btn:hover {

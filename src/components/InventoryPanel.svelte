@@ -1,6 +1,6 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
-  import { getItem } from '$lib/data/items';
+  import { getItem, getItemIcon } from '$lib/data/items';
   import type { OwnedItem } from '$lib/models/types';
   import { CATEGORY_NAMES, getCategoryName } from '$lib/data/categories';
 
@@ -206,6 +206,7 @@
     <div class="item-grid">
       {#each sortedDetailedItems as item}
         <div class="item-card">
+          <img class="item-icon" src={getItemIcon(item.itemId)} alt={item.name} />
           <div class="item-header">
             <span class="item-name">{item.name}</span>
             {#if item.count > 1}
@@ -228,6 +229,7 @@
         <div class="item-row" class:expanded={expandedItems.has(item.itemId)}>
           <button class="item-main" on:click={() => toggleExpand(item.itemId)}>
             <span class="expand-icon">{expandedItems.has(item.itemId) ? '▼' : '▶'}</span>
+            <img class="item-icon-small" src={getItemIcon(item.itemId)} alt={item.name} />
             <span class="item-name">{item.name}</span>
             <span class="item-count">×{item.count}</span>
             <span class="item-category">{CATEGORY_NAMES[item.category as keyof typeof CATEGORY_NAMES] || item.category}</span>
@@ -354,6 +356,23 @@
     border: 1px solid #4a4a6a;
     border-radius: 6px;
     transition: all 0.2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .item-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  .item-icon-small {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    flex-shrink: 0;
   }
 
   .item-card:hover {

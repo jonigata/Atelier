@@ -1,6 +1,6 @@
 <script lang="ts">
   import { gameState, addMessage, addMoney, addItem, addSalesAmount } from '$lib/stores/game';
-  import { items, getItem } from '$lib/data/items';
+  import { items, getItem, getItemIcon } from '$lib/data/items';
   import { removeItemFromInventory } from '$lib/services/inventory';
   import { SHOP } from '$lib/data/balance';
   import type { OwnedItem, ItemDef } from '$lib/models/types';
@@ -118,6 +118,7 @@
       {#each buyableItems as item}
         {@const canBuy = $gameState.money >= item.basePrice}
         <div class="shop-item" class:disabled={!canBuy}>
+          <img class="item-icon" src={getItemIcon(item.id)} alt={item.name} />
           <div class="item-info">
             <span class="item-name">{item.name}</span>
             <span class="item-desc">{item.description}</span>
@@ -145,7 +146,10 @@
           {@const def = getItem(itemId)}
           {#if def}
             <div class="item-group">
-              <h4>{def.name} ({items.length}個)</h4>
+              <div class="item-group-header">
+                <img class="item-icon-small" src={getItemIcon(itemId)} alt={def.name} />
+                <h4>{def.name} ({items.length}個)</h4>
+              </div>
               <div class="item-variants">
                 {#each items as item}
                   <div class="sell-item">
@@ -243,12 +247,26 @@
 
   .shop-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 0.75rem;
     padding: 0.75rem 1rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid #4a4a6a;
     border-radius: 6px;
+  }
+
+  .item-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  .item-icon-small {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    flex-shrink: 0;
   }
 
   .shop-item.disabled {
@@ -259,6 +277,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    flex: 1;
   }
 
   .item-name {
@@ -311,6 +330,17 @@
     padding: 0.75rem;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 6px;
+  }
+
+  .item-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .item-group-header h4 {
+    margin-bottom: 0;
   }
 
   .item-variants {

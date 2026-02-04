@@ -120,3 +120,7 @@ export const items: Record<string, ItemDef> = {
 export function getItem(id: string): ItemDef | undefined {
   return items[id];
 }
+
+export function getItemIcon(id: string): string {
+  return `/icons/materials/${id}.png`;
+}

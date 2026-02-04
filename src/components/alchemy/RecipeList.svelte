@@ -1,6 +1,6 @@
 <script lang="ts">
   import { countAvailableIngredients } from '$lib/services/alchemy';
-  import { getItem } from '$lib/data/items';
+  import { getItem, getItemIcon } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
   import type { RecipeDef, Ingredient } from '$lib/models/types';
 
@@ -38,6 +38,7 @@
         on:click={() => craftable && onSelect(recipe)}
       >
         <div class="recipe-header">
+          <img class="recipe-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} />
           <span class="recipe-name">{recipe.name}</span>
           <span class="recipe-days">{recipe.daysRequired}日</span>
         </div>
@@ -98,18 +99,27 @@
 
   .recipe-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 0.75rem;
+  }
+
+  .recipe-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    flex-shrink: 0;
   }
 
   .recipe-name {
     font-size: 1.1rem;
     font-weight: bold;
+    flex: 1;
   }
 
   .recipe-days {
     font-size: 0.85rem;
     color: #a0a0b0;
+    margin-left: auto;
   }
 
   .recipe-ingredients {
