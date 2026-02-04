@@ -75,10 +75,20 @@
     display: flex;
     flex-direction: column;
     background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
+    max-width: 960px;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
   }
 
   .main-panel {
     flex: 1;
     overflow-y: auto;
+  }
+
+  /* 広い画面での背景 */
+  @media (min-width: 960px) {
+    :global(body) {
+      background: #0a0a14;
+    }
   }
 </style>
