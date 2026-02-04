@@ -4,36 +4,43 @@
 
   let currentLine = 0;
   let delayedDialogue: typeof $gameState.tutorialProgress.pendingDialogue = null;
-  let previousDay = 0;
+  let previousDay = $gameState.day;
   let delayTimeoutId: number | undefined;
+  let isWaitingForDelay = false;
 
   $: dialogue = $gameState.tutorialProgress.pendingDialogue;
 
-  // 日付変更時はダイアログ表示を遅延させる
-  $: {
-    const currentDay = $gameState.day;
+  // 日付変更を検知
+  $: currentDay = $gameState.day;
+
+  // dialogueの変更を監視
+  $: if (dialogue) {
+    handleDialogueChange(dialogue);
+  } else if (!isWaitingForDelay) {
+    delayedDialogue = null;
+  }
+
+  function handleDialogueChange(newDialogue: typeof dialogue) {
+    if (delayTimeoutId) {
+      clearTimeout(delayTimeoutId);
+      delayTimeoutId = undefined;
+    }
+
     const dayChanged = previousDay > 0 && currentDay !== previousDay;
     previousDay = currentDay;
 
-    if (dialogue) {
-      if (delayTimeoutId) {
-        clearTimeout(delayTimeoutId);
-      }
-
-      if (dayChanged) {
-        // 日付変更演出後に表示（1.6秒後）
-        delayedDialogue = null;
-        delayTimeoutId = setTimeout(() => {
-          delayedDialogue = dialogue;
-          currentLine = 0;
-        }, 1600) as unknown as number;
-      } else {
-        // 日付変更なしなら即座に表示
-        delayedDialogue = dialogue;
+    if (dayChanged) {
+      // 日付変更演出後に表示（1.6秒後）
+      isWaitingForDelay = true;
+      delayTimeoutId = setTimeout(() => {
+        delayedDialogue = newDialogue;
         currentLine = 0;
-      }
+        isWaitingForDelay = false;
+      }, 1600) as unknown as number;
     } else {
-      delayedDialogue = null;
+      // 日付変更なしなら即座に表示
+      delayedDialogue = newDialogue;
+      currentLine = 0;
     }
   }
 

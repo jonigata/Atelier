@@ -1,13 +1,20 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { gameState } from '$lib/stores/game';
 
   let visible = false;
   let daysAdvanced = 0;
-  let previousDay = 1;
-  let timeoutId: number | undefined;
+  let previousDay = 0;
+  let animationKey = 0;
+  let mounted = false;
 
-  // 日付の変更を監視
-  $: {
+  onMount(() => {
+    previousDay = $gameState.day;
+    mounted = true;
+  });
+
+  // 日付の変更を監視（マウント後のみ）
+  $: if (mounted) {
     const currentDay = $gameState.day;
     if (currentDay > previousDay && previousDay > 0) {
       daysAdvanced = currentDay - previousDay;
@@ -17,22 +24,18 @@
   }
 
   function showTransition() {
-    // 既存のタイマーをクリア
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
+    animationKey++; // アニメーション再開用
     visible = true;
+  }
 
-    // 1.5秒後にフェードアウト
-    timeoutId = setTimeout(() => {
-      visible = false;
-    }, 1500) as unknown as number;
+  function handleAnimationEnd() {
+    visible = false;
   }
 </script>
 
 {#if visible}
-  <div class="day-transition" class:fade-out={!visible}>
+  {#key animationKey}
+    <div class="day-transition" on:animationend={handleAnimationEnd}>
     <div class="transition-content">
       <div class="days-passed">
         {#if daysAdvanced === 1}
@@ -46,6 +49,7 @@
       </div>
     </div>
   </div>
+  {/key}
 {/if}
 
 <style>
