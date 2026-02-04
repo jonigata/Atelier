@@ -4,43 +4,26 @@
 
   let currentLine = 0;
   let delayedDialogue: typeof $gameState.tutorialProgress.pendingDialogue = null;
-  let previousDay = $gameState.day;
   let delayTimeoutId: number | undefined;
-  let isWaitingForDelay = false;
 
   $: dialogue = $gameState.tutorialProgress.pendingDialogue;
+  $: pendingTransition = $gameState.pendingDayTransition;
 
-  // 日付変更を検知
-  $: currentDay = $gameState.day;
-
-  // dialogueの変更を監視
-  $: if (dialogue) {
-    handleDialogueChange(dialogue);
-  } else if (!isWaitingForDelay) {
-    delayedDialogue = null;
-  }
-
-  function handleDialogueChange(newDialogue: typeof dialogue) {
+  // 演出がない、かつダイアログがある場合のみ表示
+  $: {
     if (delayTimeoutId) {
       clearTimeout(delayTimeoutId);
       delayTimeoutId = undefined;
     }
 
-    const dayChanged = previousDay > 0 && currentDay !== previousDay;
-    previousDay = currentDay;
-
-    if (dayChanged) {
-      // 日付変更演出後に表示（1.6秒後）
-      isWaitingForDelay = true;
+    if (dialogue && !pendingTransition) {
+      // 演出終了後、少し間を置いて表示
       delayTimeoutId = setTimeout(() => {
-        delayedDialogue = newDialogue;
+        delayedDialogue = dialogue;
         currentLine = 0;
-        isWaitingForDelay = false;
-      }, 1600) as unknown as number;
-    } else {
-      // 日付変更なしなら即座に表示
-      delayedDialogue = newDialogue;
-      currentLine = 0;
+      }, 100) as unknown as number;
+    } else if (!dialogue) {
+      delayedDialogue = null;
     }
   }
 

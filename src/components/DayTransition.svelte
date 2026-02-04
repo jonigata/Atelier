@@ -1,26 +1,16 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { gameState } from '$lib/stores/game';
+  import { gameState, clearDayTransition } from '$lib/stores/game';
 
   let visible = false;
+  let displayDay = 0;
   let daysAdvanced = 0;
-  let previousDay = 0;
   let animationKey = 0;
-  let mounted = false;
 
-  onMount(() => {
-    previousDay = $gameState.day;
-    mounted = true;
-  });
-
-  // 日付の変更を監視（マウント後のみ）
-  $: if (mounted) {
-    const currentDay = $gameState.day;
-    if (currentDay > previousDay && previousDay > 0) {
-      daysAdvanced = currentDay - previousDay;
-      showTransition();
-    }
-    previousDay = currentDay;
+  // pendingDayTransitionを監視して演出を表示
+  $: if ($gameState.pendingDayTransition) {
+    displayDay = $gameState.pendingDayTransition.toDay;
+    daysAdvanced = $gameState.pendingDayTransition.daysAdvanced;
+    showTransition();
   }
 
   function showTransition() {
@@ -30,6 +20,7 @@
 
   function handleAnimationEnd() {
     visible = false;
+    clearDayTransition();
   }
 </script>
 
@@ -37,15 +28,17 @@
   {#key animationKey}
     <div class="day-transition" on:animationend={handleAnimationEnd}>
     <div class="transition-content">
-      <div class="days-passed">
-        {#if daysAdvanced === 1}
-          1日が経過...
-        {:else}
-          {daysAdvanced}日が経過...
-        {/if}
-      </div>
+      {#if daysAdvanced > 0}
+        <div class="days-passed">
+          {#if daysAdvanced === 1}
+            1日が経過...
+          {:else}
+            {daysAdvanced}日が経過...
+          {/if}
+        </div>
+      {/if}
       <div class="current-day">
-        {$gameState.day}日目
+        {displayDay}日目
       </div>
     </div>
   </div>

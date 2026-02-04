@@ -141,6 +141,9 @@ export interface GameState {
   morningEvents: MorningEvent[];
   messageLog: string[];
 
+  // 日付演出用（null以外の時に演出表示）
+  pendingDayTransition: { toDay: number; daysAdvanced: number } | null;
+
   tutorialProgress: TutorialProgress;
   achievementProgress: AchievementProgress;
   stats: GameStats;

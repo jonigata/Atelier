@@ -47,6 +47,8 @@ function createInitialState(): GameState {
     morningEvents: [],
     messageLog: ['ゲームを開始しました。'],
 
+    pendingDayTransition: null,
+
     tutorialProgress: {
       isActive: true,
       currentMilestone: 0,
@@ -174,6 +176,21 @@ export function advanceDay(days: number): void {
   gameState.update((state) => ({
     ...state,
     day: state.day + days,
+    pendingDayTransition: { toDay: state.day + days, daysAdvanced: days },
+  }));
+}
+
+export function setDayTransition(transition: GameState['pendingDayTransition']): void {
+  gameState.update((state) => ({
+    ...state,
+    pendingDayTransition: transition,
+  }));
+}
+
+export function clearDayTransition(): void {
+  gameState.update((state) => ({
+    ...state,
+    pendingDayTransition: null,
   }));
 }
 

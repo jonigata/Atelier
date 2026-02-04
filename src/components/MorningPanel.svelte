@@ -6,30 +6,26 @@
 <div class="morning-panel">
   <h2>{$gameState.day}日目の朝</h2>
 
-  {#if $gameState.morningEvents.length > 0}
-    <div class="events">
-      <h3>お知らせ</h3>
-      {#each $gameState.morningEvents as event}
-        <div class="event" class:expedition={event.type === 'expedition_return'}
-             class:quest={event.type === 'new_quest'}
-             class:expired={event.type === 'quest_expired'}>
-          {#if event.type === 'expedition_return'}
-            <span class="icon">📦</span>
-          {:else if event.type === 'new_quest'}
-            <span class="icon">📜</span>
-          {:else if event.type === 'quest_expired'}
-            <span class="icon">⚠️</span>
-          {/if}
-          <span class="text">{event.message}</span>
-        </div>
-      {/each}
-    </div>
-  {:else}
-    <p class="no-events">特にお知らせはありません。</p>
-  {/if}
+  <div class="events">
+    <h3>お知らせ</h3>
+    {#each $gameState.morningEvents as event}
+      <div class="event" class:expedition={event.type === 'expedition_return'}
+           class:quest={event.type === 'new_quest'}
+           class:expired={event.type === 'quest_expired'}>
+        {#if event.type === 'expedition_return'}
+          <span class="icon">📦</span>
+        {:else if event.type === 'new_quest'}
+          <span class="icon">📜</span>
+        {:else if event.type === 'quest_expired'}
+          <span class="icon">⚠️</span>
+        {/if}
+        <span class="text">{event.message}</span>
+      </div>
+    {/each}
+  </div>
 
   <button class="start-btn" on:click={startActionPhase}>
-    行動を開始する
+    確認
   </button>
 </div>
 
@@ -91,12 +87,6 @@
   .text {
     color: #e0e0f0;
     line-height: 1.4;
-  }
-
-  .no-events {
-    color: #a0a0b0;
-    font-style: italic;
-    margin: 2rem 0;
   }
 
   .start-btn {

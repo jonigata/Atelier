@@ -12,6 +12,7 @@ import {
   removeActiveQuest,
   incrementFailedQuests,
   setAvailableQuests,
+  setDayTransition,
 } from '$lib/stores/game';
 import { getArea } from '$lib/data/areas';
 import { getItem } from '$lib/data/items';
@@ -49,7 +50,6 @@ export function endTurn(daysSpent: number): void {
  */
 function processMorningPhase(): void {
   clearMorningEvents();
-  setPhase('morning');
 
   const state = get(gameState);
   addMessage(`--- ${state.day}日目の朝 ---`);
@@ -65,6 +65,14 @@ function processMorningPhase(): void {
 
   // 4. 新しい依頼の生成
   generateNewQuests();
+
+  // イベントがあればmorning画面を表示、なければ直接actionへ
+  const updatedState = get(gameState);
+  if (updatedState.morningEvents.length > 0) {
+    setPhase('morning');
+  } else {
+    setPhase('action');
+  }
 }
 
 /**
@@ -271,6 +279,10 @@ export function initializeGame(): void {
   const initialQuests = templates.slice(0, 2);
   setAvailableQuests(initialQuests);
 
-  setPhase('morning');
+  // 1日目の演出をセット
+  setDayTransition({ toDay: 1, daysAdvanced: 0 });
+
+  // 直接actionフェーズで開始（朝フェーズはスキップ）
+  setPhase('action');
   addMessage('ハイデル村での1年間が始まります。');
 }

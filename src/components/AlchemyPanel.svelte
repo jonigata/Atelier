@@ -181,70 +181,74 @@
       <h3>{selectedRecipe.name}を調合</h3>
       <p class="craft-info">所要日数: {selectedRecipe.daysRequired}日</p>
 
-      <!-- 選択済み素材 -->
-      <div class="selected-items">
-        <h4>選択した素材 ({selectedItems.length}/{requiredItemCount})</h4>
-        {#if selectedItems.length === 0}
-          <p class="hint">下から素材を選択してください</p>
-        {:else}
-          <div class="item-list">
-            {#each selectedItems as item, i}
-              {@const def = getItem(item.itemId)}
-              <span class="selected-item">
-                {def?.name || item.itemId} (品質{item.quality})
-              </span>
-            {/each}
-          </div>
-          <button class="undo-btn" on:click={undoLastSelection}>最後の選択を取り消す</button>
-        {/if}
-      </div>
-
-      <!-- 必要素材一覧 -->
-      <div class="required-materials">
-        <h4>必要素材</h4>
-        <div class="material-list">
-          {#each selectedRecipe.ingredients as ing, idx}
-            {@const def = ing.itemId ? getItem(ing.itemId) : null}
-            {@const name = def?.name || getIngredientName(ing)}
-            {@const startIdx = selectedRecipe.ingredients.slice(0, idx).reduce((sum, i) => sum + i.quantity, 0)}
-            {@const selectedForThis = selectedItems.slice(startIdx, startIdx + ing.quantity)}
-            <div class="material-row">
-              <span class="material-name">{name} ×{ing.quantity}</span>
-              <span class="material-status">
-                {#if selectedForThis.length === ing.quantity}
-                  完了
-                {:else}
-                  {selectedForThis.length}/{ing.quantity}
-                {/if}
-              </span>
+      <!-- 素材スロット一覧 -->
+      <div class="material-slots">
+        <h4>素材を選択 ({selectedItems.length}/{requiredItemCount})</h4>
+        <div class="slots-container">
+          {#each selectedRecipe.ingredients as ing, ingIdx}
+            {@const startIdx = selectedRecipe.ingredients.slice(0, ingIdx).reduce((sum, i) => sum + i.quantity, 0)}
+            <div class="ingredient-group">
+              <div class="ingredient-label">{getIngredientName(ing)}</div>
+              <div class="ingredient-slots">
+                {#each Array(ing.quantity) as _, slotIdx}
+                  {@const globalIdx = startIdx + slotIdx}
+                  {@const isActive = globalIdx === selectedItems.length && !selectionComplete}
+                  {@const isFilled = globalIdx < selectedItems.length}
+                  {@const selectedItem = isFilled ? selectedItems[globalIdx] : null}
+                  {@const itemDef = selectedItem ? getItem(selectedItem.itemId) : null}
+                  <button
+                    class="slot"
+                    class:active={isActive}
+                    class:filled={isFilled}
+                    class:pending={!isActive && !isFilled}
+                    on:click={() => {
+                      if (isFilled && globalIdx === selectedItems.length - 1) {
+                        undoLastSelection();
+                      }
+                    }}
+                    disabled={!isFilled || globalIdx !== selectedItems.length - 1}
+                  >
+                    {#if isFilled}
+                      <span class="slot-item">{itemDef?.name || selectedItem?.itemId}</span>
+                      <span class="slot-quality">品質 {selectedItem?.quality}</span>
+                      {#if globalIdx === selectedItems.length - 1}
+                        <span class="slot-remove">×</span>
+                      {/if}
+                    {:else if isActive}
+                      <span class="slot-prompt">選択中</span>
+                    {:else}
+                      <span class="slot-empty">―</span>
+                    {/if}
+                  </button>
+                {/each}
+              </div>
             </div>
           {/each}
         </div>
       </div>
 
-      <!-- 素材選択エリア -->
+      <!-- 選択可能アイテムリスト -->
       {#if !selectionComplete}
-        {#if currentIngredient}
-          <div class="item-selection">
-            <h4>
-              {getIngredientName(currentIngredient.ingredient)} を選択
-              ({currentIngredient.index + 1}/{currentIngredient.ingredient.quantity}個目)
-            </h4>
-            {#if availableItemsForSelection.length === 0}
-              <p class="no-items">選択可能なアイテムがありません</p>
-            {:else}
-              <div class="available-items">
-                {#each availableItemsForSelection as item}
-                  {@const def = getItem(item.itemId)}
-                  <button class="item-btn" on:click={() => selectItem(item)}>
-                    <span class="item-name">{def?.name || item.itemId}</span>
-                    <span class="item-quality">品質 {item.quality}</span>
-                  </button>
-                {/each}
-              </div>
+        <div class="item-selection">
+          <h4>
+            {#if currentIngredient}
+              {getIngredientName(currentIngredient.ingredient)} を選んでください
             {/if}
-          </div>
-        {/if}
+          </h4>
+          {#if availableItemsForSelection.length === 0}
+            <p class="no-items">選択可能なアイテムがありません</p>
+          {:else}
+            <div class="available-items">
+              {#each availableItemsForSelection as item}
+                {@const def = getItem(item.itemId)}
+                <button class="item-btn" on:click={() => selectItem(item)}>
+                  <span class="item-name">{def?.name || item.itemId}</span>
+                  <span class="item-quality">品質 {item.quality}</span>
+                </button>
+              {/each}
+            </div>
+          {/if}
+        </div>
       {:else}
         <!-- 調合実行 -->
         <div class="craft-action">
@@ -422,40 +426,117 @@
     font-size: 0.9rem;
   }
 
-  .selected-items {
+  .material-slots {
     padding: 1rem;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 8px;
   }
 
-  .hint {
-    color: #808090;
-    font-style: italic;
+  .slots-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
-  .item-list {
+  .ingredient-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .ingredient-label {
+    font-size: 0.9rem;
+    color: #c9a959;
+    font-weight: bold;
+  }
+
+  .ingredient-slots {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-bottom: 0.5rem;
   }
 
-  .selected-item {
-    padding: 0.3rem 0.6rem;
-    background: #4a6a4a;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    color: #e0f0e0;
-  }
-
-  .undo-btn {
-    padding: 0.3rem 0.75rem;
-    background: rgba(255, 100, 100, 0.2);
-    border: 1px solid #ff6b6b;
-    border-radius: 4px;
-    color: #ff6b6b;
-    cursor: pointer;
+  .slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 70px;
+    padding: 0.5rem;
+    border-radius: 6px;
     font-size: 0.85rem;
+    cursor: default;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+
+  .slot.pending {
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px dashed #4a4a6a;
+    color: #606070;
+  }
+
+  .slot.active {
+    background: rgba(201, 169, 89, 0.15);
+    border: 2px solid #c9a959;
+    color: #c9a959;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(201, 169, 89, 0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(201, 169, 89, 0); }
+  }
+
+  .slot.filled {
+    background: rgba(76, 175, 80, 0.15);
+    border: 2px solid #4caf50;
+    color: #e0f0e0;
+    cursor: pointer;
+  }
+
+  .slot.filled:not(:disabled):hover {
+    background: rgba(255, 100, 100, 0.15);
+    border-color: #ff6b6b;
+  }
+
+  .slot.filled:disabled {
+    cursor: default;
+    opacity: 0.8;
+  }
+
+  .slot-item {
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .slot-quality {
+    font-size: 0.75rem;
+    color: #a0a0b0;
+  }
+
+  .slot-prompt {
+    font-style: italic;
+  }
+
+  .slot-empty {
+    font-size: 1.2rem;
+  }
+
+  .slot-remove {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 0.7rem;
+    color: #ff6b6b;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .slot.filled:not(:disabled):hover .slot-remove {
+    opacity: 1;
   }
 
   .item-selection {
@@ -535,35 +616,6 @@
   .craft-result.success {
     background: rgba(76, 175, 80, 0.2);
     color: #81c784;
-  }
-
-  .required-materials {
-    padding: 0.75rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
-  }
-
-  .material-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .material-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.9rem;
-  }
-
-  .material-name {
-    color: #e0e0f0;
-  }
-
-  .material-status {
-    color: #81c784;
-    font-size: 0.85rem;
   }
 
   .no-items {
