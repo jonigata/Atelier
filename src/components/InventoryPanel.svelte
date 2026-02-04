@@ -9,9 +9,23 @@
   type SortKey = 'name' | 'quality' | 'category';
   let sortKey: SortKey = 'category';
   let filterCategory: string = 'all';
+  let showDetails = false; // 詳細表示モード
+  let expandedItems: Set<string> = new Set(); // 展開中のアイテムID
 
-  // アイテムをグループ化（同一アイテム・同一品質ごとに個数をカウント）
-  interface GroupedItem {
+  // まとめ表示用（同一アイテムをまとめる）
+  interface SummaryItem {
+    itemId: string;
+    name: string;
+    category: string;
+    count: number;
+    avgQuality: number;
+    minQuality: number;
+    maxQuality: number;
+    qualities: { quality: number; count: number }[]; // 品質ごとの内訳
+  }
+
+  // 詳細表示用（同一アイテム・同一品質ごと）
+  interface DetailedItem {
     itemId: string;
     quality: number;
     count: number;
@@ -19,8 +33,54 @@
     category: string;
   }
 
-  function groupItems(items: OwnedItem[]): GroupedItem[] {
-    const grouped = new Map<string, GroupedItem>();
+  // まとめ表示用のグルーピング
+  function groupItemsSummary(items: OwnedItem[]): SummaryItem[] {
+    const grouped = new Map<string, SummaryItem>();
+
+    for (const item of items) {
+      const def = getItem(item.itemId);
+      if (!def) continue;
+
+      const existing = grouped.get(item.itemId);
+
+      if (existing) {
+        existing.count++;
+        existing.minQuality = Math.min(existing.minQuality, item.quality);
+        existing.maxQuality = Math.max(existing.maxQuality, item.quality);
+        // 品質ごとの内訳を更新
+        const qualityEntry = existing.qualities.find(q => q.quality === item.quality);
+        if (qualityEntry) {
+          qualityEntry.count++;
+        } else {
+          existing.qualities.push({ quality: item.quality, count: 1 });
+        }
+      } else {
+        grouped.set(item.itemId, {
+          itemId: item.itemId,
+          name: def.name,
+          category: def.category,
+          count: 1,
+          avgQuality: 0, // 後で計算
+          minQuality: item.quality,
+          maxQuality: item.quality,
+          qualities: [{ quality: item.quality, count: 1 }],
+        });
+      }
+    }
+
+    // 平均品質を計算し、品質内訳をソート
+    for (const item of grouped.values()) {
+      const totalQuality = item.qualities.reduce((sum, q) => sum + q.quality * q.count, 0);
+      item.avgQuality = Math.round(totalQuality / item.count);
+      item.qualities.sort((a, b) => b.quality - a.quality); // 品質の高い順
+    }
+
+    return Array.from(grouped.values());
+  }
+
+  // 詳細表示用のグルーピング（従来通り）
+  function groupItemsDetailed(items: OwnedItem[]): DetailedItem[] {
+    const grouped = new Map<string, DetailedItem>();
 
     for (const item of items) {
       const def = getItem(item.itemId);
@@ -45,14 +105,44 @@
     return Array.from(grouped.values());
   }
 
-  // ソートとフィルター
-  $: groupedItems = groupItems($gameState.inventory);
+  // 展開トグル
+  function toggleExpand(itemId: string) {
+    if (expandedItems.has(itemId)) {
+      expandedItems.delete(itemId);
+    } else {
+      expandedItems.add(itemId);
+    }
+    expandedItems = expandedItems; // リアクティビティ
+  }
 
-  $: filteredItems = filterCategory === 'all'
-    ? groupedItems
-    : groupedItems.filter(item => item.category === filterCategory);
+  // ソートとフィルター（まとめ表示）
+  $: summaryItems = groupItemsSummary($gameState.inventory);
 
-  $: sortedItems = [...filteredItems].sort((a, b) => {
+  $: filteredSummaryItems = filterCategory === 'all'
+    ? summaryItems
+    : summaryItems.filter(item => item.category === filterCategory);
+
+  $: sortedSummaryItems = [...filteredSummaryItems].sort((a, b) => {
+    switch (sortKey) {
+      case 'name':
+        return a.name.localeCompare(b.name);
+      case 'quality':
+        return b.avgQuality - a.avgQuality;
+      case 'category':
+        return a.category.localeCompare(b.category) || a.name.localeCompare(b.name);
+      default:
+        return 0;
+    }
+  });
+
+  // ソートとフィルター（詳細表示）
+  $: detailedItems = groupItemsDetailed($gameState.inventory);
+
+  $: filteredDetailedItems = filterCategory === 'all'
+    ? detailedItems
+    : detailedItems.filter(item => item.category === filterCategory);
+
+  $: sortedDetailedItems = [...filteredDetailedItems].sort((a, b) => {
     switch (sortKey) {
       case 'name':
         return a.name.localeCompare(b.name);
@@ -66,7 +156,7 @@
   });
 
   // カテゴリ一覧（実際に持っているアイテムのカテゴリのみ）
-  $: availableCategories = [...new Set(groupedItems.map(item => item.category))];
+  $: availableCategories = [...new Set(summaryItems.map(item => item.category))];
 
   // 合計アイテム数
   $: totalItems = $gameState.inventory.length;
@@ -98,17 +188,23 @@
           <option value="quality">品質</option>
         </select>
       </div>
+
+      <label class="detail-toggle">
+        <input type="checkbox" bind:checked={showDetails} />
+        品質別に表示
+      </label>
     </div>
   </div>
 
-  {#if sortedItems.length === 0}
+  {#if totalItems === 0}
     <div class="empty-inventory">
       <p>アイテムがありません</p>
       <p class="hint">採取に行ってアイテムを集めましょう</p>
     </div>
-  {:else}
+  {:else if showDetails}
+    <!-- 詳細表示（品質別） -->
     <div class="item-grid">
-      {#each sortedItems as item}
+      {#each sortedDetailedItems as item}
         <div class="item-card">
           <div class="item-header">
             <span class="item-name">{item.name}</span>
@@ -122,6 +218,38 @@
               品質 {item.quality}
             </span>
           </div>
+        </div>
+      {/each}
+    </div>
+  {:else}
+    <!-- まとめ表示 -->
+    <div class="item-list">
+      {#each sortedSummaryItems as item}
+        <div class="item-row" class:expanded={expandedItems.has(item.itemId)}>
+          <button class="item-main" on:click={() => toggleExpand(item.itemId)}>
+            <span class="expand-icon">{expandedItems.has(item.itemId) ? '▼' : '▶'}</span>
+            <span class="item-name">{item.name}</span>
+            <span class="item-count">×{item.count}</span>
+            <span class="item-category">{CATEGORY_NAMES[item.category as keyof typeof CATEGORY_NAMES] || item.category}</span>
+            <span class="item-quality-summary" class:high={item.avgQuality >= 70} class:low={item.avgQuality < 30}>
+              平均 {item.avgQuality}
+              {#if item.minQuality !== item.maxQuality}
+                <span class="quality-range">({item.minQuality}~{item.maxQuality})</span>
+              {/if}
+            </span>
+          </button>
+          {#if expandedItems.has(item.itemId)}
+            <div class="item-breakdown">
+              {#each item.qualities as q}
+                <div class="quality-row">
+                  <span class="quality-value" class:high={q.quality >= 70} class:low={q.quality < 30}>
+                    品質 {q.quality}
+                  </span>
+                  <span class="quality-count">×{q.count}</span>
+                </div>
+              {/each}
+            </div>
+          {/if}
         </div>
       {/each}
     </div>
@@ -274,5 +402,134 @@
 
   .item-quality.low {
     color: #ff6b6b;
+  }
+
+  /* 詳細表示トグル */
+  .detail-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #a0a0b0;
+  }
+
+  .detail-toggle input {
+    cursor: pointer;
+  }
+
+  /* まとめ表示 */
+  .item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .item-row {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #4a4a6a;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .item-row.expanded {
+    border-color: #6a6a8a;
+  }
+
+  .item-main {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    color: #e0e0f0;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.95rem;
+  }
+
+  .item-main:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .expand-icon {
+    font-size: 0.7rem;
+    color: #808090;
+    width: 1rem;
+    flex-shrink: 0;
+  }
+
+  .item-main .item-name {
+    font-weight: bold;
+    flex: 1;
+  }
+
+  .item-main .item-count {
+    background: #c9a959;
+    color: #1a1a2e;
+    padding: 0.1rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.85rem;
+    font-weight: bold;
+  }
+
+  .item-main .item-category {
+    color: #808090;
+    font-size: 0.85rem;
+    min-width: 4rem;
+  }
+
+  .item-quality-summary {
+    color: #a0a0b0;
+    font-size: 0.9rem;
+    min-width: 6rem;
+    text-align: right;
+  }
+
+  .item-quality-summary.high {
+    color: #81c784;
+  }
+
+  .item-quality-summary.low {
+    color: #ff6b6b;
+  }
+
+  .quality-range {
+    font-size: 0.8rem;
+    color: #808090;
+    margin-left: 0.25rem;
+  }
+
+  .item-breakdown {
+    padding: 0.5rem 1rem 0.75rem 2.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid #3a3a5a;
+  }
+
+  .quality-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.25rem 0;
+  }
+
+  .quality-value {
+    color: #a0a0b0;
+    font-size: 0.85rem;
+  }
+
+  .quality-value.high {
+    color: #81c784;
+  }
+
+  .quality-value.low {
+    color: #ff6b6b;
+  }
+
+  .quality-count {
+    color: #c9a959;
+    font-size: 0.85rem;
   }
 </style>
