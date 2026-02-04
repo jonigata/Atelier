@@ -26,33 +26,43 @@
 
 {#if visible}
   {#key animationKey}
-    <div class="day-transition" on:animationend={handleAnimationEnd}>
-    <div class="transition-content">
-      {#if daysAdvanced > 0}
-        <div class="days-passed">
-          {#if daysAdvanced === 1}
-            1日が経過...
-          {:else}
-            {daysAdvanced}日が経過...
+    <!-- 全画面オーバーレイ（クリックを吸収して背景への操作を防ぐ） -->
+    <div class="day-transition-overlay">
+      <div class="day-transition" on:animationend={handleAnimationEnd}>
+        <div class="transition-content">
+          {#if daysAdvanced > 0}
+            <div class="days-passed">
+              {#if daysAdvanced === 1}
+                1日が経過...
+              {:else}
+                {daysAdvanced}日が経過...
+              {/if}
+            </div>
           {/if}
+          <div class="current-day">
+            {displayDay}日目
+          </div>
         </div>
-      {/if}
-      <div class="current-day">
-        {displayDay}日目
       </div>
     </div>
-  </div>
   {/key}
 {/if}
 
 <style>
-  .day-transition {
+  .day-transition-overlay {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    inset: 0;
     z-index: 900;
-    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 背景を軽くぼかして演出中であることを視覚的に示す */
+    background: rgba(0, 0, 0, 0.3);
+    /* クリックを吸収して背景への操作を防ぐ */
+    pointer-events: all;
+  }
+
+  .day-transition {
     animation: fadeInOut 1.5s ease-in-out;
   }
 
@@ -84,19 +94,19 @@
   @keyframes fadeInOut {
     0% {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(0.9);
+      transform: scale(0.9);
     }
     15% {
       opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
+      transform: scale(1);
     }
     85% {
       opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
+      transform: scale(1);
     }
     100% {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(1.05);
+      transform: scale(1.05);
     }
   }
 </style>

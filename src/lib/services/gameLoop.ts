@@ -14,7 +14,7 @@ import {
   setAvailableQuests,
   setDayTransition,
 } from '$lib/stores/game';
-import { showUnlockToast } from '$lib/stores/toast';
+import { queueUnlockAction } from '$lib/stores/toast';
 import { getArea } from '$lib/data/areas';
 import { getItem } from '$lib/data/items';
 import { getAvailableQuestTemplates } from '$lib/data/quests';
@@ -112,9 +112,9 @@ function checkVillageMilestones(): void {
         }));
         addMessage(`${dialogue.characterName}の到着により、${milestone.unlocks.join('、')}が解放されました！`);
 
-        // トースト表示
+        // アンロック演出をキューに追加（ダイアログ終了後に表示）
         for (const action of milestone.unlocks) {
-          showUnlockToast(action);
+          queueUnlockAction(action as import('$lib/models/types').ActionType);
         }
       }
     }

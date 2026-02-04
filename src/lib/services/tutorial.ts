@@ -7,6 +7,8 @@ import {
   completeAchievement,
 } from '$lib/stores/game';
 import { checkAchievements, getAchievementDialogue, claimReward, checkNewActiveGoals } from './achievement';
+import { triggerUnlockAnimations, showUnlockToast, pendingUnlockActions, queueUnlockAction } from '$lib/stores/toast';
+import { milestones } from '$lib/data/tutorial';
 
 /**
  * マイルストーン達成をチェックし、必要に応じて次のマイルストーンをトリガー
@@ -68,6 +70,14 @@ function triggerMilestoneWithAchievement(
   milestoneId: number,
   achievementId: string
 ): void {
+  // このマイルストーンでアンロックされるアクションを取得
+  const milestone = milestones.find(m => m.id === milestoneId);
+  if (milestone) {
+    for (const action of milestone.unlocks) {
+      queueUnlockAction(action);
+    }
+  }
+
   // マイルストーンを進める（アクションのアンロック）
   advanceTutorialMilestone(milestoneId);
 
@@ -106,8 +116,25 @@ function checkAndTriggerAchievement(): void {
 export function onDialogueClosed(): void {
   const state = get(gameState);
 
-  // 新しい目標が発動したかチェックしてトースト表示
-  checkNewActiveGoals();
+  // 1. アンロックアニメーションをトリガー
+  const pending = get(pendingUnlockActions);
+  if (pending.length > 0) {
+    triggerUnlockAnimations();
+
+    // 2. 少し遅延してトーストを表示
+    setTimeout(() => {
+      for (const action of pending) {
+        showUnlockToast(action);
+      }
+      // 3. さらに遅延して目標トーストを表示
+      setTimeout(() => {
+        checkNewActiveGoals();
+      }, 300);
+    }, 500);
+  } else {
+    // アンロックがない場合は目標トーストのみ
+    checkNewActiveGoals();
+  }
 
   // チュートリアル中でマイルストーン4が完了していたら終了処理
   if (state.tutorialProgress.isActive) {

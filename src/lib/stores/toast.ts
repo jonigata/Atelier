@@ -1,9 +1,30 @@
 import { writable } from 'svelte/store';
-import type { Toast, ToastType } from '$lib/models/types';
+import type { Toast, ToastType, ActionType } from '$lib/models/types';
 
 let toastId = 0;
 
 export const toasts = writable<Toast[]>([]);
+
+// 新しくアンロックされたアクション（演出用）
+export const pendingUnlockActions = writable<ActionType[]>([]);
+export const showingUnlockActions = writable<Set<ActionType>>(new Set());
+
+export function queueUnlockAction(action: ActionType): void {
+  pendingUnlockActions.update(actions => [...actions, action]);
+}
+
+export function triggerUnlockAnimations(): void {
+  pendingUnlockActions.update(actions => {
+    if (actions.length > 0) {
+      showingUnlockActions.set(new Set(actions));
+      // アニメーション後にクリア
+      setTimeout(() => {
+        showingUnlockActions.set(new Set());
+      }, 2000);
+    }
+    return [];
+  });
+}
 
 export function showToast(type: ToastType, title: string, message: string): void {
   const id = ++toastId;
