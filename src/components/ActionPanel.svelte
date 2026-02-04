@@ -4,6 +4,7 @@
   import { recipes } from '$lib/data/recipes';
   import { items } from '$lib/data/items';
   import type { ActionType, RecipeDef } from '$lib/models/types';
+  import { getCategoryName } from '$lib/data/categories';
 
   // 素材名を取得するヘルパー
   function getIngredientName(ingredient: { itemId?: string; category?: string }): string {
@@ -11,13 +12,7 @@
       return items[ingredient.itemId]?.name || ingredient.itemId;
     }
     if (ingredient.category) {
-      const categoryNames: Record<string, string> = {
-        herb: 'ハーブ系',
-        ore: '鉱石系',
-        water: '水系',
-        misc: 'その他',
-      };
-      return categoryNames[ingredient.category] || ingredient.category;
+      return getCategoryName(ingredient.category);
     }
     return '不明';
   }

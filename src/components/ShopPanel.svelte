@@ -1,6 +1,7 @@
 <script lang="ts">
   import { gameState, addMessage, addMoney, addItem, addSalesAmount } from '$lib/stores/game';
   import { items, getItem } from '$lib/data/items';
+  import { removeItemFromInventory } from '$lib/services/inventory';
   import type { OwnedItem, ItemDef } from '$lib/models/types';
 
   export let onBack: () => void;
@@ -58,19 +59,10 @@
     const price = Math.floor(def.basePrice * (item.quality / 50) * 0.7);
 
     // インベントリから削除
-    gameState.update((state) => {
-      const index = state.inventory.findIndex(
-        (i) => i.itemId === item.itemId && i.quality === item.quality
-      );
-      if (index === -1) return state;
-      return {
-        ...state,
-        inventory: [
-          ...state.inventory.slice(0, index),
-          ...state.inventory.slice(index + 1),
-        ],
-      };
-    });
+    gameState.update((state) => ({
+      ...state,
+      inventory: removeItemFromInventory(state.inventory, item.itemId, item.quality),
+    }));
 
     addMoney(price);
     addSalesAmount(price);

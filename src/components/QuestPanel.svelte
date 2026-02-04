@@ -11,6 +11,7 @@
     setAvailableQuests,
   } from '$lib/stores/game';
   import { getItem } from '$lib/data/items';
+  import { removeItemsFromInventory } from '$lib/services/inventory';
   import type { QuestDef, ActiveQuest, OwnedItem } from '$lib/models/types';
 
   export let onBack: () => void;
@@ -65,21 +66,10 @@
 
     // アイテムを消費
     const itemsToConsume = matchingItems.slice(0, remaining);
-    gameState.update((state) => {
-      let newInventory = [...state.inventory];
-      for (const item of itemsToConsume) {
-        const index = newInventory.findIndex(
-          (i) => i.itemId === item.itemId && i.quality === item.quality
-        );
-        if (index !== -1) {
-          newInventory = [
-            ...newInventory.slice(0, index),
-            ...newInventory.slice(index + 1),
-          ];
-        }
-      }
-      return { ...state, inventory: newInventory };
-    });
+    gameState.update((state) => ({
+      ...state,
+      inventory: removeItemsFromInventory(state.inventory, itemsToConsume),
+    }));
 
     // 報酬付与
     addMoney(quest.rewardMoney);

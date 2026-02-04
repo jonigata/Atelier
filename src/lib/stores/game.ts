@@ -9,6 +9,7 @@ import type {
   ActionType,
 } from '$lib/models/types';
 import { milestones, getUnlockedActionsUpTo, getMilestoneDialogue, TUTORIAL_ACTIONS, ALL_ACTIONS } from '$lib/data/tutorial';
+import { removeItemFromInventory } from '$lib/services/inventory';
 
 function createInitialState(): GameState {
   return {
@@ -119,14 +120,12 @@ export function addItem(item: OwnedItem): void {
 
 export function removeItem(itemId: string, quality: number): boolean {
   const state = get(gameState);
-  const index = state.inventory.findIndex(
-    (i) => i.itemId === itemId && i.quality === quality
-  );
-  if (index === -1) return false;
+  const newInventory = removeItemFromInventory(state.inventory, itemId, quality);
+  if (newInventory === state.inventory) return false;
 
   gameState.update((s) => ({
     ...s,
-    inventory: [...s.inventory.slice(0, index), ...s.inventory.slice(index + 1)],
+    inventory: newInventory,
   }));
   return true;
 }

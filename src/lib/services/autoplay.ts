@@ -4,6 +4,7 @@ import { endTurn, startActionPhase } from './gameLoop';
 import { checkMilestoneProgress, onDialogueClosed } from './tutorial';
 import { areas } from '$lib/data/areas';
 import { items } from '$lib/data/items';
+import { removeItemsFromInventory } from '$lib/services/inventory';
 import type { GameState, ActionType, OwnedItem, Expedition } from '$lib/models/types';
 
 export interface AutoplayLog {
@@ -306,15 +307,7 @@ function tryDeliverQuest(state: GameState): boolean {
       const itemsToConsume = matchingItems.slice(0, remaining);
 
       gameState.update(s => {
-        let newInventory = [...s.inventory];
-        for (const item of itemsToConsume) {
-          const index = newInventory.findIndex(
-            i => i.itemId === item.itemId && i.quality === item.quality
-          );
-          if (index !== -1) {
-            newInventory = [...newInventory.slice(0, index), ...newInventory.slice(index + 1)];
-          }
-        }
+        const newInventory = removeItemsFromInventory(s.inventory, itemsToConsume);
 
         let developmentGain = 1;
         if (quest.type === 'quality') developmentGain = 2;
@@ -366,16 +359,7 @@ function tryCraft(state: GameState): boolean {
   const avgQuality = selectedItems.reduce((sum, i) => sum + i.quality, 0) / selectedItems.length;
 
   gameState.update(s => {
-    let newInventory = [...s.inventory];
-
-    for (const item of selectedItems) {
-      const index = newInventory.findIndex(
-        i => i.itemId === item.itemId && i.quality === item.quality
-      );
-      if (index !== -1) {
-        newInventory = [...newInventory.slice(0, index), ...newInventory.slice(index + 1)];
-      }
-    }
+    let newInventory = removeItemsFromInventory(s.inventory, selectedItems);
 
     const resultQuality = Math.floor(avgQuality * 0.9 + Math.random() * 10);
     newInventory.push({ itemId: 'potion_01', quality: Math.min(100, resultQuality) });

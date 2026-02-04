@@ -8,6 +8,7 @@ import {
 } from '$lib/stores/game';
 import { getRecipe } from '$lib/data/recipes';
 import { getItem } from '$lib/data/items';
+import { removeItemsFromInventory } from '$lib/services/inventory';
 import type { OwnedItem, RecipeDef, Ingredient } from '$lib/models/types';
 
 export interface CraftResult {
@@ -23,6 +24,75 @@ export interface CraftMultipleResult {
   items: OwnedItem[];
   totalExpGained: number;
   message: string;
+}
+
+/**
+ * 1回分の調合を試行（成功判定、品質計算、経験値計算）
+ * @returns 成功時: { success: true, item, expGained }、失敗時: { success: false, expGained }
+ */
+interface CraftAttemptResult {
+  success: boolean;
+  item?: OwnedItem;
+  expGained: number;
+}
+
+function executeCraftAttempt(
+  recipe: RecipeDef,
+  selectedItems: OwnedItem[],
+  alchemyLevel: number
+): CraftAttemptResult {
+  // 成功判定
+  const successRate = calculateSuccessRate(recipe, alchemyLevel);
+  const isSuccess = Math.random() < successRate;
+
+  if (!isSuccess) {
+    // 失敗時も経験値は少しもらえる
+    const expGained = Math.floor(recipe.expReward * 0.3);
+    addExp(expGained);
+    return { success: false, expGained };
+  }
+
+  // 品質計算
+  const quality = calculateQuality(recipe, selectedItems, alchemyLevel);
+
+  // 完成品を追加
+  const newItem: OwnedItem = {
+    itemId: recipe.resultItemId,
+    quality,
+  };
+  addItem(newItem);
+  markItemCrafted(recipe.resultItemId);
+
+  // 経験値計算（高品質ボーナス）
+  let expGained = recipe.expReward;
+  if (quality >= 70) expGained = Math.floor(expGained * 1.2);
+  addExp(expGained);
+
+  return { success: true, item: newItem, expGained };
+}
+
+/**
+ * バッチ調合のメッセージを生成
+ */
+function generateBatchMessage(
+  itemName: string,
+  successCount: number,
+  failCount: number,
+  items: OwnedItem[],
+  totalExpGained: number
+): string {
+  if (successCount === 0 && failCount === 0) {
+    return '素材が足りませんでした';
+  }
+  if (failCount === 0) {
+    const avgQuality = Math.round(items.reduce((sum, item) => sum + item.quality, 0) / items.length);
+    return `${itemName}を${successCount}個作成しました！（平均品質: ${avgQuality}） +${totalExpGained} Exp`;
+  }
+  if (successCount === 0) {
+    return `${failCount}回すべて失敗しました... +${totalExpGained} Exp`;
+  }
+  const avgQuality = Math.round(items.reduce((sum, item) => sum + item.quality, 0) / items.length);
+  return `${itemName}を${successCount}個作成、${failCount}個失敗（平均品質: ${avgQuality}） +${totalExpGained} Exp`;
 }
 
 /**
@@ -44,20 +114,25 @@ export function canCraftRecipe(recipeId: string): boolean {
 }
 
 /**
+ * アイテムが素材要件に合致するかチェック
+ */
+export function matchesIngredient(item: OwnedItem, ingredient: Ingredient): boolean {
+  if (ingredient.itemId) {
+    return item.itemId === ingredient.itemId;
+  }
+  if (ingredient.category) {
+    const def = getItem(item.itemId);
+    return def?.category === ingredient.category;
+  }
+  return false;
+}
+
+/**
  * 特定の素材要件に対して利用可能な数を数える
  */
 export function countAvailableIngredients(ingredient: Ingredient): number {
   const state = get(gameState);
-  return state.inventory.filter((item) => {
-    if (ingredient.itemId) {
-      return item.itemId === ingredient.itemId;
-    }
-    if (ingredient.category) {
-      const def = getItem(item.itemId);
-      return def?.category === ingredient.category;
-    }
-    return false;
-  }).length;
+  return state.inventory.filter((item) => matchesIngredient(item, ingredient)).length;
 }
 
 /**
@@ -65,16 +140,7 @@ export function countAvailableIngredients(ingredient: Ingredient): number {
  */
 export function getMatchingItems(ingredient: Ingredient): OwnedItem[] {
   const state = get(gameState);
-  return state.inventory.filter((item) => {
-    if (ingredient.itemId) {
-      return item.itemId === ingredient.itemId;
-    }
-    if (ingredient.category) {
-      const def = getItem(item.itemId);
-      return def?.category === ingredient.category;
-    }
-    return false;
-  });
+  return state.inventory.filter((item) => matchesIngredient(item, ingredient));
 }
 
 /**
@@ -108,45 +174,24 @@ export function craft(
   // 素材を消費
   consumeItems(selectedItems);
 
-  // 成功判定
-  const successRate = calculateSuccessRate(recipe, state.alchemyLevel);
-  const isSuccess = Math.random() < successRate;
-
-  if (!isSuccess) {
-    // 失敗時も経験値は少しもらえる
-    const expGained = Math.floor(recipe.expReward * 0.3);
-    addExp(expGained);
-    return {
-      success: false,
-      expGained,
-      message: `調合に失敗しました... (+${expGained} Exp)`,
-    };
-  }
-
-  // 品質計算
-  const quality = calculateQuality(recipe, selectedItems, state.alchemyLevel);
-
-  // 完成品を追加
-  const newItem: OwnedItem = {
-    itemId: recipe.resultItemId,
-    quality,
-  };
-  addItem(newItem);
-  markItemCrafted(recipe.resultItemId);
-
-  // 経験値計算
-  let expGained = recipe.expReward;
-  if (quality >= 70) expGained = Math.floor(expGained * 1.2); // 高品質ボーナス
-  addExp(expGained);
-
+  // 調合実行
+  const result = executeCraftAttempt(recipe, selectedItems, state.alchemyLevel);
   const itemDef = getItem(recipe.resultItemId);
   const itemName = itemDef?.name || recipe.name;
 
+  if (!result.success) {
+    return {
+      success: false,
+      expGained: result.expGained,
+      message: `調合に失敗しました... (+${result.expGained} Exp)`,
+    };
+  }
+
   return {
     success: true,
-    item: newItem,
-    expGained,
-    message: `${itemName}（品質: ${quality}）を作成しました！ (+${expGained} Exp)`,
+    item: result.item,
+    expGained: result.expGained,
+    message: `${itemName}（品質: ${result.item!.quality}）を作成しました！ (+${result.expGained} Exp)`,
   };
 }
 
@@ -200,54 +245,22 @@ export function craftMultiple(
     // 素材を消費
     consumeItems(selectedItems);
 
-    // 成功判定
+    // 調合実行
     const currentState = get(gameState);
-    const successRate = calculateSuccessRate(recipe, currentState.alchemyLevel);
-    const isSuccess = Math.random() < successRate;
+    const result = executeCraftAttempt(recipe, selectedItems, currentState.alchemyLevel);
+    totalExpGained += result.expGained;
 
-    if (!isSuccess) {
+    if (result.success && result.item) {
+      successCount++;
+      items.push(result.item);
+    } else {
       failCount++;
-      const expGained = Math.floor(recipe.expReward * 0.3);
-      addExp(expGained);
-      totalExpGained += expGained;
-      continue;
     }
-
-    // 品質計算
-    const quality = calculateQuality(recipe, selectedItems, currentState.alchemyLevel);
-
-    // 完成品を追加
-    const newItem: OwnedItem = {
-      itemId: recipe.resultItemId,
-      quality,
-    };
-    addItem(newItem);
-    markItemCrafted(recipe.resultItemId);
-    items.push(newItem);
-    successCount++;
-
-    // 経験値計算
-    let expGained = recipe.expReward;
-    if (quality >= 70) expGained = Math.floor(expGained * 1.2);
-    addExp(expGained);
-    totalExpGained += expGained;
   }
 
   const itemDef = getItem(recipe.resultItemId);
   const itemName = itemDef?.name || recipe.name;
-
-  let message: string;
-  if (successCount === 0 && failCount === 0) {
-    message = '素材が足りませんでした';
-  } else if (failCount === 0) {
-    const avgQuality = Math.round(items.reduce((sum, item) => sum + item.quality, 0) / items.length);
-    message = `${itemName}を${successCount}個作成しました！（平均品質: ${avgQuality}） +${totalExpGained} Exp`;
-  } else if (successCount === 0) {
-    message = `${failCount}回すべて失敗しました... +${totalExpGained} Exp`;
-  } else {
-    const avgQuality = Math.round(items.reduce((sum, item) => sum + item.quality, 0) / items.length);
-    message = `${itemName}を${successCount}個作成、${failCount}個失敗（平均品質: ${avgQuality}） +${totalExpGained} Exp`;
-  }
+  const message = generateBatchMessage(itemName, successCount, failCount, items, totalExpGained);
 
   return {
     successCount,
@@ -309,54 +322,22 @@ export function craftBatch(
     // 素材を消費
     consumeItems(batchItems);
 
-    // 成功判定
+    // 調合実行
     const currentState = get(gameState);
-    const successRate = calculateSuccessRate(recipe, currentState.alchemyLevel);
-    const isSuccess = Math.random() < successRate;
+    const result = executeCraftAttempt(recipe, batchItems, currentState.alchemyLevel);
+    totalExpGained += result.expGained;
 
-    if (!isSuccess) {
+    if (result.success && result.item) {
+      successCount++;
+      resultItems.push(result.item);
+    } else {
       failCount++;
-      const expGained = Math.floor(recipe.expReward * 0.3);
-      addExp(expGained);
-      totalExpGained += expGained;
-      continue;
     }
-
-    // 品質計算
-    const quality = calculateQuality(recipe, batchItems, currentState.alchemyLevel);
-
-    // 完成品を追加
-    const newItem: OwnedItem = {
-      itemId: recipe.resultItemId,
-      quality,
-    };
-    addItem(newItem);
-    markItemCrafted(recipe.resultItemId);
-    resultItems.push(newItem);
-    successCount++;
-
-    // 経験値計算
-    let expGained = recipe.expReward;
-    if (quality >= 70) expGained = Math.floor(expGained * 1.2);
-    addExp(expGained);
-    totalExpGained += expGained;
   }
 
   const itemDef = getItem(recipe.resultItemId);
   const itemName = itemDef?.name || recipe.name;
-
-  let message: string;
-  if (successCount === 0 && failCount === 0) {
-    message = '素材が足りませんでした';
-  } else if (failCount === 0) {
-    const avgQuality = Math.round(resultItems.reduce((sum, item) => sum + item.quality, 0) / resultItems.length);
-    message = `${itemName}を${successCount}個作成しました！（平均品質: ${avgQuality}） +${totalExpGained} Exp`;
-  } else if (successCount === 0) {
-    message = `${failCount}回すべて失敗しました... +${totalExpGained} Exp`;
-  } else {
-    const avgQuality = Math.round(resultItems.reduce((sum, item) => sum + item.quality, 0) / resultItems.length);
-    message = `${itemName}を${successCount}個作成、${failCount}個失敗（平均品質: ${avgQuality}） +${totalExpGained} Exp`;
-  }
+  const message = generateBatchMessage(itemName, successCount, failCount, resultItems, totalExpGained);
 
   return {
     successCount,
@@ -380,14 +361,7 @@ function autoSelectItems(recipe: RecipeDef): OwnedItem[] {
       // マッチするアイテムを品質順にソート
       const matchingIndices = inventoryCopy
         .map((item, idx) => ({ item, idx }))
-        .filter(({ item }) => {
-          if (ingredient.itemId) return item.itemId === ingredient.itemId;
-          if (ingredient.category) {
-            const def = getItem(item.itemId);
-            return def?.category === ingredient.category;
-          }
-          return false;
-        })
+        .filter(({ item }) => matchesIngredient(item, ingredient))
         .sort((a, b) => b.item.quality - a.item.quality);
 
       if (matchingIndices.length === 0) {
@@ -414,12 +388,8 @@ function validateSelectedItems(recipe: RecipeDef, selectedItems: OwnedItem[]): b
       if (itemIndex >= selectedItems.length) return false;
       const item = selectedItems[itemIndex];
 
-      if (ingredient.itemId && item.itemId !== ingredient.itemId) {
+      if (!matchesIngredient(item, ingredient)) {
         return false;
-      }
-      if (ingredient.category) {
-        const def = getItem(item.itemId);
-        if (def?.category !== ingredient.category) return false;
       }
       itemIndex++;
     }
@@ -431,18 +401,10 @@ function validateSelectedItems(recipe: RecipeDef, selectedItems: OwnedItem[]): b
  * 素材をインベントリから消費
  */
 function consumeItems(items: OwnedItem[]): void {
-  gameState.update((state) => {
-    const newInventory = [...state.inventory];
-    for (const item of items) {
-      const index = newInventory.findIndex(
-        (i) => i.itemId === item.itemId && i.quality === item.quality
-      );
-      if (index !== -1) {
-        newInventory.splice(index, 1);
-      }
-    }
-    return { ...state, inventory: newInventory };
-  });
+  gameState.update((state) => ({
+    ...state,
+    inventory: removeItemsFromInventory(state.inventory, items),
+  }));
 }
 
 /**

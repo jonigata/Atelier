@@ -2,21 +2,13 @@
   import { gameState } from '$lib/stores/game';
   import { getItem } from '$lib/data/items';
   import type { OwnedItem } from '$lib/models/types';
+  import { CATEGORY_NAMES, getCategoryName } from '$lib/data/categories';
 
   export let onBack: () => void;
 
   type SortKey = 'name' | 'quality' | 'category';
   let sortKey: SortKey = 'category';
   let filterCategory: string = 'all';
-
-  // カテゴリ名のマッピング
-  const categoryNames: Record<string, string> = {
-    herb: 'ハーブ',
-    ore: '鉱石',
-    water: '水',
-    misc: 'その他',
-    product: '生成物',
-  };
 
   // アイテムをグループ化（同一アイテム・同一品質ごとに個数をカウント）
   interface GroupedItem {
@@ -93,7 +85,7 @@
         <select id="filter-category" bind:value={filterCategory}>
           <option value="all">すべて</option>
           {#each availableCategories as cat}
-            <option value={cat}>{categoryNames[cat] || cat}</option>
+            <option value={cat}>{CATEGORY_NAMES[cat as keyof typeof CATEGORY_NAMES] || cat}</option>
           {/each}
         </select>
       </div>
@@ -125,7 +117,7 @@
             {/if}
           </div>
           <div class="item-details">
-            <span class="item-category">{categoryNames[item.category] || item.category}</span>
+            <span class="item-category">{CATEGORY_NAMES[item.category as keyof typeof CATEGORY_NAMES] || item.category}</span>
             <span class="item-quality" class:high={item.quality >= 70} class:low={item.quality < 30}>
               品質 {item.quality}
             </span>

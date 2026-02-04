@@ -3,8 +3,9 @@
   import { endTurn } from '$lib/services/gameLoop';
   import { getRecipe, recipes } from '$lib/data/recipes';
   import { getItem } from '$lib/data/items';
-  import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality } from '$lib/services/alchemy';
+  import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient } from '$lib/services/alchemy';
   import type { RecipeDef, OwnedItem, Ingredient } from '$lib/models/types';
+  import { getCategoryName } from '$lib/data/categories';
 
   export let onBack: () => void;
 
@@ -43,14 +44,7 @@
     if (!selectedRecipe) return [];
     return selectedRecipe.ingredients.map((ing) => {
       const totalNeeded = ing.quantity * craftQuantity;
-      const selectedCount = selectedItems.filter((item) => {
-        if (ing.itemId) return item.itemId === ing.itemId;
-        if (ing.category) {
-          const def = getItem(item.itemId);
-          return def?.category === ing.category;
-        }
-        return false;
-      }).length;
+      const selectedCount = selectedItems.filter((item) => matchesIngredient(item, ing)).length;
       return { ingredient: ing, totalNeeded, selectedCount };
     });
   })();
@@ -137,14 +131,7 @@
       return item?.name || ing.itemId;
     }
     if (ing.category) {
-      const categoryNames: Record<string, string> = {
-        herb: 'ハーブ系',
-        ore: '鉱石系',
-        water: '水系',
-        misc: 'その他',
-        product: '生成物',
-      };
-      return categoryNames[ing.category] || ing.category;
+      return getCategoryName(ing.category);
     }
     return '???';
   }
