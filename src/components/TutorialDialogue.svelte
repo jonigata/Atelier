@@ -3,18 +3,44 @@
   import { onDialogueClosed } from '$lib/services/tutorial';
 
   let currentLine = 0;
+  let delayedDialogue: typeof $gameState.tutorialProgress.pendingDialogue = null;
+  let previousDay = 0;
+  let delayTimeoutId: number | undefined;
 
   $: dialogue = $gameState.tutorialProgress.pendingDialogue;
 
-  // ダイアログが変わったらリセット
-  $: if (dialogue) {
-    currentLine = 0;
+  // 日付変更時はダイアログ表示を遅延させる
+  $: {
+    const currentDay = $gameState.day;
+    const dayChanged = previousDay > 0 && currentDay !== previousDay;
+    previousDay = currentDay;
+
+    if (dialogue) {
+      if (delayTimeoutId) {
+        clearTimeout(delayTimeoutId);
+      }
+
+      if (dayChanged) {
+        // 日付変更演出後に表示（1.6秒後）
+        delayedDialogue = null;
+        delayTimeoutId = setTimeout(() => {
+          delayedDialogue = dialogue;
+          currentLine = 0;
+        }, 1600) as unknown as number;
+      } else {
+        // 日付変更なしなら即座に表示
+        delayedDialogue = dialogue;
+        currentLine = 0;
+      }
+    } else {
+      delayedDialogue = null;
+    }
   }
 
   function nextLine() {
-    if (!dialogue) return;
+    if (!delayedDialogue) return;
 
-    if (currentLine < dialogue.lines.length - 1) {
+    if (currentLine < delayedDialogue.lines.length - 1) {
       currentLine++;
     } else {
       closeDialogue();
@@ -33,7 +59,7 @@
   }
 
   function handleKeydown(event: KeyboardEvent) {
-    if (!dialogue) return;
+    if (!delayedDialogue) return;
 
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -47,28 +73,28 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-{#if dialogue}
+{#if delayedDialogue}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <div class="dialogue-overlay" on:click={nextLine} role="button" tabindex="0">
     <div class="dialogue-box">
-      {#if dialogue.achievementTitle}
+      {#if delayedDialogue.achievementTitle}
         <div class="achievement-header">
           <span class="achievement-badge">達成</span>
-          <span class="achievement-title">{dialogue.achievementTitle}</span>
+          <span class="achievement-title">{delayedDialogue.achievementTitle}</span>
         </div>
       {/if}
       <div class="character-info">
-        <span class="character-name">{dialogue.characterName}</span>
-        <span class="character-title">{dialogue.characterTitle}</span>
+        <span class="character-name">{delayedDialogue.characterName}</span>
+        <span class="character-title">{delayedDialogue.characterTitle}</span>
       </div>
       <div class="dialogue-text">
-        「{dialogue.lines[currentLine]}」
+        「{delayedDialogue.lines[currentLine]}」
       </div>
-      {#if dialogue.rewards && dialogue.rewards.length > 0}
+      {#if delayedDialogue.rewards && delayedDialogue.rewards.length > 0}
         <div class="rewards-section">
           <span class="rewards-label">報酬</span>
           <div class="rewards-list">
-            {#each dialogue.rewards as reward}
+            {#each delayedDialogue.rewards as reward}
               <span class="reward-item">{reward}</span>
             {/each}
           </div>
@@ -77,8 +103,8 @@
       <div class="continue-hint">
         <span class="hint-text">クリック または Enter で続ける</span>
         <div class="hint-right">
-          <span class="progress">{currentLine + 1} / {dialogue.lines.length}</span>
-          {#if dialogue.lines.length > 1}
+          <span class="progress">{currentLine + 1} / {delayedDialogue.lines.length}</span>
+          {#if delayedDialogue.lines.length > 1}
             <button class="skip-button" on:click={skipDialogue}>スキップ</button>
           {/if}
         </div>

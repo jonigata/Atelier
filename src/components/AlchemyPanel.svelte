@@ -41,19 +41,21 @@
     return null;
   })();
 
-  // 選択可能なアイテム（リアクティブ）
+  // 選択可能なアイテム（リアクティブ、品質順）
   $: availableItemsForSelection = (() => {
     if (!currentIngredient) return [];
     const matching = getMatchingItems(currentIngredient.ingredient);
-    return matching.filter((item) => {
-      const selectedCount = selectedItems.filter(
-        (s) => s.itemId === item.itemId && s.quality === item.quality
-      ).length;
-      const totalCount = matching.filter(
-        (m) => m.itemId === item.itemId && m.quality === item.quality
-      ).length;
-      return selectedCount < totalCount;
-    });
+    return matching
+      .filter((item) => {
+        const selectedCount = selectedItems.filter(
+          (s) => s.itemId === item.itemId && s.quality === item.quality
+        ).length;
+        const totalCount = matching.filter(
+          (m) => m.itemId === item.itemId && m.quality === item.quality
+        ).length;
+        return selectedCount < totalCount;
+      })
+      .sort((a, b) => b.quality - a.quality); // 品質の高い順
   })();
 
   function selectRecipe(recipe: RecipeDef) {
