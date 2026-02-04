@@ -3,6 +3,8 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ゲームデザインに関するオーダーを受けたときは、まず最初にdocuments/を読んでください。
+サーバは基本的に起動しっぱなしなので、いちいち立ち上げ直す必要はありません
+コミットは頼まれたときだけやってください
 
 ## Project Overview
 

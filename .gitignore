@@ -27,3 +27,4 @@ vite.config.ts.timestamp-*
 
 # Local scripts
 start-chrome.sh
+.vscode/
