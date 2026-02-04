@@ -2,7 +2,7 @@
   import { gameState, addMessage, restoreStamina, consumeStamina, learnRecipe } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
-  import type { ActionType } from '$lib/models/types';
+  import type { ActionType, RecipeDef } from '$lib/models/types';
   import AlchemyPanel from './AlchemyPanel.svelte';
   import ExpeditionPanel from './ExpeditionPanel.svelte';
   import ShopPanel from './ShopPanel.svelte';
@@ -10,6 +10,19 @@
 
   export let action: ActionType;
   export let onBack: () => void;
+
+  // 勉強用の選択状態
+  let selectedRecipeId: string | null = null;
+
+  // 習得可能なレシピ一覧
+  $: availableRecipes = Object.values(recipes).filter(
+    (r) => r.requiredLevel <= $gameState.alchemyLevel && !$gameState.knownRecipes.includes(r.id)
+  );
+
+  // レベル不足で習得できないレシピ（参考表示用）
+  $: lockedRecipes = Object.values(recipes).filter(
+    (r) => r.requiredLevel > $gameState.alchemyLevel && !$gameState.knownRecipes.includes(r.id)
+  );
 
   // 休息処理
   function handleRest() {
@@ -19,24 +32,22 @@
     onBack();
   }
 
-  // 勉強処理（シンプル版）
+  // 勉強処理
   function handleStudy() {
-    const state = $gameState;
-    const unknownRecipes = Object.values(recipes).filter(
-      (r) => r.requiredLevel <= state.alchemyLevel && !state.knownRecipes.includes(r.id)
-    );
+    if (!selectedRecipeId) return;
 
-    if (unknownRecipes.length === 0) {
-      addMessage('現在習得できる新しいレシピはありません。');
-      return;
-    }
+    const recipe = recipes[selectedRecipeId];
+    if (!recipe) return;
 
-    // ランダムに1つ習得
-    const recipe = unknownRecipes[Math.floor(Math.random() * unknownRecipes.length)];
     learnRecipe(recipe.id);
     addMessage(`勉強の成果！ 「${recipe.name}」のレシピを習得しました！`);
+    selectedRecipeId = null;
     endTurn(3);
     onBack();
+  }
+
+  function selectRecipe(recipeId: string) {
+    selectedRecipeId = recipeId;
   }
 </script>
 
@@ -67,12 +78,50 @@
 
   {:else if action === 'study'}
     <h2>📚 勉強</h2>
-    <p>レシピ本を読んで新しいレシピを習得します。3日経過します。</p>
+    <p>教科書を選んでレシピを習得します。3日経過します。</p>
     <p class="known-recipes">
-      習得済みレシピ: {$gameState.knownRecipes.length}個
+      習得済みレシピ: {$gameState.knownRecipes.length}個 / 錬金術Lv: {$gameState.alchemyLevel}
     </p>
-    <button class="action-btn" on:click={handleStudy}>
-      勉強する
+
+    {#if availableRecipes.length > 0}
+      <div class="recipe-list">
+        <h3>習得可能な教科書</h3>
+        {#each availableRecipes as recipe}
+          <button
+            class="recipe-item"
+            class:selected={selectedRecipeId === recipe.id}
+            on:click={() => selectRecipe(recipe.id)}
+          >
+            <span class="recipe-name">{recipe.name}</span>
+            <span class="recipe-info">必要Lv.{recipe.requiredLevel}</span>
+          </button>
+        {/each}
+      </div>
+    {:else}
+      <div class="no-recipes">
+        <p>現在習得できる教科書がありません。</p>
+        <p class="hint">錬金術レベルを上げると新しい教科書が読めるようになります。</p>
+      </div>
+    {/if}
+
+    {#if lockedRecipes.length > 0}
+      <div class="locked-recipes">
+        <h3>レベル不足</h3>
+        {#each lockedRecipes as recipe}
+          <div class="recipe-item locked">
+            <span class="recipe-name">{recipe.name}</span>
+            <span class="recipe-info">必要Lv.{recipe.requiredLevel}</span>
+          </div>
+        {/each}
+      </div>
+    {/if}
+
+    <button
+      class="action-btn"
+      on:click={handleStudy}
+      disabled={!selectedRecipeId}
+    >
+      {selectedRecipeId ? `「${recipes[selectedRecipeId].name}」を勉強する` : '教科書を選んでください'}
     </button>
   {/if}
 </div>
@@ -138,8 +187,84 @@
     margin-top: 1rem;
   }
 
-  .action-btn:hover {
+  .action-btn:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(201, 169, 89, 0.4);
+  }
+
+  .action-btn:disabled {
+    background: #4a4a5a;
+    color: #808090;
+    cursor: not-allowed;
+  }
+
+  /* 勉強パネル用スタイル */
+  .recipe-list, .locked-recipes {
+    margin: 1rem 0;
+  }
+
+  .recipe-list h3, .locked-recipes h3 {
+    font-size: 0.9rem;
+    color: #c9a959;
+    margin-bottom: 0.5rem;
+  }
+
+  .recipe-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #4a4a6a;
+    border-radius: 6px;
+    color: #e0e0f0;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+
+  .recipe-item:hover:not(.locked) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #6a6a8a;
+  }
+
+  .recipe-item.selected {
+    background: rgba(201, 169, 89, 0.2);
+    border-color: #c9a959;
+  }
+
+  .recipe-item.locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .recipe-name {
+    font-weight: bold;
+  }
+
+  .recipe-info {
+    font-size: 0.85rem;
+    color: #a0a0b0;
+  }
+
+  .no-recipes {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    margin: 1rem 0;
+  }
+
+  .no-recipes p {
+    margin: 0.25rem 0;
+  }
+
+  .locked-recipes {
+    opacity: 0.7;
+  }
+
+  .locked-recipes h3 {
+    color: #808090;
   }
 </style>
