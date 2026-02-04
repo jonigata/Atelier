@@ -16,12 +16,16 @@ import {
 } from '$lib/data/achievements';
 import { items } from '$lib/data/items';
 import { recipes } from '$lib/data/recipes';
+import { showGoalActiveToast, showGoalCompleteToast } from '$lib/stores/toast';
 import type {
   AchievementDef,
   AchievementCondition,
   GameState,
   TutorialDialogue,
 } from '$lib/models/types';
+
+// 前回の発動済み目標IDを追跡
+let previousActiveGoalIds: Set<string> = new Set();
 
 /**
  * アチーブメント条件を評価
@@ -125,6 +129,13 @@ export function checkAchievements(): string | null {
   for (const achievement of achievements) {
     if (isAchievementEligible(achievement, state)) {
       completeAchievement(achievement.id);
+
+      // 達成トースト
+      showGoalCompleteToast(achievement.title);
+
+      // 新しく発動した目標をチェック
+      checkNewActiveGoals();
+
       return achievement.id;
     }
   }
@@ -133,31 +144,69 @@ export function checkAchievements(): string | null {
 }
 
 /**
- * 次に目指すべきアチーブメントを取得
+ * 新しく発動した目標をチェックしてトーストを表示
+ */
+export function checkNewActiveGoals(): void {
+  const currentGoals = getActiveGoals();
+  const currentIds = new Set(currentGoals.map((g) => g.id));
+
+  // 新しく発動した目標を検出
+  for (const goal of currentGoals) {
+    if (!previousActiveGoalIds.has(goal.id)) {
+      showGoalActiveToast(goal.title);
+    }
+  }
+
+  previousActiveGoalIds = currentIds;
+}
+
+/**
+ * 発動済み目標の追跡を初期化（トーストは出さない、ダイアログ終了後に出す）
+ */
+export function initializeActiveGoalTracking(): void {
+  // 空で初期化して、最初の目標も「新しい目標」として検出されるようにする
+  previousActiveGoalIds = new Set();
+}
+
+/**
+ * 次に目指すべきアチーブメントを取得（後方互換のため残す）
  */
 export function getCurrentGoal(): AchievementDef | null {
+  const goals = getActiveGoals();
+  return goals.length > 0 ? goals[0] : null;
+}
+
+/**
+ * アチーブメントが「発動済み」かどうか判定
+ * 発動済み = 未達成かつ前提条件を満たしている
+ */
+function isAchievementActive(achievement: AchievementDef, state: GameState): boolean {
+  // 既に達成済みならfalse
+  if (state.achievementProgress.completed.includes(achievement.id)) {
+    return false;
+  }
+
+  // 前提が満たされていない場合はfalse
+  if (achievement.prerequisite) {
+    const prereqsMet = achievement.prerequisite.every((prereqId) =>
+      state.achievementProgress.completed.includes(prereqId)
+    );
+    if (!prereqsMet) return false;
+  }
+
+  return true;
+}
+
+/**
+ * 重要かつ発動済みのアチーブメントを全て取得
+ */
+export function getActiveGoals(): AchievementDef[] {
   const state = get(gameState);
   const achievements = getAllAchievements();
 
-  for (const achievement of achievements) {
-    // 既に達成済みならスキップ
-    if (state.achievementProgress.completed.includes(achievement.id)) {
-      continue;
-    }
-
-    // 前提が満たされていない場合はスキップ
-    if (achievement.prerequisite) {
-      const prereqsMet = achievement.prerequisite.every((prereqId) =>
-        state.achievementProgress.completed.includes(prereqId)
-      );
-      if (!prereqsMet) continue;
-    }
-
-    // 最初に見つかった未達成のアチーブメントを返す
-    return achievement;
-  }
-
-  return null;
+  return achievements.filter((achievement) =>
+    achievement.important && isAchievementActive(achievement, state)
+  );
 }
 
 /**

@@ -14,10 +14,12 @@ import {
   setAvailableQuests,
   setDayTransition,
 } from '$lib/stores/game';
+import { showUnlockToast } from '$lib/stores/toast';
 import { getArea } from '$lib/data/areas';
 import { getItem } from '$lib/data/items';
 import { getAvailableQuestTemplates } from '$lib/data/quests';
 import { villageMilestones, getVillageMilestoneDialogue } from '$lib/data/tutorial';
+import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import type { OwnedItem, MorningEvent } from '$lib/models/types';
 
 // 達成済みの村発展マイルストーンを追跡
@@ -109,6 +111,11 @@ function checkVillageMilestones(): void {
           },
         }));
         addMessage(`${dialogue.characterName}の到着により、${milestone.unlocks.join('、')}が解放されました！`);
+
+        // トースト表示
+        for (const action of milestone.unlocks) {
+          showUnlockToast(action);
+        }
       }
     }
   }
@@ -285,4 +292,7 @@ export function initializeGame(): void {
   // 直接actionフェーズで開始（朝フェーズはスキップ）
   setPhase('action');
   addMessage('ハイデル村での1年間が始まります。');
+
+  // 発動済み目標の追跡を初期化
+  initializeActiveGoalTracking();
 }

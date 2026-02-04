@@ -35,6 +35,7 @@ export const achievements: Record<string, AchievementDef> = {
     reward: { items: [{ itemId: 'herb_01', quality: 50, quantity: 3 }] },
     priority: 10,
     tutorialMilestone: 1,
+    important: true,
   },
 
   ach_first_craft: {
@@ -50,6 +51,7 @@ export const achievements: Record<string, AchievementDef> = {
     priority: 20,
     prerequisite: ['ach_first_recipe'],
     tutorialMilestone: 2,
+    important: true,
   },
 
   ach_first_quest: {
@@ -66,6 +68,7 @@ export const achievements: Record<string, AchievementDef> = {
     priority: 30,
     prerequisite: ['ach_first_craft'],
     tutorialMilestone: 3,
+    important: true,
   },
 
   ach_first_complete: {
@@ -81,6 +84,7 @@ export const achievements: Record<string, AchievementDef> = {
     priority: 40,
     prerequisite: ['ach_first_quest'],
     tutorialMilestone: 4,
+    important: true,
   },
 
   ach_first_expedition: {
@@ -96,6 +100,7 @@ export const achievements: Record<string, AchievementDef> = {
     reward: { items: [{ itemId: 'herb_01', quality: 60, quantity: 2 }] },
     priority: 50,
     prerequisite: ['ach_first_complete'],
+    important: true,
   },
 
   // =====================================
@@ -112,6 +117,8 @@ export const achievements: Record<string, AchievementDef> = {
     conditions: [{ type: 'craft_count', target: 10 }],
     reward: { money: 200, reputation: 5 },
     priority: 110,
+    important: true,
+    prerequisite: ['ach_first_craft'],
   },
 
   ach_craft_50: {
@@ -201,6 +208,8 @@ export const achievements: Record<string, AchievementDef> = {
       ],
     },
     priority: 210,
+    important: true,
+    prerequisite: ['ach_first_complete'],
   },
 
   ach_quest_15: {
@@ -215,6 +224,7 @@ export const achievements: Record<string, AchievementDef> = {
     reward: { money: 800, reputation: 10 },
     priority: 220,
     prerequisite: ['ach_quest_5'],
+    important: true,
   },
 
   ach_quest_30: {
@@ -372,6 +382,8 @@ export const achievements: Record<string, AchievementDef> = {
     conditions: [{ type: 'level', target: 5 }],
     reward: { money: 300, recipes: ['bomb_01'] },
     priority: 510,
+    important: true,
+    prerequisite: ['ach_first_craft'],
   },
 
   ach_level_10: {
@@ -386,6 +398,7 @@ export const achievements: Record<string, AchievementDef> = {
     reward: { money: 800, reputation: 10, recipes: ['ingot_01'] },
     priority: 520,
     prerequisite: ['ach_level_5'],
+    important: true,
   },
 
   ach_level_15: {

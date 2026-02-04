@@ -12,6 +12,7 @@
   import TutorialDialogue from '../components/TutorialDialogue.svelte';
   import DayTransition from '../components/DayTransition.svelte';
   import DebugPanel from '../components/DebugPanel.svelte';
+  import ToastContainer from '../components/ToastContainer.svelte';
   import type { ActionType } from '$lib/models/types';
 
   let selectedAction: ActionType | null = null;
@@ -65,6 +66,9 @@
   <!-- デバッグパネル -->
   <DebugPanel />
 </div>
+
+<!-- トースト通知（メイン画面に合わせて配置） -->
+<ToastContainer />
 
 <style>
   :global(body) {

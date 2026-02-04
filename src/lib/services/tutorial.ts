@@ -6,7 +6,7 @@ import {
   completeTutorial,
   completeAchievement,
 } from '$lib/stores/game';
-import { checkAchievements, getAchievementDialogue, claimReward } from './achievement';
+import { checkAchievements, getAchievementDialogue, claimReward, checkNewActiveGoals } from './achievement';
 
 /**
  * マイルストーン達成をチェックし、必要に応じて次のマイルストーンをトリガー
@@ -105,6 +105,9 @@ function checkAndTriggerAchievement(): void {
  */
 export function onDialogueClosed(): void {
   const state = get(gameState);
+
+  // 新しい目標が発動したかチェックしてトースト表示
+  checkNewActiveGoals();
 
   // チュートリアル中でマイルストーン4が完了していたら終了処理
   if (state.tutorialProgress.isActive) {

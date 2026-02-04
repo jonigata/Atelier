@@ -229,12 +229,23 @@ export interface AchievementDef {
   prerequisite?: string[];
   priority: number;
   tutorialMilestone?: number;  // チュートリアルとの連携用
+  important?: boolean;  // HUDに目標として表示するか
 }
 
 // アチーブメント進行状態
 export interface AchievementProgress {
   completed: string[];
   pendingReward: string | null;
+}
+
+// トースト通知
+export type ToastType = 'unlock' | 'goal_active' | 'goal_complete';
+
+export interface Toast {
+  id: number;
+  type: ToastType;
+  title: string;
+  message: string;
 }
 
 // ゲーム統計
