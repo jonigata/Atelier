@@ -3,13 +3,13 @@ import type {
   GameState,
   OwnedItem,
   MorningEvent,
-  ActiveQuest,
-  QuestDef,
-  TutorialDialogue,
-  ActionType,
 } from '$lib/models/types';
-import { milestones, getUnlockedActionsUpTo, getMilestoneDialogue, TUTORIAL_ACTIONS, ALL_ACTIONS } from '$lib/data/tutorial';
+import { getMilestoneDialogue } from '$lib/data/tutorial';
 import { removeItemFromInventory } from '$lib/services/inventory';
+
+// =====================================
+// 初期状態
+// =====================================
 
 function createInitialState(): GameState {
   return {
@@ -72,20 +72,28 @@ function createInitialState(): GameState {
   };
 }
 
-// メインのゲーム状態ストア
+// =====================================
+// メインストア
+// =====================================
+
 export const gameState = writable<GameState>(createInitialState());
 
+// =====================================
 // 派生ストア
+// =====================================
+
 export const daysRemaining = derived(gameState, ($state) => 365 - $state.day);
 
 export const isGameOver = derived(gameState, ($state) => $state.day > 365);
 
 export const expForNextLevel = derived(gameState, ($state) => {
-  // レベルアップに必要な経験値（累積ではなく現在レベルから次へ）
   return Math.floor(100 * Math.pow(1.5, $state.alchemyLevel - 1));
 });
 
-// アクション: ゲーム状態の更新ヘルパー
+// =====================================
+// メッセージ・フェーズ
+// =====================================
+
 export function addMessage(message: string): void {
   gameState.update((state) => ({
     ...state,
@@ -111,6 +119,10 @@ export function setPhase(phase: GameState['phase']): void {
   gameState.update((state) => ({ ...state, phase }));
 }
 
+// =====================================
+// インベントリ
+// =====================================
+
 export function addItem(item: OwnedItem): void {
   gameState.update((state) => ({
     ...state,
@@ -129,6 +141,10 @@ export function removeItem(itemId: string, quality: number): boolean {
   }));
   return true;
 }
+
+// =====================================
+// プレイヤー状態
+// =====================================
 
 export function addMoney(amount: number): void {
   gameState.update((state) => ({
@@ -171,6 +187,10 @@ export function addExp(amount: number): void {
   });
 }
 
+// =====================================
+// 日付・時間
+// =====================================
+
 export function advanceDay(days: number): void {
   gameState.update((state) => ({
     ...state,
@@ -193,44 +213,17 @@ export function clearDayTransition(): void {
   }));
 }
 
+// =====================================
+// 採取隊
+// =====================================
+
 export function setExpedition(expedition: GameState['expedition']): void {
   gameState.update((state) => ({ ...state, expedition }));
 }
 
-export function addActiveQuest(quest: ActiveQuest): void {
-  gameState.update((state) => ({
-    ...state,
-    activeQuests: [...state.activeQuests, quest],
-  }));
-}
-
-export function removeActiveQuest(questId: string): void {
-  gameState.update((state) => ({
-    ...state,
-    activeQuests: state.activeQuests.filter((q) => q.id !== questId),
-  }));
-}
-
-export function setAvailableQuests(quests: QuestDef[]): void {
-  gameState.update((state) => ({
-    ...state,
-    availableQuests: quests,
-  }));
-}
-
-export function incrementCompletedQuests(): void {
-  gameState.update((state) => ({
-    ...state,
-    completedQuestCount: state.completedQuestCount + 1,
-  }));
-}
-
-export function incrementFailedQuests(): void {
-  gameState.update((state) => ({
-    ...state,
-    failedQuestCount: state.failedQuestCount + 1,
-  }));
-}
+// =====================================
+// スタミナ
+// =====================================
 
 export function restoreStamina(amount: number): void {
   gameState.update((state) => ({
@@ -248,6 +241,10 @@ export function consumeStamina(amount: number): boolean {
   }));
   return true;
 }
+
+// =====================================
+// レシピ・調合
+// =====================================
 
 export function learnRecipe(recipeId: string): void {
   gameState.update((state) => {
@@ -269,153 +266,47 @@ export function markItemCrafted(itemId: string): void {
   });
 }
 
+// =====================================
+// ゲームリセット
+// =====================================
+
 export function resetGame(): void {
-  // 村発展マイルストーンもリセット
   import('$lib/services/gameLoop').then(({ resetVillageMilestones }) => {
     resetVillageMilestones();
   });
   gameState.set(createInitialState());
 }
 
-// チュートリアル関連アクション
-export function setTutorialDialogue(dialogue: TutorialDialogue | null): void {
-  gameState.update((state) => ({
-    ...state,
-    tutorialProgress: {
-      ...state.tutorialProgress,
-      pendingDialogue: dialogue,
-    },
-  }));
-}
-
-export function advanceTutorialMilestone(milestoneId: number): void {
-  gameState.update((state) => ({
-    ...state,
-    tutorialProgress: {
-      ...state.tutorialProgress,
-      currentMilestone: milestoneId,
-      unlockedActions: getUnlockedActionsUpTo(milestoneId),
-    },
-  }));
-}
-
-export function completeTutorial(): void {
-  gameState.update((state) => ({
-    ...state,
-    tutorialProgress: {
-      ...state.tutorialProgress,
-      isActive: false,
-      // チュートリアル終了時は TUTORIAL_ACTIONS + 既存のアンロック（村発展分）を維持
-      unlockedActions: [...new Set([...TUTORIAL_ACTIONS, ...state.tutorialProgress.unlockedActions])],
-      pendingDialogue: null,
-    },
-  }));
-}
-
-export function skipTutorial(): void {
-  gameState.update((state) => ({
-    ...state,
-    tutorialProgress: {
-      isActive: false,
-      currentMilestone: -1,
-      // 経験者モードでもexpeditionは村発展マイルストーンで解放
-      unlockedActions: TUTORIAL_ACTIONS,
-      pendingDialogue: null,
-    },
-  }));
-}
-
-export function isActionUnlocked(action: ActionType): boolean {
-  const state = get(gameState);
-  return state.tutorialProgress.unlockedActions.includes(action);
-}
-
 // =====================================
-// 統計更新関数
+// 再エクスポート（後方互換性のため）
 // =====================================
 
-export function incrementCraftCount(quality: number): void {
-  gameState.update((state) => ({
-    ...state,
-    stats: {
-      ...state.stats,
-      totalCraftCount: state.stats.totalCraftCount + 1,
-      highestQualityCrafted: Math.max(state.stats.highestQualityCrafted, quality),
-    },
-  }));
-}
+export {
+  setTutorialDialogue,
+  advanceTutorialMilestone,
+  completeTutorial,
+  skipTutorial,
+  isActionUnlocked,
+} from './tutorial';
 
-export function incrementExpeditionCount(): void {
-  gameState.update((state) => ({
-    ...state,
-    stats: {
-      ...state.stats,
-      totalExpeditionCount: state.stats.totalExpeditionCount + 1,
-    },
-  }));
-}
+export {
+  incrementCraftCount,
+  incrementExpeditionCount,
+  incrementConsecutiveQuestSuccess,
+  resetConsecutiveQuestSuccess,
+  addSalesAmount,
+} from './stats';
 
-export function incrementConsecutiveQuestSuccess(): void {
-  gameState.update((state) => ({
-    ...state,
-    stats: {
-      ...state.stats,
-      consecutiveQuestSuccess: state.stats.consecutiveQuestSuccess + 1,
-    },
-  }));
-}
+export {
+  completeAchievement,
+  clearPendingReward,
+  isAchievementCompleted,
+} from './achievements';
 
-export function resetConsecutiveQuestSuccess(): void {
-  gameState.update((state) => ({
-    ...state,
-    stats: {
-      ...state.stats,
-      consecutiveQuestSuccess: 0,
-    },
-  }));
-}
-
-export function addSalesAmount(amount: number): void {
-  gameState.update((state) => ({
-    ...state,
-    stats: {
-      ...state.stats,
-      totalSalesAmount: state.stats.totalSalesAmount + amount,
-    },
-  }));
-}
-
-// =====================================
-// アチーブメント関連アクション
-// =====================================
-
-export function completeAchievement(achievementId: string): void {
-  gameState.update((state) => {
-    if (state.achievementProgress.completed.includes(achievementId)) {
-      return state;
-    }
-    return {
-      ...state,
-      achievementProgress: {
-        ...state.achievementProgress,
-        completed: [...state.achievementProgress.completed, achievementId],
-        pendingReward: achievementId,
-      },
-    };
-  });
-}
-
-export function clearPendingReward(): void {
-  gameState.update((state) => ({
-    ...state,
-    achievementProgress: {
-      ...state.achievementProgress,
-      pendingReward: null,
-    },
-  }));
-}
-
-export function isAchievementCompleted(achievementId: string): boolean {
-  const state = get(gameState);
-  return state.achievementProgress.completed.includes(achievementId);
-}
+export {
+  addActiveQuest,
+  removeActiveQuest,
+  setAvailableQuests,
+  incrementCompletedQuests,
+  incrementFailedQuests,
+} from './quests';
