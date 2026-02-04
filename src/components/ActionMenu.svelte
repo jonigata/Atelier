@@ -1,7 +1,7 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
   import { showingUnlockActions, pendingUnlockActions } from '$lib/stores/toast';
-  import { getItem } from '$lib/data/items';
+  import { getItem, getItemIcon } from '$lib/data/items';
   import { getNotifiedActiveGoals, getAchievementProgress } from '$lib/services/achievement';
   import { items } from '$lib/data/items';
   import { recipes } from '$lib/data/recipes';
@@ -264,6 +264,7 @@
               </div>
               <div class="objective-requirement">
                 <span class="req-label">納品:</span>
+                <img class="item-icon-tiny" src={getItemIcon(quest.requiredItemId)} alt="" />
                 <span class="item-name">{itemDef?.name || quest.requiredItemId}</span>
                 {#if quest.requiredQuality}
                   <span class="quality-req">品質{quest.requiredQuality}以上</span>
@@ -531,6 +532,13 @@
 
   .item-name {
     color: #e0e0f0;
+  }
+
+  .item-icon-tiny {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    vertical-align: middle;
   }
 
   .quantity {
