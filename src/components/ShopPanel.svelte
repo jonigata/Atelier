@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameState, addMessage, addMoney, addItem } from '$lib/stores/game';
+  import { gameState, addMessage, addMoney, addItem, addSalesAmount } from '$lib/stores/game';
   import { items, getItem } from '$lib/data/items';
   import type { OwnedItem, ItemDef } from '$lib/models/types';
 
@@ -8,10 +8,31 @@
   type Tab = 'buy' | 'sell';
   let activeTab: Tab = 'buy';
 
-  // 購入可能なアイテム（素材のみ）
-  const buyableItems = Object.values(items).filter(
-    (item) => item.category !== 'product'
-  );
+  // 村発展度に応じた購入可能アイテム
+  $: buyableItems = getBuyableItems($gameState.villageDevelopment);
+
+  function getBuyableItems(development: number): ItemDef[] {
+    const allMaterials = Object.values(items).filter(
+      (item) => item.category !== 'product'
+    );
+
+    return allMaterials.filter((item) => {
+      // 発展度0-9: 基本素材のみ（薬草、清水）
+      if (development < 10) {
+        return item.id === 'herb_01' || item.id === 'water_01';
+      }
+      // 発展度10-19: 中級素材追加（毒消し草、鉄鉱石）
+      if (development < 20) {
+        return ['herb_01', 'herb_02', 'water_01', 'ore_01'].includes(item.id);
+      }
+      // 発展度20-49: さらに拡大（獣の皮）
+      if (development < 50) {
+        return ['herb_01', 'herb_02', 'water_01', 'ore_01', 'misc_01'].includes(item.id);
+      }
+      // 発展度50+: レア素材も購入可能
+      return true;
+    });
+  }
 
   // 購入処理
   function buyItem(item: ItemDef) {
@@ -52,6 +73,7 @@
     });
 
     addMoney(price);
+    addSalesAmount(price);
     addMessage(`${def.name}（品質${item.quality}）を${price}Gで売却しました`);
   }
 

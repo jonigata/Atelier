@@ -10,6 +10,7 @@
   import ActionPanel from '../components/ActionPanel.svelte';
   import EndingScreen from '../components/EndingScreen.svelte';
   import TutorialDialogue from '../components/TutorialDialogue.svelte';
+  import DebugPanel from '../components/DebugPanel.svelte';
   import type { ActionType } from '$lib/models/types';
 
   let selectedAction: ActionType | null = null;
@@ -56,6 +57,9 @@
 
   <!-- チュートリアルダイアログ（最前面） -->
   <TutorialDialogue />
+
+  <!-- デバッグパネル -->
+  <DebugPanel />
 </div>
 
 <style>

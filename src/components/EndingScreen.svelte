@@ -1,56 +1,62 @@
 <script lang="ts">
   import { gameState, resetGame } from '$lib/stores/game';
 
-  type EndingType = 'true' | 'master' | 'merchant' | 'graduate' | 'fail';
+  type EndingType = 'true' | 'good' | 'normal' | 'mediocre' | 'fail';
 
   function getEnding(): { type: EndingType; title: string; description: string } {
     const state = $gameState;
+    const dev = state.villageDevelopment;
 
+    // 真ED: 村発展度90以上, Lv15以上, エリクサー作成済
     if (
-      state.alchemyLevel >= 20 &&
-      state.reputation >= 80 &&
+      dev >= 90 &&
+      state.alchemyLevel >= 15 &&
       state.craftedItems.includes('elixir')
     ) {
       return {
         type: 'true',
-        title: '真のエンディング - 伝説の錬金術士',
+        title: '真のエンディング - 復興の立役者',
         description:
-          'あなたはエリクサーの調合に成功し、伝説の錬金術士として歴史に名を刻みました。アカデミーの主席として卒業し、王宮錬金術士の称号を授かりました。',
+          'あなたの尽力により、寂れていた村は見違えるほどに発展しました。エリクサーの調合という偉業も成し遂げ、村の人々はあなたを英雄として讃えています。師匠アルベルトも「よくやった」と手紙で祝福を送ってきました。',
       };
     }
 
-    if (state.alchemyLevel >= 15 && state.reputation >= 60) {
+    // 良ED: 村発展度70以上, Lv10以上
+    if (dev >= 70 && state.alchemyLevel >= 10) {
       return {
-        type: 'master',
-        title: '一流錬金術士',
+        type: 'good',
+        title: '村の恩人',
         description:
-          '優れた技術と評判を獲得したあなたは、一流の錬金術士として認められました。多くの弟子があなたの元で学ぶことを望んでいます。',
+          '村は大きく発展し、あなたは村の恩人として慕われるようになりました。多くの人々が移り住み、かつての賑わいを取り戻しつつあります。村長オルトは「君が来てくれて本当によかった」と感謝の言葉を述べました。',
       };
     }
 
-    if (state.money >= 100000) {
+    // 普通ED: 村発展度50以上
+    if (dev >= 50) {
       return {
-        type: 'merchant',
-        title: '商売上手',
+        type: 'normal',
+        title: '貢献者',
         description:
-          '錬金術よりも商才に長けていたあなた。莫大な財を築き、錬金術ショップを経営することになりました。',
+          'あなたの活動により、村は着実に発展しました。まだ道半ばですが、村には確かな変化が生まれています。村長は今後も村に残ってほしいと言っています。',
       };
     }
 
-    if (state.alchemyLevel >= 10) {
+    // 微妙ED: 村発展度30以上
+    if (dev >= 30) {
       return {
-        type: 'graduate',
-        title: '見習い卒業',
+        type: 'mediocre',
+        title: 'まあまあ',
         description:
-          'アカデミーの課程を無事修了しました。まだまだ学ぶことは多いですが、一人前の錬金術士として認められました。',
+          '少しは村の役に立てたものの、大きな変化をもたらすには至りませんでした。「また来てくれ」と村人たちは見送ってくれました。',
       };
     }
 
+    // 悪ED: 村発展度30未満
     return {
       type: 'fail',
-      title: '落第',
+      title: '力及ばず',
       description:
-        '残念ながら、錬金術の技術が十分に身につきませんでした。来年もう一度挑戦してみましょう...',
+        '残念ながら、村を発展させることはできませんでした。師匠から「まだ修行が足りないようだな」と手紙が届きました。また挑戦する機会があるかもしれません...',
     };
   }
 
@@ -62,9 +68,9 @@
 </script>
 
 <div class="ending-screen" class:true={ending.type === 'true'}
-     class:master={ending.type === 'master'}
-     class:merchant={ending.type === 'merchant'}
-     class:graduate={ending.type === 'graduate'}
+     class:good={ending.type === 'good'}
+     class:normal={ending.type === 'normal'}
+     class:mediocre={ending.type === 'mediocre'}
      class:fail={ending.type === 'fail'}>
   <div class="content">
     <h1>1年間が終了しました</h1>
@@ -77,6 +83,10 @@
     <div class="stats">
       <h3>最終成績</h3>
       <div class="stat-grid">
+        <div class="stat highlight">
+          <span class="label">村発展度</span>
+          <span class="value">{$gameState.villageDevelopment}</span>
+        </div>
         <div class="stat">
           <span class="label">錬金術レベル</span>
           <span class="value">{$gameState.alchemyLevel}</span>
@@ -92,6 +102,10 @@
         <div class="stat">
           <span class="label">達成依頼</span>
           <span class="value">{$gameState.completedQuestCount}件</span>
+        </div>
+        <div class="stat">
+          <span class="label">調合回数</span>
+          <span class="value">{$gameState.stats.totalCraftCount}回</span>
         </div>
       </div>
     </div>
@@ -114,6 +128,10 @@
 
   .ending-screen.true {
     background: linear-gradient(135deg, #1a1a2e 0%, #2e1a4a 50%, #4a2a6e 100%);
+  }
+
+  .ending-screen.good {
+    background: linear-gradient(135deg, #1a2e1a 0%, #2a4a2a 100%);
   }
 
   .ending-screen.fail {
@@ -142,6 +160,11 @@
   .true .ending-card {
     border-color: #9c27b0;
     box-shadow: 0 0 30px rgba(156, 39, 176, 0.3);
+  }
+
+  .good .ending-card {
+    border-color: #4caf50;
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.2);
   }
 
   h2 {
@@ -178,6 +201,18 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+  }
+
+  .stat.highlight {
+    grid-column: span 2;
+    background: rgba(201, 169, 89, 0.1);
+    border-radius: 6px;
+    padding: 0.75rem;
+  }
+
+  .stat.highlight .value {
+    font-size: 2rem;
+    color: #c9a959;
   }
 
   .stat .label {

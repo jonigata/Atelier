@@ -2,7 +2,15 @@
   import { gameState, daysRemaining, expForNextLevel } from '$lib/stores/game';
   import { getCurrentGoal, getAchievementProgress } from '$lib/services/achievement';
 
-  $: currentGoal = getCurrentGoal();
+  // $gameStateの変更でcurrentGoalを再計算
+  $: currentGoal = (() => {
+    // これらの参照でリアクティビティをトリガー
+    void $gameState.achievementProgress.completed.length;
+    void $gameState.knownRecipes.length;
+    void $gameState.stats.totalCraftCount;
+    void $gameState.completedQuestCount;
+    return getCurrentGoal();
+  })();
   $: goalProgress = currentGoal ? getAchievementProgress(currentGoal.id) : 0;
 </script>
 
@@ -16,6 +24,11 @@
   <div class="hud-item">
     <span class="label">所持金</span>
     <span class="value">{$gameState.money.toLocaleString()} G</span>
+  </div>
+
+  <div class="hud-item village">
+    <span class="label">村発展</span>
+    <span class="value">{$gameState.villageDevelopment}</span>
   </div>
 
   <div class="hud-item">
@@ -109,5 +122,9 @@
   .goal-progress {
     font-size: 0.75rem;
     color: #7cb342;
+  }
+
+  .hud-item.village .value {
+    color: #81c784;
   }
 </style>

@@ -6,7 +6,7 @@ export const questTemplates: QuestDef[] = [
   {
     id: 'quest_potion_basic',
     title: '回復薬を届けて！',
-    description: '街の診療所で回復薬が足りません。',
+    description: '村の診療所で回復薬が足りないんだ。',
     type: 'deliver',
     requiredItemId: 'potion_01',
     requiredQuantity: 3,
@@ -17,7 +17,7 @@ export const questTemplates: QuestDef[] = [
   {
     id: 'quest_antidote_basic',
     title: '解毒薬が必要です',
-    description: '毒にやられた冒険者がいます。',
+    description: '山菜採りで毒草に当たった村人がいるんだ。',
     type: 'deliver',
     requiredItemId: 'antidote',
     requiredQuantity: 2,
@@ -30,7 +30,7 @@ export const questTemplates: QuestDef[] = [
   {
     id: 'quest_potion_quality',
     title: '良質な回復薬を',
-    description: '貴族のお客様用に品質の良いものを。',
+    description: '村長への贈り物にしたいんだ。品質の良いものを頼む。',
     type: 'quality',
     requiredItemId: 'potion_01',
     requiredQuantity: 1,
@@ -42,7 +42,7 @@ export const questTemplates: QuestDef[] = [
   {
     id: 'quest_antidote_quality',
     title: '高品質な解毒薬',
-    description: '王宮からの依頼です。',
+    description: '近隣の領主様からの依頼だ。恥ずかしくないものを。',
     type: 'quality',
     requiredItemId: 'antidote',
     requiredQuantity: 1,
@@ -56,7 +56,7 @@ export const questTemplates: QuestDef[] = [
   {
     id: 'quest_potion_bulk',
     title: '回復薬の大量注文',
-    description: '冒険者ギルドからの注文です。',
+    description: '隣村との共同作業があるんだ。備えておきたい。',
     type: 'bulk',
     requiredItemId: 'potion_01',
     requiredQuantity: 10,
@@ -67,7 +67,7 @@ export const questTemplates: QuestDef[] = [
   {
     id: 'quest_bomb_bulk',
     title: '爆弾の納品依頼',
-    description: '鉱山の発破用に爆弾が必要です。',
+    description: '開墾作業で岩を砕きたいんだ。爆弾が必要だ。',
     type: 'bulk',
     requiredItemId: 'bomb_01',
     requiredQuantity: 5,
@@ -80,7 +80,7 @@ export const questTemplates: QuestDef[] = [
   {
     id: 'quest_ingot_iron',
     title: '鉄インゴットの注文',
-    description: '鍛冶屋からの依頼です。',
+    description: '農具の修理に使いたいんだ。鍛冶の心得がある者がいてね。',
     type: 'deliver',
     requiredItemId: 'ingot_01',
     requiredQuantity: 2,
@@ -93,7 +93,7 @@ export const questTemplates: QuestDef[] = [
   {
     id: 'quest_potion_advanced',
     title: '上級回復薬の依頼',
-    description: '遠征隊のために上級回復薬を。',
+    description: '村を出て遠出する者がいるんだ。道中の備えに。',
     type: 'deliver',
     requiredItemId: 'potion_02',
     requiredQuantity: 3,
@@ -104,7 +104,7 @@ export const questTemplates: QuestDef[] = [
   {
     id: 'quest_ingot_silver',
     title: '銀インゴットが必要',
-    description: '宝飾職人からの依頼です。',
+    description: '村の祭りで使う飾りを作りたいんだ。',
     type: 'deliver',
     requiredItemId: 'ingot_02',
     requiredQuantity: 1,
@@ -117,7 +117,7 @@ export const questTemplates: QuestDef[] = [
   {
     id: 'quest_elixir',
     title: '伝説のエリクサー',
-    description: '国王陛下からの特別依頼です。',
+    description: '村の長老が病に伏している。どうか助けてほしい。',
     type: 'quality',
     requiredItemId: 'elixir',
     requiredQuantity: 1,

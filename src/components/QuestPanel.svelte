@@ -4,6 +4,7 @@
     addMessage,
     addMoney,
     addReputation,
+    addVillageDevelopment,
     addActiveQuest,
     removeActiveQuest,
     incrementCompletedQuests,
@@ -86,10 +87,22 @@
     incrementCompletedQuests();
     removeActiveQuest(quest.id);
 
+    // 村発展度の増加（依頼難易度に応じて1-3）
+    let developmentGain = 1;
+    if (quest.type === 'quality') developmentGain = 2;
+    if (quest.type === 'bulk') developmentGain = 2;
+    if (quest.requiredItemId === 'elixir') developmentGain = 3;
+
+    // 高品質納品ボーナス（品質70以上で+1）
+    const avgQuality = itemsToConsume.reduce((sum, i) => sum + i.quality, 0) / itemsToConsume.length;
+    if (avgQuality >= 70) developmentGain += 1;
+
+    addVillageDevelopment(developmentGain);
+
     const itemDef = getItem(quest.requiredItemId);
     const itemName = itemDef?.name || quest.requiredItemId;
     addMessage(
-      `依頼「${quest.title}」を達成しました！ 報酬: ${quest.rewardMoney}G, 名声+${quest.rewardReputation}`
+      `依頼「${quest.title}」を達成しました！ 報酬: ${quest.rewardMoney}G, 名声+${quest.rewardReputation}, 村発展+${developmentGain}`
     );
   }
 

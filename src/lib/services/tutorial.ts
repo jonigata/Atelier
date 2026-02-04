@@ -4,6 +4,7 @@ import {
   advanceTutorialMilestone,
   setTutorialDialogue,
   completeTutorial,
+  completeAchievement,
 } from '$lib/stores/game';
 import { checkAchievements, getAchievementDialogue, claimReward } from './achievement';
 import { getAchievementById } from '$lib/data/achievements';
@@ -77,7 +78,8 @@ function triggerMilestoneWithAchievement(
     // アチーブメントの報酬情報を追加
     const achievement = getAchievementById(achievementId);
     if (achievement) {
-      // 報酬付与（アチーブメント達成扱い）
+      // アチーブメント達成を記録してから報酬付与
+      completeAchievement(achievementId);
       claimReward(achievementId);
 
       // 報酬情報をダイアログに追加

@@ -117,6 +117,7 @@ export interface GameState {
   day: number;              // 1-365
   money: number;
   reputation: number;       // 0-100
+  villageDevelopment: number; // 0-100 村発展度
   alchemyLevel: number;
   alchemyExp: number;
   stamina: number;          // 0-100
@@ -158,15 +159,15 @@ export type ActionType =
 
 // ナラティブの種類（報酬の出所）
 export type AchievementNarrative =
-  | 'academy_grant'       // アカデミー奨励金制度
-  | 'senior_handdown'     // 先輩からのお下がり
-  | 'townspeople_gift'    // 街の住人からの差し入れ
-  | 'patron_support'      // パトロン制度
+  | 'master_gift'         // 師匠からの贈り物
+  | 'master_teaching'     // 師匠の教え（手紙）
+  | 'villager_gift'       // 村人からの差し入れ
+  | 'patron_support'      // 匿名の支援者
   | 'workshop_discovery'  // 工房の発掘
-  | 'guild_rank_bonus'    // ギルドランク昇格ボーナス
+  | 'village_growth'      // 村の発展ボーナス
   | 'character_trial'     // キャラクターからの試練
   | 'client_gratitude'    // 依頼主からの特別謝礼
-  | 'seasonal_award'      // 季節イベントの表彰
+  | 'village_festival'    // 村の祭りでの表彰
   | 'self_investment';    // 自分への投資が実る
 
 // アチーブメントカテゴリ

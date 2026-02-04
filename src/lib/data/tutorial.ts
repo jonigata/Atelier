@@ -14,74 +14,98 @@ export const milestones: Milestone[] = [
     id: 0,
     trigger: 'game_start',
     unlocks: ['rest', 'study'],
-    character: { name: 'マルタ', title: 'アカデミー事務員' },
+    character: { name: 'オルト', title: '村長' },
     dialogue: [
-      'はい、これが工房の鍵です。1年間、ここがあなたの拠点になります',
-      '初期支給品は工房に届けてあります。足りないものは自分で調達してください',
-      'まずはレシピの勉強から始めるといいでしょう。疲れたら休むことも大事です',
-      'それでは、良い1年を',
+      'おお、君がアルベルトの弟子か。よく来てくれた',
+      '私はオルト、この村の村長をやっている。アルベルトとは若い頃からの友人でね',
+      'ここが君の工房だ。小さいが、錬金術には十分だろう',
+      'まずは師匠から習った知識を思い出すといい。疲れたら遠慮なく休んでくれ',
     ],
   },
   {
     id: 1,
     trigger: 'first_recipe_learned',
     unlocks: ['alchemy'],
-    character: { name: 'エルザ', title: '先輩錬金術士' },
+    character: { name: 'オルト', title: '村長' },
     dialogue: [
-      'あら、新入りさん？私はエルザ。隣の工房で錬金術やってるの',
-      '回復薬のレシピ覚えたのね。私も最初はそれだった',
-      'レシピを覚えただけじゃダメよ。実際に手を動かさないと',
-      '最初は失敗するかもしれないけど、それも勉強。やってみなさい',
+      '勉強は順調かね？',
+      'ほう、もうレシピを覚えたのか。さすがアルベルトの弟子だ',
+      '知識だけでは錬金術士にはなれん。実際に手を動かしてみるといい',
+      '最初は上手くいかなくても気にするな。失敗も経験のうちだ',
     ],
   },
   {
     id: 2,
     trigger: 'first_craft_success',
     unlocks: ['quest'],
-    character: { name: 'トーマス', title: '酒場の主人' },
+    character: { name: '村人', title: '農夫' },
     dialogue: [
-      'おう、新しい錬金術士が来たって聞いてな。俺はトーマス、駅前の酒場をやってる',
-      'お、もう何か作ったのか。なかなかやるじゃねえか',
-      'なあ、街の掲示板見たことあるか？困ってる奴らが依頼を出してるんだ',
-      '腕を磨くにもちょうどいい。暇なとき覗いてみな',
+      'あんたが新しく来た錬金術士かい？',
+      'へえ、もう薬を作れるのか。こりゃあ助かるなあ',
+      '実はな、ちょっと困ってることがあるんだ',
+      '村長んとこに頼みごとを伝えてある。よかったら聞いてくれないか？',
     ],
   },
   {
     id: 3,
     trigger: 'first_quest_accepted',
     unlocks: ['shop'],
-    character: { name: 'ハンナ', title: '雑貨屋の店主' },
+    character: { name: 'カリン', title: 'よろず屋' },
     dialogue: [
-      'あなた、さっき掲示板で依頼受けてたわね。私はハンナ、この店の主人よ',
-      '依頼をこなすなら、素材の調達も大事になってくるわ',
-      'うちで素材を買うこともできるし、いらないものは売ってくれてもいいのよ',
-      'お金は大事。上手にやりくりしなさいな',
+      'あら、あなたが噂の錬金術士さんね。私はカリン、よろず屋をやってるの',
+      '依頼を受けたなら、素材が必要になるでしょう？',
+      'うちで少しなら素材を扱ってるわ。困ったときは寄ってちょうだい',
+      'いらないものがあれば買い取りもするわよ',
     ],
   },
   {
     id: 4,
     trigger: 'first_quest_completed',
-    unlocks: ['expedition'],
-    character: { name: 'ガルド', title: '採取隊リーダー' },
+    unlocks: [],
+    character: { name: 'オルト', title: '村長' },
     dialogue: [
-      '...あんたが新しい錬金術士か。俺はガルド、採取隊をまとめてる',
-      '依頼をこなしてるなら、そのうち素材が足りなくなる',
-      '俺たちに依頼してくれれば、森や山から素材を集めてくる',
-      '金はかかるが、自分で行けない場所のものも手に入る。必要なら声をかけろ',
+      '聞いたぞ、依頼を達成したそうだな',
+      '村の者が喜んでいた。ありがとう',
+      'こうして一つずつ、村の役に立ってくれれば嬉しい',
+      '君のおかげで、この村にも活気が戻ってきそうだ',
     ],
   },
 ];
 
-// 全アクション（チュートリアル完了時の状態）
+// 村発展で解放されるマイルストーン（チュートリアルとは別管理）
+export interface VillageMilestone {
+  id: string;
+  requiredDevelopment: number;
+  unlocks: ActionType[];
+  character: { name: string; title: string };
+  dialogue: string[];
+}
+
+export const villageMilestones: VillageMilestone[] = [
+  {
+    id: 'adventurer_arrival',
+    requiredDevelopment: 20,
+    unlocks: ['expedition'],
+    character: { name: 'ガルド', title: '冒険者' },
+    dialogue: [
+      '...あんたがこの村の錬金術士か。俺はガルド、冒険者をやっている',
+      'この辺りを旅してたら、面白い村があると聞いてな',
+      '錬金術士がいるなら素材が必要だろう。俺が採ってきてやろうか',
+      '金は貰うが、森や山の奥まで行ける。必要なら声をかけろ',
+    ],
+  },
+];
+
+// 全アクション（最終的に解放される状態）
 export const ALL_ACTIONS: ActionType[] = ['rest', 'study', 'alchemy', 'quest', 'shop', 'expedition'];
 
 // 経験者モード用ダイアログ
 export const veteranDialogue: TutorialDialogue = {
-  characterName: 'マルタ',
-  characterTitle: 'アカデミー事務員',
+  characterName: 'オルト',
+  characterTitle: '村長',
   lines: [
-    '経験者の方ですね。では手短に。工房の鍵です',
-    '全ての機能が使えます。良い1年を',
+    'アルベルトから聞いている。手慣れているようだな',
+    'では早速頼む。この村をよろしく頼む',
   ],
 };
 
@@ -106,4 +130,27 @@ export function getUnlockedActionsUpTo(milestoneId: number): ActionType[] {
     }
   }
   return unlocked;
+}
+
+// 村発展度から解放されるアクションを取得
+export function getVillageUnlockedActions(developmentLevel: number): ActionType[] {
+  const unlocked: ActionType[] = [];
+  for (const milestone of villageMilestones) {
+    if (developmentLevel >= milestone.requiredDevelopment) {
+      unlocked.push(...milestone.unlocks);
+    }
+  }
+  return unlocked;
+}
+
+// 村発展マイルストーンのダイアログを取得
+export function getVillageMilestoneDialogue(milestoneId: string): TutorialDialogue | null {
+  const milestone = villageMilestones.find((m) => m.id === milestoneId);
+  if (!milestone) return null;
+
+  return {
+    characterName: milestone.character.name,
+    characterTitle: milestone.character.title,
+    lines: milestone.dialogue,
+  };
 }

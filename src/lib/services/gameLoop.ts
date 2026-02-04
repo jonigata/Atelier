@@ -16,7 +16,11 @@ import {
 import { getArea } from '$lib/data/areas';
 import { getItem } from '$lib/data/items';
 import { getAvailableQuestTemplates } from '$lib/data/quests';
+import { villageMilestones, getVillageMilestoneDialogue } from '$lib/data/tutorial';
 import type { OwnedItem, MorningEvent } from '$lib/models/types';
+
+// 達成済みの村発展マイルストーンを追跡
+const completedVillageMilestones = new Set<string>();
 
 /**
  * ゲームループのメイン処理
@@ -50,14 +54,56 @@ function processMorningPhase(): void {
   const state = get(gameState);
   addMessage(`--- ${state.day}日目の朝 ---`);
 
-  // 1. 採取隊の帰還チェック
+  // 1. 村発展マイルストーンチェック
+  checkVillageMilestones();
+
+  // 2. 採取隊の帰還チェック
   checkExpeditionReturn();
 
-  // 2. 依頼の期限チェック
+  // 3. 依頼の期限チェック
   checkQuestDeadlines();
 
-  // 3. 新しい依頼の生成
+  // 4. 新しい依頼の生成
   generateNewQuests();
+}
+
+/**
+ * 村発展マイルストーンチェック
+ */
+function checkVillageMilestones(): void {
+  const state = get(gameState);
+
+  for (const milestone of villageMilestones) {
+    if (completedVillageMilestones.has(milestone.id)) continue;
+    if (state.villageDevelopment < milestone.requiredDevelopment) continue;
+
+    // マイルストーン達成
+    completedVillageMilestones.add(milestone.id);
+
+    const dialogue = getVillageMilestoneDialogue(milestone.id);
+    if (dialogue) {
+      // イベントとして通知
+      const event: MorningEvent = {
+        type: 'tutorial',
+        message: `${dialogue.characterName}が村にやってきた！`,
+        data: { milestoneId: milestone.id, dialogue },
+      };
+      addMorningEvent(event);
+
+      // アクション解放
+      if (milestone.unlocks.length > 0) {
+        gameState.update((s) => ({
+          ...s,
+          tutorialProgress: {
+            ...s.tutorialProgress,
+            unlockedActions: [...new Set([...s.tutorialProgress.unlockedActions, ...milestone.unlocks])],
+            pendingDialogue: dialogue,
+          },
+        }));
+        addMessage(`${dialogue.characterName}の到着により、${milestone.unlocks.join('、')}が解放されました！`);
+      }
+    }
+  }
 }
 
 /**
@@ -216,6 +262,9 @@ export function startActionPhase(): void {
  * ゲーム開始時の初期化
  */
 export function initializeGame(): void {
+  // 村発展マイルストーンをリセット
+  completedVillageMilestones.clear();
+
   // 初期依頼を設定
   const state = get(gameState);
   const templates = getAvailableQuestTemplates(state.alchemyLevel, state.reputation);
@@ -223,5 +272,5 @@ export function initializeGame(): void {
   setAvailableQuests(initialQuests);
 
   setPhase('morning');
-  addMessage('アカデミーでの1年間が始まります。');
+  addMessage('ハイデル村での1年間が始まります。');
 }

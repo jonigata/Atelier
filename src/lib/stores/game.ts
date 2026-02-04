@@ -16,6 +16,7 @@ function createInitialState(): GameState {
     day: 1,
     money: 500,
     reputation: 0,
+    villageDevelopment: 0,
     alchemyLevel: 1,
     alchemyExp: 0,
     stamina: 100,
@@ -139,6 +140,13 @@ export function addReputation(amount: number): void {
   gameState.update((state) => ({
     ...state,
     reputation: Math.max(0, Math.min(100, state.reputation + amount)),
+  }));
+}
+
+export function addVillageDevelopment(amount: number): void {
+  gameState.update((state) => ({
+    ...state,
+    villageDevelopment: Math.max(0, Math.min(100, state.villageDevelopment + amount)),
   }));
 }
 
