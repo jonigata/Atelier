@@ -101,6 +101,8 @@ export interface TutorialDialogue {
   characterName: string;
   characterTitle: string;
   lines: string[];
+  achievementTitle?: string;  // アチーブメント達成時のタイトル
+  rewards?: string[];         // 報酬詳細リスト
 }
 
 // チュートリアル進行状態

@@ -14,6 +14,8 @@ import {
   getAchievementById,
   narrativeCharacters,
 } from '$lib/data/achievements';
+import { items } from '$lib/data/items';
+import { recipes } from '$lib/data/recipes';
 import type {
   AchievementDef,
   AchievementCondition,
@@ -203,12 +205,17 @@ export function getAchievementDialogue(achievementId: string): TutorialDialogue 
   const character =
     achievement.narrativeCharacter ?? narrativeCharacters[achievement.narrative];
 
+  // 報酬詳細を生成
+  const rewards = getDetailedRewards(achievement);
+
   // システムメッセージ系（キャラクターなし）
   if (!character) {
     return {
       characterName: '',
       characterTitle: '',
       lines: [achievement.narrativeMessage],
+      achievementTitle: achievement.title,
+      rewards,
     };
   }
 
@@ -216,7 +223,45 @@ export function getAchievementDialogue(achievementId: string): TutorialDialogue 
     characterName: character.name,
     characterTitle: character.title,
     lines: [achievement.narrativeMessage],
+    achievementTitle: achievement.title,
+    rewards,
   };
+}
+
+/**
+ * 報酬の詳細リストを生成
+ */
+function getDetailedRewards(achievement: AchievementDef): string[] {
+  const { reward } = achievement;
+  const details: string[] = [];
+
+  if (reward.money) {
+    details.push(`${reward.money.toLocaleString()} G`);
+  }
+
+  if (reward.items) {
+    for (const item of reward.items) {
+      const itemDef = items[item.itemId];
+      const itemName = itemDef ? itemDef.name : item.itemId;
+      const qualityStr = item.quality ? `（品質${item.quality}）` : '';
+      const quantityStr = item.quantity > 1 ? ` x${item.quantity}` : '';
+      details.push(`${itemName}${qualityStr}${quantityStr}`);
+    }
+  }
+
+  if (reward.reputation) {
+    details.push(`名声 +${reward.reputation}`);
+  }
+
+  if (reward.recipes) {
+    for (const recipeId of reward.recipes) {
+      const recipeDef = recipes[recipeId];
+      const recipeName = recipeDef ? recipeDef.name : recipeId;
+      details.push(`レシピ「${recipeName}」`);
+    }
+  }
+
+  return details;
 }
 
 /**

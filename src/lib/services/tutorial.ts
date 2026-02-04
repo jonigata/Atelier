@@ -7,7 +7,6 @@ import {
   completeAchievement,
 } from '$lib/stores/game';
 import { checkAchievements, getAchievementDialogue, claimReward } from './achievement';
-import { getAchievementById } from '$lib/data/achievements';
 
 /**
  * マイルストーン達成をチェックし、必要に応じて次のマイルストーンをトリガー
@@ -75,20 +74,9 @@ function triggerMilestoneWithAchievement(
   // アチーブメントのダイアログを表示
   const dialogue = getAchievementDialogue(achievementId);
   if (dialogue) {
-    // アチーブメントの報酬情報を追加
-    const achievement = getAchievementById(achievementId);
-    if (achievement) {
-      // アチーブメント達成を記録してから報酬付与
-      completeAchievement(achievementId);
-      claimReward(achievementId);
-
-      // 報酬情報をダイアログに追加
-      const rewardLines = getRewardLines(achievement);
-      if (rewardLines.length > 0) {
-        dialogue.lines.push(...rewardLines);
-      }
-    }
-
+    // アチーブメント達成を記録してから報酬付与
+    completeAchievement(achievementId);
+    claimReward(achievementId);
     setTutorialDialogue(dialogue);
   }
 }
@@ -107,47 +95,9 @@ function checkAndTriggerAchievement(): void {
   if (achievedId) {
     const dialogue = getAchievementDialogue(achievedId);
     if (dialogue) {
-      const achievement = getAchievementById(achievedId);
-      if (achievement) {
-        // 報酬情報を追加
-        const rewardLines = getRewardLines(achievement);
-        if (rewardLines.length > 0) {
-          dialogue.lines.push(...rewardLines);
-        }
-      }
       setTutorialDialogue(dialogue);
     }
   }
-}
-
-/**
- * 報酬の説明行を生成
- */
-function getRewardLines(
-  achievement: ReturnType<typeof getAchievementById>
-): string[] {
-  if (!achievement) return [];
-
-  const { reward } = achievement;
-  const lines: string[] = [];
-
-  if (reward.money) {
-    lines.push(`【報酬】${reward.money}G を獲得しました`);
-  }
-
-  if (reward.items && reward.items.length > 0) {
-    lines.push(`【報酬】アイテムを獲得しました`);
-  }
-
-  if (reward.reputation) {
-    lines.push(`【報酬】名声が ${reward.reputation} 上がりました`);
-  }
-
-  if (reward.recipes && reward.recipes.length > 0) {
-    lines.push(`【報酬】新しいレシピを習得しました`);
-  }
-
-  return lines;
 }
 
 /**
