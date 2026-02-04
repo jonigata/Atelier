@@ -5,6 +5,7 @@ import { checkMilestoneProgress, onDialogueClosed } from './tutorial';
 import { areas } from '$lib/data/areas';
 import { items } from '$lib/data/items';
 import { removeItemsFromInventory } from '$lib/services/inventory';
+import { calcExpForLevel, ALCHEMY } from '$lib/data/balance';
 import type { GameState, ActionType, OwnedItem, Expedition } from '$lib/models/types';
 
 export interface AutoplayLog {
@@ -367,11 +368,11 @@ function tryCraft(state: GameState): boolean {
     const expGain = 15;
     let newExp = s.alchemyExp + expGain;
     let newLevel = s.alchemyLevel;
-    let expNeeded = Math.floor(100 * Math.pow(1.5, newLevel - 1));
-    while (newExp >= expNeeded && newLevel < 20) {
+    let expNeeded = calcExpForLevel(newLevel);
+    while (newExp >= expNeeded && newLevel < ALCHEMY.MAX_LEVEL) {
       newExp -= expNeeded;
       newLevel++;
-      expNeeded = Math.floor(100 * Math.pow(1.5, newLevel - 1));
+      expNeeded = calcExpForLevel(newLevel);
     }
 
     return {

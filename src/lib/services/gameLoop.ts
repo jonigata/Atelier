@@ -18,6 +18,7 @@ import { queueUnlockAction } from '$lib/stores/toast';
 import { getArea } from '$lib/data/areas';
 import { getItem } from '$lib/data/items';
 import { getAvailableQuestTemplates } from '$lib/data/quests';
+import { EXPEDITION, QUEST } from '$lib/data/balance';
 import { villageMilestones, getVillageMilestoneDialogue } from '$lib/data/tutorial';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import type { OwnedItem, MorningEvent } from '$lib/models/types';
@@ -185,7 +186,7 @@ function calculateExpeditionDrops(areaId: string, duration: number): OwnedItem[]
   if (!area) return [];
 
   const items: OwnedItem[] = [];
-  const baseDropCount = duration * 2; // 1日あたり2個
+  const baseDropCount = duration * EXPEDITION.DROPS_PER_DAY;
 
   for (let i = 0; i < baseDropCount; i++) {
     // レアドロップ判定
@@ -241,7 +242,7 @@ function generateNewQuests(): void {
   const state = get(gameState);
 
   // 一定確率で新しい依頼を追加
-  if (Math.random() < 0.3 || state.availableQuests.length === 0) {
+  if (Math.random() < QUEST.NEW_QUEST_CHANCE || state.availableQuests.length === 0) {
     const templates = getAvailableQuestTemplates(state.alchemyLevel, state.reputation);
 
     if (templates.length > 0) {

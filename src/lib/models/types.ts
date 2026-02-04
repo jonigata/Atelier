@@ -89,12 +89,12 @@ export type GamePhase =
   | 'processing'   // 処理中
   | 'ending';      // エンディング
 
-// 朝のイベント
-export interface MorningEvent {
-  type: 'expedition_return' | 'new_quest' | 'quest_expired' | 'tutorial';
-  message: string;
-  data?: unknown;
-}
+// 朝のイベント（Union型で型安全に）
+export type MorningEvent =
+  | { type: 'expedition_return'; message: string; data: OwnedItem[] }
+  | { type: 'new_quest'; message: string }
+  | { type: 'quest_expired'; message: string }
+  | { type: 'tutorial'; message: string; data: { milestoneId: string; dialogue: TutorialDialogue } };
 
 // チュートリアル会話
 export interface TutorialDialogue {

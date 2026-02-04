@@ -6,6 +6,7 @@ import type {
 } from '$lib/models/types';
 import { getMilestoneDialogue } from '$lib/data/tutorial';
 import { removeItemFromInventory } from '$lib/services/inventory';
+import { calcExpForLevel, ALCHEMY } from '$lib/data/balance';
 
 // =====================================
 // 初期状態
@@ -87,7 +88,7 @@ export const daysRemaining = derived(gameState, ($state) => 365 - $state.day);
 export const isGameOver = derived(gameState, ($state) => $state.day > 365);
 
 export const expForNextLevel = derived(gameState, ($state) => {
-  return Math.floor(100 * Math.pow(1.5, $state.alchemyLevel - 1));
+  return calcExpForLevel($state.alchemyLevel);
 });
 
 // =====================================
@@ -171,12 +172,12 @@ export function addExp(amount: number): void {
   gameState.update((state) => {
     let newExp = state.alchemyExp + amount;
     let newLevel = state.alchemyLevel;
-    let expNeeded = Math.floor(100 * Math.pow(1.5, newLevel - 1));
+    let expNeeded = calcExpForLevel(newLevel);
 
-    while (newExp >= expNeeded && newLevel < 20) {
+    while (newExp >= expNeeded && newLevel < ALCHEMY.MAX_LEVEL) {
       newExp -= expNeeded;
       newLevel++;
-      expNeeded = Math.floor(100 * Math.pow(1.5, newLevel - 1));
+      expNeeded = calcExpForLevel(newLevel);
     }
 
     return {

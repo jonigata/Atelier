@@ -2,6 +2,7 @@
   import { gameState, addMessage, addMoney, addItem, addSalesAmount } from '$lib/stores/game';
   import { items, getItem } from '$lib/data/items';
   import { removeItemFromInventory } from '$lib/services/inventory';
+  import { SHOP } from '$lib/data/balance';
   import type { OwnedItem, ItemDef } from '$lib/models/types';
 
   export let onBack: () => void;
@@ -55,8 +56,8 @@
     const def = getItem(item.itemId);
     if (!def) return;
 
-    // 売却価格 = 基本価格 × (品質 / 50) × 0.7
-    const price = Math.floor(def.basePrice * (item.quality / 50) * 0.7);
+    // 売却価格 = 基本価格 × (品質 / 50) × 売却係数
+    const price = Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
 
     // インベントリから削除
     gameState.update((state) => ({
@@ -83,7 +84,7 @@
   function getSellPrice(item: OwnedItem): number {
     const def = getItem(item.itemId);
     if (!def) return 0;
-    return Math.floor(def.basePrice * (item.quality / 50) * 0.7);
+    return Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
   }
 </script>
 

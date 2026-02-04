@@ -9,6 +9,7 @@ import {
 import { getRecipe } from '$lib/data/recipes';
 import { getItem } from '$lib/data/items';
 import { removeItemsFromInventory } from '$lib/services/inventory';
+import { ALCHEMY, CRAFT_SUCCESS, QUALITY } from '$lib/data/balance';
 import type { OwnedItem, RecipeDef, Ingredient } from '$lib/models/types';
 
 export interface CraftResult {
@@ -47,7 +48,7 @@ function executeCraftAttempt(
 
   if (!isSuccess) {
     // 失敗時も経験値は少しもらえる
-    const expGained = Math.floor(recipe.expReward * 0.3);
+    const expGained = Math.floor(recipe.expReward * ALCHEMY.FAIL_EXP_RATE);
     addExp(expGained);
     return { success: false, expGained };
   }
@@ -65,7 +66,9 @@ function executeCraftAttempt(
 
   // 経験値計算（高品質ボーナス）
   let expGained = recipe.expReward;
-  if (quality >= 70) expGained = Math.floor(expGained * 1.2);
+  if (quality >= ALCHEMY.HIGH_QUALITY_THRESHOLD) {
+    expGained = Math.floor(expGained * ALCHEMY.HIGH_QUALITY_EXP_BONUS);
+  }
   addExp(expGained);
 
   return { success: true, item: newItem, expGained };
@@ -411,11 +414,11 @@ function consumeItems(items: OwnedItem[]): void {
  * 成功率を計算
  */
 export function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number): number {
-  // 基本成功率: 難易度1で95%、難易度10で50%
-  const baserate = 1 - (recipe.difficulty - 1) * 0.05;
-  // レベルボーナス: レベルが必要レベルを超えるごとに+5%
-  const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * 0.05);
-  return Math.min(0.99, baserate + levelBonus);
+  // 基本成功率: 難易度1で100%、難易度上昇ごとに減少
+  const baserate = CRAFT_SUCCESS.BASE_RATE - (recipe.difficulty - 1) * CRAFT_SUCCESS.DIFFICULTY_PENALTY;
+  // レベルボーナス: レベルが必要レベルを超えるごとに加算
+  const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * CRAFT_SUCCESS.LEVEL_BONUS);
+  return Math.min(CRAFT_SUCCESS.MAX_RATE, baserate + levelBonus);
 }
 
 /**
@@ -434,11 +437,11 @@ export function calculateExpectedQuality(
     selectedItems.reduce((sum, item) => sum + item.quality, 0) / selectedItems.length;
 
   // レベル補正
-  const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * 2);
+  const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * QUALITY.LEVEL_BONUS);
 
   const base = Math.floor(avgQuality + levelBonus);
-  const min = Math.max(1, base - 10);
-  const max = Math.min(100, base + 10);
+  const min = Math.max(QUALITY.MIN, base + QUALITY.RANDOM_MIN);
+  const max = Math.min(QUALITY.MAX, base + QUALITY.RANDOM_MAX);
 
   return { min, max, base };
 }
@@ -456,10 +459,11 @@ function calculateQuality(
     selectedItems.reduce((sum, item) => sum + item.quality, 0) / selectedItems.length;
 
   // レベル補正: 必要レベルを超えると品質が上がりやすい
-  const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * 2);
+  const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * QUALITY.LEVEL_BONUS);
 
-  // ランダム要素: -10 ~ +10
-  const randomFactor = Math.floor(Math.random() * 21) - 10;
+  // ランダム要素
+  const randomRange = QUALITY.RANDOM_MAX - QUALITY.RANDOM_MIN + 1;
+  const randomFactor = Math.floor(Math.random() * randomRange) + QUALITY.RANDOM_MIN;
 
   const quality = Math.floor(avgQuality + levelBonus + randomFactor);
   return Math.max(1, Math.min(100, quality));
