@@ -2,7 +2,7 @@
   import { gameState, addMessage, restoreStamina, consumeStamina, learnRecipe } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
-  import { items } from '$lib/data/items';
+  import { items, getItemIcon } from '$lib/data/items';
   import type { ActionType, RecipeDef } from '$lib/models/types';
   import { getCategoryName } from '$lib/data/categories';
 
@@ -105,6 +105,7 @@
             on:click={() => selectRecipe(recipe.id)}
           >
             <div class="recipe-header">
+              <img class="recipe-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} />
               <span class="recipe-name">{recipe.name}</span>
               <span class="recipe-info">必要Lv.{recipe.requiredLevel}</span>
             </div>
@@ -237,9 +238,16 @@
 
   .recipe-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 0.75rem;
     width: 100%;
+  }
+
+  .recipe-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    flex-shrink: 0;
   }
 
   .recipe-details {
@@ -283,6 +291,7 @@
   .recipe-info {
     font-size: 0.85rem;
     color: #a0a0b0;
+    margin-left: auto;
   }
 
   .no-recipes {

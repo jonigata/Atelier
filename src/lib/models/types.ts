@@ -97,12 +97,20 @@ export type MorningEvent =
   | { type: 'tutorial'; message: string; data: { milestoneId: string; dialogue: TutorialDialogue } };
 
 // チュートリアル会話
+// 構造化された報酬アイテム（アイコン表示用）
+export interface RewardDisplay {
+  text: string;
+  itemId?: string;  // アイコン表示用（アイテム報酬の場合）
+  type: 'money' | 'item' | 'reputation' | 'recipe';
+}
+
 export interface TutorialDialogue {
   characterName: string;
   characterTitle: string;
   lines: string[];
   achievementTitle?: string;  // アチーブメント達成時のタイトル
-  rewards?: string[];         // 報酬詳細リスト
+  rewards?: string[];         // 報酬詳細リスト（後方互換性のため残す）
+  structuredRewards?: RewardDisplay[];  // 構造化された報酬（アイコン付き）
 }
 
 // チュートリアル進行状態

@@ -22,6 +22,7 @@ import type {
   AchievementCondition,
   GameState,
   TutorialDialogue,
+  RewardDisplay,
 } from '$lib/models/types';
 
 // 前回の発動済み目標IDを追跡
@@ -264,6 +265,7 @@ export function getAchievementDialogue(achievementId: string): TutorialDialogue 
 
   // 報酬詳細を生成
   const rewards = getDetailedRewards(achievement);
+  const structuredRewards = getStructuredRewards(achievement);
 
   // システムメッセージ系（キャラクターなし）
   if (!character) {
@@ -273,6 +275,7 @@ export function getAchievementDialogue(achievementId: string): TutorialDialogue 
       lines: achievement.narrativeLines,
       achievementTitle: achievement.title,
       rewards,
+      structuredRewards,
     };
   }
 
@@ -282,6 +285,7 @@ export function getAchievementDialogue(achievementId: string): TutorialDialogue 
     lines: achievement.narrativeLines,
     achievementTitle: achievement.title,
     rewards,
+    structuredRewards,
   };
 }
 
@@ -319,6 +323,56 @@ function getDetailedRewards(achievement: AchievementDef): string[] {
   }
 
   return details;
+}
+
+/**
+ * 構造化された報酬リストを生成（アイコン表示用）
+ */
+function getStructuredRewards(achievement: AchievementDef): RewardDisplay[] {
+  const { reward } = achievement;
+  const structured: RewardDisplay[] = [];
+
+  if (reward.money) {
+    structured.push({
+      text: `${reward.money.toLocaleString()} G`,
+      type: 'money',
+    });
+  }
+
+  if (reward.items) {
+    for (const item of reward.items) {
+      const itemDef = items[item.itemId];
+      const itemName = itemDef ? itemDef.name : item.itemId;
+      const qualityStr = item.quality ? `（品質${item.quality}）` : '';
+      const quantityStr = item.quantity > 1 ? ` x${item.quantity}` : '';
+      structured.push({
+        text: `${itemName}${qualityStr}${quantityStr}`,
+        itemId: item.itemId,
+        type: 'item',
+      });
+    }
+  }
+
+  if (reward.reputation) {
+    structured.push({
+      text: `名声 +${reward.reputation}`,
+      type: 'reputation',
+    });
+  }
+
+  if (reward.recipes) {
+    for (const recipeId of reward.recipes) {
+      const recipeDef = recipes[recipeId];
+      const recipeName = recipeDef ? recipeDef.name : recipeId;
+      structured.push({
+        text: `レシピ「${recipeName}」`,
+        itemId: recipeDef?.resultItemId,
+        type: 'recipe',
+      });
+    }
+  }
+
+  return structured;
 }
 
 /**

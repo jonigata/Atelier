@@ -1,13 +1,16 @@
 <script lang="ts">
   import { gameState, setTutorialDialogue } from '$lib/stores/game';
   import { onDialogueClosed } from '$lib/services/tutorial';
+  import { getItemIcon } from '$lib/data/items';
 
   let currentLine = 0;
+  let showingRewards = false;  // 報酬画面を表示中かどうか
   let delayedDialogue: typeof $gameState.tutorialProgress.pendingDialogue = null;
   let delayTimeoutId: number | undefined;
 
   $: dialogue = $gameState.tutorialProgress.pendingDialogue;
   $: pendingTransition = $gameState.pendingDayTransition;
+  $: hasRewards = delayedDialogue?.structuredRewards && delayedDialogue.structuredRewards.length > 0;
 
   // 演出がない、かつダイアログがある場合のみ表示
   $: {
@@ -21,17 +24,25 @@
       delayTimeoutId = setTimeout(() => {
         delayedDialogue = dialogue;
         currentLine = 0;
+        showingRewards = false;
       }, 100) as unknown as number;
     } else if (!dialogue) {
       delayedDialogue = null;
+      showingRewards = false;
     }
   }
 
   function nextLine() {
     if (!delayedDialogue) return;
 
-    if (currentLine < delayedDialogue.lines.length - 1) {
+    if (showingRewards) {
+      // 報酬画面からクリックで閉じる
+      closeDialogue();
+    } else if (currentLine < delayedDialogue.lines.length - 1) {
       currentLine++;
+    } else if (hasRewards) {
+      // 最後の行で報酬がある場合は報酬画面へ
+      showingRewards = true;
     } else {
       closeDialogue();
     }
@@ -40,6 +51,7 @@
   function closeDialogue() {
     setTutorialDialogue(null);
     currentLine = 0;
+    showingRewards = false;
     onDialogueClosed();
   }
 
@@ -65,41 +77,63 @@
 
 {#if delayedDialogue}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <div class="dialogue-overlay" on:click={nextLine} role="button" tabindex="0">
-    <div class="dialogue-box">
-      {#if delayedDialogue.achievementTitle}
-        <div class="achievement-header">
-          <span class="achievement-badge">達成</span>
-          <span class="achievement-title">{delayedDialogue.achievementTitle}</span>
-        </div>
-      {/if}
-      <div class="character-info">
-        <span class="character-name">{delayedDialogue.characterName}</span>
-        <span class="character-title">{delayedDialogue.characterTitle}</span>
-      </div>
-      <div class="dialogue-text">
-        「{delayedDialogue.lines[currentLine]}」
-      </div>
-      {#if delayedDialogue.rewards && delayedDialogue.rewards.length > 0}
-        <div class="rewards-section">
-          <span class="rewards-label">報酬</span>
-          <div class="rewards-list">
-            {#each delayedDialogue.rewards as reward}
-              <span class="reward-item">{reward}</span>
-            {/each}
-          </div>
-        </div>
-      {/if}
-      <div class="continue-hint">
-        <span class="hint-text">クリック または Enter で続ける</span>
-        <div class="hint-right">
-          <span class="progress">{currentLine + 1} / {delayedDialogue.lines.length}</span>
-          {#if delayedDialogue.lines.length > 1}
-            <button class="skip-button" on:click={skipDialogue}>スキップ</button>
+  <div class="dialogue-overlay" class:centered={showingRewards} on:click={nextLine} role="button" tabindex="0">
+    {#if showingRewards && delayedDialogue.structuredRewards}
+      <!-- 報酬画面 -->
+      <div class="rewards-screen">
+        <div class="rewards-header">
+          <span class="rewards-title">報酬獲得！</span>
+          {#if delayedDialogue.achievementTitle}
+            <span class="achievement-subtitle">{delayedDialogue.achievementTitle}</span>
           {/if}
         </div>
+        <div class="rewards-grid">
+          {#each delayedDialogue.structuredRewards as reward}
+            <div class="reward-card" class:has-icon={reward.itemId}>
+              {#if reward.itemId}
+                <img class="reward-card-icon" src={getItemIcon(reward.itemId)} alt="" />
+              {:else if reward.type === 'money'}
+                <span class="reward-card-emoji">💰</span>
+              {:else if reward.type === 'reputation'}
+                <span class="reward-card-emoji">⭐</span>
+              {:else}
+                <span class="reward-card-emoji">🎁</span>
+              {/if}
+              <span class="reward-card-text">{reward.text}</span>
+            </div>
+          {/each}
+        </div>
+        <div class="rewards-footer">
+          <span class="hint-text">クリック または Enter で閉じる</span>
+        </div>
       </div>
-    </div>
+    {:else}
+      <!-- 通常のダイアログ -->
+      <div class="dialogue-box">
+        {#if delayedDialogue.achievementTitle}
+          <div class="achievement-header">
+            <span class="achievement-badge">達成</span>
+            <span class="achievement-title">{delayedDialogue.achievementTitle}</span>
+          </div>
+        {/if}
+        <div class="character-info">
+          <span class="character-name">{delayedDialogue.characterName}</span>
+          <span class="character-title">{delayedDialogue.characterTitle}</span>
+        </div>
+        <div class="dialogue-text">
+          「{delayedDialogue.lines[currentLine]}」
+        </div>
+        <div class="continue-hint">
+          <span class="hint-text">クリック または Enter で続ける</span>
+          <div class="hint-right">
+            <span class="progress">{currentLine + 1} / {delayedDialogue.lines.length}{hasRewards ? ' + 報酬' : ''}</span>
+            {#if delayedDialogue.lines.length > 1 || hasRewards}
+              <button class="skip-button" on:click={skipDialogue}>スキップ</button>
+            {/if}
+          </div>
+        </div>
+      </div>
+    {/if}
   </div>
 {/if}
 
@@ -114,6 +148,11 @@
     padding-bottom: 3rem;
     z-index: 1000;
     cursor: pointer;
+  }
+
+  .dialogue-overlay.centered {
+    align-items: center;
+    padding-bottom: 0;
   }
 
   .dialogue-box {
@@ -180,41 +219,6 @@
     min-height: 3.6rem;
   }
 
-  .rewards-section {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    margin-top: 1rem;
-    padding: 0.75rem;
-    background: rgba(201, 169, 89, 0.1);
-    border: 1px solid rgba(201, 169, 89, 0.3);
-    border-radius: 6px;
-  }
-
-  .rewards-label {
-    background: #c9a959;
-    color: #1a1a2e;
-    padding: 0.2rem 0.5rem;
-    border-radius: 3px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    white-space: nowrap;
-  }
-
-  .rewards-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .reward-item {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 0.25rem 0.6rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    color: #f0d78c;
-  }
-
   .continue-hint {
     display: flex;
     justify-content: space-between;
@@ -255,5 +259,91 @@
     background: rgba(255, 255, 255, 0.1);
     border-color: #8a8aaa;
     color: #8a8aaa;
+  }
+
+  /* 報酬画面 */
+  .rewards-screen {
+    background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
+    border: 3px solid #c9a959;
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow:
+      0 0 40px rgba(201, 169, 89, 0.3),
+      0 8px 32px rgba(0, 0, 0, 0.5);
+    animation: rewardPopIn 0.3s ease-out;
+  }
+
+  @keyframes rewardPopIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .rewards-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .rewards-title {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    margin-bottom: 0.5rem;
+  }
+
+  .achievement-subtitle {
+    font-size: 1rem;
+    color: #c9a959;
+  }
+
+  .rewards-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .reward-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: rgba(201, 169, 89, 0.15);
+    border: 2px solid rgba(201, 169, 89, 0.4);
+    border-radius: 10px;
+  }
+
+  .reward-card-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+
+  .reward-card-emoji {
+    font-size: 2rem;
+    width: 48px;
+    text-align: center;
+  }
+
+  .reward-card-text {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: #f0d78c;
+  }
+
+  .rewards-footer {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 1px solid #4a4a6a;
   }
 </style>
