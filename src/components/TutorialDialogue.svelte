@@ -17,17 +17,30 @@
     if (currentLine < dialogue.lines.length - 1) {
       currentLine++;
     } else {
-      // 最後の行を表示し終えたらダイアログを閉じる
-      setTutorialDialogue(null);
-      currentLine = 0;
-      onDialogueClosed();
+      closeDialogue();
     }
   }
 
+  function closeDialogue() {
+    setTutorialDialogue(null);
+    currentLine = 0;
+    onDialogueClosed();
+  }
+
+  function skipDialogue(event: MouseEvent) {
+    event.stopPropagation();
+    closeDialogue();
+  }
+
   function handleKeydown(event: KeyboardEvent) {
-    if (dialogue && (event.key === 'Enter' || event.key === ' ')) {
+    if (!dialogue) return;
+
+    if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       nextLine();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      closeDialogue();
     }
   }
 </script>
@@ -63,7 +76,12 @@
       {/if}
       <div class="continue-hint">
         <span class="hint-text">クリック または Enter で続ける</span>
-        <span class="progress">{currentLine + 1} / {dialogue.lines.length}</span>
+        <div class="hint-right">
+          <span class="progress">{currentLine + 1} / {dialogue.lines.length}</span>
+          {#if dialogue.lines.length > 1}
+            <button class="skip-button" on:click={skipDialogue}>スキップ</button>
+          {/if}
+        </div>
       </div>
     </div>
   </div>
@@ -195,8 +213,31 @@
     color: #6a6a8a;
   }
 
+  .hint-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
   .progress {
     font-size: 0.85rem;
     color: #6a6a8a;
+  }
+
+  .skip-button {
+    padding: 0.3rem 0.75rem;
+    background: transparent;
+    border: 1px solid #6a6a8a;
+    border-radius: 4px;
+    color: #6a6a8a;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .skip-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #8a8aaa;
+    color: #8a8aaa;
   }
 </style>
