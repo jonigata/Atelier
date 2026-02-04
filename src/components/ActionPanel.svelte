@@ -28,14 +28,9 @@
   // 勉強用の選択状態
   let selectedRecipeId: string | null = null;
 
-  // 習得可能なレシピ一覧
+  // 勉強可能な教科書一覧（所持していて、まだ習得していないもの）
   $: availableRecipes = Object.values(recipes).filter(
-    (r) => r.requiredLevel <= $gameState.alchemyLevel && !$gameState.knownRecipes.includes(r.id)
-  );
-
-  // レベル不足で習得できないレシピ（参考表示用）
-  $: lockedRecipes = Object.values(recipes).filter(
-    (r) => r.requiredLevel > $gameState.alchemyLevel && !$gameState.knownRecipes.includes(r.id)
+    (r) => $gameState.ownedRecipes.includes(r.id) && !$gameState.knownRecipes.includes(r.id)
   );
 
   // 休息処理
@@ -126,28 +121,8 @@
       </div>
     {:else}
       <div class="no-recipes">
-        <p>現在習得できる教科書がありません。</p>
-        <p class="hint">錬金術レベルを上げると新しい教科書が読めるようになります。</p>
-      </div>
-    {/if}
-
-    {#if lockedRecipes.length > 0}
-      <div class="locked-recipes">
-        <h3>レベル不足</h3>
-        {#each lockedRecipes as recipe}
-          <div class="recipe-item locked">
-            <div class="recipe-header">
-              <span class="recipe-name">{recipe.name}</span>
-              <span class="recipe-info">必要Lv.{recipe.requiredLevel}</span>
-            </div>
-            <div class="recipe-details">
-              <span class="detail-label">必要素材:</span>
-              {#each recipe.ingredients as ing}
-                <span class="ingredient">{getIngredientName(ing)} ×{ing.quantity}</span>
-              {/each}
-            </div>
-          </div>
-        {/each}
+        <p>勉強できる教科書がありません。</p>
+        <p class="hint">ショップで教科書を購入するか、報酬で入手しましょう。</p>
       </div>
     {/if}
 

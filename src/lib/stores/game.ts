@@ -34,7 +34,8 @@ function createInitialState(): GameState {
       { itemId: 'water_01', quality: 55 },
       { itemId: 'water_01', quality: 42 },
     ],
-    knownRecipes: [],
+    ownedRecipes: ['potion_01'],  // 回復薬の教科書を所持
+    knownRecipes: [],              // まだ勉強していない
 
     activeQuests: [],
     availableQuests: [],

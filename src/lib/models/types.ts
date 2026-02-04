@@ -126,7 +126,8 @@ export interface GameState {
   maxStamina: number;
 
   inventory: OwnedItem[];
-  knownRecipes: string[];
+  ownedRecipes: string[];   // 所持している教科書（レシピ本）
+  knownRecipes: string[];   // 勉強して習得したレシピ
 
   activeQuests: ActiveQuest[];
   availableQuests: QuestDef[];
