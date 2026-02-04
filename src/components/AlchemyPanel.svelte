@@ -3,7 +3,7 @@
   import { endTurn } from '$lib/services/gameLoop';
   import { getRecipe, recipes } from '$lib/data/recipes';
   import { getItem } from '$lib/data/items';
-  import { craft, getMatchingItems, countAvailableIngredients } from '$lib/services/alchemy';
+  import { craft, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality } from '$lib/services/alchemy';
   import type { RecipeDef, OwnedItem, Ingredient } from '$lib/models/types';
 
   export let onBack: () => void;
@@ -121,6 +121,16 @@
     }
     return true;
   }
+
+  // 成功率の計算（リアクティブ）
+  $: successRate = selectedRecipe
+    ? calculateSuccessRate(selectedRecipe, $gameState.alchemyLevel)
+    : 0;
+
+  // 予想品質の計算（リアクティブ）
+  $: expectedQuality = selectedRecipe && selectedItems.length > 0
+    ? calculateExpectedQuality(selectedRecipe, selectedItems, $gameState.alchemyLevel)
+    : null;
 </script>
 
 <div class="alchemy-panel">
@@ -242,6 +252,25 @@
             </p>
           {:else}
             <p>素材の選択が完了しました。調合を開始しますか？</p>
+
+            <div class="craft-preview">
+              <div class="preview-item">
+                <span class="preview-label">成功率</span>
+                <span class="preview-value success-rate" class:high={successRate >= 0.8} class:low={successRate < 0.5}>
+                  {Math.round(successRate * 100)}%
+                </span>
+              </div>
+              {#if expectedQuality}
+                <div class="preview-item">
+                  <span class="preview-label">予想品質</span>
+                  <span class="preview-value quality">
+                    {expectedQuality.min} 〜 {expectedQuality.max}
+                    <span class="quality-hint">(基準: {expectedQuality.base})</span>
+                  </span>
+                </div>
+              {/if}
+            </div>
+
             <button class="craft-btn" on:click={executeCraft}>
               調合する ({selectedRecipe.daysRequired}日)
             </button>
@@ -540,5 +569,55 @@
     font-style: italic;
     padding: 1rem;
     text-align: center;
+  }
+
+  .craft-preview {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 1rem 0;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+  }
+
+  .preview-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .preview-label {
+    font-size: 0.85rem;
+    color: #a0a0b0;
+  }
+
+  .preview-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+
+  .success-rate {
+    color: #ffc107;
+  }
+
+  .success-rate.high {
+    color: #81c784;
+  }
+
+  .success-rate.low {
+    color: #ff6b6b;
+  }
+
+  .quality {
+    color: #82b1ff;
+  }
+
+  .quality-hint {
+    font-size: 0.75rem;
+    font-weight: normal;
+    color: #808090;
+    margin-left: 0.25rem;
   }
 </style>

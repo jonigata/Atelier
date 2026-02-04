@@ -1,6 +1,7 @@
 <script lang="ts">
   import { gameState, daysRemaining, expForNextLevel } from '$lib/stores/game';
   import { getCurrentGoal, getAchievementProgress } from '$lib/services/achievement';
+  import MoneyIndicator from './MoneyIndicator.svelte';
 
   // $gameStateの変更でcurrentGoalを再計算
   $: currentGoal = (() => {
@@ -15,41 +16,55 @@
 </script>
 
 <div class="hud">
-  <div class="hud-item">
-    <span class="label">日付</span>
-    <span class="value">{$gameState.day} / 365日</span>
-    <span class="sub">(残り {$daysRemaining}日)</span>
-  </div>
+  <div class="hud-row main-row">
+    <div class="hud-section time-section">
+      <div class="section-icon">📅</div>
+      <div class="section-content">
+        <span class="day-display">{$gameState.day}日目</span>
+        <span class="remaining">残り {$daysRemaining}日</span>
+      </div>
+    </div>
 
-  <div class="hud-item">
-    <span class="label">所持金</span>
-    <span class="value">{$gameState.money.toLocaleString()} G</span>
-  </div>
+    <div class="hud-section money-section">
+      <div class="section-icon">💰</div>
+      <div class="section-content">
+        <span class="money-value">{$gameState.money.toLocaleString()} G</span>
+        <MoneyIndicator />
+      </div>
+    </div>
 
-  <div class="hud-item village">
-    <span class="label">村発展</span>
-    <span class="value">{$gameState.villageDevelopment}</span>
-  </div>
+    <div class="hud-section stats-section">
+      <div class="stat-item">
+        <span class="stat-label">村発展</span>
+        <span class="stat-value village">{$gameState.villageDevelopment}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">名声</span>
+        <span class="stat-value">{$gameState.reputation}</span>
+      </div>
+    </div>
 
-  <div class="hud-item">
-    <span class="label">名声</span>
-    <span class="value">{$gameState.reputation}</span>
-  </div>
-
-  <div class="hud-item">
-    <span class="label">錬金術Lv</span>
-    <span class="value">{$gameState.alchemyLevel}</span>
-    <span class="sub">(Exp: {$gameState.alchemyExp} / {$expForNextLevel})</span>
-  </div>
-
-  <div class="hud-item">
-    <span class="label">体力</span>
-    <span class="value">{$gameState.stamina} / {$gameState.maxStamina}</span>
+    <div class="hud-section character-section">
+      <div class="stat-item">
+        <span class="stat-label">錬金術</span>
+        <span class="stat-value">Lv.{$gameState.alchemyLevel}</span>
+        <div class="exp-bar">
+          <div class="exp-fill" style="width: {Math.min(100, ($gameState.alchemyExp / $expForNextLevel) * 100)}%"></div>
+        </div>
+      </div>
+      <div class="stat-item stamina">
+        <span class="stat-label">体力</span>
+        <span class="stat-value">{$gameState.stamina}/{$gameState.maxStamina}</span>
+        <div class="stamina-bar">
+          <div class="stamina-fill" style="width: {($gameState.stamina / $gameState.maxStamina) * 100}%"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   {#if currentGoal}
-    <div class="hud-goal">
-      <span class="goal-label">目標</span>
+    <div class="hud-row goal-row">
+      <span class="goal-badge">目標</span>
       <span class="goal-title">{currentGoal.title}</span>
       <span class="goal-hint">{currentGoal.hint}</span>
       {#if goalProgress > 0 && goalProgress < 100}
@@ -62,54 +77,128 @@
 <style>
   .hud {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem;
+    flex-direction: column;
     background: linear-gradient(135deg, #2c1810 0%, #4a2c17 100%);
     border-bottom: 3px solid #8b6914;
     color: #f4e4bc;
   }
 
-  .hud-item {
+  .hud-row {
     display: flex;
-    align-items: baseline;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .main-row {
+    gap: 1rem;
+  }
+
+  .hud-section {
+    display: flex;
+    align-items: center;
     gap: 0.5rem;
   }
 
-  .label {
-    font-size: 0.85rem;
-    color: #c9a959;
+  .section-icon {
+    font-size: 1rem;
+    opacity: 0.9;
   }
 
-  .value {
+  .section-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .time-section .day-display {
     font-size: 1.1rem;
     font-weight: bold;
   }
 
-  .sub {
+  .time-section .remaining {
     font-size: 0.75rem;
     color: #a89060;
   }
 
-  .hud-goal {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    margin-left: auto;
-    padding-left: 1rem;
-    border-left: 2px solid #8b6914;
+  .money-section .section-content {
+    position: relative;
   }
 
-  .goal-label {
-    font-size: 0.75rem;
+  .money-section .money-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #ffd700;
+  }
+
+  .stats-section,
+  .character-section {
+    display: flex;
+    gap: 1rem;
+    padding-left: 0.75rem;
+    border-left: 1px solid rgba(139, 105, 20, 0.5);
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
     color: #c9a959;
-    background: #5a3d1a;
-    padding: 0.15rem 0.4rem;
+  }
+
+  .stat-value {
+    font-size: 0.95rem;
+    font-weight: bold;
+  }
+
+  .stat-value.village {
+    color: #81c784;
+  }
+
+  .exp-bar,
+  .stamina-bar {
+    width: 50px;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .exp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6a5acd, #9370db);
+    transition: width 0.3s ease;
+  }
+
+  .stamina-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #81c784);
+    transition: width 0.3s ease;
+  }
+
+  .goal-row {
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(139, 105, 20, 0.3);
+    padding: 0.4rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .goal-badge {
+    font-size: 0.7rem;
+    color: #1a1a2e;
+    background: #c9a959;
+    padding: 0.1rem 0.4rem;
     border-radius: 3px;
+    font-weight: bold;
   }
 
   .goal-title {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: bold;
     color: #ffd700;
   }
@@ -124,7 +213,20 @@
     color: #7cb342;
   }
 
-  .hud-item.village .value {
-    color: #81c784;
+  @media (max-width: 600px) {
+    .hud-row {
+      padding: 0.4rem 0.75rem;
+    }
+
+    .stats-section,
+    .character-section {
+      padding-left: 0.5rem;
+      gap: 0.75rem;
+    }
+
+    .exp-bar,
+    .stamina-bar {
+      width: 40px;
+    }
   }
 </style>

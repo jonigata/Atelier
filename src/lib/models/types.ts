@@ -153,7 +153,8 @@ export type ActionType =
   | 'expedition'
   | 'shop'
   | 'rest'
-  | 'study';
+  | 'study'
+  | 'inventory';
 
 // =====================================
 // アチーブメントシステム

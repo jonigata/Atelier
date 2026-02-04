@@ -10,6 +10,7 @@
   import ActionPanel from '../components/ActionPanel.svelte';
   import EndingScreen from '../components/EndingScreen.svelte';
   import TutorialDialogue from '../components/TutorialDialogue.svelte';
+  import DayTransition from '../components/DayTransition.svelte';
   import DebugPanel from '../components/DebugPanel.svelte';
   import type { ActionType } from '$lib/models/types';
 
@@ -54,6 +55,9 @@
 
     <MessageLog />
   {/if}
+
+  <!-- 日数経過フィードバック -->
+  <DayTransition />
 
   <!-- チュートリアルダイアログ（最前面） -->
   <TutorialDialogue />

@@ -4,19 +4,24 @@
 
   export let onSelect: (action: ActionType) => void;
 
-  const actions: { type: ActionType; label: string; icon: string; description: string }[] = [
-    { type: 'alchemy', label: '調合', icon: '⚗️', description: 'アイテムを調合する' },
-    { type: 'quest', label: '依頼', icon: '📜', description: '依頼の確認・受注・納品' },
-    { type: 'expedition', label: '採取', icon: '🏕️', description: '採取隊を派遣する' },
-    { type: 'shop', label: 'ショップ', icon: '🏪', description: 'アイテムの売買' },
-    { type: 'rest', label: '休息', icon: '😴', description: '体力を回復する (1日)' },
-    { type: 'study', label: '勉強', icon: '📚', description: '新しいレシピを習得' },
+  const actions: { type: ActionType; label: string; icon: string; description: string; unlockHint: string }[] = [
+    { type: 'alchemy', label: '調合', icon: '⚗️', description: 'アイテムを調合する', unlockHint: 'レシピを習得すると解放' },
+    { type: 'quest', label: '依頼', icon: '📜', description: '依頼の確認・受注・納品', unlockHint: 'アイテムを調合すると解放' },
+    { type: 'expedition', label: '採取', icon: '🏕️', description: '採取隊を派遣する', unlockHint: '依頼を完了すると解放' },
+    { type: 'shop', label: 'ショップ', icon: '🏪', description: 'アイテムの売買', unlockHint: '依頼を受注すると解放' },
+    { type: 'inventory', label: '所持品', icon: '📦', description: '持ち物を確認する', unlockHint: '' },
+    { type: 'rest', label: '休息', icon: '😴', description: '体力を回復する (1日)', unlockHint: '' },
+    { type: 'study', label: '勉強', icon: '📚', description: '新しいレシピを習得', unlockHint: '' },
   ];
 
   $: unlockedActions = $gameState.tutorialProgress.unlockedActions;
   $: isTutorialActive = $gameState.tutorialProgress.isActive;
 
+  // 常に利用可能なアクション
+  const alwaysAvailable: ActionType[] = ['rest', 'study', 'inventory'];
+
   function isLocked(actionType: ActionType): boolean {
+    if (alwaysAvailable.includes(actionType)) return false;
     return isTutorialActive && !unlockedActions.includes(actionType);
   }
 </script>
@@ -33,7 +38,11 @@
       >
         <span class="icon">{action.icon}</span>
         <span class="label">{action.label}</span>
-        <span class="description">{action.description}</span>
+        {#if isLocked(action.type) && action.unlockHint}
+          <span class="description unlock-hint">{action.unlockHint}</span>
+        {:else}
+          <span class="description">{action.description}</span>
+        {/if}
         {#if isLocked(action.type)}
           <span class="lock-badge">🔒</span>
         {:else if action.type === 'expedition' && $gameState.expedition !== null}
@@ -105,6 +114,11 @@
   .description {
     font-size: 0.8rem;
     color: #a0a0b0;
+  }
+
+  .unlock-hint {
+    color: #ff9800;
+    font-style: italic;
   }
 
   .badge {

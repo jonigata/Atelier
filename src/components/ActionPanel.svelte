@@ -2,11 +2,30 @@
   import { gameState, addMessage, restoreStamina, consumeStamina, learnRecipe } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
+  import { items } from '$lib/data/items';
   import type { ActionType, RecipeDef } from '$lib/models/types';
+
+  // 素材名を取得するヘルパー
+  function getIngredientName(ingredient: { itemId?: string; category?: string }): string {
+    if (ingredient.itemId) {
+      return items[ingredient.itemId]?.name || ingredient.itemId;
+    }
+    if (ingredient.category) {
+      const categoryNames: Record<string, string> = {
+        herb: 'ハーブ系',
+        ore: '鉱石系',
+        water: '水系',
+        misc: 'その他',
+      };
+      return categoryNames[ingredient.category] || ingredient.category;
+    }
+    return '不明';
+  }
   import AlchemyPanel from './AlchemyPanel.svelte';
   import ExpeditionPanel from './ExpeditionPanel.svelte';
   import ShopPanel from './ShopPanel.svelte';
   import QuestPanel from './QuestPanel.svelte';
+  import InventoryPanel from './InventoryPanel.svelte';
 
   export let action: ActionType;
   export let onBack: () => void;
@@ -52,8 +71,6 @@
 </script>
 
 <div class="action-panel">
-  <button class="back-btn" on:click={onBack}>← 戻る</button>
-
   {#if action === 'alchemy'}
     <AlchemyPanel {onBack} />
 
@@ -66,7 +83,11 @@
   {:else if action === 'shop'}
     <ShopPanel {onBack} />
 
+  {:else if action === 'inventory'}
+    <InventoryPanel {onBack} />
+
   {:else if action === 'rest'}
+    <button class="back-btn" on:click={onBack}>← 戻る</button>
     <h2>😴 休息</h2>
     <p>体力を全回復します。1日経過します。</p>
     <p class="current-stamina">
@@ -77,6 +98,7 @@
     </button>
 
   {:else if action === 'study'}
+    <button class="back-btn" on:click={onBack}>← 戻る</button>
     <h2>📚 勉強</h2>
     <p>教科書を選んでレシピを習得します。3日経過します。</p>
     <p class="known-recipes">
@@ -92,8 +114,18 @@
             class:selected={selectedRecipeId === recipe.id}
             on:click={() => selectRecipe(recipe.id)}
           >
-            <span class="recipe-name">{recipe.name}</span>
-            <span class="recipe-info">必要Lv.{recipe.requiredLevel}</span>
+            <div class="recipe-header">
+              <span class="recipe-name">{recipe.name}</span>
+              <span class="recipe-info">必要Lv.{recipe.requiredLevel}</span>
+            </div>
+            {#if selectedRecipeId === recipe.id}
+              <div class="recipe-details">
+                <span class="detail-label">必要素材:</span>
+                {#each recipe.ingredients as ing}
+                  <span class="ingredient">{getIngredientName(ing)} ×{ing.quantity}</span>
+                {/each}
+              </div>
+            {/if}
           </button>
         {/each}
       </div>
@@ -109,8 +141,16 @@
         <h3>レベル不足</h3>
         {#each lockedRecipes as recipe}
           <div class="recipe-item locked">
-            <span class="recipe-name">{recipe.name}</span>
-            <span class="recipe-info">必要Lv.{recipe.requiredLevel}</span>
+            <div class="recipe-header">
+              <span class="recipe-name">{recipe.name}</span>
+              <span class="recipe-info">必要Lv.{recipe.requiredLevel}</span>
+            </div>
+            <div class="recipe-details">
+              <span class="detail-label">必要素材:</span>
+              {#each recipe.ingredients as ing}
+                <span class="ingredient">{getIngredientName(ing)} ×{ing.quantity}</span>
+              {/each}
+            </div>
           </div>
         {/each}
       </div>
@@ -211,8 +251,7 @@
 
   .recipe-item {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
     width: 100%;
     padding: 0.75rem 1rem;
     margin-bottom: 0.5rem;
@@ -223,6 +262,33 @@
     cursor: pointer;
     transition: all 0.2s;
     text-align: left;
+    gap: 0.5rem;
+  }
+
+  .recipe-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .recipe-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+
+  .detail-label {
+    color: #808090;
+  }
+
+  .ingredient {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    color: #c0c0d0;
   }
 
   .recipe-item:hover:not(.locked) {

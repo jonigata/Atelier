@@ -186,12 +186,37 @@ function consumeItems(items: OwnedItem[]): void {
 /**
  * 成功率を計算
  */
-function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number): number {
+export function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number): number {
   // 基本成功率: 難易度1で95%、難易度10で50%
   const baserate = 1 - (recipe.difficulty - 1) * 0.05;
   // レベルボーナス: レベルが必要レベルを超えるごとに+5%
   const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * 0.05);
   return Math.min(0.99, baserate + levelBonus);
+}
+
+/**
+ * 予想品質を計算（ランダム要素を除く）
+ */
+export function calculateExpectedQuality(
+  recipe: RecipeDef,
+  selectedItems: OwnedItem[],
+  alchemyLevel: number
+): { min: number; max: number; base: number } {
+  if (selectedItems.length === 0) {
+    return { min: 0, max: 0, base: 0 };
+  }
+  // 素材の平均品質
+  const avgQuality =
+    selectedItems.reduce((sum, item) => sum + item.quality, 0) / selectedItems.length;
+
+  // レベル補正
+  const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * 2);
+
+  const base = Math.floor(avgQuality + levelBonus);
+  const min = Math.max(1, base - 10);
+  const max = Math.min(100, base + 10);
+
+  return { min, max, base };
 }
 
 /**
