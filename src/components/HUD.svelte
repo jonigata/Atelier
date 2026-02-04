@@ -1,19 +1,6 @@
 <script lang="ts">
   import { gameState, daysRemaining, expForNextLevel } from '$lib/stores/game';
-  import { getActiveGoals, getAchievementProgress } from '$lib/services/achievement';
   import MoneyIndicator from './MoneyIndicator.svelte';
-
-  // $gameStateの変更でactiveGoalsを再計算
-  $: activeGoals = (() => {
-    // これらの参照でリアクティビティをトリガー
-    void $gameState.achievementProgress.completed.length;
-    void $gameState.knownRecipes.length;
-    void $gameState.stats.totalCraftCount;
-    void $gameState.completedQuestCount;
-    void $gameState.stats.totalExpeditionCount;
-    void $gameState.alchemyLevel;
-    return getActiveGoals();
-  })();
 </script>
 
 <div class="hud">
@@ -63,23 +50,6 @@
     </div>
   </div>
 
-  {#if activeGoals.length > 0}
-    <div class="hud-row goal-row">
-      <span class="goal-badge">目標</span>
-      <div class="goals-list">
-        {#each activeGoals as goal}
-          {@const progress = getAchievementProgress(goal.id)}
-          <div class="goal-item">
-            <span class="goal-title">{goal.title}</span>
-            <span class="goal-hint">{goal.hint}</span>
-            {#if progress > 0 && progress < 100}
-              <span class="goal-progress">({progress}%)</span>
-            {/if}
-          </div>
-        {/each}
-      </div>
-    </div>
-  {/if}
 </div>
 
 <style>
@@ -187,53 +157,6 @@
     height: 100%;
     background: linear-gradient(90deg, #4caf50, #81c784);
     transition: width 0.3s ease;
-  }
-
-  .goal-row {
-    background: rgba(0, 0, 0, 0.2);
-    border-top: 1px solid rgba(139, 105, 20, 0.3);
-    padding: 0.4rem 1rem;
-    gap: 0.5rem;
-    align-items: flex-start;
-  }
-
-  .goal-badge {
-    font-size: 0.7rem;
-    color: #1a1a2e;
-    background: #c9a959;
-    padding: 0.1rem 0.4rem;
-    border-radius: 3px;
-    font-weight: bold;
-    flex-shrink: 0;
-    margin-top: 0.1rem;
-  }
-
-  .goals-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.5rem;
-  }
-
-  .goal-item {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
-  .goal-title {
-    font-size: 0.85rem;
-    font-weight: bold;
-    color: #ffd700;
-  }
-
-  .goal-hint {
-    font-size: 0.75rem;
-    color: #c9a959;
-  }
-
-  .goal-progress {
-    font-size: 0.7rem;
-    color: #7cb342;
   }
 
   @media (max-width: 600px) {

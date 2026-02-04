@@ -169,6 +169,14 @@ export function initializeActiveGoalTracking(): void {
 }
 
 /**
+ * 通知済みの発動中目標を取得（トースト表示済みのもののみ）
+ */
+export function getNotifiedActiveGoals(): AchievementDef[] {
+  const goals = getActiveGoals();
+  return goals.filter((goal) => previousActiveGoalIds.has(goal.id));
+}
+
+/**
  * 次に目指すべきアチーブメントを取得（後方互換のため残す）
  */
 export function getCurrentGoal(): AchievementDef | null {

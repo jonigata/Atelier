@@ -113,6 +113,9 @@
         return type;
     }
   }
+
+  // 納品可能なクエスト数
+  $: deliverableCount = $gameState.activeQuests.filter((quest) => canDeliver(quest)).length;
 </script>
 
 <div class="quest-panel">
@@ -133,6 +136,9 @@
       on:click={() => (activeTab = 'active')}
     >
       受注中 ({$gameState.activeQuests.length}/3)
+      {#if deliverableCount > 0}
+        <span class="badge">{deliverableCount}</span>
+      {/if}
     </button>
   </div>
 
@@ -269,6 +275,21 @@
     border-color: #c9a959;
     color: #f4e4bc;
     background: rgba(201, 169, 89, 0.2);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.4rem;
+    margin-left: 0.5rem;
+    background: #4caf50;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: white;
   }
 
   .quest-list {
