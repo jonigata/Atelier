@@ -96,6 +96,9 @@ export const villageMilestones: VillageMilestone[] = [
   },
 ];
 
+// チュートリアルで解放されるアクション（村発展マイルストーン対象外）
+export const TUTORIAL_ACTIONS: ActionType[] = ['rest', 'study', 'alchemy', 'quest', 'shop'];
+
 // 全アクション（最終的に解放される状態）
 export const ALL_ACTIONS: ActionType[] = ['rest', 'study', 'alchemy', 'quest', 'shop', 'expedition'];
 

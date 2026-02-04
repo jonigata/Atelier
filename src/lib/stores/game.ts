@@ -8,7 +8,7 @@ import type {
   TutorialDialogue,
   ActionType,
 } from '$lib/models/types';
-import { milestones, getUnlockedActionsUpTo, getMilestoneDialogue, ALL_ACTIONS } from '$lib/data/tutorial';
+import { milestones, getUnlockedActionsUpTo, getMilestoneDialogue, TUTORIAL_ACTIONS, ALL_ACTIONS } from '$lib/data/tutorial';
 
 function createInitialState(): GameState {
   return {
@@ -271,6 +271,10 @@ export function markItemCrafted(itemId: string): void {
 }
 
 export function resetGame(): void {
+  // 村発展マイルストーンもリセット
+  import('$lib/services/gameLoop').then(({ resetVillageMilestones }) => {
+    resetVillageMilestones();
+  });
   gameState.set(createInitialState());
 }
 
@@ -302,7 +306,8 @@ export function completeTutorial(): void {
     tutorialProgress: {
       ...state.tutorialProgress,
       isActive: false,
-      unlockedActions: ALL_ACTIONS,
+      // チュートリアル終了時は TUTORIAL_ACTIONS + 既存のアンロック（村発展分）を維持
+      unlockedActions: [...new Set([...TUTORIAL_ACTIONS, ...state.tutorialProgress.unlockedActions])],
       pendingDialogue: null,
     },
   }));
@@ -314,7 +319,8 @@ export function skipTutorial(): void {
     tutorialProgress: {
       isActive: false,
       currentMilestone: -1,
-      unlockedActions: ALL_ACTIONS,
+      // 経験者モードでもexpeditionは村発展マイルストーンで解放
+      unlockedActions: TUTORIAL_ACTIONS,
       pendingDialogue: null,
     },
   }));

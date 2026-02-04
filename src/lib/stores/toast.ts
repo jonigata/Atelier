@@ -5,6 +5,17 @@ let toastId = 0;
 
 export const toasts = writable<Toast[]>([]);
 
+// アクションタイプの日本語ラベル
+const actionLabels: Record<ActionType, string> = {
+  alchemy: '調合',
+  quest: '依頼',
+  expedition: '採取',
+  shop: 'ショップ',
+  inventory: '所持品',
+  rest: '休息',
+  study: '勉強',
+};
+
 // 新しくアンロックされたアクション（演出用）
 export const pendingUnlockActions = writable<ActionType[]>([]);
 export const showingUnlockActions = writable<Set<ActionType>>(new Set());
@@ -43,8 +54,9 @@ export function dismissToast(id: number): void {
 }
 
 // 便利関数
-export function showUnlockToast(actionName: string): void {
-  showToast('unlock', '機能解放', `「${actionName}」が使えるようになった！`);
+export function showUnlockToast(action: ActionType): void {
+  const label = actionLabels[action] ?? action;
+  showToast('unlock', '機能解放', `「${label}」が使えるようになった！`);
 }
 
 export function showGoalActiveToast(goalTitle: string): void {

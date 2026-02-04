@@ -223,7 +223,7 @@ export interface AchievementDef {
   category: AchievementCategory;
   narrative: AchievementNarrative;
   narrativeCharacter?: { name: string; title: string };
-  narrativeMessage: string;
+  narrativeLines: string[];  // 複数行のダイアログ
   conditions: AchievementCondition[];
   reward: AchievementReward;
   prerequisite?: string[];

@@ -262,7 +262,7 @@ export function getAchievementDialogue(achievementId: string): TutorialDialogue 
     return {
       characterName: '',
       characterTitle: '',
-      lines: [achievement.narrativeMessage],
+      lines: achievement.narrativeLines,
       achievementTitle: achievement.title,
       rewards,
     };
@@ -271,7 +271,7 @@ export function getAchievementDialogue(achievementId: string): TutorialDialogue 
   return {
     characterName: character.name,
     characterTitle: character.title,
-    lines: [achievement.narrativeMessage],
+    lines: achievement.narrativeLines,
     achievementTitle: achievement.title,
     rewards,
   };

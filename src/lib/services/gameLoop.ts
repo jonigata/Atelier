@@ -23,7 +23,14 @@ import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import type { OwnedItem, MorningEvent } from '$lib/models/types';
 
 // 達成済みの村発展マイルストーンを追跡
-const completedVillageMilestones = new Set<string>();
+let completedVillageMilestones = new Set<string>();
+
+/**
+ * 村発展マイルストーンをリセット
+ */
+export function resetVillageMilestones(): void {
+  completedVillageMilestones = new Set<string>();
+}
 
 /**
  * ゲームループのメイン処理
