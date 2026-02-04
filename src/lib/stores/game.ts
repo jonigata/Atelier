@@ -1,5 +1,14 @@
 import { writable, derived, get } from 'svelte/store';
-import type { GameState, OwnedItem, MorningEvent, ActiveQuest, QuestDef } from '$lib/models/types';
+import type {
+  GameState,
+  OwnedItem,
+  MorningEvent,
+  ActiveQuest,
+  QuestDef,
+  TutorialDialogue,
+  ActionType,
+} from '$lib/models/types';
+import { milestones, getUnlockedActionsUpTo, getMilestoneDialogue, ALL_ACTIONS } from '$lib/data/tutorial';
 
 function createInitialState(): GameState {
   return {
@@ -36,6 +45,26 @@ function createInitialState(): GameState {
     phase: 'morning',
     morningEvents: [],
     messageLog: ['ゲームを開始しました。'],
+
+    tutorialProgress: {
+      isActive: true,
+      currentMilestone: 0,
+      unlockedActions: ['rest', 'study'],
+      pendingDialogue: getMilestoneDialogue(0),
+    },
+
+    achievementProgress: {
+      completed: [],
+      pendingReward: null,
+    },
+
+    stats: {
+      totalCraftCount: 0,
+      totalExpeditionCount: 0,
+      consecutiveQuestSuccess: 0,
+      highestQualityCrafted: 0,
+      totalSalesAmount: 0,
+    },
   };
 }
 
@@ -218,4 +247,145 @@ export function markItemCrafted(itemId: string): void {
 
 export function resetGame(): void {
   gameState.set(createInitialState());
+}
+
+// チュートリアル関連アクション
+export function setTutorialDialogue(dialogue: TutorialDialogue | null): void {
+  gameState.update((state) => ({
+    ...state,
+    tutorialProgress: {
+      ...state.tutorialProgress,
+      pendingDialogue: dialogue,
+    },
+  }));
+}
+
+export function advanceTutorialMilestone(milestoneId: number): void {
+  gameState.update((state) => ({
+    ...state,
+    tutorialProgress: {
+      ...state.tutorialProgress,
+      currentMilestone: milestoneId,
+      unlockedActions: getUnlockedActionsUpTo(milestoneId),
+    },
+  }));
+}
+
+export function completeTutorial(): void {
+  gameState.update((state) => ({
+    ...state,
+    tutorialProgress: {
+      ...state.tutorialProgress,
+      isActive: false,
+      unlockedActions: ALL_ACTIONS,
+      pendingDialogue: null,
+    },
+  }));
+}
+
+export function skipTutorial(): void {
+  gameState.update((state) => ({
+    ...state,
+    tutorialProgress: {
+      isActive: false,
+      currentMilestone: -1,
+      unlockedActions: ALL_ACTIONS,
+      pendingDialogue: null,
+    },
+  }));
+}
+
+export function isActionUnlocked(action: ActionType): boolean {
+  const state = get(gameState);
+  return state.tutorialProgress.unlockedActions.includes(action);
+}
+
+// =====================================
+// 統計更新関数
+// =====================================
+
+export function incrementCraftCount(quality: number): void {
+  gameState.update((state) => ({
+    ...state,
+    stats: {
+      ...state.stats,
+      totalCraftCount: state.stats.totalCraftCount + 1,
+      highestQualityCrafted: Math.max(state.stats.highestQualityCrafted, quality),
+    },
+  }));
+}
+
+export function incrementExpeditionCount(): void {
+  gameState.update((state) => ({
+    ...state,
+    stats: {
+      ...state.stats,
+      totalExpeditionCount: state.stats.totalExpeditionCount + 1,
+    },
+  }));
+}
+
+export function incrementConsecutiveQuestSuccess(): void {
+  gameState.update((state) => ({
+    ...state,
+    stats: {
+      ...state.stats,
+      consecutiveQuestSuccess: state.stats.consecutiveQuestSuccess + 1,
+    },
+  }));
+}
+
+export function resetConsecutiveQuestSuccess(): void {
+  gameState.update((state) => ({
+    ...state,
+    stats: {
+      ...state.stats,
+      consecutiveQuestSuccess: 0,
+    },
+  }));
+}
+
+export function addSalesAmount(amount: number): void {
+  gameState.update((state) => ({
+    ...state,
+    stats: {
+      ...state.stats,
+      totalSalesAmount: state.stats.totalSalesAmount + amount,
+    },
+  }));
+}
+
+// =====================================
+// アチーブメント関連アクション
+// =====================================
+
+export function completeAchievement(achievementId: string): void {
+  gameState.update((state) => {
+    if (state.achievementProgress.completed.includes(achievementId)) {
+      return state;
+    }
+    return {
+      ...state,
+      achievementProgress: {
+        ...state.achievementProgress,
+        completed: [...state.achievementProgress.completed, achievementId],
+        pendingReward: achievementId,
+      },
+    };
+  });
+}
+
+export function clearPendingReward(): void {
+  gameState.update((state) => ({
+    ...state,
+    achievementProgress: {
+      ...state.achievementProgress,
+      pendingReward: null,
+    },
+  }));
+}
+
+export function isAchievementCompleted(achievementId: string): boolean {
+  const state = get(gameState);
+  return state.achievementProgress.completed.includes(achievementId);
 }

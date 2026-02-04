@@ -91,9 +91,24 @@ export type GamePhase =
 
 // 朝のイベント
 export interface MorningEvent {
-  type: 'expedition_return' | 'new_quest' | 'quest_expired';
+  type: 'expedition_return' | 'new_quest' | 'quest_expired' | 'tutorial';
   message: string;
   data?: unknown;
+}
+
+// チュートリアル会話
+export interface TutorialDialogue {
+  characterName: string;
+  characterTitle: string;
+  lines: string[];
+}
+
+// チュートリアル進行状態
+export interface TutorialProgress {
+  isActive: boolean;
+  currentMilestone: number;
+  unlockedActions: ActionType[];
+  pendingDialogue: TutorialDialogue | null;
 }
 
 // ゲーム状態
@@ -122,6 +137,10 @@ export interface GameState {
   phase: GamePhase;
   morningEvents: MorningEvent[];
   messageLog: string[];
+
+  tutorialProgress: TutorialProgress;
+  achievementProgress: AchievementProgress;
+  stats: GameStats;
 }
 
 // 行動タイプ
@@ -132,3 +151,90 @@ export type ActionType =
   | 'shop'
   | 'rest'
   | 'study';
+
+// =====================================
+// アチーブメントシステム
+// =====================================
+
+// ナラティブの種類（報酬の出所）
+export type AchievementNarrative =
+  | 'academy_grant'       // アカデミー奨励金制度
+  | 'senior_handdown'     // 先輩からのお下がり
+  | 'townspeople_gift'    // 街の住人からの差し入れ
+  | 'patron_support'      // パトロン制度
+  | 'workshop_discovery'  // 工房の発掘
+  | 'guild_rank_bonus'    // ギルドランク昇格ボーナス
+  | 'character_trial'     // キャラクターからの試練
+  | 'client_gratitude'    // 依頼主からの特別謝礼
+  | 'seasonal_award'      // 季節イベントの表彰
+  | 'self_investment';    // 自分への投資が実る
+
+// アチーブメントカテゴリ
+export type AchievementCategory =
+  | 'tutorial'   // チュートリアル
+  | 'alchemy'    // 調合系
+  | 'quest'      // 依頼系
+  | 'expedition' // 採取系
+  | 'economy'    // 経済系
+  | 'mastery';   // 熟練系
+
+// アチーブメント報酬
+export interface AchievementReward {
+  money?: number;
+  items?: { itemId: string; quality: number; quantity: number }[];
+  reputation?: number;
+  recipes?: string[];
+}
+
+// アチーブメント条件の種類
+export type AchievementConditionType =
+  | 'level'
+  | 'reputation'
+  | 'money'
+  | 'quest_count'
+  | 'craft_count'
+  | 'craft_item'
+  | 'craft_quality'
+  | 'expedition_count'
+  | 'recipe_count'
+  | 'consecutive_quests'
+  | 'total_sales';
+
+// アチーブメント条件
+export interface AchievementCondition {
+  type: AchievementConditionType;
+  target: number | string;
+  comparison?: '>=' | '>' | '==' | '<=' | '<';
+}
+
+// アチーブメント定義（マスタ）
+export interface AchievementDef {
+  id: string;
+  title: string;
+  description: string;
+  hint: string;
+  category: AchievementCategory;
+  narrative: AchievementNarrative;
+  narrativeCharacter?: { name: string; title: string };
+  narrativeMessage: string;
+  conditions: AchievementCondition[];
+  reward: AchievementReward;
+  prerequisite?: string[];
+  priority: number;
+  tutorialMilestone?: number;  // チュートリアルとの連携用
+}
+
+// アチーブメント進行状態
+export interface AchievementProgress {
+  completed: string[];
+  pendingReward: string | null;
+}
+
+// ゲーム統計
+export interface GameStats {
+  totalCraftCount: number;
+  totalExpeditionCount: number;
+  consecutiveQuestSuccess: number;
+  highestQualityCrafted: number;
+  totalSalesAmount: number;
+}
