@@ -12,6 +12,13 @@
     { type: 'rest', label: '休息', icon: '😴', description: '体力を回復する (1日)' },
     { type: 'study', label: '勉強', icon: '📚', description: '新しいレシピを習得' },
   ];
+
+  $: unlockedActions = $gameState.tutorialProgress.unlockedActions;
+  $: isTutorialActive = $gameState.tutorialProgress.isActive;
+
+  function isLocked(actionType: ActionType): boolean {
+    return isTutorialActive && !unlockedActions.includes(actionType);
+  }
 </script>
 
 <div class="action-menu">
@@ -20,13 +27,16 @@
     {#each actions as action}
       <button
         class="action-btn"
+        class:locked={isLocked(action.type)}
         on:click={() => onSelect(action.type)}
-        disabled={action.type === 'expedition' && $gameState.expedition !== null}
+        disabled={isLocked(action.type) || (action.type === 'expedition' && $gameState.expedition !== null)}
       >
         <span class="icon">{action.icon}</span>
         <span class="label">{action.label}</span>
         <span class="description">{action.description}</span>
-        {#if action.type === 'expedition' && $gameState.expedition !== null}
+        {#if isLocked(action.type)}
+          <span class="lock-badge">🔒</span>
+        {:else if action.type === 'expedition' && $gameState.expedition !== null}
           <span class="badge">派遣中</span>
         {/if}
       </button>
@@ -78,6 +88,11 @@
     cursor: not-allowed;
   }
 
+  .action-btn.locked {
+    opacity: 0.4;
+    filter: grayscale(0.5);
+  }
+
   .icon {
     font-size: 2rem;
   }
@@ -102,5 +117,12 @@
     font-size: 0.7rem;
     font-weight: bold;
     border-radius: 4px;
+  }
+
+  .lock-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1.2rem;
   }
 </style>

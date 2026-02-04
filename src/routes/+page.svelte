@@ -2,12 +2,14 @@
   import { onMount } from 'svelte';
   import { gameState } from '$lib/stores/game';
   import { initializeGame } from '$lib/services/gameLoop';
+  import { checkMilestoneProgress } from '$lib/services/tutorial';
   import HUD from '../components/HUD.svelte';
   import MessageLog from '../components/MessageLog.svelte';
   import MorningPanel from '../components/MorningPanel.svelte';
   import ActionMenu from '../components/ActionMenu.svelte';
   import ActionPanel from '../components/ActionPanel.svelte';
   import EndingScreen from '../components/EndingScreen.svelte';
+  import TutorialDialogue from '../components/TutorialDialogue.svelte';
   import type { ActionType } from '$lib/models/types';
 
   let selectedAction: ActionType | null = null;
@@ -22,6 +24,8 @@
 
   function handleBackToMenu() {
     selectedAction = null;
+    // アクション完了後にチュートリアル進行をチェック
+    checkMilestoneProgress();
   }
 </script>
 
@@ -49,6 +53,9 @@
 
     <MessageLog />
   {/if}
+
+  <!-- チュートリアルダイアログ（最前面） -->
+  <TutorialDialogue />
 </div>
 
 <style>
