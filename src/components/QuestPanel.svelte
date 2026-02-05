@@ -12,7 +12,7 @@
     setAvailableQuests,
     clearNewQuestCount,
   } from '$lib/stores/game';
-  import { getItem, getItemIcon } from '$lib/data/items';
+  import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { removeItemsFromInventory } from '$lib/services/inventory';
   import { checkMilestoneProgress } from '$lib/services/tutorial';
   import type { QuestDef, ActiveQuest, OwnedItem } from '$lib/models/types';
@@ -169,7 +169,7 @@
             <p class="quest-desc">{quest.description}</p>
             <div class="quest-details">
               <span class="requirement">
-                <img class="item-icon-small" src={getItemIcon(quest.requiredItemId)} alt={itemDef?.name || quest.requiredItemId} />
+                <img class="item-icon-small" src={getItemIcon(quest.requiredItemId)} alt={itemDef?.name || quest.requiredItemId} on:error={handleIconError} />
                 {itemDef?.name || quest.requiredItemId}
                 ×{quest.requiredQuantity}
                 {#if quest.requiredQuality}
@@ -213,7 +213,7 @@
             </div>
             <div class="quest-details">
               <span class="requirement">
-                <img class="item-icon-small" src={getItemIcon(quest.requiredItemId)} alt={itemDef?.name || quest.requiredItemId} />
+                <img class="item-icon-small" src={getItemIcon(quest.requiredItemId)} alt={itemDef?.name || quest.requiredItemId} on:error={handleIconError} />
                 {itemDef?.name || quest.requiredItemId}
                 ×{quest.requiredQuantity}
                 {#if quest.requiredQuality}

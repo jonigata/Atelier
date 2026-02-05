@@ -1,5 +1,5 @@
 // アイテムカテゴリ
-export type ItemCategory = 'herb' | 'ore' | 'water' | 'misc' | 'product';
+export type ItemCategory = 'herb' | 'ore' | 'water' | 'misc' | 'plant' | 'wood' | 'crystal' | 'product';
 
 // アイテム定義（マスタ）
 export interface ItemDef {

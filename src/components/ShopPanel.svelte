@@ -1,6 +1,6 @@
 <script lang="ts">
   import { gameState, addMessage, addMoney, addItem, addSalesAmount } from '$lib/stores/game';
-  import { items, getItem, getItemIcon } from '$lib/data/items';
+  import { items, getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { removeItemFromInventory } from '$lib/services/inventory';
   import { SHOP } from '$lib/data/balance';
   import type { OwnedItem, ItemDef } from '$lib/models/types';
@@ -118,7 +118,7 @@
       {#each buyableItems as item}
         {@const canBuy = $gameState.money >= item.basePrice}
         <div class="shop-item" class:disabled={!canBuy}>
-          <img class="item-icon" src={getItemIcon(item.id)} alt={item.name} />
+          <img class="item-icon" src={getItemIcon(item.id)} alt={item.name} on:error={handleIconError} />
           <div class="item-info">
             <span class="item-name">{item.name}</span>
             <span class="item-desc">{item.description}</span>
@@ -147,7 +147,7 @@
           {#if def}
             <div class="item-group">
               <div class="item-group-header">
-                <img class="item-icon-small" src={getItemIcon(itemId)} alt={def.name} />
+                <img class="item-icon-small" src={getItemIcon(itemId)} alt={def.name} on:error={handleIconError} />
                 <h4>{def.name} ({items.length}個)</h4>
               </div>
               <div class="item-variants">

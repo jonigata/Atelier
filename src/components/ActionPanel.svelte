@@ -3,7 +3,7 @@
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
   import { books } from '$lib/data/books';
-  import { items, getItemIcon } from '$lib/data/items';
+  import { items, getItemIcon, handleIconError } from '$lib/data/items';
   import type { ActionType, RecipeBookDef } from '$lib/models/types';
   import { getCategoryName } from '$lib/data/categories';
 

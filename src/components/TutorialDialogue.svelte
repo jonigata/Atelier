@@ -1,7 +1,7 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
   import { resolveDialogue } from '$lib/services/presentation';
-  import { getItemIcon } from '$lib/data/items';
+  import { getItemIcon, handleIconError } from '$lib/data/items';
 
   let currentLine = 0;
   let showingRewards = false;
@@ -74,7 +74,7 @@
           {#each dialogue.structuredRewards as reward}
             <div class="reward-card" class:has-icon={reward.itemId}>
               {#if reward.itemId}
-                <img class="reward-card-icon" src={getItemIcon(reward.itemId)} alt="" />
+                <img class="reward-card-icon" src={getItemIcon(reward.itemId)} alt="" on:error={handleIconError} />
               {:else if reward.type === 'money'}
                 <span class="reward-card-emoji">💰</span>
               {:else if reward.type === 'reputation'}
