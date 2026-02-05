@@ -1,7 +1,7 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
   import { resolveDialogue } from '$lib/services/presentation';
-  import { getItemIcon, handleIconError } from '$lib/data/items';
+  import ItemCard from './common/ItemCard.svelte';
 
   let currentLine = 0;
   let showingRewards = false;
@@ -72,18 +72,11 @@
         </div>
         <div class="rewards-grid">
           {#each dialogue.structuredRewards as reward}
-            <div class="reward-card" class:has-icon={reward.itemId}>
-              {#if reward.itemId}
-                <img class="reward-card-icon" src={getItemIcon(reward.itemId)} alt="" on:error={handleIconError} />
-              {:else if reward.type === 'money'}
-                <span class="reward-card-emoji">💰</span>
-              {:else if reward.type === 'reputation'}
-                <span class="reward-card-emoji">⭐</span>
-              {:else}
-                <span class="reward-card-emoji">🎁</span>
-              {/if}
-              <span class="reward-card-text">{reward.text}</span>
-            </div>
+            <ItemCard
+              itemId={reward.itemId}
+              label={reward.text}
+              emoji={!reward.itemId ? (reward.type === 'money' ? '💰' : reward.type === 'reputation' ? '⭐' : reward.type === 'unlock' ? '🔓' : '🎁') : null}
+            />
           {/each}
         </div>
         <div class="rewards-footer">
@@ -131,6 +124,7 @@
     padding-bottom: 3rem;
     z-index: 1000;
     cursor: pointer;
+    user-select: none;
   }
 
   .dialogue-overlay.centered {
@@ -289,39 +283,10 @@
   }
 
   .rewards-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
     margin-bottom: 1.5rem;
-  }
-
-  .reward-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    background: rgba(201, 169, 89, 0.15);
-    border: 2px solid rgba(201, 169, 89, 0.4);
-    border-radius: 10px;
-  }
-
-  .reward-card-icon {
-    width: 48px;
-    height: 48px;
-    object-fit: contain;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-  }
-
-  .reward-card-emoji {
-    font-size: 2rem;
-    width: 48px;
-    text-align: center;
-  }
-
-  .reward-card-text {
-    font-size: 1.15rem;
-    font-weight: bold;
-    color: #f0d78c;
   }
 
   .rewards-footer {

@@ -3,6 +3,7 @@
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import type { OwnedItem } from '$lib/models/types';
   import { CATEGORY_NAMES, getCategoryName } from '$lib/data/categories';
+  import ItemCard from './common/ItemCard.svelte';
 
   export let onBack: () => void;
 
@@ -243,12 +244,7 @@
           {#if expandedItems.has(item.itemId)}
             <div class="item-breakdown">
               {#each item.qualities as q}
-                <div class="quality-row">
-                  <span class="quality-value" class:high={q.quality >= 70} class:low={q.quality < 30}>
-                    品質 {q.quality}
-                  </span>
-                  <span class="quality-count">×{q.count}</span>
-                </div>
+                <ItemCard itemId={item.itemId} quality={q.quality} />
               {/each}
             </div>
           {/if}
@@ -522,33 +518,11 @@
   }
 
   .item-breakdown {
-    padding: 0.5rem 1rem 0.75rem 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
     background: rgba(0, 0, 0, 0.2);
     border-top: 1px solid #3a3a5a;
-  }
-
-  .quality-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.25rem 0;
-  }
-
-  .quality-value {
-    color: #a0a0b0;
-    font-size: 0.85rem;
-  }
-
-  .quality-value.high {
-    color: #81c784;
-  }
-
-  .quality-value.low {
-    color: #ff6b6b;
-  }
-
-  .quality-count {
-    color: #c9a959;
-    font-size: 0.85rem;
   }
 </style>

@@ -5,8 +5,8 @@ export const narrativeCharacters: Record<
   AchievementNarrative,
   { name: string; title: string } | null
 > = {
-  master_gift: { name: 'アルベルト', title: '師匠（手紙）' },
-  master_teaching: { name: 'アルベルト', title: '師匠（手紙）' },
+  master_gift: { name: 'イリーナ', title: '師匠（手紙）' },
+  master_teaching: { name: 'イリーナ', title: '師匠（手紙）' },
   villager_gift: { name: '村人', title: '' },
   patron_support: { name: '???', title: '匿名の支援者' },
   workshop_discovery: null, // システムメッセージ
@@ -24,15 +24,15 @@ export const achievements: Record<string, AchievementDef> = {
   // =====================================
   ach_game_start: {
     id: 'ach_game_start',
-    title: '旅の始まり',
+    title: '新しい日々',
     description: 'ハイデル村に到着した',
     hint: '物語が始まる',
     category: 'tutorial',
     narrative: 'village_growth',
     narrativeCharacter: { name: 'オルト', title: '村長' },
     narrativeLines: [
-      'おお、君がアルベルトの弟子か。よく来てくれた',
-      '私はオルト、この村の村長をやっている。アルベルトとは若い頃からの友人でね',
+      'おお、君がイリーナの弟子か。よく来てくれた',
+      '私はオルト、この村の村長をやっている。イリーナとは若い頃からの友人でね',
       'ここが君の工房だ。小さいが、錬金術には十分だろう',
       'まずは師匠から習った知識を思い出すといい。疲れたら遠慮なく休んでくれ',
     ],
@@ -53,14 +53,14 @@ export const achievements: Record<string, AchievementDef> = {
     narrative: 'village_growth',
     narrativeCharacter: { name: 'オルト', title: '村長' },
     narrativeLines: [
-      'おお、もうレシピを覚えたのか。さすがアルベルトの弟子だ',
+      'おお、もうレシピを覚えたのか。さすがイリーナの弟子だ',
       'これは師匠から預かっていた餞別だ。役立ててくれ',
       '知識だけでは錬金術士にはなれん。実際に調合してみるといい',
     ],
     conditions: [{ type: 'recipe_count', target: 1 }],
     reward: {
       items: [{ itemId: 'herb_01', quality: 50, quantity: 3 }],
-      unlocks: ['alchemy'],
+      unlocks: ['alchemy', 'inventory'],
     },
     prerequisite: ['ach_game_start'],
     priority: 10,
@@ -336,7 +336,7 @@ export const achievements: Record<string, AchievementDef> = {
     hint: '完璧な仕事を続けよう',
     category: 'quest',
     narrative: 'master_teaching',
-    narrativeCharacter: { name: 'アルベルト', title: '師匠（手紙）' },
+    narrativeCharacter: { name: 'イリーナ', title: '師匠（手紙）' },
     narrativeLines: ['師匠からの手紙「噂は聞いている。流石は私の弟子だ」'],
     conditions: [{ type: 'consecutive_quests', target: 10 }],
     reward: { money: 1000, reputation: 10 },
@@ -484,7 +484,7 @@ export const achievements: Record<string, AchievementDef> = {
     category: 'mastery',
     narrative: 'village_growth',
     narrativeCharacter: { name: 'オルト', title: '村長' },
-    narrativeLines: ['オルト「もう立派な錬金術士だな。アルベルトも喜んでいるだろう」'],
+    narrativeLines: ['オルト「もう立派な錬金術士だな。イリーナも喜んでいるだろう」'],
     conditions: [{ type: 'level', target: 15 }],
     reward: { money: 1500, reputation: 15 },
     priority: 530,

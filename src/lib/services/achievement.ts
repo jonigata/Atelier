@@ -17,7 +17,7 @@ import {
 } from '$lib/data/achievements';
 import { items } from '$lib/data/items';
 import { recipes } from '$lib/data/recipes';
-import { showGoalActiveToast, queueUnlockAction } from '$lib/stores/toast';
+import { showGoalActiveToast, queueUnlockAction, actionLabels } from '$lib/stores/toast';
 import type {
   AchievementDef,
   AchievementCondition,
@@ -338,14 +338,6 @@ function getDetailedRewards(achievement: AchievementDef): string[] {
   }
 
   if (reward.unlocks) {
-    const actionLabels: Record<string, string> = {
-      alchemy: '調合',
-      quest: '依頼',
-      expedition: '採取',
-      shop: 'ショップ',
-      rest: '休息',
-      study: '勉強',
-    };
     for (const action of reward.unlocks) {
       const label = actionLabels[action] ?? action;
       details.push(`「${label}」解放`);
@@ -403,14 +395,6 @@ function getStructuredRewards(achievement: AchievementDef): RewardDisplay[] {
   }
 
   if (reward.unlocks) {
-    const actionLabels: Record<string, string> = {
-      alchemy: '調合',
-      quest: '依頼',
-      expedition: '採取',
-      shop: 'ショップ',
-      rest: '休息',
-      study: '勉強',
-    };
     for (const action of reward.unlocks) {
       const label = actionLabels[action] ?? action;
       structured.push({

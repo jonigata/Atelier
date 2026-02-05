@@ -207,9 +207,13 @@
           <div class="quest-item active" class:urgent={daysLeft <= 3}>
             <div class="quest-header">
               <span class="quest-title">{quest.title}</span>
-              <span class="days-left" class:danger={daysLeft <= 3}>
-                残り{daysLeft}日
-              </span>
+            </div>
+            <div class="days-bar-container">
+              <div
+                class="days-bar"
+                style="width: {Math.max(0, Math.min(100, (daysLeft / 7) * 100))}%; --danger-level: {Math.max(0, 1 - daysLeft / 7)}"
+              ></div>
+              <span class="days-label">残り{daysLeft}日</span>
             </div>
             <div class="quest-details">
               <span class="requirement">
@@ -306,10 +310,10 @@
   }
 
   .quest-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1rem;
-    max-height: 400px;
+    max-height: 500px;
     overflow-y: auto;
   }
 
@@ -320,10 +324,13 @@
   }
 
   .quest-item {
+    display: flex;
+    flex-direction: column;
     padding: 1rem;
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid #4a4a6a;
     border-radius: 8px;
+    min-height: 200px;
   }
 
   .quest-item.active {
@@ -356,17 +363,35 @@
     color: #90caf9;
   }
 
-  .days-left {
-    padding: 0.2rem 0.5rem;
-    background: rgba(76, 175, 80, 0.3);
+  .days-bar-container {
+    position: relative;
+    height: 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
     border-radius: 4px;
-    font-size: 0.85rem;
-    color: #81c784;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
   }
 
-  .days-left.danger {
-    background: rgba(244, 67, 54, 0.3);
-    color: #ef5350;
+  .days-bar {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, #4caf50 calc((1 - var(--danger-level)) * 100%), #f44336),
+      color-mix(in srgb, #81c784 calc((1 - var(--danger-level)) * 100%), #ff6b6b)
+    );
+    transition: width 0.3s ease, background 0.3s ease;
+  }
+
+  .days-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
   .quest-desc {
@@ -404,6 +429,8 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 0.75rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
   }
 
   .reward-money {

@@ -154,16 +154,13 @@
     const pending = $pendingUnlockActions;
 
     // ロック判定: アンロックされていないアクションはロック
-    // ただし、inventoryは常に利用可能
     let isLocked = false;
-    if (actionType !== 'inventory') {
-      // 日付演出中またはダイアログ表示中は、pendingのアクションもロック表示
-      // （ダイアログが閉じるまでアンロック演出を見せない）
-      if ((dayTransition !== null || pendingDialogue !== null) && pending.includes(actionType)) {
-        isLocked = true;
-      } else if (!unlockedActions.includes(actionType)) {
-        isLocked = true;
-      }
+    // 日付演出中またはダイアログ表示中は、pendingのアクションもロック表示
+    // （ダイアログが閉じるまでアンロック演出を見せない）
+    if ((dayTransition !== null || pendingDialogue !== null) && pending.includes(actionType)) {
+      isLocked = true;
+    } else if (!unlockedActions.includes(actionType)) {
+      isLocked = true;
     }
 
     // 新規アンロック判定

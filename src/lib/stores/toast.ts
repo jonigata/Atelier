@@ -6,7 +6,7 @@ let toastId = 0;
 export const toasts = writable<Toast[]>([]);
 
 // アクションタイプの日本語ラベル
-const actionLabels: Record<ActionType, string> = {
+export const actionLabels: Record<ActionType, string> = {
   alchemy: '調合',
   quest: '依頼',
   expedition: '採取',

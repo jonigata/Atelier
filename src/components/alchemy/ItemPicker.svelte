@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
+  import { getItem } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
+  import ItemCard from '../common/ItemCard.svelte';
   import type { OwnedItem, Ingredient } from '$lib/models/types';
 
   export let items: OwnedItem[];
@@ -30,12 +31,10 @@
   {:else}
     <div class="available-items">
       {#each items as item}
-        {@const def = getItem(item.itemId)}
-        <button class="item-btn" on:click={() => onSelect(item)}>
-          <img class="item-icon" src={getItemIcon(item.itemId)} alt={def?.name || item.itemId} on:error={handleIconError} />
-          <span class="item-name">{def?.name || item.itemId}</span>
-          <span class="item-quality">品質 {item.quality}</span>
-        </button>
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <div on:click={() => onSelect(item)}>
+          <ItemCard itemId={item.itemId} quality={item.quality} clickable={true} />
+        </div>
       {/each}
     </div>
   {/if}
@@ -58,40 +57,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 0.5rem;
-  }
-
-  .item-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #4a4a6a;
-    border-radius: 4px;
-    color: #e0e0f0;
-    cursor: pointer;
-    font-size: 0.85rem;
-  }
-
-  .item-icon {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-    margin-bottom: 0.25rem;
-  }
-
-  .item-btn:hover {
-    background: rgba(201, 169, 89, 0.2);
-    border-color: #c9a959;
-  }
-
-  .item-name {
-    font-weight: bold;
-  }
-
-  .item-quality {
-    font-size: 0.8rem;
-    color: #a0a0b0;
   }
 
   .no-items {
