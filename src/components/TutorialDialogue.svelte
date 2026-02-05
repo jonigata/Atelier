@@ -1,47 +1,30 @@
 <script lang="ts">
-  import { gameState, setTutorialDialogue } from '$lib/stores/game';
-  import { onDialogueClosed } from '$lib/services/tutorial';
+  import { gameState } from '$lib/stores/game';
+  import { resolveDialogue } from '$lib/services/presentation';
   import { getItemIcon } from '$lib/data/items';
 
   let currentLine = 0;
-  let showingRewards = false;  // 報酬画面を表示中かどうか
-  let delayedDialogue: typeof $gameState.tutorialProgress.pendingDialogue = null;
-  let delayTimeoutId: number | undefined;
+  let showingRewards = false;
 
+  // ダイアログは pendingDialogue がセットされたら即座に表示
+  // 日数表示との同期は presentation サービスが async/await で制御する
   $: dialogue = $gameState.tutorialProgress.pendingDialogue;
-  $: pendingTransition = $gameState.pendingDayTransition;
-  $: hasRewards = delayedDialogue?.structuredRewards && delayedDialogue.structuredRewards.length > 0;
+  $: hasRewards = dialogue?.structuredRewards && dialogue.structuredRewards.length > 0;
 
-  // 演出がない、かつダイアログがある場合のみ表示
-  $: {
-    if (delayTimeoutId) {
-      clearTimeout(delayTimeoutId);
-      delayTimeoutId = undefined;
-    }
-
-    if (dialogue && !pendingTransition) {
-      // 演出終了後、少し間を置いて表示
-      delayTimeoutId = setTimeout(() => {
-        delayedDialogue = dialogue;
-        currentLine = 0;
-        showingRewards = false;
-      }, 100) as unknown as number;
-    } else if (!dialogue) {
-      delayedDialogue = null;
-      showingRewards = false;
-    }
+  // ダイアログが変わったらリセット
+  $: if (dialogue) {
+    currentLine = 0;
+    showingRewards = false;
   }
 
   function nextLine() {
-    if (!delayedDialogue) return;
+    if (!dialogue) return;
 
     if (showingRewards) {
-      // 報酬画面からクリックで閉じる
       closeDialogue();
-    } else if (currentLine < delayedDialogue.lines.length - 1) {
+    } else if (currentLine < dialogue.lines.length - 1) {
       currentLine++;
     } else if (hasRewards) {
-      // 最後の行で報酬がある場合は報酬画面へ
       showingRewards = true;
     } else {
       closeDialogue();
@@ -49,10 +32,10 @@
   }
 
   function closeDialogue() {
-    setTutorialDialogue(null);
     currentLine = 0;
     showingRewards = false;
-    onDialogueClosed();
+    // presentation サービスに完了を通知
+    resolveDialogue();
   }
 
   function skipDialogue(event: MouseEvent) {
@@ -61,7 +44,7 @@
   }
 
   function handleKeydown(event: KeyboardEvent) {
-    if (!delayedDialogue) return;
+    if (!dialogue) return;
 
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -75,20 +58,20 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-{#if delayedDialogue}
+{#if dialogue}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <div class="dialogue-overlay" class:centered={showingRewards} on:click={nextLine} role="button" tabindex="0">
-    {#if showingRewards && delayedDialogue.structuredRewards}
+    {#if showingRewards && dialogue.structuredRewards}
       <!-- 報酬画面 -->
       <div class="rewards-screen">
         <div class="rewards-header">
           <span class="rewards-title">報酬獲得！</span>
-          {#if delayedDialogue.achievementTitle}
-            <span class="achievement-subtitle">{delayedDialogue.achievementTitle}</span>
+          {#if dialogue.achievementTitle}
+            <span class="achievement-subtitle">{dialogue.achievementTitle}</span>
           {/if}
         </div>
         <div class="rewards-grid">
-          {#each delayedDialogue.structuredRewards as reward}
+          {#each dialogue.structuredRewards as reward}
             <div class="reward-card" class:has-icon={reward.itemId}>
               {#if reward.itemId}
                 <img class="reward-card-icon" src={getItemIcon(reward.itemId)} alt="" />
@@ -110,24 +93,24 @@
     {:else}
       <!-- 通常のダイアログ -->
       <div class="dialogue-box">
-        {#if delayedDialogue.achievementTitle}
+        {#if dialogue.achievementTitle}
           <div class="achievement-header">
             <span class="achievement-badge">達成</span>
-            <span class="achievement-title">{delayedDialogue.achievementTitle}</span>
+            <span class="achievement-title">{dialogue.achievementTitle}</span>
           </div>
         {/if}
         <div class="character-info">
-          <span class="character-name">{delayedDialogue.characterName}</span>
-          <span class="character-title">{delayedDialogue.characterTitle}</span>
+          <span class="character-name">{dialogue.characterName}</span>
+          <span class="character-title">{dialogue.characterTitle}</span>
         </div>
         <div class="dialogue-text">
-          「{delayedDialogue.lines[currentLine]}」
+          「{dialogue.lines[currentLine]}」
         </div>
         <div class="continue-hint">
           <span class="hint-text">クリック または Enter で続ける</span>
           <div class="hint-right">
-            <span class="progress">{currentLine + 1} / {delayedDialogue.lines.length}{hasRewards ? ' + 報酬' : ''}</span>
-            {#if delayedDialogue.lines.length > 1 || hasRewards}
+            <span class="progress">{currentLine + 1} / {dialogue.lines.length}{hasRewards ? ' + 報酬' : ''}</span>
+            {#if dialogue.lines.length > 1 || hasRewards}
               <button class="skip-button" on:click={skipDialogue}>スキップ</button>
             {/if}
           </div>

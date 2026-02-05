@@ -17,7 +17,7 @@ import {
 } from '$lib/data/achievements';
 import { items } from '$lib/data/items';
 import { recipes } from '$lib/data/recipes';
-import { showGoalActiveToast, showGoalCompleteToast, queueUnlockAction } from '$lib/stores/toast';
+import { showGoalActiveToast, queueUnlockAction } from '$lib/stores/toast';
 import type {
   AchievementDef,
   AchievementCondition,
@@ -126,6 +126,9 @@ function isAchievementEligible(achievement: AchievementDef, state: GameState): b
 /**
  * 全アチーブメントをチェックし、達成したものを処理
  * @returns 達成したアチーブメントID（最初の1つのみ）
+ *
+ * 注意: トースト表示はこの関数では行わない
+ * presentation.ts が async/await で順序制御を行う
  */
 export function checkAchievements(): string | null {
   const state = get(gameState);
@@ -140,13 +143,7 @@ export function checkAchievements(): string | null {
   for (const achievement of achievements) {
     if (isAchievementEligible(achievement, state)) {
       completeAchievement(achievement.id);
-
-      // 達成トースト
-      showGoalCompleteToast(achievement.title);
-
-      // 新しく発動した目標をチェック
-      checkNewActiveGoals();
-
+      // トースト表示は presentation.ts で行う
       return achievement.id;
     }
   }

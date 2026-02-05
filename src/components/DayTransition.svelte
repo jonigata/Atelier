@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { gameState, clearDayTransition } from '$lib/stores/game';
+  import { gameState } from '$lib/stores/game';
+  import { resolveDayTransition } from '$lib/services/presentation';
 
   let visible = false;
   let displayDay = 0;
@@ -14,13 +15,14 @@
   }
 
   function showTransition() {
-    animationKey++; // アニメーション再開用
+    animationKey++;
     visible = true;
   }
 
   function handleAnimationEnd() {
     visible = false;
-    clearDayTransition();
+    // presentation サービスに完了を通知
+    resolveDayTransition();
   }
 </script>
 

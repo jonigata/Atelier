@@ -1,7 +1,8 @@
 import { get } from 'svelte/store';
 import { gameState, setTutorialDialogue, incrementExpeditionCount } from '$lib/stores/game';
 import { endTurn, startActionPhase } from './gameLoop';
-import { checkMilestoneProgress, onDialogueClosed } from './tutorial';
+import { checkMilestoneProgress } from './tutorial';
+import { resolveDialogue } from './presentation';
 import { areas } from '$lib/data/areas';
 import { items } from '$lib/data/items';
 import { removeItemsFromInventory } from '$lib/services/inventory';
@@ -112,8 +113,7 @@ async function processCurrentPhase(): Promise<void> {
 
   // ダイアログがあれば閉じる
   if (state.tutorialProgress.pendingDialogue) {
-    setTutorialDialogue(null);
-    onDialogueClosed();
+    resolveDialogue();
     log('dialogue', 'success', 'ダイアログを閉じました');
     return;
   }
