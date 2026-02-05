@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { gameState, addMessage, restoreStamina, consumeStamina, learnRecipe } from '$lib/stores/game';
+  import { gameState, addMessage, restoreStamina, learnRecipesFromBook } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
+  import { books } from '$lib/data/books';
   import { items, getItemIcon } from '$lib/data/items';
-  import type { ActionType, RecipeDef } from '$lib/models/types';
+  import type { ActionType, RecipeBookDef } from '$lib/models/types';
   import { getCategoryName } from '$lib/data/categories';
 
   // 素材名を取得するヘルパー
@@ -26,12 +27,22 @@
   export let onBack: () => void;
 
   // 勉強用の選択状態
-  let selectedRecipeId: string | null = null;
+  let selectedBookId: string | null = null;
 
-  // 勉強可能な教科書一覧（所持していて、まだ習得していないもの）
-  $: availableRecipes = Object.values(recipes).filter(
-    (r) => $gameState.ownedRecipes.includes(r.id) && !$gameState.knownRecipes.includes(r.id)
-  );
+  // 勉強可能な本一覧（所持していて、まだ未習得のレシピがあるもの）
+  $: availableBooks = $gameState.ownedBooks
+    .map(id => books[id])
+    .filter((book): book is RecipeBookDef => {
+      if (!book) return false;
+      // 本に未習得のレシピが1つでもあれば勉強可能
+      return book.recipeIds.some(recipeId => !$gameState.knownRecipes.includes(recipeId));
+    });
+
+  // 選択中の本の未習得レシピ
+  $: selectedBook = selectedBookId ? books[selectedBookId] : null;
+  $: unlearnedRecipes = selectedBook
+    ? selectedBook.recipeIds.filter(id => !$gameState.knownRecipes.includes(id))
+    : [];
 
   // 休息処理
   function handleRest() {
@@ -43,20 +54,22 @@
 
   // 勉強処理
   function handleStudy() {
-    if (!selectedRecipeId) return;
+    if (!selectedBookId || !selectedBook) return;
 
-    const recipe = recipes[selectedRecipeId];
-    if (!recipe) return;
-
-    learnRecipe(recipe.id);
-    addMessage(`勉強の成果！ 「${recipe.name}」のレシピを習得しました！`);
-    selectedRecipeId = null;
+    const learned = learnRecipesFromBook(selectedBook.recipeIds);
+    if (learned.length > 0) {
+      const names = learned.map(id => recipes[id]?.name || id).join('、');
+      addMessage(`「${selectedBook.name}」を読破！ ${names}のレシピを習得しました！`);
+    } else {
+      addMessage(`「${selectedBook.name}」を読みましたが、すでに全てのレシピを習得済みでした。`);
+    }
+    selectedBookId = null;
     endTurn(3);
     onBack();
   }
 
-  function selectRecipe(recipeId: string) {
-    selectedRecipeId = recipeId;
+  function selectBook(bookId: string) {
+    selectedBookId = bookId;
   }
 </script>
 
@@ -90,30 +103,38 @@
   {:else if action === 'study'}
     <button class="back-btn" on:click={onBack}>← 戻る</button>
     <h2>📚 勉強</h2>
-    <p>教科書を選んでレシピを習得します。3日経過します。</p>
+    <p>本を選んで読みます。3日経過します。</p>
     <p class="known-recipes">
       習得済みレシピ: {$gameState.knownRecipes.length}個 / 錬金術Lv: {$gameState.alchemyLevel}
     </p>
 
-    {#if availableRecipes.length > 0}
+    {#if availableBooks.length > 0}
       <div class="recipe-list">
-        <h3>習得可能な教科書</h3>
-        {#each availableRecipes as recipe}
+        <h3>読める本</h3>
+        {#each availableBooks as book}
+          {@const bookUnlearnedRecipes = book.recipeIds.filter(id => !$gameState.knownRecipes.includes(id))}
           <button
             class="recipe-item"
-            class:selected={selectedRecipeId === recipe.id}
-            on:click={() => selectRecipe(recipe.id)}
+            class:selected={selectedBookId === book.id}
+            on:click={() => selectBook(book.id)}
           >
             <div class="recipe-header">
-              <img class="recipe-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} />
-              <span class="recipe-name">{recipe.name}</span>
-              <span class="recipe-info">必要Lv.{recipe.requiredLevel}</span>
+              <span class="book-icon">📖</span>
+              <span class="recipe-name">{book.name}</span>
+              <span class="recipe-info">未習得: {bookUnlearnedRecipes.length}個</span>
             </div>
-            {#if selectedRecipeId === recipe.id}
+            <div class="book-description">{book.description}</div>
+            {#if selectedBookId === book.id}
               <div class="recipe-details">
-                <span class="detail-label">必要素材:</span>
-                {#each recipe.ingredients as ing}
-                  <span class="ingredient">{getIngredientName(ing)} ×{ing.quantity}</span>
+                <span class="detail-label">習得できるレシピ:</span>
+                {#each bookUnlearnedRecipes as recipeId}
+                  {@const recipe = recipes[recipeId]}
+                  {#if recipe}
+                    <span class="ingredient">
+                      <img class="mini-icon" src={getItemIcon(recipe.resultItemId)} alt="" />
+                      {recipe.name}
+                    </span>
+                  {/if}
                 {/each}
               </div>
             {/if}
@@ -122,17 +143,17 @@
       </div>
     {:else}
       <div class="no-recipes">
-        <p>勉強できる教科書がありません。</p>
-        <p class="hint">ショップで教科書を購入するか、報酬で入手しましょう。</p>
+        <p>読める本がありません。</p>
+        <p class="hint">ショップで本を購入するか、報酬で入手しましょう。</p>
       </div>
     {/if}
 
     <button
       class="action-btn"
       on:click={handleStudy}
-      disabled={!selectedRecipeId}
+      disabled={!selectedBookId}
     >
-      {selectedRecipeId ? `「${recipes[selectedRecipeId].name}」を勉強する` : '教科書を選んでください'}
+      {selectedBookId && selectedBook ? `「${selectedBook.name}」を読む` : '本を選んでください'}
     </button>
   {/if}
 </div>
@@ -263,10 +284,29 @@
   }
 
   .ingredient {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     background: rgba(255, 255, 255, 0.1);
     padding: 0.2rem 0.5rem;
     border-radius: 3px;
     color: #c0c0d0;
+  }
+
+  .mini-icon {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+  }
+
+  .book-icon {
+    font-size: 1.5rem;
+  }
+
+  .book-description {
+    font-size: 0.85rem;
+    color: #a0a0b0;
+    margin-top: 0.25rem;
   }
 
   .recipe-item:hover:not(.locked) {

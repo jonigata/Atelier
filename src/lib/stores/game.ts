@@ -33,7 +33,7 @@ function createInitialState(): GameState {
       { itemId: 'water_01', quality: 55 },
       { itemId: 'water_01', quality: 42 },
     ],
-    ownedRecipes: ['potion_01'],  // 回復薬の教科書を所持
+    ownedBooks: ['book_basics'],   // 錬金術入門を所持
     knownRecipes: [],              // まだ勉強していない
 
     activeQuests: [],
@@ -252,6 +252,30 @@ export function learnRecipe(recipeId: string): void {
     return {
       ...state,
       knownRecipes: [...state.knownRecipes, recipeId],
+    };
+  });
+}
+
+export function learnRecipesFromBook(recipeIds: string[]): string[] {
+  const learned: string[] = [];
+  gameState.update((state) => {
+    const newRecipes = recipeIds.filter(id => !state.knownRecipes.includes(id));
+    learned.push(...newRecipes);
+    if (newRecipes.length === 0) return state;
+    return {
+      ...state,
+      knownRecipes: [...state.knownRecipes, ...newRecipes],
+    };
+  });
+  return learned;
+}
+
+export function addBook(bookId: string): void {
+  gameState.update((state) => {
+    if (state.ownedBooks.includes(bookId)) return state;
+    return {
+      ...state,
+      ownedBooks: [...state.ownedBooks, bookId],
     };
   });
 }

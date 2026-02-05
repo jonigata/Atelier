@@ -35,6 +35,15 @@ export interface RecipeDef {
   expReward: number;
 }
 
+// レシピ本（教科書）定義（マスタ）
+export interface RecipeBookDef {
+  id: string;
+  name: string;
+  description: string;
+  recipeIds: string[];  // この本に含まれるレシピID
+  basePrice: number;    // ショップでの購入価格
+}
+
 // 依頼タイプ
 export type QuestType = 'deliver' | 'quality' | 'bulk';
 
@@ -131,7 +140,7 @@ export interface GameState {
   maxStamina: number;
 
   inventory: OwnedItem[];
-  ownedRecipes: string[];   // 所持している教科書（レシピ本）
+  ownedBooks: string[];     // 所持しているレシピ本のID
   knownRecipes: string[];   // 勉強して習得したレシピ
 
   activeQuests: ActiveQuest[];
