@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import {
     gameState,
     addMessage,
@@ -11,10 +11,12 @@
     incrementCompletedQuests,
     setAvailableQuests,
     clearNewQuestCount,
+    setSelectedQuestId,
   } from '$lib/stores/game';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { removeItemsFromInventory } from '$lib/services/inventory';
   import { checkMilestoneProgress } from '$lib/services/tutorial';
+  import ActiveQuestCard from './common/ActiveQuestCard.svelte';
   import type { QuestDef, ActiveQuest, OwnedItem } from '$lib/models/types';
 
   export let onBack: () => void;
@@ -24,8 +26,14 @@
     clearNewQuestCount();
   });
 
+  // パネルを閉じるときにselectedQuestIdをクリア
+  onDestroy(() => {
+    setSelectedQuestId(null);
+  });
+
   type Tab = 'available' | 'active';
-  let activeTab: Tab = 'available';
+  // selectedQuestIdがある場合は受注中タブを開く
+  let activeTab: Tab = $gameState.selectedQuestId ? 'active' : 'available';
 
   // 依頼を受注
   function acceptQuest(quest: QuestDef) {
@@ -200,46 +208,7 @@
         <p class="empty">受注中の依頼はありません</p>
       {:else}
         {#each $gameState.activeQuests as quest}
-          {@const itemDef = getItem(quest.requiredItemId)}
-          {@const daysLeft = getDaysRemaining(quest)}
-          {@const canDeliverNow = canDeliver(quest)}
-          {@const matchingCount = getMatchingItemsForQuest(quest).length}
-          <div class="quest-item active" class:urgent={daysLeft <= 3}>
-            <div class="quest-header">
-              <span class="quest-title">{quest.title}</span>
-            </div>
-            <div class="days-bar-container">
-              <div
-                class="days-bar"
-                style="width: {Math.max(0, Math.min(100, (daysLeft / 7) * 100))}%; --danger-level: {Math.max(0, 1 - daysLeft / 7)}"
-              ></div>
-              <span class="days-label">残り{daysLeft}日</span>
-            </div>
-            <div class="quest-details">
-              <span class="requirement">
-                <img class="item-icon-small" src={getItemIcon(quest.requiredItemId)} alt={itemDef?.name || quest.requiredItemId} on:error={handleIconError} />
-                {itemDef?.name || quest.requiredItemId}
-                ×{quest.requiredQuantity}
-                {#if quest.requiredQuality}
-                  (品質{quest.requiredQuality}以上)
-                {/if}
-              </span>
-              <span class="progress">
-                所持: {matchingCount}/{quest.requiredQuantity}
-              </span>
-            </div>
-            <div class="quest-rewards">
-              <span class="reward-money">{quest.rewardMoney}G</span>
-              <span class="reward-rep">名声+{quest.rewardReputation}</span>
-            </div>
-            <button
-              class="deliver-btn"
-              disabled={!canDeliverNow}
-              on:click={() => deliverQuest(quest)}
-            >
-              {canDeliverNow ? '納品する' : '準備中...'}
-            </button>
-          </div>
+          <ActiveQuestCard {quest} showDeliverButton={true} onDeliver={deliverQuest} />
         {/each}
       {/if}
     </div>
@@ -333,15 +302,6 @@
     min-height: 200px;
   }
 
-  .quest-item.active {
-    border-color: #2196f3;
-  }
-
-  .quest-item.urgent {
-    border-color: #ff9800;
-    background: rgba(255, 152, 0, 0.1);
-  }
-
   .quest-header {
     display: flex;
     justify-content: space-between;
@@ -361,37 +321,6 @@
     border-radius: 4px;
     font-size: 0.8rem;
     color: #90caf9;
-  }
-
-  .days-bar-container {
-    position: relative;
-    height: 1.5rem;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
-    margin-bottom: 0.75rem;
-    overflow: hidden;
-  }
-
-  .days-bar {
-    height: 100%;
-    border-radius: 4px;
-    background: linear-gradient(
-      90deg,
-      color-mix(in srgb, #4caf50 calc((1 - var(--danger-level)) * 100%), #f44336),
-      color-mix(in srgb, #81c784 calc((1 - var(--danger-level)) * 100%), #ff6b6b)
-    );
-    transition: width 0.3s ease, background 0.3s ease;
-  }
-
-  .days-label {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 0.8rem;
-    font-weight: bold;
-    color: #fff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
   .quest-desc {
@@ -442,7 +371,7 @@
     color: #81c784;
   }
 
-  .accept-btn, .deliver-btn {
+  .accept-btn {
     width: 100%;
     padding: 0.6rem;
     background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
@@ -453,17 +382,12 @@
     cursor: pointer;
   }
 
-  .accept-btn:disabled, .deliver-btn:disabled {
+  .accept-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
-  .accept-btn:hover:not(:disabled), .deliver-btn:hover:not(:disabled) {
+  .accept-btn:hover:not(:disabled) {
     transform: translateY(-1px);
-  }
-
-  .deliver-btn {
-    background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
-    color: white;
   }
 </style>

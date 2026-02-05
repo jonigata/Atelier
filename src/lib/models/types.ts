@@ -148,6 +148,7 @@ export interface GameState {
   completedQuestCount: number;
   failedQuestCount: number;
   newQuestCount: number;       // 未確認の新規依頼数
+  selectedQuestId: string | null; // 依頼画面で選択中の依頼ID
 
   expedition: Expedition | null;
 

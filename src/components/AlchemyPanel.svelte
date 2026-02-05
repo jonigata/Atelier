@@ -59,17 +59,15 @@
   $: availableItemsForSelection = (() => {
     if (!currentIngredient) return [];
     const matching = getMatchingItems(currentIngredient);
-    return matching
-      .filter((item) => {
-        const selectedCount = selectedItems.filter(
-          (s) => s.itemId === item.itemId && s.quality === item.quality
-        ).length;
-        const totalCount = matching.filter(
-          (m) => m.itemId === item.itemId && m.quality === item.quality
-        ).length;
-        return selectedCount < totalCount;
-      })
-      .sort((a, b) => b.quality - a.quality);
+    // 選択済みアイテムを除外
+    const remaining = [...matching];
+    for (const selected of selectedItems) {
+      const idx = remaining.findIndex(
+        (item) => item.itemId === selected.itemId && item.quality === selected.quality
+      );
+      if (idx !== -1) remaining.splice(idx, 1);
+    }
+    return remaining.sort((a, b) => b.quality - a.quality);
   })();
 
   // 成功率

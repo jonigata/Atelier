@@ -17,7 +17,7 @@ import {
 } from '$lib/data/achievements';
 import { items } from '$lib/data/items';
 import { recipes } from '$lib/data/recipes';
-import { showGoalActiveToast, queueUnlockAction, actionLabels } from '$lib/stores/toast';
+import { showGoalActiveToast, actionLabels } from '$lib/stores/toast';
 import type {
   AchievementDef,
   AchievementCondition,
@@ -260,7 +260,6 @@ export function claimReward(achievementId: string): void {
   if (reward.unlocks) {
     for (const action of reward.unlocks) {
       unlockAction(action);
-      queueUnlockAction(action);
     }
   }
 

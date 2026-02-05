@@ -70,3 +70,13 @@ export function clearNewQuestCount(): void {
     newQuestCount: 0,
   }));
 }
+
+/**
+ * 選択中の依頼IDを設定
+ */
+export function setSelectedQuestId(questId: string | null): void {
+  gameState.update((state) => ({
+    ...state,
+    selectedQuestId: questId,
+  }));
+}

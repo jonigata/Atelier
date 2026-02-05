@@ -1,33 +1,17 @@
 <script lang="ts">
-  import { gameState } from '$lib/stores/game';
+  import { gameState, setSelectedQuestId } from '$lib/stores/game';
   import { showingUnlockActions, pendingUnlockActions } from '$lib/stores/toast';
-  import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
-  import { getNotifiedActiveGoals, getAchievementProgress } from '$lib/services/achievement';
+  import { getActiveGoals, getAchievementProgress } from '$lib/services/achievement';
   import { items } from '$lib/data/items';
   import { recipes } from '$lib/data/recipes';
-  import type { ActionType, ActiveQuest, OwnedItem, AchievementDef } from '$lib/models/types';
+  import ActiveQuestCard from './common/ActiveQuestCard.svelte';
+  import type { ActionType, AchievementDef, ActiveQuest } from '$lib/models/types';
 
   export let onSelect: (action: ActionType) => void;
 
-  // 依頼に合致するアイテムを取得
-  function getMatchingItemsForQuest(quest: ActiveQuest): OwnedItem[] {
-    return $gameState.inventory.filter((item) => {
-      if (item.itemId !== quest.requiredItemId) return false;
-      if (quest.requiredQuality && item.quality < quest.requiredQuality) return false;
-      return true;
-    });
-  }
-
-  // 納品可能かチェック
-  function canDeliver(quest: ActiveQuest): boolean {
-    const remaining = quest.requiredQuantity - quest.deliveredCount;
-    const matchingItems = getMatchingItemsForQuest(quest);
-    return matchingItems.length >= remaining;
-  }
-
-  // 残り日数を計算
-  function getDaysRemaining(quest: ActiveQuest): number {
-    return quest.acceptedDay + quest.deadlineDays - $gameState.day;
+  function handleQuestClick(quest: ActiveQuest) {
+    setSelectedQuestId(quest.id);
+    onSelect('quest');
   }
 
   // アチーブメントの報酬を短縮表示
@@ -58,7 +42,6 @@
   }
 
   // アクティブな目標を取得（リアクティブ - gameStateに依存）
-  // 通知済み（トースト表示済み）の目標のみ表示
   $: activeGoals = (() => {
     // $gameStateを参照してリアクティブにする
     void $gameState.achievementProgress.completed;
@@ -67,7 +50,7 @@
     void $gameState.completedQuestCount;
     void $gameState.stats.totalExpeditionCount;
     void $gameState.alchemyLevel;
-    return getNotifiedActiveGoals();
+    return getActiveGoals();
   })();
 
   // アチーブメントの進捗を具体的に表示
@@ -208,31 +191,33 @@
       <!-- アチーブメント目標 -->
       {#if activeGoals.length > 0}
         <div class="objectives-group">
-          <h5>実績</h5>
-          {#each activeGoals as goal}
-            {@const progressDetail = getProgressDetail(goal)}
-            {@const progressPercent = getAchievementProgress(goal.id)}
-            <div class="objective-item achievement" class:important={goal.important}>
-              <div class="objective-header">
-                <span class="objective-title">{goal.title}</span>
-                {#if progressDetail}
-                  <span class="progress-badge">{progressDetail.label}: {progressDetail.current}/{progressDetail.target}</span>
+          <h5>現在の目標</h5>
+          <div class="goal-grid">
+            {#each activeGoals as goal}
+              {@const progressDetail = getProgressDetail(goal)}
+              {@const progressPercent = getAchievementProgress(goal.id)}
+              <div class="objective-item achievement" class:important={goal.important}>
+                <div class="objective-header">
+                  <span class="objective-title">{goal.title}</span>
+                  {#if progressDetail}
+                    <span class="progress-badge">{progressDetail.label}: {progressDetail.current}/{progressDetail.target}</span>
+                  {/if}
+                </div>
+                <div class="objective-hint">{goal.hint}</div>
+                <div class="objective-rewards">
+                  <span class="reward-label">報酬:</span>
+                  {#each getRewardSummary(goal) as reward}
+                    <span class="reward-item">{reward}</span>
+                  {/each}
+                </div>
+                {#if progressPercent > 0 && progressDetail}
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: {progressPercent}%"></div>
+                  </div>
                 {/if}
               </div>
-              <div class="objective-hint">{goal.hint}</div>
-              <div class="objective-rewards">
-                <span class="reward-label">報酬:</span>
-                {#each getRewardSummary(goal) as reward}
-                  <span class="reward-item">{reward}</span>
-                {/each}
-              </div>
-              {#if progressPercent > 0 && progressDetail}
-                <div class="progress-bar">
-                  <div class="progress-fill" style="width: {progressPercent}%"></div>
-                </div>
-              {/if}
-            </div>
-          {/each}
+            {/each}
+          </div>
         </div>
       {/if}
 
@@ -240,37 +225,11 @@
       {#if $gameState.activeQuests.length > 0}
         <div class="objectives-group">
           <h5>受注中の依頼</h5>
-          {#each $gameState.activeQuests as quest}
-            {@const itemDef = getItem(quest.requiredItemId)}
-            {@const daysLeft = getDaysRemaining(quest)}
-            {@const matchingCount = getMatchingItemsForQuest(quest).length}
-            {@const canDeliverNow = canDeliver(quest)}
-            <div class="objective-item quest" class:urgent={daysLeft <= 3} class:ready={canDeliverNow}>
-              <div class="objective-header">
-                <span class="objective-title">{quest.title}</span>
-                <span class="days-left" class:danger={daysLeft <= 3}>残{daysLeft}日</span>
-              </div>
-              <div class="objective-requirement">
-                <span class="req-label">納品:</span>
-                <img class="item-icon-tiny" src={getItemIcon(quest.requiredItemId)} alt="" on:error={handleIconError} />
-                <span class="item-name">{itemDef?.name || quest.requiredItemId}</span>
-                {#if quest.requiredQuality}
-                  <span class="quality-req">品質{quest.requiredQuality}以上</span>
-                {/if}
-                <span class="quantity">
-                  (所持: <span class:complete={matchingCount >= quest.requiredQuantity}>{matchingCount}</span>/{quest.requiredQuantity})
-                </span>
-              </div>
-              <div class="objective-rewards">
-                <span class="reward-label">報酬:</span>
-                <span class="reward-money">{quest.rewardMoney}G</span>
-                <span class="reward-rep">名声+{quest.rewardReputation}</span>
-                {#if canDeliverNow}
-                  <span class="ready-badge">納品可</span>
-                {/if}
-              </div>
-            </div>
-          {/each}
+          <div class="quest-grid">
+            {#each $gameState.activeQuests as quest}
+              <ActiveQuestCard {quest} onClick={handleQuestClick} />
+            {/each}
+          </div>
         </div>
       {/if}
     </div>
@@ -429,6 +388,12 @@
     border-left: 2px solid #4a4a6a;
   }
 
+  .goal-grid, .quest-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
   .objective-item {
     padding: 0.75rem 1rem;
     background: rgba(255, 255, 255, 0.03);
@@ -448,21 +413,6 @@
     border-left: 4px solid #c9a959;
     background: linear-gradient(135deg, rgba(201, 169, 89, 0.15) 0%, rgba(201, 169, 89, 0.05) 100%);
     box-shadow: 0 0 8px rgba(201, 169, 89, 0.2);
-  }
-
-  /* 依頼目標 */
-  .objective-item.quest {
-    border-left-color: #2196f3;
-  }
-
-  .objective-item.quest.urgent {
-    border-left-color: #ff9800;
-    background: rgba(255, 152, 0, 0.05);
-  }
-
-  .objective-item.quest.ready {
-    border-left-color: #4caf50;
-    background: rgba(76, 175, 80, 0.08);
   }
 
   .objective-header {
@@ -508,87 +458,12 @@
     transition: width 0.3s ease;
   }
 
-  .days-left {
-    padding: 0.15rem 0.4rem;
-    background: rgba(76, 175, 80, 0.3);
-    border-radius: 3px;
-    font-size: 0.75rem;
-    color: #81c784;
-  }
-
-  .days-left.danger {
-    background: rgba(244, 67, 54, 0.3);
-    color: #ef5350;
-  }
-
-  .objective-requirement {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.4rem;
-    font-size: 0.9rem;
-  }
-
-  .item-name {
-    color: #e0e0f0;
-  }
-
-  .item-icon-tiny {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-    vertical-align: middle;
-  }
-
-  .quantity {
-    color: #a0a0b0;
-  }
-
-  .quantity .complete {
-    color: #4caf50;
-    font-weight: bold;
-  }
-
-  .quality-req {
-    padding: 0.1rem 0.35rem;
-    background: rgba(156, 39, 176, 0.3);
-    border-radius: 3px;
-    font-size: 0.75rem;
-    color: #ce93d8;
-  }
-
-  .objective-rewards {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-  }
-
-  .reward-label, .req-label {
+  .reward-label {
     color: #808090;
     font-size: 0.8rem;
   }
 
   .reward-item {
     color: #c9a959;
-  }
-
-  .reward-money {
-    color: #c9a959;
-  }
-
-  .reward-rep {
-    color: #81c784;
-  }
-
-  .ready-badge {
-    margin-left: auto;
-    padding: 0.15rem 0.5rem;
-    background: #4caf50;
-    border-radius: 3px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: white;
   }
 </style>

@@ -41,6 +41,7 @@ function createInitialState(): GameState {
     completedQuestCount: 0,
     failedQuestCount: 0,
     newQuestCount: 0,
+    selectedQuestId: null,
 
     expedition: null,
 
@@ -331,4 +332,5 @@ export {
   incrementFailedQuests,
   incrementNewQuestCount,
   clearNewQuestCount,
+  setSelectedQuestId,
 } from './quests';
