@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import {
     gameState,
     addMessage,
@@ -9,12 +10,19 @@
     removeActiveQuest,
     incrementCompletedQuests,
     setAvailableQuests,
+    clearNewQuestCount,
   } from '$lib/stores/game';
   import { getItem, getItemIcon } from '$lib/data/items';
   import { removeItemsFromInventory } from '$lib/services/inventory';
+  import { checkMilestoneProgress } from '$lib/services/tutorial';
   import type { QuestDef, ActiveQuest, OwnedItem } from '$lib/models/types';
 
   export let onBack: () => void;
+
+  // パネルを開いたときに新規依頼のバッジをクリア
+  onMount(() => {
+    clearNewQuestCount();
+  });
 
   type Tab = 'available' | 'active';
   let activeTab: Tab = 'available';
@@ -36,6 +44,9 @@
     setAvailableQuests($gameState.availableQuests.filter((q) => q.id !== quest.id));
     addMessage(`依頼「${quest.title}」を受注しました`);
     activeTab = 'active';
+
+    // アチーブメントチェック（依頼受注関連）
+    checkMilestoneProgress();
   }
 
   // 納品可能かチェック

@@ -93,15 +93,14 @@ export type GamePhase =
 export type MorningEvent =
   | { type: 'expedition_return'; message: string; data: OwnedItem[] }
   | { type: 'new_quest'; message: string }
-  | { type: 'quest_expired'; message: string }
-  | { type: 'tutorial'; message: string; data: { milestoneId: string; dialogue: TutorialDialogue } };
+  | { type: 'quest_expired'; message: string };
 
 // チュートリアル会話
 // 構造化された報酬アイテム（アイコン表示用）
 export interface RewardDisplay {
   text: string;
   itemId?: string;  // アイコン表示用（アイテム報酬の場合）
-  type: 'money' | 'item' | 'reputation' | 'recipe';
+  type: 'money' | 'item' | 'reputation' | 'recipe' | 'unlock';
 }
 
 export interface TutorialDialogue {
@@ -113,10 +112,8 @@ export interface TutorialDialogue {
   structuredRewards?: RewardDisplay[];  // 構造化された報酬（アイコン付き）
 }
 
-// チュートリアル進行状態
+// チュートリアル進行状態（アクションアンロック管理）
 export interface TutorialProgress {
-  isActive: boolean;
-  currentMilestone: number;
   unlockedActions: ActionType[];
   pendingDialogue: TutorialDialogue | null;
 }
@@ -141,6 +138,7 @@ export interface GameState {
   availableQuests: QuestDef[];
   completedQuestCount: number;
   failedQuestCount: number;
+  newQuestCount: number;       // 未確認の新規依頼数
 
   expedition: Expedition | null;
 
@@ -200,6 +198,7 @@ export interface AchievementReward {
   items?: { itemId: string; quality: number; quantity: number }[];
   reputation?: number;
   recipes?: string[];
+  unlocks?: ActionType[];  // アクションアンロック
 }
 
 // アチーブメント条件の種類
@@ -208,13 +207,16 @@ export type AchievementConditionType =
   | 'reputation'
   | 'money'
   | 'quest_count'
+  | 'active_quest_count'    // 受注中の依頼数
   | 'craft_count'
   | 'craft_item'
   | 'craft_quality'
   | 'expedition_count'
   | 'recipe_count'
   | 'consecutive_quests'
-  | 'total_sales';
+  | 'total_sales'
+  | 'day'                   // 日付条件（ゲーム開始時など）
+  | 'village_development';  // 村発展度
 
 // アチーブメント条件
 export interface AchievementCondition {
@@ -237,7 +239,7 @@ export interface AchievementDef {
   reward: AchievementReward;
   prerequisite?: string[];
   priority: number;
-  tutorialMilestone?: number;  // チュートリアルとの連携用
+  autoComplete?: boolean;  // ゲーム開始時に自動達成
   important?: boolean;  // HUDに目標として表示するか
 }
 

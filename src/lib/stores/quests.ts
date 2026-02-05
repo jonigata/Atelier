@@ -50,3 +50,23 @@ export function incrementFailedQuests(): void {
     failedQuestCount: state.failedQuestCount + 1,
   }));
 }
+
+/**
+ * 未確認の新規依頼数を増加
+ */
+export function incrementNewQuestCount(count: number = 1): void {
+  gameState.update((state) => ({
+    ...state,
+    newQuestCount: state.newQuestCount + count,
+  }));
+}
+
+/**
+ * 未確認の新規依頼数をクリア
+ */
+export function clearNewQuestCount(): void {
+  gameState.update((state) => ({
+    ...state,
+    newQuestCount: 0,
+  }));
+}

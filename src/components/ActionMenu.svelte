@@ -120,6 +120,10 @@
         current = $gameState.stats.totalSalesAmount;
         label = '累計売上';
         break;
+      case 'village_development':
+        current = $gameState.villageDevelopment;
+        label = '村発展度';
+        break;
       default:
         return null;
     }
@@ -137,9 +141,6 @@
     { type: 'study', label: '勉強', icon: '📚', description: '新しいレシピを習得' },
   ];
 
-  // 常に利用可能なアクション
-  const alwaysAvailable: ActionType[] = ['rest', 'study', 'inventory'];
-
   // 日付演出中かどうか
   $: isDayTransition = $gameState.pendingDayTransition !== null;
 
@@ -147,23 +148,21 @@
   // ストアを直接参照することでSvelteがすべての依存関係を追跡
   $: actionStates = actions.map(action => {
     const actionType = action.type;
-    const tutorialActive = $gameState.tutorialProgress.isActive;
     const unlockedActions = $gameState.tutorialProgress.unlockedActions;
     const dayTransition = $gameState.pendingDayTransition;
     const pendingDialogue = $gameState.tutorialProgress.pendingDialogue;
     const pending = $pendingUnlockActions;
 
-    // ロック判定
+    // ロック判定: アンロックされていないアクションはロック
+    // ただし、inventoryは常に利用可能
     let isLocked = false;
-    if (!alwaysAvailable.includes(actionType)) {
-      if (tutorialActive) {
-        // 日付演出中またはダイアログ表示中は、pendingのアクションもロック表示
-        // （ダイアログが閉じるまでアンロック演出を見せない）
-        if ((dayTransition !== null || pendingDialogue !== null) && pending.includes(actionType)) {
-          isLocked = true;
-        } else if (!unlockedActions.includes(actionType)) {
-          isLocked = true;
-        }
+    if (actionType !== 'inventory') {
+      // 日付演出中またはダイアログ表示中は、pendingのアクションもロック表示
+      // （ダイアログが閉じるまでアンロック演出を見せない）
+      if ((dayTransition !== null || pendingDialogue !== null) && pending.includes(actionType)) {
+        isLocked = true;
+      } else if (!unlockedActions.includes(actionType)) {
+        isLocked = true;
       }
     }
 
@@ -173,16 +172,6 @@
     return { ...action, isLocked, isNewlyUnlocked };
   });
 
-  // デバッグ用: 状態変化をログ出力
-  $: if (typeof window !== 'undefined') {
-    console.log('[ActionMenu] State update:', {
-      isDayTransition,
-      hasPendingDialogue: $gameState.tutorialProgress.pendingDialogue !== null,
-      pendingUnlockActions: $pendingUnlockActions,
-      unlockedActions: $gameState.tutorialProgress.unlockedActions,
-      actionStates: actionStates.map(a => ({ type: a.type, isLocked: a.isLocked }))
-    });
-  }
 </script>
 
 <div class="action-menu">
@@ -208,6 +197,8 @@
           <span class="description">{action.description}</span>
           {#if action.type === 'expedition' && $gameState.expedition !== null}
             <span class="badge">派遣中</span>
+          {:else if action.type === 'quest' && $gameState.newQuestCount > 0}
+            <span class="badge new-quest">{$gameState.newQuestCount}件</span>
           {/if}
         </button>
       {/if}
@@ -399,6 +390,17 @@
     font-size: 0.7rem;
     font-weight: bold;
     border-radius: 4px;
+  }
+
+  .badge.new-quest {
+    background: #2196f3;
+    color: white;
+    animation: badgePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes badgePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
   }
 
   /* 目標一覧 */

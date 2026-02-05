@@ -4,7 +4,6 @@ import type {
   OwnedItem,
   MorningEvent,
 } from '$lib/models/types';
-import { getMilestoneDialogue } from '$lib/data/tutorial';
 import { removeItemFromInventory } from '$lib/services/inventory';
 import { calcExpForLevel, ALCHEMY } from '$lib/data/balance';
 
@@ -41,6 +40,7 @@ function createInitialState(): GameState {
     availableQuests: [],
     completedQuestCount: 0,
     failedQuestCount: 0,
+    newQuestCount: 0,
 
     expedition: null,
 
@@ -53,10 +53,8 @@ function createInitialState(): GameState {
     pendingDayTransition: null,
 
     tutorialProgress: {
-      isActive: true,
-      currentMilestone: 0,
-      unlockedActions: ['rest', 'study'],
-      pendingDialogue: getMilestoneDialogue(0),
+      unlockedActions: [],  // 空で開始（ゲーム開始アチーブメントでアンロック）
+      pendingDialogue: null,
     },
 
     achievementProgress: {
@@ -273,9 +271,6 @@ export function markItemCrafted(itemId: string): void {
 // =====================================
 
 export function resetGame(): void {
-  import('$lib/services/gameLoop').then(({ resetVillageMilestones }) => {
-    resetVillageMilestones();
-  });
   gameState.set(createInitialState());
 }
 
@@ -285,9 +280,8 @@ export function resetGame(): void {
 
 export {
   setTutorialDialogue,
-  advanceTutorialMilestone,
-  completeTutorial,
-  skipTutorial,
+  unlockAction,
+  unlockActions,
   isActionUnlocked,
 } from './tutorial';
 
@@ -311,4 +305,6 @@ export {
   setAvailableQuests,
   incrementCompletedQuests,
   incrementFailedQuests,
+  incrementNewQuestCount,
+  clearNewQuestCount,
 } from './quests';

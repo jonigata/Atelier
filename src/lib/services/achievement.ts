@@ -9,6 +9,7 @@ import {
   learnRecipe,
   isAchievementCompleted,
 } from '$lib/stores/game';
+import { unlockAction } from '$lib/stores/tutorial';
 import {
   getAllAchievements,
   getAchievementById,
@@ -16,7 +17,7 @@ import {
 } from '$lib/data/achievements';
 import { items } from '$lib/data/items';
 import { recipes } from '$lib/data/recipes';
-import { showGoalActiveToast, showGoalCompleteToast } from '$lib/stores/toast';
+import { showGoalActiveToast, showGoalCompleteToast, queueUnlockAction } from '$lib/stores/toast';
 import type {
   AchievementDef,
   AchievementCondition,
@@ -48,6 +49,9 @@ function evaluateCondition(condition: AchievementCondition, state: GameState): b
     case 'quest_count':
       currentValue = state.completedQuestCount;
       break;
+    case 'active_quest_count':
+      currentValue = state.activeQuests.length;
+      break;
     case 'craft_count':
       currentValue = state.stats.totalCraftCount;
       break;
@@ -68,6 +72,12 @@ function evaluateCondition(condition: AchievementCondition, state: GameState): b
       break;
     case 'total_sales':
       currentValue = state.stats.totalSalesAmount;
+      break;
+    case 'day':
+      currentValue = state.day;
+      break;
+    case 'village_development':
+      currentValue = state.villageDevelopment;
       break;
     default:
       return false;
@@ -249,6 +259,14 @@ export function claimReward(achievementId: string): void {
     }
   }
 
+  // アクションアンロック
+  if (reward.unlocks) {
+    for (const action of reward.unlocks) {
+      unlockAction(action);
+      queueUnlockAction(action);
+    }
+  }
+
   clearPendingReward();
 }
 
@@ -322,6 +340,21 @@ function getDetailedRewards(achievement: AchievementDef): string[] {
     }
   }
 
+  if (reward.unlocks) {
+    const actionLabels: Record<string, string> = {
+      alchemy: '調合',
+      quest: '依頼',
+      expedition: '採取',
+      shop: 'ショップ',
+      rest: '休息',
+      study: '勉強',
+    };
+    for (const action of reward.unlocks) {
+      const label = actionLabels[action] ?? action;
+      details.push(`「${label}」解放`);
+    }
+  }
+
   return details;
 }
 
@@ -368,6 +401,24 @@ function getStructuredRewards(achievement: AchievementDef): RewardDisplay[] {
         text: `レシピ「${recipeName}」`,
         itemId: recipeDef?.resultItemId,
         type: 'recipe',
+      });
+    }
+  }
+
+  if (reward.unlocks) {
+    const actionLabels: Record<string, string> = {
+      alchemy: '調合',
+      quest: '依頼',
+      expedition: '採取',
+      shop: 'ショップ',
+      rest: '休息',
+      study: '勉強',
+    };
+    for (const action of reward.unlocks) {
+      const label = actionLabels[action] ?? action;
+      structured.push({
+        text: `「${label}」解放`,
+        type: 'unlock',
       });
     }
   }
@@ -439,6 +490,9 @@ export function getAchievementProgress(achievementId: string): number {
       case 'quest_count':
         current = state.completedQuestCount;
         break;
+      case 'active_quest_count':
+        current = state.activeQuests.length;
+        break;
       case 'craft_count':
         current = state.stats.totalCraftCount;
         break;
@@ -456,6 +510,12 @@ export function getAchievementProgress(achievementId: string): number {
         break;
       case 'total_sales':
         current = state.stats.totalSalesAmount;
+        break;
+      case 'day':
+        current = state.day;
+        break;
+      case 'village_development':
+        current = state.villageDevelopment;
         break;
       default:
         return 0;

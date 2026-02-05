@@ -22,6 +22,28 @@ export const achievements: Record<string, AchievementDef> = {
   // =====================================
   // チュートリアル系 (priority: 1-100)
   // =====================================
+  ach_game_start: {
+    id: 'ach_game_start',
+    title: '旅の始まり',
+    description: 'ハイデル村に到着した',
+    hint: '物語が始まる',
+    category: 'tutorial',
+    narrative: 'village_growth',
+    narrativeCharacter: { name: 'オルト', title: '村長' },
+    narrativeLines: [
+      'おお、君がアルベルトの弟子か。よく来てくれた',
+      '私はオルト、この村の村長をやっている。アルベルトとは若い頃からの友人でね',
+      'ここが君の工房だ。小さいが、錬金術には十分だろう',
+      'まずは師匠から習った知識を思い出すといい。疲れたら遠慮なく休んでくれ',
+    ],
+    conditions: [{ type: 'day', target: 1 }],
+    reward: {
+      unlocks: ['rest', 'study'],
+    },
+    priority: 1,
+    autoComplete: true,
+  },
+
   ach_first_recipe: {
     id: 'ach_first_recipe',
     title: '知識の扉',
@@ -36,9 +58,12 @@ export const achievements: Record<string, AchievementDef> = {
       '知識だけでは錬金術士にはなれん。実際に調合してみるといい',
     ],
     conditions: [{ type: 'recipe_count', target: 1 }],
-    reward: { items: [{ itemId: 'herb_01', quality: 50, quantity: 3 }] },
+    reward: {
+      items: [{ itemId: 'herb_01', quality: 50, quantity: 3 }],
+      unlocks: ['alchemy'],
+    },
+    prerequisite: ['ach_game_start'],
     priority: 10,
-    tutorialMilestone: 1,
     important: true,
   },
 
@@ -57,10 +82,12 @@ export const achievements: Record<string, AchievementDef> = {
       '村長んとこに頼み事を伝えてある。よかったら依頼を見てくれないか？',
     ],
     conditions: [{ type: 'craft_count', target: 1 }],
-    reward: { money: 100 },
+    reward: {
+      money: 100,
+      unlocks: ['quest'],
+    },
     priority: 20,
     prerequisite: ['ach_first_recipe'],
-    tutorialMilestone: 2,
     important: true,
   },
 
@@ -78,11 +105,13 @@ export const achievements: Record<string, AchievementDef> = {
       'うちで少しなら素材を扱ってるわ。困ったときは寄ってちょうだい',
       'これはご挨拶代わり。いらないものがあれば買い取りもするわよ',
     ],
-    conditions: [{ type: 'quest_count', target: 0, comparison: '>' }],
-    reward: { items: [{ itemId: 'water_01', quality: 50, quantity: 2 }] },
+    conditions: [{ type: 'active_quest_count', target: 1 }],
+    reward: {
+      items: [{ itemId: 'water_01', quality: 50, quantity: 2 }],
+      unlocks: ['shop'],
+    },
     priority: 30,
     prerequisite: ['ach_first_craft'],
-    tutorialMilestone: 3,
     important: true,
   },
 
@@ -104,7 +133,29 @@ export const achievements: Record<string, AchievementDef> = {
     reward: { money: 50, reputation: 2 },
     priority: 40,
     prerequisite: ['ach_first_quest'],
-    tutorialMilestone: 4,
+    important: true,
+  },
+
+  ach_adventurer_arrival: {
+    id: 'ach_adventurer_arrival',
+    title: '冒険者の到来',
+    description: '村発展度が20に達した',
+    hint: '依頼を達成して村を発展させよう',
+    category: 'tutorial',
+    narrative: 'character_trial',
+    narrativeCharacter: { name: 'ガルド', title: '冒険者' },
+    narrativeLines: [
+      '...あんたがこの村の錬金術士か。俺はガルド、冒険者をやっている',
+      'この辺りを旅してたら、面白い村があると聞いてな',
+      '錬金術士がいるなら素材が必要だろう。俺が採ってきてやろうか',
+      '金は貰うが、森や山の奥まで行ける。必要なら声をかけろ',
+    ],
+    conditions: [{ type: 'village_development', target: 20 }],
+    reward: {
+      unlocks: ['expedition'],
+    },
+    priority: 45,
+    prerequisite: ['ach_first_complete'],
     important: true,
   },
 
@@ -123,7 +174,7 @@ export const achievements: Record<string, AchievementDef> = {
     conditions: [{ type: 'expedition_count', target: 1 }],
     reward: { items: [{ itemId: 'herb_01', quality: 60, quantity: 2 }] },
     priority: 50,
-    prerequisite: ['ach_first_complete'],
+    prerequisite: ['ach_adventurer_arrival'],
     important: true,
   },
 
@@ -502,9 +553,7 @@ export function getAchievementsByCategory(
   return getAllAchievements().filter((a) => a.category === category);
 }
 
-// チュートリアルマイルストーンに対応するアチーブメントを取得
-export function getAchievementByMilestone(
-  milestoneId: number
-): AchievementDef | undefined {
-  return getAllAchievements().find((a) => a.tutorialMilestone === milestoneId);
+// 自動達成アチーブメントを取得
+export function getAutoCompleteAchievements(): AchievementDef[] {
+  return getAllAchievements().filter((a) => a.autoComplete);
 }

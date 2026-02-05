@@ -1,7 +1,6 @@
 import { get } from 'svelte/store';
 import { gameState } from './game';
 import type { TutorialDialogue, ActionType } from '$lib/models/types';
-import { getUnlockedActionsUpTo, TUTORIAL_ACTIONS } from '$lib/data/tutorial';
 
 /**
  * チュートリアルダイアログを設定
@@ -17,47 +16,40 @@ export function setTutorialDialogue(dialogue: TutorialDialogue | null): void {
 }
 
 /**
- * チュートリアルマイルストーンを進める
+ * アクションをアンロック
  */
-export function advanceTutorialMilestone(milestoneId: number): void {
-  gameState.update((state) => ({
-    ...state,
-    tutorialProgress: {
-      ...state.tutorialProgress,
-      currentMilestone: milestoneId,
-      unlockedActions: getUnlockedActionsUpTo(milestoneId),
-    },
-  }));
+export function unlockAction(action: ActionType): void {
+  gameState.update((state) => {
+    if (state.tutorialProgress.unlockedActions.includes(action)) {
+      return state;
+    }
+    return {
+      ...state,
+      tutorialProgress: {
+        ...state.tutorialProgress,
+        unlockedActions: [...state.tutorialProgress.unlockedActions, action],
+      },
+    };
+  });
 }
 
 /**
- * チュートリアルを完了
+ * 複数のアクションを一括アンロック
  */
-export function completeTutorial(): void {
-  gameState.update((state) => ({
-    ...state,
-    tutorialProgress: {
-      ...state.tutorialProgress,
-      isActive: false,
-      unlockedActions: [...new Set([...TUTORIAL_ACTIONS, ...state.tutorialProgress.unlockedActions])],
-      pendingDialogue: null,
-    },
-  }));
-}
-
-/**
- * チュートリアルをスキップ（経験者モード）
- */
-export function skipTutorial(): void {
-  gameState.update((state) => ({
-    ...state,
-    tutorialProgress: {
-      isActive: false,
-      currentMilestone: -1,
-      unlockedActions: TUTORIAL_ACTIONS,
-      pendingDialogue: null,
-    },
-  }));
+export function unlockActions(actions: ActionType[]): void {
+  gameState.update((state) => {
+    const newActions = actions.filter(
+      (action) => !state.tutorialProgress.unlockedActions.includes(action)
+    );
+    if (newActions.length === 0) return state;
+    return {
+      ...state,
+      tutorialProgress: {
+        ...state.tutorialProgress,
+        unlockedActions: [...state.tutorialProgress.unlockedActions, ...newActions],
+      },
+    };
+  });
 }
 
 /**

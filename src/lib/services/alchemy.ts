@@ -5,6 +5,7 @@ import {
   addItem,
   addExp,
   markItemCrafted,
+  incrementCraftCount,
 } from '$lib/stores/game';
 import { getRecipe } from '$lib/data/recipes';
 import { getItem } from '$lib/data/items';
@@ -63,6 +64,7 @@ function executeCraftAttempt(
   };
   addItem(newItem);
   markItemCrafted(recipe.resultItemId);
+  incrementCraftCount(quality);
 
   // 経験値計算（高品質ボーナス）
   let expGained = recipe.expReward;

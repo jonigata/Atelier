@@ -13,25 +13,16 @@ import {
   incrementFailedQuests,
   setAvailableQuests,
   setDayTransition,
+  incrementNewQuestCount,
+  isActionUnlocked,
 } from '$lib/stores/game';
-import { queueUnlockAction } from '$lib/stores/toast';
 import { getArea } from '$lib/data/areas';
 import { getItem } from '$lib/data/items';
 import { getAvailableQuestTemplates } from '$lib/data/quests';
 import { EXPEDITION, QUEST } from '$lib/data/balance';
-import { villageMilestones, getVillageMilestoneDialogue } from '$lib/data/tutorial';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
+import { checkAutoCompleteAchievements } from '$lib/services/tutorial';
 import type { OwnedItem, MorningEvent } from '$lib/models/types';
-
-// 達成済みの村発展マイルストーンを追跡
-let completedVillageMilestones = new Set<string>();
-
-/**
- * 村発展マイルストーンをリセット
- */
-export function resetVillageMilestones(): void {
-  completedVillageMilestones = new Set<string>();
-}
 
 /**
  * ゲームループのメイン処理
@@ -64,16 +55,13 @@ function processMorningPhase(): void {
   const state = get(gameState);
   addMessage(`--- ${state.day}日目の朝 ---`);
 
-  // 1. 村発展マイルストーンチェック
-  checkVillageMilestones();
-
-  // 2. 採取隊の帰還チェック
+  // 1. 採取隊の帰還チェック
   checkExpeditionReturn();
 
-  // 3. 依頼の期限チェック
+  // 2. 依頼の期限チェック
   checkQuestDeadlines();
 
-  // 4. 新しい依頼の生成
+  // 3. 新しい依頼の生成
   generateNewQuests();
 
   // イベントがあればmorning画面を表示、なければ直接actionへ
@@ -82,50 +70,6 @@ function processMorningPhase(): void {
     setPhase('morning');
   } else {
     setPhase('action');
-  }
-}
-
-/**
- * 村発展マイルストーンチェック
- */
-function checkVillageMilestones(): void {
-  const state = get(gameState);
-
-  for (const milestone of villageMilestones) {
-    if (completedVillageMilestones.has(milestone.id)) continue;
-    if (state.villageDevelopment < milestone.requiredDevelopment) continue;
-
-    // マイルストーン達成
-    completedVillageMilestones.add(milestone.id);
-
-    const dialogue = getVillageMilestoneDialogue(milestone.id);
-    if (dialogue) {
-      // イベントとして通知
-      const event: MorningEvent = {
-        type: 'tutorial',
-        message: `${dialogue.characterName}が村にやってきた！`,
-        data: { milestoneId: milestone.id, dialogue },
-      };
-      addMorningEvent(event);
-
-      // アクション解放
-      if (milestone.unlocks.length > 0) {
-        gameState.update((s) => ({
-          ...s,
-          tutorialProgress: {
-            ...s.tutorialProgress,
-            unlockedActions: [...new Set([...s.tutorialProgress.unlockedActions, ...milestone.unlocks])],
-            pendingDialogue: dialogue,
-          },
-        }));
-        addMessage(`${dialogue.characterName}の到着により、${milestone.unlocks.join('、')}が解放されました！`);
-
-        // アンロック演出をキューに追加（ダイアログ終了後に表示）
-        for (const action of milestone.unlocks) {
-          queueUnlockAction(action as import('$lib/models/types').ActionType);
-        }
-      }
-    }
   }
 }
 
@@ -239,6 +183,11 @@ function checkQuestDeadlines(): void {
  * 新しい依頼の生成
  */
 function generateNewQuests(): void {
+  // クエストがアンロックされていない場合はスキップ
+  if (!isActionUnlocked('quest')) {
+    return;
+  }
+
   const state = get(gameState);
 
   // 一定確率で新しい依頼を追加
@@ -261,13 +210,9 @@ function generateNewQuests(): void {
 
       if (newQuests.length > 0) {
         setAvailableQuests([...state.availableQuests, ...newQuests]);
-
-        const event: MorningEvent = {
-          type: 'new_quest',
-          message: `新しい依頼が掲示板に追加されました！`,
-        };
-        addMorningEvent(event);
-        addMessage(event.message);
+        incrementNewQuestCount(newQuests.length);
+        // メッセージログにのみ追加（朝画面は表示しない）
+        addMessage(`新しい依頼が掲示板に追加されました！`);
       }
     }
   }
@@ -285,9 +230,6 @@ export function startActionPhase(): void {
  * ゲーム開始時の初期化
  */
 export function initializeGame(): void {
-  // 村発展マイルストーンをリセット
-  completedVillageMilestones.clear();
-
   // 初期依頼を設定
   const state = get(gameState);
   const templates = getAvailableQuestTemplates(state.alchemyLevel, state.reputation);
@@ -303,4 +245,7 @@ export function initializeGame(): void {
 
   // 発動済み目標の追跡を初期化
   initializeActiveGoalTracking();
+
+  // ゲーム開始アチーブメントをチェック（ダイアログ表示）
+  checkAutoCompleteAchievements();
 }
