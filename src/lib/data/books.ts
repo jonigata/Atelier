@@ -7,6 +7,7 @@ export const books: Record<string, RecipeBookDef> = {
     description: '錬金術の基礎を学ぶための教科書。回復薬と解毒薬のレシピが載っている。',
     recipeIds: ['potion_01', 'antidote'],
     basePrice: 100,
+    studyDays: 1,
   },
   book_advanced_potions: {
     id: 'book_advanced_potions',
@@ -14,6 +15,7 @@ export const books: Record<string, RecipeBookDef> = {
     description: 'より高度な薬の調合法を解説した本。',
     recipeIds: ['potion_02'],
     basePrice: 500,
+    studyDays: 1,
   },
   book_metallurgy: {
     id: 'book_metallurgy',
@@ -21,6 +23,7 @@ export const books: Record<string, RecipeBookDef> = {
     description: '金属の精錬技術について書かれた技術書。',
     recipeIds: ['ingot_01', 'ingot_02'],
     basePrice: 800,
+    studyDays: 1,
   },
   book_explosives: {
     id: 'book_explosives',
@@ -28,6 +31,7 @@ export const books: Record<string, RecipeBookDef> = {
     description: '危険だが役立つ爆発物の製造法。取扱注意。',
     recipeIds: ['bomb_01'],
     basePrice: 400,
+    studyDays: 1,
   },
   book_legendary: {
     id: 'book_legendary',
@@ -35,6 +39,7 @@ export const books: Record<string, RecipeBookDef> = {
     description: '古代から伝わる万能薬の製法が記された貴重な書物。',
     recipeIds: ['elixir'],
     basePrice: 2000,
+    studyDays: 1,
   },
 };
 

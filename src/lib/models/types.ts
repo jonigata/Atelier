@@ -42,6 +42,7 @@ export interface RecipeBookDef {
   description: string;
   recipeIds: string[];  // この本に含まれるレシピID
   basePrice: number;    // ショップでの購入価格
+  studyDays: number;    // 勉強に必要な日数
 }
 
 // 依頼タイプ

@@ -22,12 +22,18 @@
   import ShopPanel from './ShopPanel.svelte';
   import QuestPanel from './QuestPanel.svelte';
   import InventoryPanel from './InventoryPanel.svelte';
+  import StudyCompleteDialog from './StudyCompleteDialog.svelte';
 
   export let action: ActionType;
   export let onBack: () => void;
 
   // 勉強用の選択状態
   let selectedBookId: string | null = null;
+
+  // 勉強完了ダイアログ用
+  let showStudyDialog = false;
+  let studyCompletedBook: RecipeBookDef | null = null;
+  let studyLearnedRecipeNames: string[] = [];
 
   // 勉強可能な本一覧（所持していて、まだ未習得のレシピがあるもの）
   $: availableBooks = $gameState.ownedBooks
@@ -57,14 +63,30 @@
     if (!selectedBookId || !selectedBook) return;
 
     const learned = learnRecipesFromBook(selectedBook.recipeIds);
+    const learnedNames = learned.map(id => recipes[id]?.name || id);
+
     if (learned.length > 0) {
-      const names = learned.map(id => recipes[id]?.name || id).join('、');
-      addMessage(`「${selectedBook.name}」を読破！ ${names}のレシピを習得しました！`);
+      addMessage(`「${selectedBook.name}」を読破！ ${learnedNames.join('、')}のレシピを習得しました！`);
     } else {
       addMessage(`「${selectedBook.name}」を読みましたが、すでに全てのレシピを習得済みでした。`);
     }
+
+    // ダイアログ表示用に保存
+    studyCompletedBook = selectedBook;
+    studyLearnedRecipeNames = learnedNames;
+    showStudyDialog = true;
+  }
+
+  // ダイアログを閉じて日数進行
+  function handleStudyDialogClose() {
+    if (!studyCompletedBook) return;
+
+    const days = studyCompletedBook.studyDays;
+    showStudyDialog = false;
+    studyCompletedBook = null;
+    studyLearnedRecipeNames = [];
     selectedBookId = null;
-    endTurn(3);
+    endTurn(days);
     onBack();
   }
 
@@ -103,7 +125,7 @@
   {:else if action === 'study'}
     <button class="back-btn" on:click={onBack}>← 戻る</button>
     <h2>📚 勉強</h2>
-    <p>本を選んで読みます。3日経過します。</p>
+    <p>本を選んで読みます。{selectedBook ? selectedBook.studyDays : 1}日経過します。</p>
     <p class="known-recipes">
       習得済みレシピ: {$gameState.knownRecipes.length}個 / 錬金術Lv: {$gameState.alchemyLevel}
     </p>
@@ -157,6 +179,14 @@
     </button>
   {/if}
 </div>
+
+{#if showStudyDialog && studyCompletedBook}
+  <StudyCompleteDialog
+    book={studyCompletedBook}
+    learnedRecipes={studyLearnedRecipeNames}
+    onClose={handleStudyDialogClose}
+  />
+{/if}
 
 <style>
   .action-panel {
