@@ -1,6 +1,6 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
-  import { getItem, getItemIcon } from '$lib/data/items';
+  import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import type { OwnedItem } from '$lib/models/types';
   import { CATEGORY_NAMES, getCategoryName } from '$lib/data/categories';
 
@@ -206,7 +206,7 @@
     <div class="item-grid">
       {#each sortedDetailedItems as item}
         <div class="item-card">
-          <img class="item-icon" src={getItemIcon(item.itemId)} alt={item.name} />
+          <img class="item-icon" src={getItemIcon(item.itemId)} alt={item.name} on:error={handleIconError} />
           <div class="item-header">
             <span class="item-name">{item.name}</span>
             {#if item.count > 1}
@@ -229,7 +229,7 @@
         <div class="item-row" class:expanded={expandedItems.has(item.itemId)}>
           <button class="item-main" on:click={() => toggleExpand(item.itemId)}>
             <span class="expand-icon">{expandedItems.has(item.itemId) ? '▼' : '▶'}</span>
-            <img class="item-icon-small" src={getItemIcon(item.itemId)} alt={item.name} />
+            <img class="item-icon-small" src={getItemIcon(item.itemId)} alt={item.name} on:error={handleIconError} />
             <span class="item-name">{item.name}</span>
             <span class="item-count">×{item.count}</span>
             <span class="item-category">{CATEGORY_NAMES[item.category as keyof typeof CATEGORY_NAMES] || item.category}</span>

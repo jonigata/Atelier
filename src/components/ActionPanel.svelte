@@ -2,7 +2,7 @@
   import { gameState, addMessage, restoreStamina, consumeStamina, learnRecipe } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
-  import { items, getItemIcon } from '$lib/data/items';
+  import { items, getItemIcon, handleIconError } from '$lib/data/items';
   import type { ActionType, RecipeDef } from '$lib/models/types';
   import { getCategoryName } from '$lib/data/categories';
 
@@ -105,7 +105,7 @@
             on:click={() => selectRecipe(recipe.id)}
           >
             <div class="recipe-header">
-              <img class="recipe-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} />
+              <img class="recipe-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
               <span class="recipe-name">{recipe.name}</span>
               <span class="recipe-info">必要Lv.{recipe.requiredLevel}</span>
             </div>

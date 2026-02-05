@@ -1,6 +1,6 @@
 <script lang="ts">
   import { countAvailableIngredients } from '$lib/services/alchemy';
-  import { getItem, getItemIcon } from '$lib/data/items';
+  import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
   import type { RecipeDef, Ingredient } from '$lib/models/types';
 
@@ -38,7 +38,7 @@
         on:click={() => craftable && onSelect(recipe)}
       >
         <div class="recipe-header">
-          <img class="recipe-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} />
+          <img class="recipe-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
           <span class="recipe-name">{recipe.name}</span>
           <span class="recipe-days">{recipe.daysRequired}日</span>
         </div>

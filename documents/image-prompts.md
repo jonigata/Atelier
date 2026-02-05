@@ -40,3 +40,5 @@ bash /home/hirayama/.claude/skills/fal-generate/scripts/generate.sh \
 | ingot_01 | 鉄インゴット | iron ingot, grey metal bar | static/icons/materials/ingot_01.png |
 | ingot_02 | 銀インゴット | silver ingot, shiny white metal bar | static/icons/materials/ingot_02.png |
 | elixir | エリクサー | golden elixir in a fancy crystal bottle, magical sparkles | static/icons/materials/elixir.png |
+| unknown | 未発見アイテム | mysterious question mark symbol wrapped in swirling mist and shadows, unknown item | static/icons/materials/unknown.png |
+| fallback | フォールバック | broken cracked empty bottle or flask, missing item placeholder | static/icons/materials/fallback.png |

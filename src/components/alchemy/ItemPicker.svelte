@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getItem, getItemIcon } from '$lib/data/items';
+  import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
   import type { OwnedItem, Ingredient } from '$lib/models/types';
 
@@ -32,7 +32,7 @@
       {#each items as item}
         {@const def = getItem(item.itemId)}
         <button class="item-btn" on:click={() => onSelect(item)}>
-          <img class="item-icon" src={getItemIcon(item.itemId)} alt={def?.name || item.itemId} />
+          <img class="item-icon" src={getItemIcon(item.itemId)} alt={def?.name || item.itemId} on:error={handleIconError} />
           <span class="item-name">{def?.name || item.itemId}</span>
           <span class="item-quality">品質 {item.quality}</span>
         </button>

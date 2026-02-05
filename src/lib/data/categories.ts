@@ -8,6 +8,9 @@ export const CATEGORY_NAMES: Record<ItemCategory, string> = {
   ore: '鉱石系',
   water: '水系',
   misc: 'その他',
+  plant: '植物系',
+  wood: '木材系',
+  crystal: '結晶系',
   product: '生成物',
 } as const;
 

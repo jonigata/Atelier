@@ -1,7 +1,7 @@
 <script lang="ts">
   import { gameState, setTutorialDialogue } from '$lib/stores/game';
   import { onDialogueClosed } from '$lib/services/tutorial';
-  import { getItemIcon } from '$lib/data/items';
+  import { getItemIcon, handleIconError } from '$lib/data/items';
 
   let currentLine = 0;
   let showingRewards = false;  // 報酬画面を表示中かどうか
@@ -91,7 +91,7 @@
           {#each delayedDialogue.structuredRewards as reward}
             <div class="reward-card" class:has-icon={reward.itemId}>
               {#if reward.itemId}
-                <img class="reward-card-icon" src={getItemIcon(reward.itemId)} alt="" />
+                <img class="reward-card-icon" src={getItemIcon(reward.itemId)} alt="" on:error={handleIconError} />
               {:else if reward.type === 'money'}
                 <span class="reward-card-emoji">💰</span>
               {:else if reward.type === 'reputation'}
