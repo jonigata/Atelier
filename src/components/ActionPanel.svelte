@@ -22,6 +22,7 @@
   import ShopPanel from './ShopPanel.svelte';
   import QuestPanel from './QuestPanel.svelte';
   import InventoryPanel from './InventoryPanel.svelte';
+  import AlbumPanel from './AlbumPanel.svelte';
   import StudyCompleteDialog from './StudyCompleteDialog.svelte';
 
   export let action: ActionType;
@@ -110,6 +111,9 @@
 
   {:else if action === 'inventory'}
     <InventoryPanel {onBack} />
+
+  {:else if action === 'album'}
+    <AlbumPanel {onBack} />
 
   {:else if action === 'rest'}
     <button class="back-btn" on:click={onBack}>← 戻る</button>

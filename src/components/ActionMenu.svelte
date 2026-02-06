@@ -123,6 +123,7 @@
     { type: 'inventory', label: '所持品', description: '持ち物を確認する' },
     { type: 'rest', label: '休息', description: '体力を回復する (1日)' },
     { type: 'study', label: '勉強', description: '新しいレシピを習得' },
+    { type: 'album', label: 'アルバム', description: 'アイテム図鑑' },
   ];
 
   function getActionIcon(type: ActionType): string {
