@@ -8,8 +8,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 サーバは基本的に起動しっぱなしなので、いちいち立ち上げ直す必要はありません
 コミットは頼まれたときだけやってください
 
+ブランチを切って～しろ、と指示されたらまず先にブランチを切って、
+そのブランチ(worktree)でドキュメント生成や作業を始めてください。
+
 # 画像
 
+画像を作れと言われたらスキルを使ってください。
+環境変数はsetting.jsonに書いてあります
 falで画像生成するときは
 背景透過のもの(アイコンなど)はgpt-image-1.5(medium, transparent)で。
 背景透過でないものはflux.2.kleinで。
