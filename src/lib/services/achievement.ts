@@ -288,6 +288,7 @@ export function getAchievementDialogue(achievementId: string): TutorialDialogue 
       characterTitle: '',
       lines: achievement.narrativeLines,
       achievementTitle: achievement.title,
+      achievementCategory: achievement.category,
       rewards,
       structuredRewards,
     };
@@ -298,6 +299,7 @@ export function getAchievementDialogue(achievementId: string): TutorialDialogue 
     characterTitle: character.title,
     lines: achievement.narrativeLines,
     achievementTitle: achievement.title,
+    achievementCategory: achievement.category,
     rewards,
     structuredRewards,
   };

@@ -118,6 +118,7 @@ export interface TutorialDialogue {
   characterTitle: string;
   lines: string[];
   achievementTitle?: string;  // アチーブメント達成時のタイトル
+  achievementCategory?: AchievementCategory;  // アチーブメントカテゴリ（アイコン表示用）
   rewards?: string[];         // 報酬詳細リスト（後方互換性のため残す）
   structuredRewards?: RewardDisplay[];  // 構造化された報酬（アイコン付き）
 }

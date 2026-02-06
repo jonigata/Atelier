@@ -1,6 +1,7 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
+  import QuestTypeIcon from './QuestTypeIcon.svelte';
   import type { ActiveQuest, OwnedItem } from '$lib/models/types';
 
   export let quest: ActiveQuest;
@@ -48,16 +49,23 @@
   role={onClick ? 'button' : undefined}
   tabindex={onClick ? 0 : undefined}
 >
-  <div class="quest-header">
-    <span class="quest-title">{quest.title}</span>
-  </div>
+  <div class="quest-main">
+    <div class="quest-type-area">
+      <QuestTypeIcon type={quest.type} size="medium" />
+    </div>
+    <div class="quest-content">
+      <div class="quest-header">
+        <span class="quest-title">{quest.title}</span>
+      </div>
 
-  <div class="days-bar-container">
-    <div
-      class="days-bar"
-      style="width: {Math.max(0, Math.min(100, (daysLeft / 7) * 100))}%; --danger-level: {dangerLevel}"
-    ></div>
-    <span class="days-label">残り{daysLeft}日</span>
+      <div class="days-bar-container">
+        <div
+          class="days-bar"
+          style="width: {Math.max(0, Math.min(100, (daysLeft / 7) * 100))}%; --danger-level: {dangerLevel}"
+        ></div>
+        <span class="days-label">残り{daysLeft}日</span>
+      </div>
+    </div>
   </div>
 
   <div class="quest-requirement">
@@ -118,8 +126,25 @@
     border-color: #6a6a8a;
   }
 
-  .quest-header {
+  .quest-main {
+    display: flex;
+    gap: 0.75rem;
     margin-bottom: 0.5rem;
+  }
+
+  .quest-type-area {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .quest-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .quest-header {
+    margin-bottom: 0.4rem;
   }
 
   .quest-title {
@@ -133,7 +158,6 @@
     height: 1.25rem;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 4px;
-    margin-bottom: 0.5rem;
     overflow: hidden;
   }
 

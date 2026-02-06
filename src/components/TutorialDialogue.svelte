@@ -2,6 +2,7 @@
   import { gameState } from '$lib/stores/game';
   import { resolveDialogue } from '$lib/services/presentation';
   import ItemCard from './common/ItemCard.svelte';
+  import AchievementCategoryIcon from './common/AchievementCategoryIcon.svelte';
 
   let currentLine = 0;
   let showingRewards = false;
@@ -88,8 +89,15 @@
       <div class="dialogue-box">
         {#if dialogue.achievementTitle}
           <div class="achievement-header">
-            <span class="achievement-badge">達成</span>
-            <span class="achievement-title">{dialogue.achievementTitle}</span>
+            {#if dialogue.achievementCategory}
+              <div class="achievement-icon">
+                <AchievementCategoryIcon category={dialogue.achievementCategory} size="large" />
+              </div>
+            {/if}
+            <div class="achievement-info">
+              <span class="achievement-badge">達成</span>
+              <span class="achievement-title">{dialogue.achievementTitle}</span>
+            </div>
           </div>
         {/if}
         <div class="character-info">
@@ -145,13 +153,25 @@
   .achievement-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
     border-bottom: 2px solid #c9a959;
   }
 
+  .achievement-icon {
+    flex-shrink: 0;
+  }
+
+  .achievement-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
   .achievement-badge {
+    display: inline-block;
+    width: fit-content;
     background: linear-gradient(135deg, #c9a959 0%, #f0d78c 50%, #c9a959 100%);
     color: #1a1a2e;
     padding: 0.25rem 0.6rem;

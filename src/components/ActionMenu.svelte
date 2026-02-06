@@ -5,6 +5,7 @@
   import { items } from '$lib/data/items';
   import { recipes } from '$lib/data/recipes';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
+  import AchievementCategoryIcon from './common/AchievementCategoryIcon.svelte';
   import type { ActionType, AchievementDef, ActiveQuest } from '$lib/models/types';
 
   export let onSelect: (action: ActionType) => void;
@@ -197,13 +198,20 @@
               {@const progressDetail = getProgressDetail(goal)}
               {@const progressPercent = getAchievementProgress(goal.id)}
               <div class="objective-item achievement" class:important={goal.important}>
-                <div class="objective-header">
-                  <span class="objective-title">{goal.title}</span>
-                  {#if progressDetail}
-                    <span class="progress-badge">{progressDetail.label}: {progressDetail.current}/{progressDetail.target}</span>
-                  {/if}
+                <div class="objective-main">
+                  <div class="objective-icon">
+                    <AchievementCategoryIcon category={goal.category} size="medium" />
+                  </div>
+                  <div class="objective-content">
+                    <div class="objective-header">
+                      <span class="objective-title">{goal.title}</span>
+                      {#if progressDetail}
+                        <span class="progress-badge">{progressDetail.label}: {progressDetail.current}/{progressDetail.target}</span>
+                      {/if}
+                    </div>
+                    <div class="objective-hint">{goal.hint}</div>
+                  </div>
                 </div>
-                <div class="objective-hint">{goal.hint}</div>
                 <div class="objective-rewards">
                   <span class="reward-label">報酬:</span>
                   {#each getRewardSummary(goal) as reward}
@@ -415,11 +423,26 @@
     box-shadow: 0 0 8px rgba(201, 169, 89, 0.2);
   }
 
+  .objective-main {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .objective-icon {
+    flex-shrink: 0;
+  }
+
+  .objective-content {
+    flex: 1;
+    min-width: 0;
+  }
+
   .objective-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.25rem;
   }
 
   .objective-title {
@@ -431,7 +454,6 @@
   .objective-hint {
     color: #a0a0b0;
     font-size: 0.85rem;
-    margin-bottom: 0.4rem;
   }
 
   .progress-badge {

@@ -17,6 +17,7 @@
   import { removeItemsFromInventory } from '$lib/services/inventory';
   import { checkMilestoneProgress } from '$lib/services/tutorial';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
+  import QuestTypeIcon from './common/QuestTypeIcon.svelte';
   import type { QuestDef, ActiveQuest, OwnedItem } from '$lib/models/types';
 
   export let onBack: () => void;
@@ -172,7 +173,9 @@
           <div class="quest-item">
             <div class="quest-header">
               <span class="quest-title">{quest.title}</span>
-              <span class="quest-type">{getQuestTypeLabel(quest.type)}</span>
+              <span class="quest-type">
+                <QuestTypeIcon type={quest.type} showLabel={true} />
+              </span>
             </div>
             <p class="quest-desc">{quest.description}</p>
             <div class="quest-details">
