@@ -37,3 +37,18 @@
 | expedition | `An expedition backpack icon, cartoon game style, adventurer backpack with pickaxe and rope, cheerful colors, sticker-style dark outline, clean vector look, game UI icon` |
 | economy | `A gold coins icon, cartoon game style, stack of shiny gold coins with sparkles, cheerful colors, sticker-style dark outline, clean vector look, game UI icon` |
 | mastery | `A mastery crown icon, cartoon game style, golden crown with gems and radiant glow, premium achievement look, cheerful colors, sticker-style dark outline, clean vector look, game UI icon` |
+
+## アクションコマンドアイコン
+
+**モデル**: gpt-image-1.5 (medium, transparent)
+**サイズ**: 1024x1024
+
+| アクション | プロンプト |
+|-----------|----------|
+| alchemy | `An alchemy flask icon, cartoon game style, bubbling colorful potion in a round glass flask, cheerful colors, sticker-style dark outline, clean vector look, game UI icon` |
+| quest | `A quest board icon, cartoon game style, wooden notice board with paper notes pinned, cheerful colors, sticker-style dark outline, clean vector look, game UI icon` |
+| expedition | `A forest exploration icon, cartoon game style, green forest trees with path leading into woods, cheerful colors, sticker-style dark outline, clean vector look, game UI icon` |
+| shop | `A shop store icon, cartoon game style, cute small shop building with awning and sign, cheerful colors, sticker-style dark outline, clean vector look, game UI icon` |
+| inventory | `An inventory bag icon, cartoon game style, leather pouch bag with buckle, cheerful colors, sticker-style dark outline, clean vector look, game UI icon` |
+| rest | `A rest bed icon, cartoon game style, cozy wooden bed with pillow and blanket, cheerful colors, sticker-style dark outline, clean vector look, game UI icon` |
+| study | `A study book icon, cartoon game style, open magic book with glowing pages, cheerful colors, sticker-style dark outline, clean vector look, game UI icon` |

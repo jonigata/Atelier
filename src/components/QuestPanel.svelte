@@ -52,7 +52,6 @@
     addActiveQuest(activeQuest);
     setAvailableQuests($gameState.availableQuests.filter((q) => q.id !== quest.id));
     addMessage(`依頼「${quest.title}」を受注しました`);
-    activeTab = 'active';
 
     // アチーブメントチェック（依頼受注関連）
     checkMilestoneProgress();

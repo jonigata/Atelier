@@ -115,15 +115,19 @@
     return { label, current: Math.min(current, target), target };
   }
 
-  const actions: { type: ActionType; label: string; icon: string; description: string }[] = [
-    { type: 'alchemy', label: '調合', icon: '⚗️', description: 'アイテムを調合する' },
-    { type: 'quest', label: '依頼', icon: '📜', description: '依頼の確認・受注・納品' },
-    { type: 'expedition', label: '採取', icon: '🏕️', description: '採取隊を派遣する' },
-    { type: 'shop', label: 'ショップ', icon: '🏪', description: 'アイテムの売買' },
-    { type: 'inventory', label: '所持品', icon: '📦', description: '持ち物を確認する' },
-    { type: 'rest', label: '休息', icon: '😴', description: '体力を回復する (1日)' },
-    { type: 'study', label: '勉強', icon: '📚', description: '新しいレシピを習得' },
+  const actions: { type: ActionType; label: string; description: string }[] = [
+    { type: 'alchemy', label: '調合', description: 'アイテムを調合する' },
+    { type: 'quest', label: '依頼', description: '依頼の確認・受注・納品' },
+    { type: 'expedition', label: '採取', description: '採取隊を派遣する' },
+    { type: 'shop', label: 'ショップ', description: 'アイテムの売買' },
+    { type: 'inventory', label: '所持品', description: '持ち物を確認する' },
+    { type: 'rest', label: '休息', description: '体力を回復する (1日)' },
+    { type: 'study', label: '勉強', description: '新しいレシピを習得' },
   ];
+
+  function getActionIcon(type: ActionType): string {
+    return `/icons/actions/${type}.png`;
+  }
 
   // 日付演出中かどうか
   $: isDayTransition = $gameState.pendingDayTransition !== null;
@@ -162,7 +166,7 @@
       {#if action.isLocked}
         <!-- ロック中：鍵マークのみ表示 -->
         <div class="action-btn locked">
-          <span class="lock-icon">🔒</span>
+          <img class="lock-icon" src="/icons/actions/locked.png" alt="ロック中" />
           <span class="lock-label">???</span>
         </div>
       {:else}
@@ -173,7 +177,7 @@
           on:click={() => onSelect(action.type)}
           disabled={action.type === 'expedition' && $gameState.expedition !== null}
         >
-          <span class="icon">{action.icon}</span>
+          <img class="icon" src={getActionIcon(action.type)} alt={action.label} />
           <span class="label">{action.label}</span>
           <span class="description">{action.description}</span>
           {#if action.type === 'expedition' && $gameState.expedition !== null}
@@ -298,7 +302,9 @@
   }
 
   .lock-icon {
-    font-size: 3rem;
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
     opacity: 0.5;
   }
 
@@ -330,7 +336,9 @@
   }
 
   .icon {
-    font-size: 2rem;
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
   }
 
   .label {
