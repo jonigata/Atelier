@@ -42,3 +42,13 @@ bash /home/hirayama/.claude/skills/fal-generate/scripts/generate.sh \
 | elixir | エリクサー | golden elixir in a fancy crystal bottle, magical sparkles | static/icons/materials/elixir.png |
 | unknown | 未発見アイテム | mysterious question mark symbol wrapped in swirling mist and shadows, unknown item | static/icons/materials/unknown.png |
 | fallback | フォールバック | broken cracked empty bottle or flask, missing item placeholder | static/icons/materials/fallback.png |
+
+## アクションアイコン (Action Icons)
+
+**モデル**: `fal-ai/gpt-image-1.5`（同じスタイルプロンプト）
+
+### 生成済みアイコン
+
+| ID | アクション | プロンプト | ファイル |
+|----|----------|----------|----------|
+| album | アルバム | old leather-bound album book with golden clasp, item encyclopedia journal | static/icons/actions/album.png |

@@ -155,6 +155,7 @@ export interface GameState {
   expedition: Expedition | null;
 
   craftedItems: string[];
+  discoveredItems: string[];
 
   phase: GamePhase;
   morningEvents: MorningEvent[];
@@ -176,7 +177,8 @@ export type ActionType =
   | 'shop'
   | 'rest'
   | 'study'
-  | 'inventory';
+  | 'inventory'
+  | 'album';
 
 // =====================================
 // アチーブメントシステム

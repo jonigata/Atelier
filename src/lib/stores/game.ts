@@ -46,6 +46,7 @@ function createInitialState(): GameState {
     expedition: null,
 
     craftedItems: [],
+    discoveredItems: ['herb_01', 'water_01'],
 
     phase: 'morning',
     morningEvents: [],
@@ -128,6 +129,9 @@ export function addItem(item: OwnedItem): void {
   gameState.update((state) => ({
     ...state,
     inventory: [...state.inventory, item],
+    discoveredItems: state.discoveredItems.includes(item.itemId)
+      ? state.discoveredItems
+      : [...state.discoveredItems, item.itemId],
   }));
 }
 
@@ -277,6 +281,16 @@ export function addBook(bookId: string): void {
     return {
       ...state,
       ownedBooks: [...state.ownedBooks, bookId],
+    };
+  });
+}
+
+export function markItemDiscovered(itemId: string): void {
+  gameState.update((state) => {
+    if (state.discoveredItems.includes(itemId)) return state;
+    return {
+      ...state,
+      discoveredItems: [...state.discoveredItems, itemId],
     };
   });
 }

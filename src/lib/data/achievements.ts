@@ -60,7 +60,7 @@ export const achievements: Record<string, AchievementDef> = {
     conditions: [{ type: 'recipe_count', target: 1 }],
     reward: {
       items: [{ itemId: 'herb_01', quality: 50, quantity: 3 }],
-      unlocks: ['alchemy', 'inventory'],
+      unlocks: ['alchemy', 'inventory', 'album'],
     },
     prerequisite: ['ach_game_start'],
     priority: 10,

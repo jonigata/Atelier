@@ -14,6 +14,7 @@ export const actionLabels: Record<ActionType, string> = {
   inventory: '所持品',
   rest: '休息',
   study: '勉強',
+  album: 'アルバム',
 };
 
 // 新しくアンロックされたアクション（演出用）
