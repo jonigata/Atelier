@@ -16,9 +16,10 @@
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { removeItemsFromInventory } from '$lib/services/inventory';
   import { checkMilestoneProgress } from '$lib/services/tutorial';
+  import { setTutorialDialogue } from '$lib/stores/tutorial';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
   import QuestTypeIcon from './common/QuestTypeIcon.svelte';
-  import type { QuestDef, ActiveQuest, OwnedItem } from '$lib/models/types';
+  import type { QuestDef, ActiveQuest, OwnedItem, TutorialDialogue, RewardDisplay } from '$lib/models/types';
 
   export let onBack: () => void;
 
@@ -108,8 +109,21 @@
 
     addVillageDevelopment(developmentGain);
 
-    const itemDef = getItem(quest.requiredItemId);
-    const itemName = itemDef?.name || quest.requiredItemId;
+    // 完了ダイアログを表示
+    const structuredRewards: RewardDisplay[] = [
+      { text: `${quest.rewardMoney.toLocaleString()} G`, type: 'money' },
+      { text: `名声 +${quest.rewardReputation}`, type: 'reputation' },
+    ];
+
+    const dialogue: TutorialDialogue = {
+      characterName: '依頼主',
+      characterTitle: '',
+      lines: ['ありがとう！助かったよ。'],
+      achievementTitle: `依頼完了「${quest.title}」`,
+      structuredRewards,
+    };
+    setTutorialDialogue(dialogue);
+
     addMessage(
       `依頼「${quest.title}」を達成しました！ 報酬: ${quest.rewardMoney}G, 名声+${quest.rewardReputation}, 村発展+${developmentGain}`
     );

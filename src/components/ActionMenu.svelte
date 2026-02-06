@@ -493,6 +493,13 @@
     font-size: 0.8rem;
   }
 
+  .objective-rewards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+  }
+
   .reward-item {
     color: #c9a959;
   }
