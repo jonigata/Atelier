@@ -7,8 +7,12 @@
   function handleRest() {
     restoreStamina(100);
     addMessage('休息しました。体力が全回復しました。');
+    // 先にendTurn → DayTransitionが上から被さる
     endTurn(1);
-    onBack();
+    // DayTransitionの暗転(0.3s)後に画面を切り替え
+    setTimeout(() => {
+      onBack();
+    }, 350);
   }
 </script>
 

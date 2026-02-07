@@ -131,6 +131,7 @@
     user-select: none;
   }
 
+
   .dialog-box {
     background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
     border: 3px solid #c9a959;

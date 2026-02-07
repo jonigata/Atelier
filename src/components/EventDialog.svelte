@@ -2,24 +2,41 @@
   import { gameState } from '$lib/stores/game';
   import { resolveDialogue } from '$lib/services/presentation';
   import ItemCard from './common/ItemCard.svelte';
+  import AnimatedGauge from './common/AnimatedGauge.svelte';
   import AchievementCategoryIcon from './common/AchievementCategoryIcon.svelte';
+
+  type GaugeColor = 'gold' | 'blue' | 'green';
+  function getGaugeColor(type: string): GaugeColor {
+    switch (type) {
+      case 'reputation': return 'gold';
+      case 'exp': return 'blue';
+      case 'villageDevelopment': return 'green';
+      default: return 'blue';
+    }
+  }
 
   let currentLine = 0;
   let showingRewards = false;
+  let closing = false;
 
   // ダイアログは pendingDialogue がセットされたら即座に表示
   // 日数表示との同期は presentation サービスが async/await で制御する
   $: dialogue = $gameState.tutorialProgress.pendingDialogue;
   $: hasRewards = dialogue?.structuredRewards && dialogue.structuredRewards.length > 0;
 
+  // ゲージ報酬と通常報酬を分離
+  $: gaugeRewards = dialogue?.structuredRewards?.filter(r => r.gaugeData) ?? [];
+  $: normalRewards = dialogue?.structuredRewards?.filter(r => !r.gaugeData) ?? [];
+
   // ダイアログが変わったらリセット
   $: if (dialogue) {
     currentLine = 0;
     showingRewards = false;
+    closing = false;
   }
 
   function nextLine() {
-    if (!dialogue) return;
+    if (!dialogue || closing) return;
 
     if (showingRewards) {
       closeDialogue();
@@ -33,26 +50,39 @@
   }
 
   function closeDialogue() {
+    if (closing) return;
+    closing = true;
+  }
+
+  function handleFadeOutEnd() {
+    closing = false;
     currentLine = 0;
     showingRewards = false;
-    // presentation サービスに完了を通知
     resolveDialogue();
   }
 
   function skipDialogue(event: MouseEvent) {
     event.stopPropagation();
-    closeDialogue();
+    if (!showingRewards && hasRewards) {
+      showingRewards = true;
+    } else {
+      closeDialogue();
+    }
   }
 
   function handleKeydown(event: KeyboardEvent) {
-    if (!dialogue) return;
+    if (!dialogue || closing) return;
 
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       nextLine();
     } else if (event.key === 'Escape') {
       event.preventDefault();
-      closeDialogue();
+      if (!showingRewards && hasRewards) {
+        showingRewards = true;
+      } else {
+        closeDialogue();
+      }
     }
   }
 </script>
@@ -61,25 +91,44 @@
 
 {#if dialogue}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <div class="dialogue-overlay" class:centered={showingRewards} on:click={nextLine} role="button" tabindex="0">
+  <div class="dialogue-overlay" class:closing on:click={nextLine} on:animationend={closing ? handleFadeOutEnd : undefined} role="button" tabindex="0">
     {#if showingRewards && dialogue.structuredRewards}
       <!-- 報酬画面 -->
-      <div class="rewards-screen">
+      <div class="rewards-screen" class:quest-reward={!!dialogue.rewardsTitle}>
         <div class="rewards-header">
-          <span class="rewards-title">報酬獲得！</span>
+          <span class="rewards-title">{dialogue.rewardsTitle ?? '目標達成！'}</span>
           {#if dialogue.achievementTitle}
             <span class="achievement-subtitle">{dialogue.achievementTitle}</span>
           {/if}
         </div>
-        <div class="rewards-grid">
-          {#each dialogue.structuredRewards as reward}
-            <ItemCard
-              itemId={reward.itemId}
-              label={reward.text}
-              emoji={!reward.itemId ? (reward.type === 'money' ? '💰' : reward.type === 'reputation' ? '⭐' : reward.type === 'unlock' ? '🔓' : '🎁') : null}
-            />
-          {/each}
-        </div>
+        {#if normalRewards.length > 0}
+          <div class="rewards-grid">
+            {#each normalRewards as reward}
+              <ItemCard
+                itemId={reward.itemId}
+                label={reward.text}
+                iconUrl={reward.iconUrl}
+                emoji={!reward.itemId && !reward.iconUrl ? (reward.type === 'money' ? '💰' : '🎁') : null}
+              />
+            {/each}
+          </div>
+        {/if}
+        {#if gaugeRewards.length > 0}
+          <div class="gauge-rewards">
+            {#each gaugeRewards as reward}
+              {#if reward.gaugeData}
+                <AnimatedGauge
+                  before={reward.gaugeData.before}
+                  after={reward.gaugeData.after}
+                  max={reward.gaugeData.max}
+                  label={reward.gaugeData.label}
+                  text={reward.text}
+                  color={getGaugeColor(reward.type)}
+                />
+              {/if}
+            {/each}
+          </div>
+        {/if}
         <div class="rewards-footer">
           <span class="hint-text">クリック または Enter で閉じる</span>
         </div>
@@ -127,17 +176,27 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.6);
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
-    padding-bottom: 3rem;
     z-index: 1000;
     cursor: pointer;
     user-select: none;
+    animation: overlayFadeIn 0.2s ease-out;
   }
 
-  .dialogue-overlay.centered {
-    align-items: center;
-    padding-bottom: 0;
+  .dialogue-overlay.closing {
+    animation: overlayFadeOut 0.2s ease-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes overlayFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
   }
 
   .dialogue-box {
@@ -272,6 +331,23 @@
     animation: rewardPopIn 0.3s ease-out;
   }
 
+  /* 依頼達成 */
+  .rewards-screen.quest-reward {
+    border-color: #5a8abf;
+    box-shadow:
+      0 0 30px rgba(90, 138, 191, 0.25),
+      0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  .quest-reward .rewards-title {
+    color: #7ab8f5;
+    text-shadow: 0 0 15px rgba(122, 184, 245, 0.4);
+  }
+
+  .quest-reward .achievement-subtitle {
+    color: #5a8abf;
+  }
+
   @keyframes rewardPopIn {
     from {
       opacity: 0;
@@ -313,5 +389,13 @@
     text-align: center;
     padding-top: 1rem;
     border-top: 1px solid #4a4a6a;
+  }
+
+  /* ゲージ報酬 */
+  .gauge-rewards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
   }
 </style>

@@ -1,11 +1,11 @@
 import { get } from 'svelte/store';
 import { gameState } from './game';
-import type { TutorialDialogue, ActionType } from '$lib/models/types';
+import type { EventDialogue, ActionType } from '$lib/models/types';
 
 /**
- * チュートリアルダイアログを設定
+ * イベントダイアログを設定
  */
-export function setTutorialDialogue(dialogue: TutorialDialogue | null): void {
+export function setEventDialogue(dialogue: EventDialogue | null): void {
   gameState.update((state) => ({
     ...state,
     tutorialProgress: {

@@ -4,9 +4,12 @@ import {
   addMoney,
   addItem,
   addReputation,
+  addExp,
+  addVillageDevelopment,
   learnRecipe,
   unlockFacility,
 } from '$lib/stores/game';
+import { calcExpForLevel } from '$lib/data/balance';
 import { completeAchievement, clearPendingReward, isAchievementCompleted } from '$lib/stores/achievements';
 import { unlockAction } from '$lib/stores/tutorial';
 import {
@@ -22,7 +25,7 @@ import type {
   AchievementDef,
   AchievementCondition,
   GameState,
-  TutorialDialogue,
+  EventDialogue,
   RewardDisplay,
 } from '$lib/models/types';
 
@@ -250,6 +253,14 @@ export function claimReward(achievementId: string): void {
     addReputation(reward.reputation);
   }
 
+  if (reward.exp) {
+    addExp(reward.exp);
+  }
+
+  if (reward.villageDevelopment) {
+    addVillageDevelopment(reward.villageDevelopment);
+  }
+
   if (reward.recipes) {
     for (const recipeId of reward.recipes) {
       learnRecipe(recipeId);
@@ -276,7 +287,7 @@ export function claimReward(achievementId: string): void {
 /**
  * アチーブメント達成時のダイアログを生成
  */
-export function getAchievementDialogue(achievementId: string): TutorialDialogue | null {
+export function getAchievementDialogue(achievementId: string): EventDialogue | null {
   const achievement = getAchievementById(achievementId);
   if (!achievement) return null;
 
@@ -337,6 +348,14 @@ function getDetailedRewards(achievement: AchievementDef): string[] {
     details.push(`名声 +${reward.reputation}`);
   }
 
+  if (reward.exp) {
+    details.push(`経験値 +${reward.exp}`);
+  }
+
+  if (reward.villageDevelopment) {
+    details.push(`村発展度 +${reward.villageDevelopment}`);
+  }
+
   if (reward.recipes) {
     for (const recipeId of reward.recipes) {
       const recipeDef = recipes[recipeId];
@@ -368,6 +387,7 @@ function getDetailedRewards(achievement: AchievementDef): string[] {
  */
 function getStructuredRewards(achievement: AchievementDef): RewardDisplay[] {
   const { reward } = achievement;
+  const state = get(gameState);
   const structured: RewardDisplay[] = [];
 
   if (reward.money) {
@@ -392,9 +412,33 @@ function getStructuredRewards(achievement: AchievementDef): RewardDisplay[] {
   }
 
   if (reward.reputation) {
+    const before = state.reputation;
+    const after = Math.min(100, before + reward.reputation);
     structured.push({
       text: `名声 +${reward.reputation}`,
       type: 'reputation',
+      gaugeData: { before, after, max: 100, label: '名声' },
+    });
+  }
+
+  if (reward.exp) {
+    const before = state.alchemyExp;
+    const max = calcExpForLevel(state.alchemyLevel);
+    const after = Math.min(max, before + reward.exp);
+    structured.push({
+      text: `経験値 +${reward.exp}`,
+      type: 'exp',
+      gaugeData: { before, after, max, label: `Lv.${state.alchemyLevel}` },
+    });
+  }
+
+  if (reward.villageDevelopment) {
+    const before = state.villageDevelopment;
+    const after = Math.min(100, before + reward.villageDevelopment);
+    structured.push({
+      text: `村発展度 +${reward.villageDevelopment}`,
+      type: 'villageDevelopment',
+      gaugeData: { before, after, max: 100, label: '村発展度' },
     });
   }
 
@@ -416,6 +460,7 @@ function getStructuredRewards(achievement: AchievementDef): RewardDisplay[] {
       structured.push({
         text: `「${label}」解放`,
         type: 'unlock',
+        iconUrl: `/icons/actions/${action}.png`,
       });
     }
   }
@@ -457,6 +502,14 @@ export function getRewardDescription(achievementId: string): string[] {
 
   if (reward.reputation) {
     descriptions.push(`名声 +${reward.reputation}`);
+  }
+
+  if (reward.exp) {
+    descriptions.push(`経験値 +${reward.exp}`);
+  }
+
+  if (reward.villageDevelopment) {
+    descriptions.push(`村発展度 +${reward.villageDevelopment}`);
   }
 
   if (reward.recipes) {

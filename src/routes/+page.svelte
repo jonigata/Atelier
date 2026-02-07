@@ -9,7 +9,7 @@
   import ActionMenu from '../components/ActionMenu.svelte';
   import ActionPanel from '../components/ActionPanel.svelte';
   import EndingScreen from '../components/EndingScreen.svelte';
-  import TutorialDialogue from '../components/TutorialDialogue.svelte';
+  import EventDialog from '../components/EventDialog.svelte';
   import DayTransition from '../components/DayTransition.svelte';
   import DebugPanel from '../components/DebugPanel.svelte';
   import ToastContainer from '../components/ToastContainer.svelte';
@@ -19,6 +19,18 @@
 
   onMount(() => {
     initializeGame();
+
+    // ブラウザの戻る/進むナビゲーションを全て防止
+    // (マウスサイドボタン、ブラウザボタン、Alt+←等すべて対応)
+    history.pushState(null, '', location.href);
+    const preventNav = () => {
+      history.pushState(null, '', location.href);
+    };
+    window.addEventListener('popstate', preventNav);
+
+    return () => {
+      window.removeEventListener('popstate', preventNav);
+    };
   });
 
   function handleActionSelect(action: ActionType) {
@@ -60,8 +72,8 @@
   <!-- 日数経過フィードバック -->
   <DayTransition />
 
-  <!-- チュートリアルダイアログ（最前面） -->
-  <TutorialDialogue />
+  <!-- イベントダイアログ（最前面） -->
+  <EventDialog />
 
   <!-- デバッグパネル -->
   <DebugPanel />
@@ -76,6 +88,8 @@
     padding: 0;
     font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
     background: #0a0a14;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   .game-container {

@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { get } from 'svelte/store';
   import { gameState, pendingLevelUp } from '$lib/stores/game';
   import type { LevelUpInfo } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
   import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient } from '$lib/services/alchemy';
   import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
+  import { calcExpForLevel } from '$lib/data/balance';
   import type { RecipeDef, OwnedItem, Ingredient } from '$lib/models/types';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
 
@@ -24,6 +26,7 @@
   let craftQuantity: number = 1;
   let selectedItems: OwnedItem[] = [];
   let craftResultData: CraftMultipleResult | null = null;
+  let expGaugeData: { before: number; after: number; max: number; label: string } | null = null;
   let levelUpData: LevelUpInfo | null = null;
 
   // 習得済みかつレベル条件を満たすレシピ
@@ -134,17 +137,33 @@
     // 錬成前にpendingLevelUpをクリア
     pendingLevelUp.set(null);
 
+    // ゲージ用にbefore値をキャプチャ
+    const stateBefore = get(gameState);
+    const expBefore = stateBefore.alchemyExp;
+    const levelBefore = stateBefore.alchemyLevel;
+    const expMax = calcExpForLevel(levelBefore);
+
     const result = craftBatch(selectedRecipe.id, selectedItems, craftQuantity);
     craftResultData = result;
+
+    // 経験値ゲージデータを構築
+    const stateAfter = get(gameState);
+    const leveledUp = stateAfter.alchemyLevel > levelBefore;
+    expGaugeData = {
+      before: expBefore,
+      after: leveledUp ? expMax : stateAfter.alchemyExp,
+      max: expMax,
+      label: `Lv.${levelBefore}`,
+    };
   }
 
   function closeCraftResult() {
     if (!selectedRecipe) return;
-    craftResultData = null;
 
     // レベルアップがあればダイアログを表示
     const lvUp = $pendingLevelUp;
     if (lvUp) {
+      craftResultData = null;
       levelUpData = lvUp;
       pendingLevelUp.set(null);
     } else {
@@ -153,15 +172,20 @@
   }
 
   function closeLevelUp() {
-    levelUpData = null;
     finishCraft();
   }
 
   function finishCraft() {
     if (!selectedRecipe) return;
     const days = selectedRecipe.daysRequired * craftQuantity;
+    // 先にendTurn → DayTransitionが上から被さる
     endTurn(days);
-    onBack();
+    // DayTransitionの暗転(0.3s)後にダイアログを片付け
+    setTimeout(() => {
+      craftResultData = null;
+      levelUpData = null;
+      onBack();
+    }, 350);
   }
 </script>
 
@@ -231,6 +255,7 @@
   <CraftResultDialog
     result={craftResultData}
     recipeName={selectedRecipe.name}
+    {expGaugeData}
     onClose={closeCraftResult}
   />
 {/if}

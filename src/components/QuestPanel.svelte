@@ -18,10 +18,11 @@
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { removeItemsFromInventory } from '$lib/services/inventory';
   import { checkMilestoneProgress } from '$lib/services/tutorial';
-  import { setTutorialDialogue } from '$lib/stores/tutorial';
+  import { setEventDialogue } from '$lib/stores/tutorial';
+  import { get } from 'svelte/store';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
   import QuestTypeIcon from './common/QuestTypeIcon.svelte';
-  import type { QuestDef, ActiveQuest, OwnedItem, TutorialDialogue, RewardDisplay } from '$lib/models/types';
+  import type { QuestDef, ActiveQuest, OwnedItem, EventDialogue, RewardDisplay } from '$lib/models/types';
 
   export let onBack: () => void;
 
@@ -93,13 +94,7 @@
       inventory: removeItemsFromInventory(state.inventory, itemsToConsume),
     }));
 
-    // 報酬付与
-    addMoney(quest.rewardMoney);
-    addReputation(quest.rewardReputation);
-    incrementCompletedQuests();
-    removeActiveQuest(quest.id);
-
-    // 村発展度の増加（依頼難易度に応じて1-3）
+    // 村発展度の増加量を計算（依頼難易度に応じて1-3）
     let developmentGain = 1;
     if (quest.type === 'quality') developmentGain = 2;
     if (quest.type === 'bulk') developmentGain = 2;
@@ -109,22 +104,40 @@
     const avgQuality = itemsToConsume.reduce((sum, i) => sum + i.quality, 0) / itemsToConsume.length;
     if (avgQuality >= 70) developmentGain += 1;
 
+    // ゲージ用にbefore値をキャプチャ
+    const state = get(gameState);
+    const repBefore = state.reputation;
+    const devBefore = state.villageDevelopment;
+
+    // 報酬付与
+    addMoney(quest.rewardMoney);
+    addReputation(quest.rewardReputation);
     addVillageDevelopment(developmentGain);
+    incrementCompletedQuests();
+    removeActiveQuest(quest.id);
 
     // 完了ダイアログを表示
     const structuredRewards: RewardDisplay[] = [
       { text: `${quest.rewardMoney.toLocaleString()} G`, type: 'money' },
-      { text: `名声 +${quest.rewardReputation}`, type: 'reputation' },
+      {
+        text: `名声 +${quest.rewardReputation}`, type: 'reputation',
+        gaugeData: { before: repBefore, after: Math.min(100, repBefore + quest.rewardReputation), max: 100, label: '名声' },
+      },
+      {
+        text: `村発展度 +${developmentGain}`, type: 'villageDevelopment',
+        gaugeData: { before: devBefore, after: Math.min(100, devBefore + developmentGain), max: 100, label: '村発展度' },
+      },
     ];
 
-    const dialogue: TutorialDialogue = {
+    const dialogue: EventDialogue = {
       characterName: '依頼主',
       characterTitle: '',
       lines: ['ありがとう！助かったよ。'],
-      achievementTitle: `依頼完了「${quest.title}」`,
+      rewardsTitle: '依頼達成！',
+      achievementTitle: quest.title,
       structuredRewards,
     };
-    setTutorialDialogue(dialogue);
+    setEventDialogue(dialogue);
 
     addMessage(
       `依頼「${quest.title}」を達成しました！ 報酬: ${quest.rewardMoney}G, 名声+${quest.rewardReputation}, 村発展+${developmentGain}`

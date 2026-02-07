@@ -2,70 +2,102 @@
   import { gameState } from '$lib/stores/game';
   import { resolveDayTransition } from '$lib/services/presentation';
 
-  let visible = false;
+  let visible = true; // 初期表示は黒画面から
+  let initialLoad = true;
+  let transitioning = false;
   let displayDay = 0;
   let daysAdvanced = 0;
-  let animationKey = 0;
+  let showText = false;
+  let fading: 'in' | 'out' | null = null;
+  let timers: ReturnType<typeof setTimeout>[] = [];
 
   // pendingDayTransitionを監視して演出を表示
-  $: if ($gameState.pendingDayTransition) {
+  $: if ($gameState.pendingDayTransition && !transitioning) {
     displayDay = $gameState.pendingDayTransition.toDay;
     daysAdvanced = $gameState.pendingDayTransition.daysAdvanced;
-    showTransition();
+    startTransition();
   }
 
-  function showTransition() {
-    animationKey++;
+  function clearTimers() {
+    for (const t of timers) clearTimeout(t);
+    timers = [];
+  }
+
+  function startTransition() {
+    clearTimers();
+    transitioning = true;
     visible = true;
-  }
+    showText = false;
 
-  function handleAnimationEnd() {
-    visible = false;
-    // presentation サービスに完了を通知
-    resolveDayTransition();
+    if (initialLoad) {
+      // 初回: すでに黒画面なのでフェードイン不要
+      initialLoad = false;
+      fading = null;
+      timers.push(setTimeout(() => { showText = true; }, 100));
+      timers.push(setTimeout(() => { showText = false; fading = 'out'; }, 1100));
+      timers.push(setTimeout(() => { visible = false; fading = null; transitioning = false; resolveDayTransition(); }, 1600));
+    } else {
+      // 通常: フェードで暗転してからテキスト表示
+      fading = 'in';
+      timers.push(setTimeout(() => { fading = null; showText = true; }, 350));
+      timers.push(setTimeout(() => { showText = false; fading = 'out'; }, 1350));
+      timers.push(setTimeout(() => { visible = false; fading = null; transitioning = false; resolveDayTransition(); }, 1850));
+    }
   }
 </script>
 
 {#if visible}
-  {#key animationKey}
-    <!-- 全画面オーバーレイ（クリックを吸収して背景への操作を防ぐ） -->
-    <div class="day-transition-overlay">
-      <div class="day-transition" on:animationend={handleAnimationEnd}>
-        <div class="transition-content">
-          {#if daysAdvanced > 0}
-            <div class="days-passed">
-              {#if daysAdvanced === 1}
-                1日が経過...
-              {:else}
-                {daysAdvanced}日が経過...
-              {/if}
-            </div>
+  <div
+    class="day-transition-overlay"
+    class:fade-in={fading === 'in'}
+    class:fade-out={fading === 'out'}
+  >
+    <div class="transition-content" class:visible={showText}>
+      {#if daysAdvanced > 0}
+        <div class="days-passed">
+          {#if daysAdvanced === 1}
+            1日が経過...
+          {:else}
+            {daysAdvanced}日が経過...
           {/if}
-          <div class="current-day">
-            {displayDay}日目
-          </div>
         </div>
+      {/if}
+      <div class="current-day">
+        {displayDay}日目
       </div>
     </div>
-  {/key}
+  </div>
 {/if}
 
 <style>
   .day-transition-overlay {
     position: fixed;
     inset: 0;
-    z-index: 900;
+    z-index: 1100;
     display: flex;
     align-items: center;
     justify-content: center;
-    /* 背景を軽くぼかして演出中であることを視覚的に示す */
-    background: rgba(0, 0, 0, 0.3);
-    /* クリックを吸収して背景への操作を防ぐ */
+    background: #000;
     pointer-events: all;
+    opacity: 1;
   }
 
-  .day-transition {
-    animation: fadeInOut 1.5s ease-in-out;
+  .day-transition-overlay.fade-in {
+    animation: fadeToBlack 0.3s ease-in both;
+  }
+
+  .day-transition-overlay.fade-out {
+    animation: fadeFromBlack 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeToBlack {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeFromBlack {
+    from { opacity: 1; }
+    to { opacity: 0; }
   }
 
   .transition-content {
@@ -73,11 +105,14 @@
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    padding: 1.5rem 3rem;
-    background: rgba(26, 26, 46, 0.95);
-    border: 2px solid #c9a959;
-    border-radius: 12px;
-    box-shadow: 0 0 30px rgba(201, 169, 89, 0.3);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  }
+
+  .transition-content.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .days-passed {
@@ -91,24 +126,5 @@
     font-weight: bold;
     color: #f4e4bc;
     text-shadow: 0 0 10px rgba(244, 228, 188, 0.3);
-  }
-
-  @keyframes fadeInOut {
-    0% {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-    15% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    85% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(1.05);
-    }
   }
 </style>

@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { gameState, clearDayTransition } from '$lib/stores/game';
-import { setTutorialDialogue } from '$lib/stores/tutorial';
+import { setEventDialogue } from '$lib/stores/tutorial';
 import {
   showGoalCompleteToast,
   showUnlockToast,
@@ -14,7 +14,7 @@ import {
   checkNewActiveGoals,
 } from './achievement';
 import { getAchievementById } from '$lib/data/achievements';
-import type { TutorialDialogue } from '$lib/models/types';
+import type { EventDialogue } from '$lib/models/types';
 
 // 日数表示の完了を待つための resolver
 let dayTransitionResolver: (() => void) | null = null;
@@ -36,10 +36,10 @@ export function resolveDayTransition(): void {
 
 /**
  * ダイアログの完了を待つ
- * TutorialDialogue.svelte から呼ばれる
+ * EventDialog.svelte から呼ばれる
  */
 export function resolveDialogue(): void {
-  setTutorialDialogue(null);
+  setEventDialogue(null);
   if (dialogueResolver) {
     dialogueResolver();
     dialogueResolver = null;
@@ -63,8 +63,8 @@ async function waitForDayTransition(): Promise<void> {
 /**
  * ダイアログを表示して閉じるまで待つ
  */
-async function showDialogueAndWait(dialogue: TutorialDialogue): Promise<void> {
-  setTutorialDialogue(dialogue);
+async function showDialogueAndWait(dialogue: EventDialogue): Promise<void> {
+  setEventDialogue(dialogue);
 
   return new Promise((resolve) => {
     dialogueResolver = resolve;

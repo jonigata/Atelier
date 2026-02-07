@@ -1,9 +1,11 @@
 <script lang="ts">
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
+  import AnimatedGauge from '../common/AnimatedGauge.svelte';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
 
   export let result: CraftMultipleResult;
   export let recipeName: string;
+  export let expGaugeData: { before: number; after: number; max: number; label: string } | null = null;
   export let onClose: () => void;
 
   $: allSuccess = result.failCount === 0 && result.successCount > 0;
@@ -71,7 +73,6 @@
   }
 
   function handleBoxClick(event: MouseEvent) {
-    // ダイアログ内部のクリックはオーバーレイに伝搬させない
     event.stopPropagation();
     if (!canClose()) return;
     onClose();
@@ -212,10 +213,21 @@
             <span class="summary-value success-text">{result.successCount}個</span>
           </div>
         {/if}
-        <div class="exp-row">
-          <span class="exp-label">獲得経験値</span>
-          <span class="exp-value">+{result.totalExpGained} Exp</span>
-        </div>
+        {#if expGaugeData}
+          <AnimatedGauge
+            before={expGaugeData.before}
+            after={expGaugeData.after}
+            max={expGaugeData.max}
+            label={expGaugeData.label}
+            text="+{result.totalExpGained} Exp"
+            color="blue"
+          />
+        {:else}
+          <div class="exp-row">
+            <span class="exp-label">獲得経験値</span>
+            <span class="exp-value">+{result.totalExpGained} Exp</span>
+          </div>
+        {/if}
       </div>
 
       <!-- フッター -->
@@ -243,6 +255,8 @@
   .dialog-overlay.clickable {
     cursor: pointer;
   }
+
+
 
   /* === 醸造中エフェクト === */
   .brewing-effect {
@@ -648,6 +662,7 @@
     font-weight: bold;
     color: #ffc107;
   }
+
 
   /* === フッター === */
   .dialog-footer {

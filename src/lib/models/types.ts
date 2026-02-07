@@ -132,15 +132,23 @@ export type MorningEvent =
 export interface RewardDisplay {
   text: string;
   itemId?: string;  // アイコン表示用（アイテム報酬の場合）
-  type: 'money' | 'item' | 'reputation' | 'recipe' | 'unlock';
+  iconUrl?: string; // カスタムアイコンURL（アクションアンロック等）
+  type: 'money' | 'item' | 'reputation' | 'recipe' | 'unlock' | 'exp' | 'villageDevelopment';
+  gaugeData?: {     // ゲージ演出用
+    before: number;
+    after: number;
+    max: number;
+    label: string;  // ゲージラベル（例: "Lv.3"）
+  };
 }
 
-export interface TutorialDialogue {
+export interface EventDialogue {
   characterName: string;
   characterTitle: string;
   lines: string[];
   achievementTitle?: string;  // アチーブメント達成時のタイトル
   achievementCategory?: AchievementCategory;  // アチーブメントカテゴリ（アイコン表示用）
+  rewardsTitle?: string;      // 報酬画面のメインタイトル（デフォルト: "報酬獲得！"）
   rewards?: string[];         // 報酬詳細リスト（後方互換性のため残す）
   structuredRewards?: RewardDisplay[];  // 構造化された報酬（アイコン付き）
 }
@@ -148,7 +156,7 @@ export interface TutorialDialogue {
 // チュートリアル進行状態（アクションアンロック管理）
 export interface TutorialProgress {
   unlockedActions: ActionType[];
-  pendingDialogue: TutorialDialogue | null;
+  pendingDialogue: EventDialogue | null;
 }
 
 // ゲーム状態
@@ -234,6 +242,8 @@ export interface AchievementReward {
   money?: number;
   items?: { itemId: string; quality: number; quantity: number }[];
   reputation?: number;
+  exp?: number;              // 錬金経験値
+  villageDevelopment?: number; // 村発展度
   recipes?: string[];
   unlocks?: ActionType[];  // アクションアンロック
   facilities?: string[];   // 設備アンロック

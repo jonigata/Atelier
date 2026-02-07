@@ -59,12 +59,16 @@
     if (!studyCompletedBook) return;
 
     const days = studyCompletedBook.studyDays;
-    showStudyDialog = false;
-    studyCompletedBook = null;
-    studyLearnedRecipeNames = [];
-    selectedBookId = null;
+    // 先にendTurn → DayTransitionが上から被さる
     endTurn(days);
-    onBack();
+    // DayTransitionの暗転(0.3s)後にダイアログを片付け
+    setTimeout(() => {
+      showStudyDialog = false;
+      studyCompletedBook = null;
+      studyLearnedRecipeNames = [];
+      selectedBookId = null;
+      onBack();
+    }, 350);
   }
 
   function selectBook(bookId: string) {

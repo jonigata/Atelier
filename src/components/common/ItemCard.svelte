@@ -6,6 +6,7 @@
   export let count: number | null = null;
   export let label: string | null = null; // アイテム以外の表示用（お金、名声など）
   export let emoji: string | null = null; // アイコンの代わりにemoji表示
+  export let iconUrl: string | null = null; // カスタムアイコンURL
   export let clickable: boolean = false;
 
   $: def = itemId ? getItem(itemId) : null;
@@ -13,7 +14,9 @@
 </script>
 
 <div class="item-card" class:clickable role={clickable ? 'button' : undefined} tabindex={clickable ? 0 : undefined}>
-  {#if emoji}
+  {#if iconUrl}
+    <img class="item-icon" src={iconUrl} alt={name} on:error={handleIconError} />
+  {:else if emoji}
     <span class="item-emoji">{emoji}</span>
   {:else if itemId}
     <img class="item-icon" src={getItemIcon(itemId)} alt={name} on:error={handleIconError} />

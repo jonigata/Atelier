@@ -25,6 +25,12 @@
     if (reward.reputation) {
       summaries.push(`名声+${reward.reputation}`);
     }
+    if (reward.exp) {
+      summaries.push(`経験値+${reward.exp}`);
+    }
+    if (reward.villageDevelopment) {
+      summaries.push(`村発展+${reward.villageDevelopment}`);
+    }
     if (reward.recipes) {
       for (const recipeId of reward.recipes) {
         const recipeDef = recipes[recipeId];
