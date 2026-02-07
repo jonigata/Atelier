@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import { gameState, resetGame, addVillageDevelopment } from '$lib/stores/game';
+  import { unlockActions } from '$lib/stores/tutorial';
+  import type { ActionType } from '$lib/models/types';
   import {
     startAutoplay,
     stopAutoplay,
@@ -52,6 +54,12 @@
     addVillageDevelopment(amount);
   }
 
+  const allActions: ActionType[] = ['alchemy', 'quest', 'expedition', 'shop', 'rest', 'study', 'inventory', 'album'];
+
+  function handleUnlockAll() {
+    unlockActions(allActions);
+  }
+
   function togglePanel() {
     isOpen = !isOpen;
   }
@@ -86,6 +94,14 @@
         {/if}
         <button on:click={handleReset}>リセット</button>
       </div>
+    </div>
+
+    <div class="section">
+      <h4>コマンド解放</h4>
+      <div class="buttons">
+        <button class="unlock-all" on:click={handleUnlockAll}>全コマンド解放</button>
+      </div>
+      <p class="info">解放済み: {$gameState.tutorialProgress.unlockedActions.length} / {allActions.length}</p>
     </div>
 
     <div class="section">
@@ -237,6 +253,14 @@
 
   button.stop:hover {
     background: #d32f2f;
+  }
+
+  button.unlock-all {
+    background: #1565c0;
+  }
+
+  button.unlock-all:hover {
+    background: #1976d2;
   }
 
   .info {
