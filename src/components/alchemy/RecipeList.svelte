@@ -50,7 +50,7 @@
       <button
         class="recipe-item"
         class:disabled={!craftable}
-        on:click={() => craftable && onSelect(recipe)}
+        on:click={() => onSelect(recipe)}
       >
         <div class="recipe-header">
           <img class="recipe-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
@@ -114,9 +114,14 @@
     border-color: #c9a959;
   }
 
+  .recipe-item.disabled:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #5a5a7a;
+  }
+
   .recipe-item.disabled {
     opacity: 0.6;
-    cursor: not-allowed;
+    cursor: pointer;
   }
 
   .recipe-header {
