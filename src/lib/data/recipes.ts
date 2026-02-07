@@ -114,7 +114,7 @@ export const recipes: Record<string, RecipeDef> = {
   },
   herbal_paste: {
     id: 'herbal_paste',
-    name: '薬草ペースト',
+    name: 'ハルマム草ペースト',
     resultItemId: 'herbal_paste',
     ingredients: [
       { itemId: 'herb_01', quantity: 3 },
@@ -200,7 +200,7 @@ export const recipes: Record<string, RecipeDef> = {
   },
   dried_herbs: {
     id: 'dried_herbs',
-    name: '乾燥薬草',
+    name: '乾燥ハルマム草',
     resultItemId: 'dried_herbs',
     ingredients: [
       { itemId: 'herb_01', quantity: 2 },

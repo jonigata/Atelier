@@ -10,7 +10,7 @@ mkdir -p "$OUTPUT_DIR"
 
 # アイテム定義: id|name|prompt
 ITEMS=(
-  "herb_01|薬草|medicinal herb, green leaves"
+  "herb_01|ハルマム草|medicinal herb, green leaves"
   "herb_02|毒消し草|antidote herb, purple leaves with white spots"
   "ore_01|鉄鉱石|iron ore, rough grey metallic rock"
   "ore_02|銀鉱石|silver ore, shiny white metallic rock"

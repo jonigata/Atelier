@@ -25,7 +25,7 @@ bash /home/hirayama/.claude/skills/fal-generate/scripts/generate.sh \
 
 | ID | アイテム | プロンプト | ファイル |
 |----|---------|----------|----------|
-| herb_01 | 薬草 | medicinal herb, green leaves | static/icons/materials/herb_01.png |
+| herb_01 | ハルマム草 | medicinal herb, green leaves | static/icons/materials/herb_01.png |
 | herb_02 | 毒消し草 | antidote herb, purple leaves with white spots | static/icons/materials/herb_02.png |
 | ore_01 | 鉄鉱石 | iron ore, rough grey metallic rock | static/icons/materials/ore_01.png |
 | ore_02 | 銀鉱石 | silver ore, shiny white metallic rock | static/icons/materials/ore_02.png |

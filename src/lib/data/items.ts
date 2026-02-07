@@ -4,10 +4,10 @@ export const items: Record<string, ItemDef> = {
   // 素材: ハーブ系
   herb_01: {
     id: 'herb_01',
-    name: '薬草',
+    name: 'ハルマム草',
     category: 'herb',
     basePrice: 10,
-    description: 'どこにでも生えている基本的な薬草',
+    description: 'どこにでも生えている基本的なハルマム草',
   },
   herb_02: {
     id: 'herb_02',
@@ -325,7 +325,7 @@ export const items: Record<string, ItemDef> = {
   },
   herbal_paste: {
     id: 'herbal_paste',
-    name: '薬草ペースト',
+    name: 'ハルマム草ペースト',
     category: 'product',
     basePrice: 40,
     description: '軟膏の基材となるペースト',
@@ -374,10 +374,10 @@ export const items: Record<string, ItemDef> = {
   },
   dried_herbs: {
     id: 'dried_herbs',
-    name: '乾燥薬草',
+    name: '乾燥ハルマム草',
     category: 'product',
     basePrice: 25,
-    description: '保存用に乾燥させた薬草',
+    description: '保存用に乾燥させたハルマム草',
   },
   salt_crystal: {
     id: 'salt_crystal',

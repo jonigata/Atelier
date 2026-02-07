@@ -204,7 +204,7 @@ function tryBuyMaterials(state: GameState): boolean {
   const herbCount = state.inventory.filter(i => i.itemId === 'herb_01').length;
   const waterCount = state.inventory.filter(i => i.itemId === 'water_01').length;
 
-  // 薬草が2個未満、または清水が1個未満なら購入
+  // ハルマム草が2個未満、または清水が1個未満なら購入
   const needHerb = herbCount < 4;
   const needWater = waterCount < 2;
 
@@ -213,7 +213,7 @@ function tryBuyMaterials(state: GameState): boolean {
   // 購入可能なアイテムをチェック（村発展度に応じて）
   const buyableItemIds = getBuyableItemIds(state.villageDevelopment);
 
-  // 薬草を優先購入
+  // ハルマム草を優先購入
   if (needHerb && buyableItemIds.includes('herb_01')) {
     const herbDef = items['herb_01'];
     if (state.money >= herbDef.basePrice) {
@@ -223,7 +223,7 @@ function tryBuyMaterials(state: GameState): boolean {
         money: s.money - herbDef.basePrice,
         inventory: [...s.inventory, { itemId: 'herb_01', quality }],
       }));
-      log('shop', 'success', `薬草を${herbDef.basePrice}Gで購入`);
+      log('shop', 'success', `ハルマム草を${herbDef.basePrice}Gで購入`);
       return true;
     }
   }

@@ -11,7 +11,7 @@
 
 ### 例
 - 回復薬: `A red healing potion in a round glass bottle with cork, cartoon game style...`
-- 薬草: `A green medicinal herb bundle, cartoon game style...`
+- ハルマム草: `A green medicinal herb bundle, cartoon game style...`
 
 ## 依頼種別アイコン
 

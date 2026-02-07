@@ -28,7 +28,7 @@
 ### チュートリアル統合（既存マイルストーン対応）
 | ID | タイトル | 条件 | ナラティブ | 報酬 |
 |----|---------|------|-----------|------|
-| ach_first_recipe | 知識の扉 | レシピ1個習得 | senior_handdown | 薬草x3 |
+| ach_first_recipe | 知識の扉 | レシピ1個習得 | senior_handdown | ハルマム草x3 |
 | ach_first_craft | 錬金術士の目覚め | 初回調合成功 | academy_grant | 100G |
 | ach_first_quest | 街との繋がり | 初回依頼受注 | townspeople_gift | 清水x2 |
 | ach_first_complete | 信頼の芽生え | 初回依頼完了 | client_gratitude | 50G, 名声+2 |

@@ -20,7 +20,7 @@
     );
 
     return allMaterials.filter((item) => {
-      // 発展度0-9: 基本素材のみ（薬草、清水）
+      // 発展度0-9: 基本素材のみ（ハルマム草、清水）
       if (development < 10) {
         return item.id === 'herb_01' || item.id === 'water_01';
       }
