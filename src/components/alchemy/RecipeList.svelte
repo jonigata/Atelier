@@ -1,5 +1,6 @@
 <script lang="ts">
   import { countAvailableIngredients } from '$lib/services/alchemy';
+  import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
   import type { RecipeDef, Ingredient } from '$lib/models/types';
@@ -19,10 +20,22 @@
   }
 
   function canCraft(recipe: RecipeDef): boolean {
+    if (!hasRequiredFacilities(recipe)) return false;
     for (const ing of recipe.ingredients) {
       if (countAvailableIngredients(ing) < ing.quantity) return false;
     }
     return true;
+  }
+
+  function getDisabledReason(recipe: RecipeDef): string | null {
+    if (!hasRequiredFacilities(recipe)) {
+      const missing = getMissingFacilities(recipe);
+      return '設備不足: ' + missing.map(f => f.name).join(', ');
+    }
+    for (const ing of recipe.ingredients) {
+      if (countAvailableIngredients(ing) < ing.quantity) return '素材不足';
+    }
+    return null;
   }
 </script>
 
@@ -32,6 +45,8 @@
   {:else}
     {#each recipes as recipe}
       {@const craftable = canCraft(recipe)}
+      {@const reason = !craftable ? getDisabledReason(recipe) : null}
+      {@const facilityMissing = !hasRequiredFacilities(recipe)}
       <button
         class="recipe-item"
         class:disabled={!craftable}
@@ -51,8 +66,15 @@
             </span>
           {/each}
         </div>
-        {#if !craftable}
-          <span class="craft-status">素材不足</span>
+        {#if recipe.requiredFacilities && recipe.requiredFacilities.length > 0}
+          <div class="recipe-facilities">
+            {#each getMissingFacilities(recipe) as facility}
+              <span class="facility-tag missing">🔒 {facility.name}</span>
+            {/each}
+          </div>
+        {/if}
+        {#if reason}
+          <span class="craft-status" class:facility-status={facilityMissing}>{reason}</span>
         {/if}
       </button>
     {/each}
@@ -144,6 +166,21 @@
     font-size: 0.8rem;
   }
 
+  .recipe-facilities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+  }
+
+  .facility-tag.missing {
+    padding: 0.15rem 0.4rem;
+    background: rgba(255, 152, 0, 0.2);
+    border: 1px solid #ff9800;
+    border-radius: 4px;
+    color: #ffb74d;
+  }
+
   .craft-status {
     position: absolute;
     top: 0.5rem;
@@ -153,5 +190,9 @@
     color: white;
     font-size: 0.75rem;
     border-radius: 4px;
+  }
+
+  .craft-status.facility-status {
+    background: #e65100;
   }
 </style>

@@ -33,6 +33,28 @@ export interface RecipeDef {
   daysRequired: number;
   difficulty: number; // 1-10
   expReward: number;
+  requiredFacilities?: string[]; // 必要な設備ID（すべて必要）
+}
+
+// 設備効果の種類
+type FacilityEffectScope = 'all' | 'category';
+
+// 設備効果
+export interface FacilityEffect {
+  type: 'success_rate' | 'quality';
+  value: number;
+  scope: FacilityEffectScope;
+  targetCategory?: ItemCategory; // scope='category' の場合
+}
+
+// 設備定義（マスタ）
+export interface FacilityDef {
+  id: string;
+  name: string;
+  description: string;
+  type: 'permanent' | 'inventory'; // permanent=フラグ, inventory=所持品
+  itemId?: string; // type='inventory' の場合、対応するアイテムID
+  effects: FacilityEffect[];
 }
 
 // レシピ本（教科書）定義（マスタ）
@@ -156,6 +178,7 @@ export interface GameState {
 
   craftedItems: string[];
   discoveredItems: string[];
+  facilities: string[]; // 解放済み永続設備ID
 
   phase: GamePhase;
   morningEvents: MorningEvent[];
@@ -213,6 +236,7 @@ export interface AchievementReward {
   reputation?: number;
   recipes?: string[];
   unlocks?: ActionType[];  // アクションアンロック
+  facilities?: string[];   // 設備アンロック
 }
 
 // アチーブメント条件の種類

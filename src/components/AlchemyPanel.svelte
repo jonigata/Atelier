@@ -11,9 +11,11 @@
   import ItemPicker from './alchemy/ItemPicker.svelte';
   import CraftPreview from './alchemy/CraftPreview.svelte';
   import CraftResultDialog from './alchemy/CraftResultDialog.svelte';
+  import FacilityInfo from './alchemy/FacilityInfo.svelte';
 
   export let onBack: () => void;
 
+  let showFacilities = false;
   let selectedRecipe: RecipeDef | null = null;
   let craftQuantity: number = 1;
   let selectedItems: OwnedItem[] = [];
@@ -136,7 +138,15 @@
   <h2>⚗️ 調合</h2>
 
   {#if !selectedRecipe}
-    <RecipeList recipes={availableRecipes} onSelect={selectRecipe} />
+    <div class="tab-bar">
+      <button class="tab" class:active={!showFacilities} on:click={() => showFacilities = false}>レシピ</button>
+      <button class="tab" class:active={showFacilities} on:click={() => showFacilities = true}>設備</button>
+    </div>
+    {#if showFacilities}
+      <FacilityInfo />
+    {:else}
+      <RecipeList recipes={availableRecipes} onSelect={selectRecipe} />
+    {/if}
   {:else}
     <div class="crafting-area">
       <button class="back-btn small" on:click={backToRecipeList}>← レシピ選択に戻る</button>
@@ -175,6 +185,7 @@
           {expectedQuality}
           {craftQuantity}
           daysRequired={selectedRecipe.daysRequired * craftQuantity}
+          recipe={selectedRecipe}
           onCraft={executeCraft}
         />
       {/if}
@@ -293,5 +304,31 @@
     margin-top: 0.5rem;
     font-size: 0.85rem;
     color: #a0a0b0;
+  }
+
+  .tab-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .tab {
+    padding: 0.5rem 1.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #4a4a6a;
+    border-radius: 6px;
+    color: #a0a0b0;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .tab.active {
+    background: rgba(201, 169, 89, 0.2);
+    border-color: #c9a959;
+    color: #f4e4bc;
+  }
+
+  .tab:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.1);
   }
 </style>

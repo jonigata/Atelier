@@ -11,6 +11,7 @@ import { getRecipe } from '$lib/data/recipes';
 import { getItem } from '$lib/data/items';
 import { removeItemsFromInventory } from '$lib/services/inventory';
 import { ALCHEMY, CRAFT_SUCCESS, QUALITY } from '$lib/data/balance';
+import { getFacilityBonuses, hasRequiredFacilities } from '$lib/services/facility';
 import type { OwnedItem, RecipeDef, Ingredient } from '$lib/models/types';
 
 export interface CraftResult {
@@ -109,6 +110,7 @@ export function canCraftRecipe(recipeId: string): boolean {
   if (!recipe) return false;
   if (recipe.requiredLevel > state.alchemyLevel) return false;
   if (!state.knownRecipes.includes(recipeId)) return false;
+  if (!hasRequiredFacilities(recipe)) return false;
 
   // 各素材の必要数をチェック
   for (const ingredient of recipe.ingredients) {
@@ -420,7 +422,9 @@ export function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number): n
   const baserate = CRAFT_SUCCESS.BASE_RATE - (recipe.difficulty - 1) * CRAFT_SUCCESS.DIFFICULTY_PENALTY;
   // レベルボーナス: レベルが必要レベルを超えるごとに加算
   const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * CRAFT_SUCCESS.LEVEL_BONUS);
-  return Math.min(CRAFT_SUCCESS.MAX_RATE, baserate + levelBonus);
+  // 設備ボーナス
+  const { successRateBonus } = getFacilityBonuses(recipe);
+  return Math.min(CRAFT_SUCCESS.MAX_RATE, baserate + levelBonus + successRateBonus);
 }
 
 /**
@@ -441,7 +445,10 @@ export function calculateExpectedQuality(
   // レベル補正
   const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * QUALITY.LEVEL_BONUS);
 
-  const base = Math.floor(avgQuality + levelBonus);
+  // 設備ボーナス
+  const { qualityBonus } = getFacilityBonuses(recipe);
+
+  const base = Math.floor(avgQuality + levelBonus + qualityBonus);
   const min = Math.max(QUALITY.MIN, base + QUALITY.RANDOM_MIN);
   const max = Math.min(QUALITY.MAX, base + QUALITY.RANDOM_MAX);
 
@@ -463,10 +470,13 @@ function calculateQuality(
   // レベル補正: 必要レベルを超えると品質が上がりやすい
   const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * QUALITY.LEVEL_BONUS);
 
+  // 設備ボーナス
+  const { qualityBonus } = getFacilityBonuses(recipe);
+
   // ランダム要素
   const randomRange = QUALITY.RANDOM_MAX - QUALITY.RANDOM_MIN + 1;
   const randomFactor = Math.floor(Math.random() * randomRange) + QUALITY.RANDOM_MIN;
 
-  const quality = Math.floor(avgQuality + levelBonus + randomFactor);
+  const quality = Math.floor(avgQuality + levelBonus + qualityBonus + randomFactor);
   return Math.max(1, Math.min(100, quality));
 }

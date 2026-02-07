@@ -7,6 +7,7 @@ import {
   addItem,
   addReputation,
   learnRecipe,
+  unlockFacility,
   isAchievementCompleted,
 } from '$lib/stores/game';
 import { unlockAction } from '$lib/stores/tutorial';
@@ -17,6 +18,7 @@ import {
 } from '$lib/data/achievements';
 import { items } from '$lib/data/items';
 import { recipes } from '$lib/data/recipes';
+import { getFacility } from '$lib/data/facilities';
 import { showGoalActiveToast, actionLabels } from '$lib/stores/toast';
 import type {
   AchievementDef,
@@ -263,6 +265,13 @@ export function claimReward(achievementId: string): void {
     }
   }
 
+  // 設備アンロック
+  if (reward.facilities) {
+    for (const facilityId of reward.facilities) {
+      unlockFacility(facilityId);
+    }
+  }
+
   clearPendingReward();
 }
 
@@ -345,6 +354,14 @@ function getDetailedRewards(achievement: AchievementDef): string[] {
     }
   }
 
+  if (reward.facilities) {
+    for (const facilityId of reward.facilities) {
+      const facility = getFacility(facilityId);
+      const name = facility ? facility.name : facilityId;
+      details.push(`設備「${name}」解放`);
+    }
+  }
+
   return details;
 }
 
@@ -400,6 +417,17 @@ function getStructuredRewards(achievement: AchievementDef): RewardDisplay[] {
       const label = actionLabels[action] ?? action;
       structured.push({
         text: `「${label}」解放`,
+        type: 'unlock',
+      });
+    }
+  }
+
+  if (reward.facilities) {
+    for (const facilityId of reward.facilities) {
+      const facility = getFacility(facilityId);
+      const name = facility ? facility.name : facilityId;
+      structured.push({
+        text: `設備「${name}」解放`,
         type: 'unlock',
       });
     }

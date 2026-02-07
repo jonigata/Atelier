@@ -26,6 +26,7 @@ export const recipes: Record<string, RecipeDef> = {
     daysRequired: 2,
     difficulty: 4,
     expReward: 30,
+    requiredFacilities: ['distiller'],
   },
   antidote: {
     id: 'antidote',
@@ -64,6 +65,7 @@ export const recipes: Record<string, RecipeDef> = {
     daysRequired: 3,
     difficulty: 4,
     expReward: 25,
+    requiredFacilities: ['furnace'],
   },
   ingot_02: {
     id: 'ingot_02',
@@ -76,6 +78,7 @@ export const recipes: Record<string, RecipeDef> = {
     daysRequired: 3,
     difficulty: 6,
     expReward: 50,
+    requiredFacilities: ['furnace'],
   },
   elixir: {
     id: 'elixir',
@@ -90,6 +93,7 @@ export const recipes: Record<string, RecipeDef> = {
     daysRequired: 5,
     difficulty: 9,
     expReward: 100,
+    requiredFacilities: ['distiller', 'magic_circle'],
   },
 
   // ========================================
@@ -651,6 +655,7 @@ export const recipes: Record<string, RecipeDef> = {
     daysRequired: 2,
     difficulty: 5,
     expReward: 40,
+    requiredFacilities: ['magic_circle'],
   },
   quality_ceramic: {
     id: 'quality_ceramic',
@@ -754,6 +759,7 @@ export const recipes: Record<string, RecipeDef> = {
     daysRequired: 2,
     difficulty: 6,
     expReward: 48,
+    requiredFacilities: ['magic_circle'],
   },
   spirit_essence: {
     id: 'spirit_essence',
@@ -955,6 +961,7 @@ export const recipes: Record<string, RecipeDef> = {
     daysRequired: 3,
     difficulty: 7,
     expReward: 70,
+    requiredFacilities: ['magic_circle'],
   },
   light_core: {
     id: 'light_core',
@@ -1006,6 +1013,7 @@ export const recipes: Record<string, RecipeDef> = {
     daysRequired: 3,
     difficulty: 7,
     expReward: 65,
+    requiredFacilities: ['furnace'],
   },
   magic_mirror: {
     id: 'magic_mirror',
@@ -1070,6 +1078,7 @@ export const recipes: Record<string, RecipeDef> = {
     daysRequired: 4,
     difficulty: 8,
     expReward: 90,
+    requiredFacilities: ['furnace'],
   },
   golem_clay: {
     id: 'golem_clay',
@@ -1188,6 +1197,7 @@ export const recipes: Record<string, RecipeDef> = {
     daysRequired: 4,
     difficulty: 9,
     expReward: 100,
+    requiredFacilities: ['furnace'],
   },
   moon_crystal: {
     id: 'moon_crystal',
@@ -1421,6 +1431,7 @@ export const recipes: Record<string, RecipeDef> = {
     daysRequired: 5,
     difficulty: 10,
     expReward: 150,
+    requiredFacilities: ['furnace', 'magic_circle', 'advanced_workbench'],
   },
   road_stone: {
     id: 'road_stone',
@@ -1546,6 +1557,7 @@ export const recipes: Record<string, RecipeDef> = {
     daysRequired: 7,
     difficulty: 10,
     expReward: 200,
+    requiredFacilities: ['furnace', 'magic_circle', 'advanced_workbench'],
   },
 };
 
