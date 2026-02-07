@@ -4,10 +4,12 @@
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
   import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient } from '$lib/services/alchemy';
+  import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
   import type { RecipeDef, OwnedItem, Ingredient } from '$lib/models/types';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
 
   import RecipeList from './alchemy/RecipeList.svelte';
+  import RecipeDetail from './alchemy/RecipeDetail.svelte';
   import MaterialSlots from './alchemy/MaterialSlots.svelte';
   import ItemPicker from './alchemy/ItemPicker.svelte';
   import CraftPreview from './alchemy/CraftPreview.svelte';
@@ -28,6 +30,12 @@
   $: availableRecipes = Object.values(recipes).filter(
     (r) => $gameState.knownRecipes.includes(r.id) && r.requiredLevel <= $gameState.alchemyLevel
   );
+
+  // 選択中のレシピが調合可能か
+  $: canCraftSelected = selectedRecipe
+    ? hasRequiredFacilities(selectedRecipe) &&
+      selectedRecipe.ingredients.every((ing) => countAvailableIngredients(ing) >= ing.quantity)
+    : false;
 
   // 現在のレシピで作成可能な最大個数
   $: maxCraftable = selectedRecipe
@@ -171,6 +179,8 @@
     {:else}
       <RecipeList recipes={availableRecipes} onSelect={selectRecipe} />
     {/if}
+  {:else if !canCraftSelected}
+    <RecipeDetail recipe={selectedRecipe} onBack={backToRecipeList} />
   {:else}
     <div class="crafting-area">
       <button class="back-btn small" on:click={backToRecipeList}>← レシピ選択に戻る</button>
