@@ -38,6 +38,18 @@
         summaries.push(`レシピ:${recipeDef?.name || recipeId}`);
       }
     }
+    if (reward.unlocks) {
+      const actionLabels: Record<string, string> = {
+        alchemy: '調合', quest: '依頼', expedition: '採取', shop: 'ショップ',
+        inventory: '所持品', rest: '休息', study: '勉強', album: 'アルバム',
+      };
+      for (const action of reward.unlocks) {
+        summaries.push(`解放:${actionLabels[action] || action}`);
+      }
+    }
+    if (reward.facilities) {
+      summaries.push(`設備解放`);
+    }
 
     return summaries;
   }

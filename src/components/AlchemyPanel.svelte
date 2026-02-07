@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { gameState } from '$lib/stores/game';
+  import { gameState, pendingLevelUp } from '$lib/stores/game';
+  import type { LevelUpInfo } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
   import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient } from '$lib/services/alchemy';
@@ -11,6 +12,7 @@
   import ItemPicker from './alchemy/ItemPicker.svelte';
   import CraftPreview from './alchemy/CraftPreview.svelte';
   import CraftResultDialog from './alchemy/CraftResultDialog.svelte';
+  import LevelUpDialog from './LevelUpDialog.svelte';
   import FacilityInfo from './alchemy/FacilityInfo.svelte';
 
   export let onBack: () => void;
@@ -20,6 +22,7 @@
   let craftQuantity: number = 1;
   let selectedItems: OwnedItem[] = [];
   let craftResultData: CraftMultipleResult | null = null;
+  let levelUpData: LevelUpInfo | null = null;
 
   // 習得済みかつレベル条件を満たすレシピ
   $: availableRecipes = Object.values(recipes).filter(
@@ -120,14 +123,35 @@
   function executeCraft() {
     if (!selectedRecipe || !selectionComplete) return;
 
+    // 錬成前にpendingLevelUpをクリア
+    pendingLevelUp.set(null);
+
     const result = craftBatch(selectedRecipe.id, selectedItems, craftQuantity);
     craftResultData = result;
   }
 
   function closeCraftResult() {
     if (!selectedRecipe) return;
-    const days = selectedRecipe.daysRequired * craftQuantity;
     craftResultData = null;
+
+    // レベルアップがあればダイアログを表示
+    const lvUp = $pendingLevelUp;
+    if (lvUp) {
+      levelUpData = lvUp;
+      pendingLevelUp.set(null);
+    } else {
+      finishCraft();
+    }
+  }
+
+  function closeLevelUp() {
+    levelUpData = null;
+    finishCraft();
+  }
+
+  function finishCraft() {
+    if (!selectedRecipe) return;
+    const days = selectedRecipe.daysRequired * craftQuantity;
     endTurn(days);
     onBack();
   }
@@ -198,6 +222,13 @@
     result={craftResultData}
     recipeName={selectedRecipe.name}
     onClose={closeCraftResult}
+  />
+{/if}
+
+{#if levelUpData}
+  <LevelUpDialog
+    levelUpInfo={levelUpData}
+    onClose={closeLevelUp}
   />
 {/if}
 

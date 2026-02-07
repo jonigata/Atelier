@@ -173,16 +173,28 @@ export function addVillageDevelopment(amount: number): void {
   }));
 }
 
+export interface LevelUpInfo {
+  oldLevel: number;
+  newLevel: number;
+}
+
+export const pendingLevelUp = writable<LevelUpInfo | null>(null);
+
 export function addExp(amount: number): void {
   gameState.update((state) => {
     let newExp = state.alchemyExp + amount;
     let newLevel = state.alchemyLevel;
+    const oldLevel = state.alchemyLevel;
     let expNeeded = calcExpForLevel(newLevel);
 
     while (newExp >= expNeeded && newLevel < ALCHEMY.MAX_LEVEL) {
       newExp -= expNeeded;
       newLevel++;
       expNeeded = calcExpForLevel(newLevel);
+    }
+
+    if (newLevel > oldLevel) {
+      pendingLevelUp.set({ oldLevel, newLevel });
     }
 
     return {
