@@ -11,6 +11,67 @@
     }
   });
 
+  // 購入・売却メッセージのパターン
+  const BUY_PATTERN = /^(.+?)（品質(\d+)）を(\d+)Gで購入しました$/;
+  const SELL_PATTERN = /^(.+?)（品質(\d+)）を(\d+)Gで売却しました$/;
+
+  interface GroupedMessage {
+    text: string;
+    count: number;
+  }
+
+  // 連続する同種の購入・売却メッセージをまとめる
+  function groupMessages(messages: string[]): GroupedMessage[] {
+    const result: GroupedMessage[] = [];
+    let i = 0;
+
+    while (i < messages.length) {
+      const buyMatch = messages[i].match(BUY_PATTERN);
+      const sellMatch = messages[i].match(SELL_PATTERN);
+      const pattern = buyMatch ? BUY_PATTERN : sellMatch ? SELL_PATTERN : null;
+      const match = buyMatch || sellMatch;
+      const action = buyMatch ? '購入' : '売却';
+
+      if (match && pattern) {
+        const itemName = match[1];
+        let count = 1;
+        let totalPrice = parseInt(match[3]);
+        const qualities = [parseInt(match[2])];
+
+        // 同じアイテム・同じアクションの連続をまとめる
+        while (i + 1 < messages.length) {
+          const nextMatch = messages[i + 1].match(pattern);
+          if (nextMatch && nextMatch[1] === itemName) {
+            count++;
+            totalPrice += parseInt(nextMatch[3]);
+            qualities.push(parseInt(nextMatch[2]));
+            i++;
+          } else {
+            break;
+          }
+        }
+
+        if (count === 1) {
+          result.push({ text: messages[i], count: 1 });
+        } else {
+          const minQ = Math.min(...qualities);
+          const maxQ = Math.max(...qualities);
+          result.push({
+            text: `${itemName}を${count}個${action}しました（合計${totalPrice}G、品質${minQ}〜${maxQ}）`,
+            count,
+          });
+        }
+      } else {
+        result.push({ text: messages[i], count: 1 });
+      }
+      i++;
+    }
+
+    return result;
+  }
+
+  $: groupedMessages = groupMessages($gameState.messageLog);
+
   // メッセージのタイプを判定
   function getMessageType(message: string): 'success' | 'error' | 'reward' | 'info' {
     if (message.includes('作成しました') || message.includes('成功') || message.includes('習得しました') || message.includes('完了')) {
@@ -38,17 +99,22 @@
     </button>
   </div>
   <div class="message-log" bind:this={logContainer}>
-    {#each $gameState.messageLog as message, i}
-      {@const type = getMessageType(message)}
+    {#each groupedMessages as grouped, i}
+      {@const type = getMessageType(grouped.text)}
       <div
         class="message {type}"
-        class:latest={i === $gameState.messageLog.length - 1}
+        class:latest={i === groupedMessages.length - 1}
       >
         <span class="message-bullet"></span>
-        <span class="message-text">{message}</span>
+        <span class="message-text">
+          {grouped.text}
+          {#if grouped.count > 1}
+            <span class="batch-badge">×{grouped.count}</span>
+          {/if}
+        </span>
       </div>
     {/each}
-    {#if $gameState.messageLog.length === 0}
+    {#if groupedMessages.length === 0}
       <div class="no-messages">まだメッセージがありません</div>
     {/if}
   </div>
@@ -161,6 +227,18 @@
 
   .message.latest .message-text {
     font-weight: bold;
+  }
+
+  .batch-badge {
+    display: inline-block;
+    margin-left: 0.4rem;
+    padding: 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+    color: #a0a0b0;
+    vertical-align: middle;
   }
 
   .no-messages {
