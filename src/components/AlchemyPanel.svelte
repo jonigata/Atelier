@@ -4,18 +4,20 @@
   import { recipes } from '$lib/data/recipes';
   import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient } from '$lib/services/alchemy';
   import type { RecipeDef, OwnedItem, Ingredient } from '$lib/models/types';
+  import type { CraftMultipleResult } from '$lib/services/alchemy';
 
   import RecipeList from './alchemy/RecipeList.svelte';
   import MaterialSlots from './alchemy/MaterialSlots.svelte';
   import ItemPicker from './alchemy/ItemPicker.svelte';
   import CraftPreview from './alchemy/CraftPreview.svelte';
+  import CraftResultDialog from './alchemy/CraftResultDialog.svelte';
 
   export let onBack: () => void;
 
   let selectedRecipe: RecipeDef | null = null;
   let craftQuantity: number = 1;
   let selectedItems: OwnedItem[] = [];
-  let craftResult: string | null = null;
+  let craftResultData: CraftMultipleResult | null = null;
 
   // 習得済みかつレベル条件を満たすレシピ
   $: availableRecipes = Object.values(recipes).filter(
@@ -84,14 +86,14 @@
     selectedRecipe = recipe;
     craftQuantity = 1;
     selectedItems = [];
-    craftResult = null;
+    craftResultData = null;
   }
 
   function backToRecipeList() {
     selectedRecipe = null;
     craftQuantity = 1;
     selectedItems = [];
-    craftResult = null;
+    craftResultData = null;
   }
 
   function adjustQuantity(delta: number) {
@@ -117,12 +119,15 @@
     if (!selectedRecipe || !selectionComplete) return;
 
     const result = craftBatch(selectedRecipe.id, selectedItems, craftQuantity);
-    craftResult = result.message;
+    craftResultData = result;
+  }
 
-    setTimeout(() => {
-      endTurn(selectedRecipe!.daysRequired * craftQuantity);
-      onBack();
-    }, 1500);
+  function closeCraftResult() {
+    if (!selectedRecipe) return;
+    const days = selectedRecipe.daysRequired * craftQuantity;
+    craftResultData = null;
+    endTurn(days);
+    onBack();
   }
 </script>
 
@@ -170,13 +175,20 @@
           {expectedQuality}
           {craftQuantity}
           daysRequired={selectedRecipe.daysRequired * craftQuantity}
-          {craftResult}
           onCraft={executeCraft}
         />
       {/if}
     </div>
   {/if}
 </div>
+
+{#if craftResultData && selectedRecipe}
+  <CraftResultDialog
+    result={craftResultData}
+    recipeName={selectedRecipe.name}
+    onClose={closeCraftResult}
+  />
+{/if}
 
 <style>
   .alchemy-panel {

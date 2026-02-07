@@ -3,39 +3,32 @@
   export let expectedQuality: { min: number; max: number } | null;
   export let craftQuantity: number;
   export let daysRequired: number;
-  export let craftResult: string | null;
   export let onCraft: () => void;
 </script>
 
 <div class="craft-action">
-  {#if craftResult}
-    <p class="craft-result" class:success={craftResult.includes('作成')}>
-      {craftResult}
-    </p>
-  {:else}
-    <p>素材の選択が完了しました。調合を開始しますか？</p>
+  <p>素材の選択が完了しました。調合を開始しますか？</p>
 
-    <div class="craft-preview">
+  <div class="craft-preview">
+    <div class="preview-item">
+      <span class="preview-label">成功率（1個あたり）</span>
+      <span class="preview-value success-rate" class:high={successRate >= 0.8} class:low={successRate < 0.5}>
+        {Math.round(successRate * 100)}%
+      </span>
+    </div>
+    {#if expectedQuality}
       <div class="preview-item">
-        <span class="preview-label">成功率（1個あたり）</span>
-        <span class="preview-value success-rate" class:high={successRate >= 0.8} class:low={successRate < 0.5}>
-          {Math.round(successRate * 100)}%
+        <span class="preview-label">予想品質</span>
+        <span class="preview-value quality">
+          {expectedQuality.min} 〜 {expectedQuality.max}
         </span>
       </div>
-      {#if expectedQuality}
-        <div class="preview-item">
-          <span class="preview-label">予想品質</span>
-          <span class="preview-value quality">
-            {expectedQuality.min} 〜 {expectedQuality.max}
-          </span>
-        </div>
-      {/if}
-    </div>
+    {/if}
+  </div>
 
-    <button class="craft-btn" on:click={onCraft}>
-      {craftQuantity}個 調合する ({daysRequired}日)
-    </button>
-  {/if}
+  <button class="craft-btn" on:click={onCraft}>
+    {craftQuantity}個 調合する ({daysRequired}日)
+  </button>
 </div>
 
 <style>
@@ -66,19 +59,6 @@
   .craft-btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(201, 169, 89, 0.4);
-  }
-
-  .craft-result {
-    font-size: 1.1rem;
-    padding: 1rem;
-    border-radius: 6px;
-    background: rgba(211, 47, 47, 0.2);
-    color: #ff6b6b;
-  }
-
-  .craft-result.success {
-    background: rgba(76, 175, 80, 0.2);
-    color: #81c784;
   }
 
   .craft-preview {
