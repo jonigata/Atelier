@@ -6,13 +6,15 @@
     addMoney,
     addReputation,
     addVillageDevelopment,
+  } from '$lib/stores/game';
+  import {
     addActiveQuest,
     removeActiveQuest,
     incrementCompletedQuests,
     setAvailableQuests,
     clearNewQuestCount,
     setSelectedQuestId,
-  } from '$lib/stores/game';
+  } from '$lib/stores/quests';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { removeItemsFromInventory } from '$lib/services/inventory';
   import { checkMilestoneProgress } from '$lib/services/tutorial';

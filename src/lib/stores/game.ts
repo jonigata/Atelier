@@ -340,38 +340,3 @@ export function resetGame(): void {
   gameState.set(createInitialState());
 }
 
-// =====================================
-// 再エクスポート（後方互換性のため）
-// =====================================
-
-export {
-  setTutorialDialogue,
-  unlockAction,
-  unlockActions,
-  isActionUnlocked,
-} from './tutorial';
-
-export {
-  incrementCraftCount,
-  incrementExpeditionCount,
-  incrementConsecutiveQuestSuccess,
-  resetConsecutiveQuestSuccess,
-  addSalesAmount,
-} from './stats';
-
-export {
-  completeAchievement,
-  clearPendingReward,
-  isAchievementCompleted,
-} from './achievements';
-
-export {
-  addActiveQuest,
-  removeActiveQuest,
-  setAvailableQuests,
-  incrementCompletedQuests,
-  incrementFailedQuests,
-  incrementNewQuestCount,
-  clearNewQuestCount,
-  setSelectedQuestId,
-} from './quests';

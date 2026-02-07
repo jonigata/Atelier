@@ -1,5 +1,7 @@
 import { get } from 'svelte/store';
-import { gameState, setTutorialDialogue, incrementExpeditionCount } from '$lib/stores/game';
+import { gameState } from '$lib/stores/game';
+import { setTutorialDialogue } from '$lib/stores/tutorial';
+import { incrementExpeditionCount } from '$lib/stores/stats';
 import { endTurn, startActionPhase } from './gameLoop';
 import { checkMilestoneProgress } from './tutorial';
 import { resolveDialogue } from './presentation';

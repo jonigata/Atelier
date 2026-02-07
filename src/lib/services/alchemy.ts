@@ -5,8 +5,8 @@ import {
   addItem,
   addExp,
   markItemCrafted,
-  incrementCraftCount,
 } from '$lib/stores/game';
+import { incrementCraftCount } from '$lib/stores/stats';
 import { getRecipe } from '$lib/data/recipes';
 import { getItem } from '$lib/data/items';
 import { removeItemsFromInventory } from '$lib/services/inventory';

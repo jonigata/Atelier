@@ -1,15 +1,13 @@
 import { get } from 'svelte/store';
 import {
   gameState,
-  completeAchievement,
-  clearPendingReward,
   addMoney,
   addItem,
   addReputation,
   learnRecipe,
   unlockFacility,
-  isAchievementCompleted,
 } from '$lib/stores/game';
+import { completeAchievement, clearPendingReward, isAchievementCompleted } from '$lib/stores/achievements';
 import { unlockAction } from '$lib/stores/tutorial';
 import {
   getAllAchievements,

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { gameState, addMessage, addMoney, addItem, addSalesAmount } from '$lib/stores/game';
+  import { gameState, addMessage, addMoney, addItem } from '$lib/stores/game';
+  import { addSalesAmount } from '$lib/stores/stats';
   import { items, getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { removeItemFromInventory } from '$lib/services/inventory';
   import { SHOP } from '$lib/data/balance';

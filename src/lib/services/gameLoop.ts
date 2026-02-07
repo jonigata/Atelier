@@ -9,13 +9,10 @@ import {
   setExpedition,
   addItem,
   addReputation,
-  removeActiveQuest,
-  incrementFailedQuests,
-  setAvailableQuests,
   setDayTransition,
-  incrementNewQuestCount,
-  isActionUnlocked,
 } from '$lib/stores/game';
+import { removeActiveQuest, incrementFailedQuests, setAvailableQuests, incrementNewQuestCount } from '$lib/stores/quests';
+import { isActionUnlocked } from '$lib/stores/tutorial';
 import { getArea } from '$lib/data/areas';
 import { getItem } from '$lib/data/items';
 import { getAvailableQuestTemplates } from '$lib/data/quests';
