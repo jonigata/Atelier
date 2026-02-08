@@ -13,7 +13,7 @@ setting_sketch.md の物語設定を、plot_insertion_manual.md のアチーブ�
 | オルト（村長） | → | フォンテ村長 | `village_growth` | 村娘の父。名前は作中で「村長」呼びを基本とし、村娘が「お父さん」と呼ぶ |
 | イリーナ（師匠） | → | イリーナ（師匠） | `master_gift` / `master_teaching` | 役割維持。手紙での登場。主人公を「座学は優秀だが実践不足」と評価 |
 | カリン（よろず屋） | → | カリン（よろず屋・維持） | `villager_gift` | ゲームシステム上の常設ショップ担当として維持。既存のまま |
-| （新規） | | マルコ（旅商人） | `merchant_visit`（新規） | 胡散臭い旅商人。定期訪問で通常ショップにはないレア素材・特殊品を扱う。ショップの特別品揃えや専用コマンドなどゲームシステム上の役割も持つ |
+| （新規） | | マルコ（旅商人） | `merchant_visit`（新規） | 胡散臭い旅商人。月1回・7日間滞在で通常ショップにはないレア素材・特殊品を扱う。ショップの特別品揃えや専用コマンドなどゲームシステム上の役割も持つ |
 | ガルド（冒険者） | → | 冒険者パーティー | `character_trial` | リーダー: レン（剣士）、メンバー: ピィ（斥候） の2人構成 |
 | ???（匿名支援者） | → | 削除 | - | ライバルの伏線として再編。`patron_support` は査察官の匿名評価として転用 |
 | 村人（農夫） | → | 村人（汎用） | `villager_gift` | 既存のまま |
@@ -47,6 +47,36 @@ patron_support: { name: '査察官', title: '師匠組合' },  // 匿名支援�
 
 ## 2. 四半期ストーリーアーク
 
+### 2.0 暦と基本設定
+
+| 項目 | 値 |
+|------|-----|
+| 1ヶ月 | 30日 |
+| 1年 | 360日（12ヶ月） |
+| 四半期 | 90日（3ヶ月） |
+
+#### マルコ（旅商人）の滞在スケジュール
+
+月1回、7日間滞在する。滞在中のみ旅商人との取引が可能。
+
+| 月 | 滞在期間 |
+|----|---------|
+| 1月 | Day 8 - 14 |
+| 2月 | Day 38 - 44 |
+| 3月 | Day 68 - 74 |
+| 4月 | Day 98 - 104 |
+| 5月 | Day 128 - 134 |
+| 6月 | Day 158 - 164 |
+| 7月 | Day 188 - 194 |
+| 8月 | Day 218 - 224 |
+| 9月 | Day 248 - 254 |
+| 10月 | Day 278 - 284 |
+| 11月 | Day 308 - 314 |
+| 12月 | Day 338 - 344 |
+
+> 初月は到着直後のため少し遅め（Day 8〜）。以降は毎月同じタイミング。
+> 滞在日はゲームシステム側で `(day - 8) % 30 < 7` 等で判定可能。
+
 ### 2.1 タイムライン概要
 
 | 期間 | アーク名 | テーマ | 関門 |
@@ -54,7 +84,7 @@ patron_support: { name: '査察官', title: '師匠組合' },  // 匿名支援�
 | Q1 (Day 1-90) | 「先生と呼ばれて」 | 到着と期待のギャップ、初めての信頼構築 | Day 90: 師匠組合への経過報告 |
 | Q2 (Day 91-180) | 「この村の錬金術師」 | 居場所の意識、ライバルとの対比 | Day 180: 中間査察（ライバルとの直接比較） |
 | Q3 (Day 181-270) | 「フォンテの宝」 | 特産品開発、挫折と再起 | Day 270: 査察官の予告訪問 |
-| Q4 (Day 271-365) | 「自分の居場所」 | 完成と証明、帰属 | Day 365: 最終査察（エンディング分岐） |
+| Q4 (Day 271-360) | 「自分の居場所」 | 完成と証明、帰属 | Day 360: 最終査察（エンディング分岐） |
 
 ---
 
@@ -754,7 +784,7 @@ ach_story_q3_checkpoint: {
 
 ---
 
-### 3.5 Q4 ストーリーイベント (Day 271-365):「自分の居場所」
+### 3.5 Q4 ストーリーイベント (Day 271-360):「自分の居場所」
 
 テーマ: 完成と証明、帰属
 
@@ -888,7 +918,7 @@ ach_story_final_inspection: {
   id: 'ach_story_final_inspection',
   title: '査察の日',
   description: '師匠組合の最終査察を受けた',
-  hint: '365日目を迎えよう',
+  hint: '360日目を迎えよう',
   category: 'quest',
   narrative: 'patron_support',
   narrativeCharacter: { name: '査察官', title: '師匠組合' },
@@ -899,7 +929,7 @@ ach_story_final_inspection: {
     '「では、あなたの成果を見せてください」',
   ],
   conditions: [
-    { type: 'day', target: 365, comparison: '>=' },
+    { type: 'day', target: 360, comparison: '>=' },
   ],
   reward: {},
   prerequisite: ['ach_story_q3_checkpoint'],
@@ -912,7 +942,7 @@ ach_story_final_inspection: {
 
 ## 4. エンディング分岐設計
 
-最終査察（Day 365）時点でのパラメータに基づき、エンディングを分岐させる。
+最終査察（Day 360）時点でのパラメータに基づき、エンディングを分岐させる。
 
 ### 4.1 エンディング条件一覧
 
@@ -946,7 +976,7 @@ ach_ending_true: {
     'この小さな村で、大切な人たちと一緒に。',
   ],
   conditions: [
-    { type: 'day', target: 365, comparison: '>=' },
+    { type: 'day', target: 360, comparison: '>=' },
     { type: 'reputation', target: 70 },
     { type: 'level', target: 15 },
     { type: 'village_development', target: 60 },
@@ -973,7 +1003,7 @@ ach_ending_good: {
     '物語はまだ続く。この村で、もう少しだけ――。',
   ],
   conditions: [
-    { type: 'day', target: 365, comparison: '>=' },
+    { type: 'day', target: 360, comparison: '>=' },
     { type: 'reputation', target: 50 },
     { type: 'level', target: 10 },
   ],
@@ -1000,7 +1030,7 @@ ach_ending_normal: {
     '別れの朝。また会える日を信じて、私は次の村へ向かう。',
   ],
   conditions: [
-    { type: 'day', target: 365, comparison: '>=' },
+    { type: 'day', target: 360, comparison: '>=' },
     { type: 'reputation', target: 30 },
     { type: 'level', target: 8 },
     { type: 'quest_count', target: 15 },
@@ -1026,7 +1056,7 @@ ach_ending_bad: {
     '……もっと頑張れたはずだった。後悔だけが、胸に残る。',
   ],
   conditions: [
-    { type: 'day', target: 365, comparison: '>=' },
+    { type: 'day', target: 360, comparison: '>=' },
   ],
   reward: {},
   prerequisite: ['ach_story_final_inspection'],
@@ -1088,11 +1118,11 @@ ach_ending_bad: {
 | `ach_story_girl_friendship` | 親友 | 920 | `village_girl` | day ≥ 320, reputation ≥ 60 |
 | `ach_story_rival_final` | 決着 | 930 | `rival_pressure` | day ≥ 340 |
 | `ach_story_master_letter` | 師匠の言葉 | 940 | `master_teaching` | day ≥ 350 |
-| `ach_story_final_inspection` | 査察の日 | 990 | `patron_support` | day ≥ 365 |
-| `ach_ending_true` | この村の錬金術師 | 1001 | `village_growth` | day ≥ 365, rep ≥ 70, lv ≥ 15, vd ≥ 60 |
-| `ach_ending_good` | 芽吹きの日 | 1010 | `village_growth` | day ≥ 365, rep ≥ 50, lv ≥ 10 |
-| `ach_ending_normal` | 旅立ちの朝 | 1020 | `village_growth` | day ≥ 365, rep ≥ 30, lv ≥ 8, quest ≥ 15 |
-| `ach_ending_bad` | 帰り道 | 1030 | `village_growth` | day ≥ 365 |
+| `ach_story_final_inspection` | 査察の日 | 990 | `patron_support` | day ≥ 360 |
+| `ach_ending_true` | この村の錬金術師 | 1001 | `village_growth` | day ≥ 360, rep ≥ 70, lv ≥ 15, vd ≥ 60 |
+| `ach_ending_good` | 芽吹きの日 | 1010 | `village_growth` | day ≥ 360, rep ≥ 50, lv ≥ 10 |
+| `ach_ending_normal` | 旅立ちの朝 | 1020 | `village_growth` | day ≥ 360, rep ≥ 30, lv ≥ 8, quest ≥ 15 |
+| `ach_ending_bad` | 帰り道 | 1030 | `village_growth` | day ≥ 360 |
 
 ---
 
@@ -1228,6 +1258,24 @@ function determineEnding(state: GameState): string {
 - `ach_game_start` の description: `'ハイデル村に到着した'` → `'フォンテ村に到着した'`
 - その他、村名がハードコードされている箇所を全検索して修正
 
+### 7.8 暦の変更（365日 → 360日）
+
+ゲーム期間を365日から360日（12ヶ月 × 30日）に変更する。
+
+コード側の変更箇所:
+- `src/lib/stores/game.ts:88` — `365 - $state.day` → `360 - $state.day`
+- `src/lib/stores/game.ts:90` — `$state.day > 365` → `$state.day > 360`
+- `src/lib/services/gameLoop.ts:37` — `state.day > 365` → `state.day > 360`
+- `src/lib/models/types.ts:174` — コメント `1-365` → `1-360`
+- `src/components/DebugPanel.svelte:86` — `max="365"` → `max="360"`
+
+### 7.9 マルコ（旅商人）の滞在システム
+
+月1回・7日間滞在の旅商人を実装するために必要な仕組み:
+- 滞在判定: `(day - 8) % 30 < 7` で滞在中かどうかを判定
+- 滞在中のみ旅商人コマンド（または特殊品揃え）が利用可能
+- 朝フェーズで到着/出発メッセージを表示
+
 ---
 
 ## 8. plot_insertion_manual.md の更新案
@@ -1311,12 +1359,12 @@ function determineEnding(state: GameState): string {
 | 独自の薬草群 | herb_03（フォンテの恵み草）、枯泉の丘 | OK |
 | 特産品開発 | Q3-Q4 ストーリーアーク | OK |
 | ライバルとの比較 | Q2-Q4 ヴィクト関連イベント | OK |
-| 半年の時間制限 | 365日（1年）に拡張。四半期関門で段階管理 | OK（※） |
+| 半年の時間制限 | 360日（1年）に拡張。四半期関門で段階管理 | OK（※） |
 | 村娘との関係構築 | Q1冷たい出迎え → Q4友情完成の全アーク | OK |
 | 祖母の民間療法 | ach_story_girl_soften | OK |
 | 工房の発展 | facilities によるアンロック | OK |
 
-> ※ setting_sketch では「半年」だが、ゲームが365日（1年）のため適宜調整。ログラインの「半年」は作中設定として維持し、ゲーム内の1年をフィクション上の半年として扱う。
+> ※ setting_sketch では「半年」だが、ゲームが360日（1年）のため適宜調整。ログラインの「半年」は作中設定として維持し、ゲーム内の1年をフィクション上の半年として扱う。
 
 ### 9.3 整合性検証
 
