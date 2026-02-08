@@ -10,9 +10,10 @@ setting_sketch.md の物語設定を、plot_insertion_manual.md のアチーブ�
 
 | 既存キャラ | → | 新キャラ | narrative 種別 | 備考 |
 |-----------|---|---------|---------------|------|
-| オルト（村長） | → | エルダ村長 | `village_growth` | 村娘の父。名前は作中で「村長」呼びを基本とし、村娘が「お父さん」と呼ぶ |
+| オルト（村長） | → | フォンテ村長 | `village_growth` | 村娘の父。名前は作中で「村長」呼びを基本とし、村娘が「お父さん」と呼ぶ |
 | イリーナ（師匠） | → | イリーナ（師匠） | `master_gift` / `master_teaching` | 役割維持。手紙での登場。主人公を「座学は優秀だが実践不足」と評価 |
-| カリン（よろず屋） | → | マルコ（旅商人） | `merchant_visit`（新規） | 胡散臭い旅商人。定期的に村を訪問。素材を売りつけ/買い叩く |
+| カリン（よろず屋） | → | カリン（よろず屋・維持） | `villager_gift` | ゲームシステム上の常設ショップ担当として維持。既存のまま |
+| （新規） | | マルコ（旅商人） | `merchant_visit`（新規） | 胡散臭い旅商人。定期訪問で通常ショップにはないレア素材・特殊品を扱う。ショップの特別品揃えや専用コマンドなどゲームシステム上の役割も持つ |
 | ガルド（冒険者） | → | 冒険者パーティー | `character_trial` | リーダー: レン（剣士）、メンバー: ピィ（斥候） の2人構成 |
 | ???（匿名支援者） | → | 削除 | - | ライバルの伏線として再編。`patron_support` は査察官の匿名評価として転用 |
 | 村人（農夫） | → | 村人（汎用） | `villager_gift` | 既存のまま |
@@ -37,7 +38,7 @@ merchant_visit: { name: 'マルコ', title: '旅商人' },
 rival_pressure: { name: 'ヴィクト', title: 'ライバル錬金術師' },
 
 // 既存の更新
-village_growth: { name: '村長', title: 'エルダ村長' },
+village_growth: { name: '村長', title: 'フォンテ村長' },
 character_trial: null,  // パーティーごとに個別指定（維持）
 patron_support: { name: '査察官', title: '師匠組合' },  // 匿名支援者→査察官に転用
 ```
@@ -52,7 +53,7 @@ patron_support: { name: '査察官', title: '師匠組合' },  // 匿名支援�
 |------|---------|-------|------|
 | Q1 (Day 1-90) | 「先生と呼ばれて」 | 到着と期待のギャップ、初めての信頼構築 | Day 90: 師匠組合への経過報告 |
 | Q2 (Day 91-180) | 「この村の錬金術師」 | 居場所の意識、ライバルとの対比 | Day 180: 中間査察（ライバルとの直接比較） |
-| Q3 (Day 181-270) | 「エルダの宝」 | 特産品開発、挫折と再起 | Day 270: 査察官の予告訪問 |
+| Q3 (Day 181-270) | 「フォンテの宝」 | 特産品開発、挫折と再起 | Day 270: 査察官の予告訪問 |
 | Q4 (Day 271-365) | 「自分の居場所」 | 完成と証明、帰属 | Day 365: 最終査察（エンディング分岐） |
 
 ---
@@ -92,16 +93,16 @@ patron_support: { name: '査察官', title: '師匠組合' },  // 匿名支援�
 ach_game_start: {
   id: 'ach_game_start',
   title: '新しい日々',
-  description: 'エルダ村に到着した',
+  description: 'フォンテ村に到着した',
   hint: '物語が始まる',
   category: 'tutorial',
   narrative: 'village_growth',
-  narrativeCharacter: { name: '村長', title: 'エルダ村長' },
+  narrativeCharacter: { name: '村長', title: 'フォンテ村長' },
   narrativeLines: [
     'おお、ついに来てくれたか！ 君がイリーナ先生の弟子だな',
     '私はこの村の村長をやっている。もう何年も組合に頼み続けてな……',
     'ここが君の工房だ。少し古いが、娘と一緒に掃除しておいた',
-    'エルダ村を頼む。君が来てくれるのを、村のみんなが待っていたんだ',
+    'フォンテ村を頼む。君が来てくれるのを、村のみんなが待っていたんだ',
   ],
   conditions: [{ type: 'day', target: 1 }],
   reward: { unlocks: ['rest', 'study'] },
@@ -165,7 +166,7 @@ ach_first_quest: {
 ```typescript
 ach_first_complete: {
   // ...既存維持
-  narrativeCharacter: { name: '村長', title: 'エルダ村長' },
+  narrativeCharacter: { name: '村長', title: 'フォンテ村長' },
   narrativeLines: [
     '聞いたぞ、依頼を達成したそうだな。やるじゃないか',
     '村の者が喜んでいたよ。これは心付けだ、受け取ってくれ',
@@ -411,12 +412,12 @@ ach_story_girl_partner: {
 },
 ```
 
-#### ach_story_elda_spring（エルダの泉の痕跡発見）
+#### ach_story_elda_spring（フォンテの泉の痕跡発見）
 
 ```typescript
 ach_story_elda_spring: {
   id: 'ach_story_elda_spring',
-  title: 'エルダの泉の記憶',
+  title: 'フォンテの泉の記憶',
   description: '枯れた泉の周辺で独自の薬草を発見した',
   hint: 'リーネと共に採取を続けよう',
   category: 'expedition',
@@ -424,7 +425,7 @@ ach_story_elda_spring: {
   narrativeLines: [
     'リーネに案内された泉の跡地で、見たこともない薬草を見つけた',
     '泉は枯れたが、土壌にはまだ不思議な成分が染み込んでいるようだ',
-    'この薬草は他の場所では育たない……エルダ村だけの固有種かもしれない',
+    'この薬草は他の場所では育たない……フォンテ村だけの固有種かもしれない',
     '（※ 新しい採取エリア「枯泉の丘」が解放されました）',
   ],
   conditions: [
@@ -535,7 +536,7 @@ ach_story_q2_checkpoint: {
 
 ---
 
-### 3.4 Q3 ストーリーイベント (Day 181-270):「エルダの宝」
+### 3.4 Q3 ストーリーイベント (Day 181-270):「フォンテの宝」
 
 テーマ: 独自の価値の創造、挫折と再起
 
@@ -546,12 +547,12 @@ ach_story_specialty_start: {
   id: 'ach_story_specialty_start',
   title: '挑戦の始まり',
   description: '特産品の開発を開始した',
-  hint: 'エルダ固有の素材を使った調合に挑戦しよう',
+  hint: 'フォンテ固有の素材を使った調合に挑戦しよう',
   category: 'alchemy',
   narrative: 'village_girl',
   narrativeCharacter: { name: 'リーネ', title: '村娘' },
   narrativeLines: [
-    'ねえ、この薬草……おばあちゃんが「エルダの恵み」って呼んでた種類よ',
+    'ねえ、この薬草……おばあちゃんが「フォンテの恵み」って呼んでた種類よ',
     '普通の使い方じゃダメみたい。錬金術で何かできないかな',
     '私の知ってる薬草の特性と、あなたの錬金術を合わせたら……',
     '……一緒に、この村だけの何かを作りましょうよ！',
@@ -666,7 +667,7 @@ ach_story_village_crisis: {
   hint: '高品質な回復薬を作れるようにしておこう',
   category: 'quest',
   narrative: 'village_growth',
-  narrativeCharacter: { name: '村長', title: 'エルダ村長' },
+  narrativeCharacter: { name: '村長', title: 'フォンテ村長' },
   narrativeLines: [
     '先生、大変だ！ 村に病が広がっている',
     '症状は軽いが、このままでは秋の収穫に響く……',
@@ -762,16 +763,16 @@ ach_story_q3_checkpoint: {
 ```typescript
 ach_story_specialty_complete: {
   id: 'ach_story_specialty_complete',
-  title: 'エルダの恵み',
-  description: 'エルダ村の特産品を完成させた',
+  title: 'フォンテの恵み',
+  description: 'フォンテ村の特産品を完成させた',
   hint: '最高のレシピを完成させよう',
   category: 'alchemy',
   narrative: 'workshop_discovery',
   narrativeLines: [
     '長い試行錯誤の末……ついに、完成した',
-    'エルダの泉の成分を含んだ薬草と、リーネの教えてくれた民間療法の知恵',
+    'フォンテの泉の成分を含んだ薬草と、リーネの教えてくれた民間療法の知恵',
     'それを錬金術で昇華させた、この村でしか作れない一品',
-    '「エルダの恵み」―― これが、私の答え',
+    '「フォンテの恵み」―― これが、私の答え',
   ],
   conditions: [
     { type: 'day', target: 300, comparison: '>=' },
@@ -864,7 +865,7 @@ ach_story_master_letter: {
   narrativeCharacter: { name: 'イリーナ', title: '師匠（手紙）' },
   narrativeLines: [
     '師匠からの手紙が届いた――',
-    '「あなたの噂は聞いています。エルダ村の錬金術師、と」',
+    '「あなたの噂は聞いています。フォンテ村の錬金術師、と」',
     '「最初は心配したけれど……やっぱり、あなたを送り出して正解だったわ」',
     '「査察では、あなたの答えを見せてもらいます。楽しみにしていますよ」',
     '「――お前の師匠であることを、誇りに思う。イリーナ」',
@@ -917,7 +918,7 @@ ach_story_final_inspection: {
 
 | エンディング | 条件 | 概要 |
 |-------------|------|------|
-| **真エンド: 「この村の錬金術師」** | 特産品完成 + reputation ≥ 70 + level ≥ 15 + village_development ≥ 60 | 査察合格。エルダ村に正式赴任。師匠の承認。リーネとの友情 |
+| **真エンド: 「この村の錬金術師」** | 特産品完成 + reputation ≥ 70 + level ≥ 15 + village_development ≥ 60 | 査察合格。フォンテ村に正式赴任。師匠の承認。リーネとの友情 |
 | **好エンド: 「芽吹きの日」** | 特産品完成 + reputation ≥ 50 + level ≥ 10 | 査察合格。特産品は認められるが改善の余地あり。1年延長赴任 |
 | **普通エンド: 「旅立ちの朝」** | reputation ≥ 30 + level ≥ 8 + quest_count ≥ 15 | 査察は不合格だが温情で免許維持。別の村への再赴任 |
 | **バッドエンド: 「帰り道」** | 上記いずれも満たさない | 査察不合格。免許剥奪。村を去る |
@@ -933,7 +934,7 @@ ach_ending_true: {
   hint: '',
   category: 'mastery',
   narrative: 'village_growth',
-  narrativeCharacter: { name: '村長', title: 'エルダ村長' },
+  narrativeCharacter: { name: '村長', title: 'フォンテ村長' },
   narrativeLines: [
     '「査察の結果……合格です。おめでとうございます」',
     '村長「やったぞ……！ 先生、本当にありがとう！」',
@@ -941,7 +942,7 @@ ach_ending_true: {
     'マルコ「いやぁ、俺の目に狂いはなかったな！ これからも贔屓にしてくれよ？」',
     'ゴルド「……よくやった」',
     '師匠からの最後の手紙「――お前の居場所を、お前自身で見つけたのね。誇りに思うわ」',
-    'こうして私は「エルダ村の錬金術師」になった。',
+    'こうして私は「フォンテ村の錬金術師」になった。',
     'この小さな村で、大切な人たちと一緒に。',
   ],
   conditions: [
@@ -1072,7 +1073,7 @@ ach_ending_bad: {
 | `ach_story_q1_checkpoint` | 最初の報告書 | 690 | `patron_support` | day ≥ 90, quest ≥ 5 |
 | `ach_story_rival_appear` | 不穏な来訪者 | 705 | `rival_pressure` | day ≥ 100 |
 | `ach_story_girl_partner` | 素材採りの相棒 | 715 | `village_girl` | day ≥ 110, expedition ≥ 5, craft ≥ 20 |
-| `ach_story_elda_spring` | エルダの泉の記憶 | 725 | `workshop_discovery` | day ≥ 130, expedition ≥ 8 |
+| `ach_story_elda_spring` | フォンテの泉の記憶 | 725 | `workshop_discovery` | day ≥ 130, expedition ≥ 8 |
 | `ach_story_smith_repair` | 頑固おやじの好意 | 735 | `villager_gift` | day ≥ 140, craft ≥ 30 |
 | `ach_story_neighbor_pressure` | 焦りの種 | 745 | `client_gratitude` | day ≥ 160, village_dev ≥ 30 |
 | `ach_story_q2_checkpoint` | 中間査察 | 790 | `patron_support` | day ≥ 180, quest ≥ 10, level ≥ 5 |
@@ -1083,7 +1084,7 @@ ach_ending_bad: {
 | `ach_story_village_crisis` | 村を守る力 | 845 | `village_growth` | day ≥ 245, level ≥ 10, quality ≥ 60 |
 | `ach_story_crisis_resolved` | この村の錬金術師 | 855 | `village_girl` | quest ≥ 20 |
 | `ach_story_q3_checkpoint` | 審判の予告 | 890 | `patron_support` | day ≥ 270, level ≥ 12, quest ≥ 20 |
-| `ach_story_specialty_complete` | エルダの恵み | 905 | `workshop_discovery` | day ≥ 300, level ≥ 15, quality ≥ 80, craft ≥ 80 |
+| `ach_story_specialty_complete` | フォンテの恵み | 905 | `workshop_discovery` | day ≥ 300, level ≥ 15, quality ≥ 80, craft ≥ 80 |
 | `ach_story_girl_friendship` | 親友 | 920 | `village_girl` | day ≥ 320, reputation ≥ 60 |
 | `ach_story_rival_final` | 決着 | 930 | `rival_pressure` | day ≥ 340 |
 | `ach_story_master_letter` | 師匠の言葉 | 940 | `master_teaching` | day ≥ 350 |
@@ -1159,7 +1160,7 @@ export type AchievementNarrative =
 
 | narrative | 旧デフォルトキャラ | → | 新デフォルトキャラ |
 |-----------|---------------|---|---------------|
-| `village_growth` | オルト（村長） | → | 村長（エルダ村長） |
+| `village_growth` | オルト（村長） | → | 村長（フォンテ村長） |
 | `patron_support` | ???（匿名の支援者） | → | 査察官（師匠組合） |
 
 ### 7.3 複数キャラの掛け合い
@@ -1210,10 +1211,10 @@ function determineEnding(state: GameState): string {
 
 | 種別 | ID（仮） | 名前 | 用途 |
 |------|---------|------|------|
-| レシピ | `elda_prototype_01` | エルダの試作薬 | 特産品の試作版。Q3で解放 |
-| アイテム | `herb_03` | エルダの恵み草 | エルダ固有の薬草。枯泉の丘で採取 |
+| レシピ | `elda_prototype_01` | フォンテの試作薬 | 特産品の試作版。Q3で解放 |
+| アイテム | `herb_03` | フォンテの恵み草 | フォンテ固有の薬草。枯泉の丘で採取 |
 | 設備 | `reinforced_cauldron` | 強化大釜 | ゴルドが修理した大釜。調合品質+5 |
-| 採取エリア | `dried_spring_hill` | 枯泉の丘 | エルダの泉跡。固有素材が採取可能 |
+| 採取エリア | `dried_spring_hill` | 枯泉の丘 | フォンテの泉跡。固有素材が採取可能 |
 
 ### 7.6 day == N 条件の活用
 
@@ -1223,8 +1224,8 @@ function determineEnding(state: GameState): string {
 
 ### 7.7 村名の変更
 
-既存コード内の「ハイデル村」を「エルダ村」に変更する必要がある。
-- `ach_game_start` の description: `'ハイデル村に到着した'` → `'エルダ村に到着した'`
+既存コード内の「ハイデル村」を「フォンテ村」に変更する必要がある。
+- `ach_game_start` の description: `'ハイデル村に到着した'` → `'フォンテ村に到着した'`
 - その他、村名がハードコードされている箇所を全検索して修正
 
 ---
@@ -1238,7 +1239,7 @@ function determineEnding(state: GameState): string {
 
 | キャラクター | 肩書き | 登場イベント | 性格・特徴 |
 |------------|-------|------------|-----------|
-| 村長 | エルダ村長 | 到着、依頼完了、村発展、危機、エンディング | 穏やか、村の将来を憂う。村娘の父 |
+| 村長 | フォンテ村長 | 到着、依頼完了、村発展、危機、エンディング | 穏やか、村の将来を憂う。村娘の父 |
 | イリーナ | 師匠（手紙で登場） | レベルアップ、熟練時、最終手紙 | 厳しくも温かい。主人公の基礎力を見抜いた |
 | マルコ | 旅商人 | 初依頼受注、定期訪問、レア素材 | 胡散臭い、商売上手。主人公の成功を望む |
 | レン | 冒険者（リーダー） | 村発展度20、採取系 | 実力者、面倒見がいい |
@@ -1293,7 +1294,7 @@ function determineEnding(state: GameState): string {
 | 気難しい村娘 | リーネ | OK |
 | 旅商人 | マルコ | OK |
 | 冒険者パーティー | レン & ピィ | OK |
-| 村長（親友の父） | 村長（エルダ村長） | OK |
+| 村長（親友の父） | 村長（フォンテ村長） | OK |
 | 鍛冶屋のおやじ | ゴルド | OK |
 | パン屋のおばちゃん | メルダ | OK |
 | ライバル錬金術師 | ヴィクト | OK |
@@ -1306,8 +1307,8 @@ function determineEnding(state: GameState): string {
 | 師匠組合の派遣制度 | 全体の前提として反映 | OK |
 | 回復薬しか作れない素人 | チュートリアルの段階的学習で表現 | OK |
 | 村人の過大な期待 | ach_game_start, ach_story_village_girl_cold | OK |
-| エルダの泉（枯れた） | ach_story_elda_spring | OK |
-| 独自の薬草群 | herb_03（エルダの恵み草）、枯泉の丘 | OK |
+| フォンテの泉（枯れた） | ach_story_elda_spring | OK |
+| 独自の薬草群 | herb_03（フォンテの恵み草）、枯泉の丘 | OK |
 | 特産品開発 | Q3-Q4 ストーリーアーク | OK |
 | ライバルとの比較 | Q2-Q4 ヴィクト関連イベント | OK |
 | 半年の時間制限 | 365日（1年）に拡張。四半期関門で段階管理 | OK（※） |
@@ -1326,3 +1327,32 @@ function determineEnding(state: GameState): string {
 | day 条件の自然な進行 | OK | 四半期ごとに day ≥ N で制御 |
 | 既存アチーブメントへの影響 | 最小 | セリフのみ書き換え、ID/条件/報酬は維持 |
 | 条件型の範囲内 | OK | すべて既存の AchievementConditionType で実現可能 |
+
+### 9.4 既知の矛盾・要修正事項
+
+実装時に解決が必要な矛盾点を以下にまとめる。
+
+#### 矛盾1: `patron_support` の転用による既存アチーブメントとの不整合
+
+本設計では `patron_support` のデフォルトキャラを「???（匿名の支援者）」→「査察官」に転用したが、既存コードに `patron_support` を使うアチーブメントが3つあり、セリフが「支援者」のまま残る。
+
+| 既存アチーブメント | セリフ | 問題 |
+|------------------|-------|------|
+| `ach_quality_90` | `'匿名の支援者「素晴らしい腕前です…」'` | 査察官が匿名で褒めるのは不自然 |
+| `ach_quest_streak_5` | `'支援者「確実な仕事ぶりに…」'` | 同上 |
+| `ach_money_20000` | `'支援者「経営手腕を高く…」'` | 同上 |
+
+**対処案**: `patron_support` は既存のまま残し、査察イベント用に `inspection`（新narrative）を別途追加する。ストーリーイベントの査察関連アチーブメントはすべて `inspection` を使う。
+
+#### 矛盾2: IDに旧村名「elda」が残っている
+
+村名を「フォンテ」に変更したが、設計書内のアチーブメントID・レシピIDに `elda` が残っている。
+
+| 現在のID | → | 修正後ID |
+|---------|---|---------|
+| `ach_story_elda_spring` | → | `ach_story_fonte_spring` |
+| `elda_prototype_01` | → | `fonte_prototype_01` |
+
+#### ~~矛盾3: ショップ解放の担い手の不整合~~ → 解決済み
+
+カリン（よろず屋）はゲームシステム上の常設ショップ担当として維持する。`ach_first_quest` でのショップ解放は既存のままカリンが担当。マルコ（旅商人）はカリンとは別の新規キャラとして追加し、定期訪問で通常ショップにはないレア素材・特殊品を扱う。実装形態は専用コマンド（「旅商人の品を見る」）またはショップの品揃え拡張（マルコ滞在中のみ特殊品が並ぶ）など。
