@@ -10,8 +10,9 @@ import { incrementCraftCount } from '$lib/stores/stats';
 import { getRecipe } from '$lib/data/recipes';
 import { getItem } from '$lib/data/items';
 import { removeItemsFromInventory } from '$lib/services/inventory';
-import { ALCHEMY, CRAFT_SUCCESS, QUALITY } from '$lib/data/balance';
+import { ALCHEMY, CRAFT_SUCCESS, QUALITY, STAMINA } from '$lib/data/balance';
 import { getFacilityBonuses, hasRequiredFacilities } from '$lib/services/facility';
+import { craftedFlavors, pickRandom } from '$lib/data/flavorTexts';
 import type { OwnedItem, RecipeDef, Ingredient } from '$lib/models/types';
 
 export interface CraftResult {
@@ -44,8 +45,17 @@ function executeCraftAttempt(
   selectedItems: OwnedItem[],
   alchemyLevel: number
 ): CraftAttemptResult {
-  // 成功判定
-  const successRate = calculateSuccessRate(recipe, alchemyLevel);
+  // 現在の体力を取得して疲労込みの成功率を計算
+  const currentState = get(gameState);
+  const successRate = calculateSuccessRate(recipe, alchemyLevel, currentState.stamina);
+
+  // 体力を消費
+  const staminaCost = calculateStaminaCost(recipe);
+  gameState.update((s) => ({
+    ...s,
+    stamina: Math.max(0, s.stamina - staminaCost),
+  }));
+
   const isSuccess = Math.random() < successRate;
 
   if (!isSuccess) {
@@ -59,9 +69,15 @@ function executeCraftAttempt(
   const quality = calculateQuality(recipe, selectedItems, alchemyLevel);
 
   // 完成品を追加
+  const stateForOrigin = get(gameState);
   const newItem: OwnedItem = {
     itemId: recipe.resultItemId,
     quality,
+    origin: {
+      type: 'crafted',
+      day: stateForOrigin.day,
+      flavorText: pickRandom(craftedFlavors),
+    },
   };
   addItem(newItem);
   markItemCrafted(recipe.resultItemId);
@@ -415,16 +431,45 @@ function consumeItems(items: OwnedItem[]): void {
 }
 
 /**
+ * 調合に必要な体力を計算
+ */
+export function calculateStaminaCost(recipe: RecipeDef): number {
+  return STAMINA.CRAFT_BASE_COST + recipe.difficulty * STAMINA.CRAFT_DIFFICULTY_COST;
+}
+
+/**
+ * 疲労による成功率ペナルティを計算
+ */
+export function calculateFatiguePenalty(stamina: number): number {
+  if (stamina >= STAMINA.FATIGUE_THRESHOLD_NONE) return 0;
+  if (stamina >= STAMINA.FATIGUE_THRESHOLD_MILD) return STAMINA.FATIGUE_PENALTY_MILD;
+  if (stamina >= STAMINA.FATIGUE_THRESHOLD_MODERATE) return STAMINA.FATIGUE_PENALTY_MODERATE;
+  return STAMINA.FATIGUE_PENALTY_SEVERE;
+}
+
+/**
+ * 疲労レベルのラベルを取得
+ */
+export function getFatigueLabel(stamina: number): string | null {
+  if (stamina >= STAMINA.FATIGUE_THRESHOLD_NONE) return null;
+  if (stamina >= STAMINA.FATIGUE_THRESHOLD_MILD) return '軽度疲労';
+  if (stamina >= STAMINA.FATIGUE_THRESHOLD_MODERATE) return '中度疲労';
+  return '重度疲労';
+}
+
+/**
  * 成功率を計算
  */
-export function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number): number {
+export function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number, stamina?: number): number {
   // 基本成功率: 難易度1で100%、難易度上昇ごとに減少
   const baserate = CRAFT_SUCCESS.BASE_RATE - (recipe.difficulty - 1) * CRAFT_SUCCESS.DIFFICULTY_PENALTY;
   // レベルボーナス: レベルが必要レベルを超えるごとに加算
   const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * CRAFT_SUCCESS.LEVEL_BONUS);
   // 設備ボーナス
   const { successRateBonus } = getFacilityBonuses(recipe);
-  return Math.min(CRAFT_SUCCESS.MAX_RATE, baserate + levelBonus + successRateBonus);
+  // 疲労ペナルティ
+  const fatiguePenalty = stamina !== undefined ? calculateFatiguePenalty(stamina) : 0;
+  return Math.max(0.01, Math.min(CRAFT_SUCCESS.MAX_RATE, baserate + levelBonus + successRateBonus - fatiguePenalty));
 }
 
 /**

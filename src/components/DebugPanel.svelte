@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { gameState, resetGame, addVillageDevelopment, addExp } from '$lib/stores/game';
+  import { gameState, resetGame, addVillageDevelopment, addExp, consumeStamina, restoreStamina } from '$lib/stores/game';
   import { unlockActions } from '$lib/stores/tutorial';
   import type { ActionType } from '$lib/models/types';
   import {
@@ -122,6 +122,17 @@
         <button on:click={() => addExp(100)}>+100 Exp</button>
       </div>
       <p class="info">現在: {$gameState.alchemyExp} / Lv.{$gameState.alchemyLevel}</p>
+    </div>
+
+    <div class="section">
+      <h4>体力操作</h4>
+      <div class="buttons">
+        <button on:click={() => consumeStamina(30)}>-30</button>
+        <button on:click={() => consumeStamina(50)}>-50</button>
+        <button on:click={() => consumeStamina(80)}>-80</button>
+        <button on:click={() => restoreStamina(100)}>全回復</button>
+      </div>
+      <p class="info">現在: {$gameState.stamina} / {$gameState.maxStamina}</p>
     </div>
 
     <div class="section">

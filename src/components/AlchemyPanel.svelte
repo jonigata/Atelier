@@ -4,7 +4,7 @@
   import type { LevelUpInfo } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
-  import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient } from '$lib/services/alchemy';
+  import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient, calculateStaminaCost, calculateFatiguePenalty, getFatigueLabel } from '$lib/services/alchemy';
   import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
   import { calcExpForLevel } from '$lib/data/balance';
   import type { RecipeDef, OwnedItem, Ingredient } from '$lib/models/types';
@@ -88,9 +88,17 @@
     return remaining.sort((a, b) => b.quality - a.quality);
   })();
 
-  // 成功率
+  // 体力コスト
+  $: staminaCost = selectedRecipe ? calculateStaminaCost(selectedRecipe) : 0;
+  $: totalStaminaCost = staminaCost * craftQuantity;
+
+  // 疲労ペナルティ
+  $: fatiguePenalty = calculateFatiguePenalty($gameState.stamina);
+  $: fatigueLabel = getFatigueLabel($gameState.stamina);
+
+  // 成功率（体力による疲労ペナルティ込み）
   $: successRate = selectedRecipe
-    ? calculateSuccessRate(selectedRecipe, $gameState.alchemyLevel)
+    ? calculateSuccessRate(selectedRecipe, $gameState.alchemyLevel, $gameState.stamina)
     : 0;
 
   // 予想品質
@@ -244,6 +252,11 @@
           {craftQuantity}
           daysRequired={selectedRecipe.daysRequired * craftQuantity}
           recipe={selectedRecipe}
+          {staminaCost}
+          {totalStaminaCost}
+          currentStamina={$gameState.stamina}
+          {fatiguePenalty}
+          {fatigueLabel}
           onCraft={executeCraft}
         />
       {/if}

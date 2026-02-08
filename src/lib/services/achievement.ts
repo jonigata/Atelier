@@ -242,9 +242,14 @@ export function claimReward(achievementId: string): void {
   }
 
   if (reward.items) {
+    const state = get(gameState);
     for (const item of reward.items) {
       for (let i = 0; i < item.quantity; i++) {
-        addItem({ itemId: item.itemId, quality: item.quality });
+        addItem({
+          itemId: item.itemId,
+          quality: item.quality,
+          origin: { type: 'reward', day: state.day },
+        });
       }
     }
   }

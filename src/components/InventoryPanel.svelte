@@ -1,6 +1,8 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
+  import { getArea } from '$lib/data/areas';
+  import { formatOrigin } from '$lib/data/flavorTexts';
   import type { OwnedItem } from '$lib/models/types';
   import { CATEGORY_NAMES, getCategoryName } from '$lib/data/categories';
   import ItemCard from './common/ItemCard.svelte';
@@ -23,6 +25,7 @@
     minQuality: number;
     maxQuality: number;
     qualities: { quality: number; count: number }[]; // 品質ごとの内訳
+    items: OwnedItem[]; // 個別アイテム（来歴表示用）
   }
 
   // 詳細表示用（同一アイテム・同一品質ごと）
@@ -48,6 +51,7 @@
         existing.count++;
         existing.minQuality = Math.min(existing.minQuality, item.quality);
         existing.maxQuality = Math.max(existing.maxQuality, item.quality);
+        existing.items.push(item);
         // 品質ごとの内訳を更新
         const qualityEntry = existing.qualities.find(q => q.quality === item.quality);
         if (qualityEntry) {
@@ -65,6 +69,7 @@
           minQuality: item.quality,
           maxQuality: item.quality,
           qualities: [{ quality: item.quality, count: 1 }],
+          items: [item],
         });
       }
     }
@@ -242,9 +247,33 @@
             </span>
           </button>
           {#if expandedItems.has(item.itemId)}
-            <div class="item-breakdown">
-              {#each item.qualities as q}
-                <ItemCard itemId={item.itemId} quality={q.quality} />
+            <div class="item-breakdown-list">
+              {#each item.items.sort((a, b) => b.quality - a.quality) as ownedItem}
+                <div class="item-detail-row">
+                  <span class="detail-quality" class:high={ownedItem.quality >= 70} class:low={ownedItem.quality < 30}>
+                    品質 {ownedItem.quality}
+                  </span>
+                  {#if ownedItem.origin}
+                    <span class="detail-origin">
+                      {#if ownedItem.origin.type === 'initial'}
+                        師匠からの餞別
+                      {:else if ownedItem.origin.type === 'expedition' && ownedItem.origin.areaId}
+                        {getArea(ownedItem.origin.areaId)?.name ?? ownedItem.origin.areaId} · {ownedItem.origin.day}日目
+                      {:else if ownedItem.origin.type === 'shop'}
+                        ショップ · {ownedItem.origin.day}日目
+                      {:else if ownedItem.origin.type === 'crafted'}
+                        調合 · {ownedItem.origin.day}日目
+                      {:else if ownedItem.origin.type === 'reward'}
+                        報酬 · {ownedItem.origin.day}日目
+                      {:else}
+                        {ownedItem.origin.day}日目
+                      {/if}
+                    </span>
+                    {#if ownedItem.origin.flavorText}
+                      <span class="detail-flavor">「{ownedItem.origin.flavorText}」</span>
+                    {/if}
+                  {/if}
+                </div>
               {/each}
             </div>
           {/if}
@@ -517,12 +546,51 @@
     margin-left: 0.25rem;
   }
 
-  .item-breakdown {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
+  .item-breakdown-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem 0.75rem;
     background: rgba(0, 0, 0, 0.2);
     border-top: 1px solid #3a3a5a;
+  }
+
+  .item-detail-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 3px;
+  }
+
+  .item-detail-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .detail-quality {
+    font-size: 0.85rem;
+    color: #a0a0b0;
+    min-width: 4rem;
+    flex-shrink: 0;
+  }
+
+  .detail-quality.high {
+    color: #81c784;
+  }
+
+  .detail-quality.low {
+    color: #ff6b6b;
+  }
+
+  .detail-origin {
+    font-size: 0.8rem;
+    color: #808090;
+    flex-shrink: 0;
+  }
+
+  .detail-flavor {
+    font-size: 0.8rem;
+    color: #6a7a6a;
+    font-style: italic;
   }
 </style>

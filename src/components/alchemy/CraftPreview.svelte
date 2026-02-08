@@ -7,6 +7,11 @@
   export let craftQuantity: number;
   export let daysRequired: number;
   export let recipe: RecipeDef;
+  export let staminaCost: number;
+  export let totalStaminaCost: number;
+  export let currentStamina: number;
+  export let fatiguePenalty: number;
+  export let fatigueLabel: string | null;
   export let onCraft: () => void;
 
   $: bonuses = getFacilityBonuses(recipe);
@@ -29,6 +34,21 @@
         <span class="preview-value quality">
           {expectedQuality.min} 〜 {expectedQuality.max}
         </span>
+      </div>
+    {/if}
+  </div>
+
+  <div class="stamina-info">
+    <div class="stamina-row">
+      <span class="stamina-label">体力消費</span>
+      <span class="stamina-value" class:over-budget={totalStaminaCost > currentStamina}>
+        {staminaCost}{#if craftQuantity > 1} × {craftQuantity} = {totalStaminaCost}{/if}
+      </span>
+      <span class="stamina-current">（残り: {currentStamina}）</span>
+    </div>
+    {#if fatigueLabel}
+      <div class="fatigue-warning">
+        {fatigueLabel}: 成功率 -{Math.round(fatiguePenalty * 100)}%
       </div>
     {/if}
   </div>
@@ -135,6 +155,48 @@
     border: 1px solid #4caf50;
     border-radius: 4px;
     color: #81c784;
+    font-size: 0.8rem;
+  }
+
+  .stamina-info {
+    margin: 0.75rem 0;
+    padding: 0.6rem 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+  }
+
+  .stamina-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .stamina-label {
+    color: #a0a0b0;
+  }
+
+  .stamina-value {
+    color: #e0e0f0;
+    font-weight: bold;
+  }
+
+  .stamina-value.over-budget {
+    color: #ff9800;
+  }
+
+  .stamina-current {
+    color: #808090;
+    font-size: 0.85rem;
+  }
+
+  .fatigue-warning {
+    margin-top: 0.4rem;
+    padding: 0.3rem 0.6rem;
+    background: rgba(255, 107, 107, 0.15);
+    border: 1px solid rgba(255, 107, 107, 0.4);
+    border-radius: 4px;
+    color: #ff6b6b;
     font-size: 0.8rem;
   }
 </style>

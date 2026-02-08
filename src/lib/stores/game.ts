@@ -24,14 +24,14 @@ function createInitialState(): GameState {
     maxStamina: 100,
 
     inventory: [
-      { itemId: 'herb_01', quality: 45 },
-      { itemId: 'herb_01', quality: 52 },
-      { itemId: 'herb_01', quality: 38 },
-      { itemId: 'herb_01', quality: 61 },
-      { itemId: 'herb_01', quality: 44 },
-      { itemId: 'water_01', quality: 30 },
-      { itemId: 'water_01', quality: 55 },
-      { itemId: 'water_01', quality: 42 },
+      { itemId: 'herb_01', quality: 45, origin: { type: 'initial', day: 0 } },
+      { itemId: 'herb_01', quality: 52, origin: { type: 'initial', day: 0 } },
+      { itemId: 'herb_01', quality: 38, origin: { type: 'initial', day: 0 } },
+      { itemId: 'herb_01', quality: 61, origin: { type: 'initial', day: 0 } },
+      { itemId: 'herb_01', quality: 44, origin: { type: 'initial', day: 0 } },
+      { itemId: 'water_01', quality: 30, origin: { type: 'initial', day: 0 } },
+      { itemId: 'water_01', quality: 55, origin: { type: 'initial', day: 0 } },
+      { itemId: 'water_01', quality: 42, origin: { type: 'initial', day: 0 } },
     ],
     ownedBooks: ['book_basics'],   // 錬金術入門を所持
     knownRecipes: [],              // まだ勉強していない

@@ -96,6 +96,25 @@ export const STAMINA = {
   REST_RECOVERY: 50,
   /** 初期最大スタミナ */
   INITIAL_MAX: 100,
+
+  /** 調合時の体力消費基礎値 */
+  CRAFT_BASE_COST: 5,
+  /** 調合時の体力消費（難易度1あたり） */
+  CRAFT_DIFFICULTY_COST: 3,
+
+  /** 疲労なし閾値（この値以上なら成功率ペナルティなし） */
+  FATIGUE_THRESHOLD_NONE: 50,
+  /** 軽度疲労閾値 */
+  FATIGUE_THRESHOLD_MILD: 30,
+  /** 中度疲労閾値 */
+  FATIGUE_THRESHOLD_MODERATE: 10,
+
+  /** 軽度疲労時の成功率ペナルティ */
+  FATIGUE_PENALTY_MILD: 0.10,
+  /** 中度疲労時の成功率ペナルティ */
+  FATIGUE_PENALTY_MODERATE: 0.20,
+  /** 重度疲労時の成功率ペナルティ */
+  FATIGUE_PENALTY_SEVERE: 0.35,
 } as const;
 
 // =====================================

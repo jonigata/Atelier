@@ -19,6 +19,7 @@ import { getAvailableQuestTemplates } from '$lib/data/quests';
 import { EXPEDITION, QUEST } from '$lib/data/balance';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import { checkAutoCompleteAchievements } from '$lib/services/tutorial';
+import { expeditionFlavors, pickRandom } from '$lib/data/flavorTexts';
 import type { OwnedItem, MorningEvent } from '$lib/models/types';
 
 /**
@@ -143,7 +144,18 @@ function calculateExpeditionDrops(areaId: string, duration: number): OwnedItem[]
       if (roll <= 0) {
         const [minQ, maxQ] = drop.qualityRange;
         const quality = Math.floor(Math.random() * (maxQ - minQ + 1)) + minQ;
-        items.push({ itemId: drop.itemId, quality });
+        const areaFlavors = expeditionFlavors[areaId] ?? [];
+        const state = get(gameState);
+        items.push({
+          itemId: drop.itemId,
+          quality,
+          origin: {
+            type: 'expedition',
+            day: state.day,
+            areaId,
+            flavorText: areaFlavors.length > 0 ? pickRandom(areaFlavors) : undefined,
+          },
+        });
         break;
       }
     }

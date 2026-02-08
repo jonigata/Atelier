@@ -4,6 +4,7 @@
   import { items, getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { removeItemFromInventory } from '$lib/services/inventory';
   import { SHOP } from '$lib/data/balance';
+  import { shopFlavors, pickRandom } from '$lib/data/flavorTexts';
   import type { OwnedItem, ItemDef } from '$lib/models/types';
 
   export let onBack: () => void;
@@ -48,7 +49,15 @@
     addMoney(-price);
     // 品質はランダム（40-70）
     const quality = Math.floor(Math.random() * 31) + 40;
-    addItem({ itemId: item.id, quality });
+    addItem({
+      itemId: item.id,
+      quality,
+      origin: {
+        type: 'shop',
+        day: $gameState.day,
+        flavorText: pickRandom(shopFlavors),
+      },
+    });
     addMessage(`${item.name}（品質${quality}）を${price}Gで購入しました`);
   }
 

@@ -10,10 +10,19 @@ export interface ItemDef {
   description: string;
 }
 
+// アイテムの来歴
+export interface ItemOrigin {
+  type: 'expedition' | 'shop' | 'crafted' | 'reward' | 'initial';
+  day: number;
+  areaId?: string;       // 採取地（expedition時）
+  flavorText?: string;   // 短い情景描写
+}
+
 // 所持アイテム（品質付き）
 export interface OwnedItem {
   itemId: string;
   quality: number; // 1-100
+  origin?: ItemOrigin;
 }
 
 // レシピの素材要件
