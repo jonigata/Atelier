@@ -4,7 +4,7 @@
   export let max: number;
   export let label: string;
   export let text: string;
-  export let color: 'gold' | 'blue' | 'green' = 'blue';
+  export let color: 'gold' | 'blue' | 'green' | 'orange' = 'blue';
 
   $: beforePct = (before / max) * 100;
   $: afterPct = (after / max) * 100;
@@ -88,4 +88,11 @@
     box-shadow: 0 0 10px rgba(129, 199, 132, 0.6);
   }
   .gauge-green .gauge-label { color: #81c784; }
+
+  /* オレンジ（体力） */
+  .gauge-orange .gauge-fill {
+    background: linear-gradient(90deg, #b07040, #e09050);
+    box-shadow: 0 0 10px rgba(224, 144, 80, 0.6);
+  }
+  .gauge-orange .gauge-label { color: #e09050; }
 </style>

@@ -2,6 +2,7 @@
   import { gameState, addMessage, restoreStamina } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { getFatigueLabel } from '$lib/services/alchemy';
+  import VideoOverlay from './common/VideoOverlay.svelte';
 
   export let onBack: () => void;
 
@@ -9,13 +10,19 @@
   $: staminaPercent = Math.round(($gameState.stamina / $gameState.maxStamina) * 100);
   $: isFullStamina = $gameState.stamina >= $gameState.maxStamina;
 
+  let showVideo = false;
+
   function handleRest() {
+    showVideo = true;
+  }
+
+  function onVideoEnd() {
     restoreStamina(100);
     addMessage('休息しました。体力が全回復しました。');
-    // 先にendTurn → DayTransitionが上から被さる
     endTurn(1);
-    // DayTransitionの暗転(0.3s)後に画面を切り替え
+    // DayTransitionの暗転(0.3s)が完了してからオーバーレイを消す
     setTimeout(() => {
+      showVideo = false;
       onBack();
     }, 350);
   }
@@ -50,6 +57,10 @@
     休息する
   </button>
 </div>
+
+{#if showVideo}
+  <VideoOverlay src="/movies/rest.mp4" text="休息中..." onEnd={onVideoEnd} />
+{/if}
 
 <style>
   .rest-panel {
@@ -163,4 +174,5 @@
     background: rgba(255, 255, 255, 0.1);
     color: #808090;
   }
+
 </style>

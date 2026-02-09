@@ -7,6 +7,7 @@
   import { getCategoryName } from '$lib/data/categories';
   import type { RecipeBookDef } from '$lib/models/types';
   import StudyCompleteDialog from './StudyCompleteDialog.svelte';
+  import VideoOverlay from './common/VideoOverlay.svelte';
 
   export let onBack: () => void;
 
@@ -22,6 +23,7 @@
 
   let selectedBookId: string | null = null;
 
+  let showVideo = false;
   let showStudyDialog = false;
   let studyCompletedBook: RecipeBookDef | null = null;
   let studyLearnedRecipeNames: string[] = [];
@@ -39,6 +41,12 @@
     : [];
 
   function handleStudy() {
+    if (!selectedBookId || !selectedBook) return;
+    showVideo = true;
+  }
+
+  function onVideoEnd() {
+    showVideo = false;
     if (!selectedBookId || !selectedBook) return;
 
     const learned = learnRecipesFromBook(selectedBook.recipeIds);
@@ -132,6 +140,10 @@
     {selectedBookId && selectedBook ? `「${selectedBook.name}」を読む` : '本を選んでください'}
   </button>
 </div>
+
+{#if showVideo}
+  <VideoOverlay src="/movies/study.mp4" text="勉強中..." onEnd={onVideoEnd} />
+{/if}
 
 {#if showStudyDialog && studyCompletedBook}
   <StudyCompleteDialog

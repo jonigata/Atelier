@@ -6,6 +6,7 @@
   export let result: CraftMultipleResult;
   export let recipeName: string;
   export let expGaugeData: { before: number; after: number; max: number; label: string } | null = null;
+  export let staminaGaugeData: { before: number; after: number; max: number; label: string } | null = null;
   export let onClose: () => void;
 
   $: allSuccess = result.failCount === 0 && result.successCount > 0;
@@ -227,6 +228,16 @@
             <span class="exp-label">獲得経験値</span>
             <span class="exp-value">+{result.totalExpGained} Exp</span>
           </div>
+        {/if}
+        {#if staminaGaugeData}
+          <AnimatedGauge
+            before={staminaGaugeData.before}
+            after={staminaGaugeData.after}
+            max={staminaGaugeData.max}
+            label={staminaGaugeData.label}
+            text="-{staminaGaugeData.before - staminaGaugeData.after}"
+            color="orange"
+          />
         {/if}
       </div>
 

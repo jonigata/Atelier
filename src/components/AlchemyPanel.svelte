@@ -27,6 +27,7 @@
   let selectedItems: OwnedItem[] = [];
   let craftResultData: CraftMultipleResult | null = null;
   let expGaugeData: { before: number; after: number; max: number; label: string } | null = null;
+  let staminaGaugeData: { before: number; after: number; max: number; label: string } | null = null;
   let levelUpData: LevelUpInfo | null = null;
 
   // 習得済みかつレベル条件を満たすレシピ
@@ -150,6 +151,7 @@
     const expBefore = stateBefore.alchemyExp;
     const levelBefore = stateBefore.alchemyLevel;
     const expMax = calcExpForLevel(levelBefore);
+    const staminaBefore = stateBefore.stamina;
 
     const result = craftBatch(selectedRecipe.id, selectedItems, craftQuantity);
     craftResultData = result;
@@ -162,6 +164,14 @@
       after: leveledUp ? expMax : stateAfter.alchemyExp,
       max: expMax,
       label: `Lv.${levelBefore}`,
+    };
+
+    // 体力ゲージデータを構築
+    staminaGaugeData = {
+      before: staminaBefore,
+      after: stateAfter.stamina,
+      max: stateBefore.maxStamina,
+      label: '体力',
     };
   }
 
@@ -269,6 +279,7 @@
     result={craftResultData}
     recipeName={selectedRecipe.name}
     {expGaugeData}
+    {staminaGaugeData}
     onClose={closeCraftResult}
   />
 {/if}
