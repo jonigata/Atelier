@@ -46,8 +46,8 @@
       <p class="fatigue-note">疲労状態では調合の成功率が低下します。</p>
     {/if}
   </div>
-  <button class="action-btn" on:click={handleRest} disabled={isFullStamina}>
-    {isFullStamina ? '体力は満タンです' : '休息する'}
+  <button class="action-btn" on:click={handleRest}>
+    休息する
   </button>
 </div>
 

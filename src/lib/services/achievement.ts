@@ -198,6 +198,7 @@ export function getCurrentGoal(): AchievementDef | null {
 /**
  * アチーブメントが「発動済み」かどうか判定
  * 発動済み = 未達成かつ前提条件を満たしている
+ * ただし、前提の報酬がまだ受け取られていない場合は発動しない
  */
 function isAchievementActive(achievement: AchievementDef, state: GameState): boolean {
   // 既に達成済みならfalse
@@ -207,10 +208,15 @@ function isAchievementActive(achievement: AchievementDef, state: GameState): boo
 
   // 前提が満たされていない場合はfalse
   if (achievement.prerequisite) {
-    const prereqsMet = achievement.prerequisite.every((prereqId) =>
-      state.achievementProgress.completed.includes(prereqId)
-    );
-    if (!prereqsMet) return false;
+    for (const prereqId of achievement.prerequisite) {
+      if (!state.achievementProgress.completed.includes(prereqId)) {
+        return false;
+      }
+      // 前提の報酬がまだ受け取られていない（ダイアログ表示中）なら非表示
+      if (state.achievementProgress.pendingReward === prereqId) {
+        return false;
+      }
+    }
   }
 
   return true;

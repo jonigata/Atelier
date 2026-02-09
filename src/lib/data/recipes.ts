@@ -1559,6 +1559,21 @@ export const recipes: Record<string, RecipeDef> = {
     expReward: 200,
     requiredFacilities: ['furnace', 'magic_circle', 'advanced_workbench'],
   },
+
+  // ストーリー用レシピ
+  fonte_prototype_01: {
+    id: 'fonte_prototype_01',
+    name: 'フォンテの試作薬',
+    resultItemId: 'fonte_prototype',
+    ingredients: [
+      { itemId: 'herb_03', quantity: 2 },
+      { category: 'water', quantity: 1 },
+    ],
+    requiredLevel: 8,
+    daysRequired: 1,
+    difficulty: 6,
+    expReward: 80,
+  },
 };
 
 export function getRecipe(id: string): RecipeDef | undefined {

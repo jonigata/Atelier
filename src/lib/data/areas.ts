@@ -38,6 +38,19 @@ export const areas: Record<string, AreaDef> = {
     ],
     rareChance: 0.1,
   },
+  dried_spring_hill: {
+    id: 'dried_spring_hill',
+    name: '枯泉の丘',
+    costPerDay: 80,
+    drops: [
+      { itemId: 'herb_03', weight: 60, qualityRange: [40, 80] },
+      { itemId: 'herb_01', weight: 40, qualityRange: [40, 70] },
+    ],
+    rareDrops: [
+      { itemId: 'herb_03', weight: 100, qualityRange: [60, 95] },
+    ],
+    rareChance: 0.12,
+  },
 };
 
 export function getArea(id: string): AreaDef | undefined {

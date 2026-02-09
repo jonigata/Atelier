@@ -83,7 +83,7 @@
         </label>
         <label>
           日数:
-          <input type="number" bind:value={maxDays} min="1" max="365" />
+          <input type="number" bind:value={maxDays} min="1" max="360" />
         </label>
       </div>
       <div class="buttons">

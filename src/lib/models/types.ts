@@ -235,7 +235,10 @@ export type AchievementNarrative =
   | 'character_trial'     // キャラクターからの試練
   | 'client_gratitude'    // 依頼主からの特別謝礼
   | 'village_festival'    // 村の祭りでの表彰
-  | 'self_investment';    // 自分への投資が実る
+  | 'self_investment'     // 自分への投資が実る
+  | 'village_girl'        // 村娘リーネのイベント
+  | 'merchant_visit'      // 旅商人マルコの訪問
+  | 'rival_pressure';     // ライバル ヴィクトの圧力
 
 // アチーブメントカテゴリ
 export type AchievementCategory =

@@ -34,7 +34,7 @@ export function endTurn(daysSpent: number): void {
   const state = get(gameState);
 
   // ゲーム終了チェック
-  if (state.day > 365) {
+  if (state.day > 360) {
     setPhase('ending');
     addMessage('1年が経過しました。最終評価を行います...');
     return;
@@ -250,7 +250,7 @@ export function initializeGame(): void {
 
   // 直接actionフェーズで開始（朝フェーズはスキップ）
   setPhase('action');
-  addMessage('ハイデル村での1年間が始まります。');
+  addMessage('フォンテ村での1年間が始まります。');
 
   // 発動済み目標の追跡を初期化
   initializeActiveGoalTracking();

@@ -20,7 +20,7 @@ function createInitialState(): GameState {
     villageDevelopment: 0,
     alchemyLevel: 1,
     alchemyExp: 0,
-    stamina: 100,
+    stamina: 0,
     maxStamina: 100,
 
     inventory: [
@@ -85,9 +85,9 @@ export const gameState = writable<GameState>(createInitialState());
 // 派生ストア
 // =====================================
 
-export const daysRemaining = derived(gameState, ($state) => 365 - $state.day);
+export const daysRemaining = derived(gameState, ($state) => 360 - $state.day);
 
-export const isGameOver = derived(gameState, ($state) => $state.day > 365);
+export const isGameOver = derived(gameState, ($state) => $state.day > 360);
 
 export const expForNextLevel = derived(gameState, ($state) => {
   return calcExpForLevel($state.alchemyLevel);

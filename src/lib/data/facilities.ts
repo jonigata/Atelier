@@ -48,6 +48,16 @@ export const facilities: Record<string, FacilityDef> = {
     ],
   },
 
+  reinforced_cauldron: {
+    id: 'reinforced_cauldron',
+    name: '強化大釜',
+    description: '鍛冶屋のゴルドが修理・強化した大釜。調合品質が上がる',
+    type: 'permanent',
+    effects: [
+      { type: 'quality', value: 5, scope: 'all' },
+    ],
+  },
+
   // =====================================
   // 所持設備（インベントリにある間だけ有効）
   // =====================================

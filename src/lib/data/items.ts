@@ -16,6 +16,13 @@ export const items: Record<string, ItemDef> = {
     basePrice: 20,
     description: '解毒作用のある草',
   },
+  herb_03: {
+    id: 'herb_03',
+    name: 'フォンテの恵み草',
+    category: 'herb',
+    basePrice: 80,
+    description: 'フォンテの泉跡地にのみ自生する希少な薬草。不思議な成分を含む',
+  },
 
   // 素材: 鉱石系
   ore_01: {
@@ -1105,6 +1112,15 @@ export const items: Record<string, ItemDef> = {
     category: 'product',
     basePrice: 15000,
     description: '農業を自動化する高性能ゴーレム',
+  },
+
+  // ストーリー用特殊アイテム
+  fonte_prototype: {
+    id: 'fonte_prototype',
+    name: 'フォンテの試作薬',
+    category: 'product',
+    basePrice: 300,
+    description: 'フォンテの恵み草を使った試作品。まだ完成には遠い',
   },
 };
 
