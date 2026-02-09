@@ -12,6 +12,7 @@ import {
   getAchievementDialogue,
   claimReward,
   checkNewActiveGoals,
+  isStoryAchievement,
 } from './achievement';
 import { getAchievementById } from '$lib/data/achievements';
 import type { EventDialogue } from '$lib/models/types';
@@ -117,9 +118,9 @@ export async function processAchievementPresentation(achievementId: string): Pro
   // 4. アンロックアニメーション＆トースト
   await showUnlockToasts();
 
-  // 5. 目標達成トースト
+  // 5. 目標達成トースト（ストーリー/チュートリアル系はスキップ）
   const achievement = getAchievementById(achievementId);
-  if (achievement) {
+  if (achievement && !isStoryAchievement(achievement)) {
     await sleep(300);
     showGoalCompleteToast(achievement.title);
   }

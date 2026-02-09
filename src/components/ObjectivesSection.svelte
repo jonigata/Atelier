@@ -5,9 +5,72 @@
   import { recipes } from '$lib/data/recipes';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
   import AchievementCategoryIcon from './common/AchievementCategoryIcon.svelte';
-  import type { AchievementDef, ActiveQuest } from '$lib/models/types';
+  import type { AchievementDef, AchievementCondition, ActiveQuest } from '$lib/models/types';
 
   export let onQuestClick: (quest: ActiveQuest) => void;
+
+  let expandedGoalId: string | null = null;
+
+  function toggleDetail(goalId: string) {
+    expandedGoalId = expandedGoalId === goalId ? null : goalId;
+  }
+
+  const conditionLabels: Record<string, string> = {
+    level: '錬金レベル',
+    reputation: '名声',
+    money: '所持金',
+    quest_count: '依頼完了数',
+    active_quest_count: '受注中の依頼',
+    craft_count: '調合回数',
+    craft_item: 'アイテム調合',
+    craft_quality: '最高品質',
+    expedition_count: '採取回数',
+    recipe_count: 'レシピ数',
+    consecutive_quests: '連続成功',
+    total_sales: '累計売上',
+    day: '経過日数',
+    village_development: '村発展度',
+  };
+
+  function getConditionCurrentValue(cond: AchievementCondition): number {
+    switch (cond.type) {
+      case 'level': return $gameState.alchemyLevel;
+      case 'reputation': return $gameState.reputation;
+      case 'money': return $gameState.money;
+      case 'quest_count': return $gameState.completedQuestCount;
+      case 'craft_count': return $gameState.stats.totalCraftCount;
+      case 'craft_quality': return $gameState.stats.highestQualityCrafted;
+      case 'expedition_count': return $gameState.stats.totalExpeditionCount;
+      case 'recipe_count': return $gameState.knownRecipes.length;
+      case 'consecutive_quests': return $gameState.stats.consecutiveQuestSuccess;
+      case 'total_sales': return $gameState.stats.totalSalesAmount;
+      case 'day': return $gameState.day;
+      case 'village_development': return $gameState.villageDevelopment;
+      default: return 0;
+    }
+  }
+
+  function getConditionDetails(achievement: AchievementDef): { label: string; current: number; target: number; met: boolean }[] {
+    return achievement.conditions.map(cond => {
+      const target = cond.target as number;
+      const current = getConditionCurrentValue(cond);
+      const comparison = cond.comparison ?? '>=';
+      let met = false;
+      switch (comparison) {
+        case '>=': met = current >= target; break;
+        case '>': met = current > target; break;
+        case '==': met = current === target; break;
+        case '<=': met = current <= target; break;
+        case '<': met = current < target; break;
+      }
+      return {
+        label: conditionLabels[cond.type] || cond.type,
+        current,
+        target,
+        met,
+      };
+    });
+  }
 
   function getRewardSummary(achievement: AchievementDef): string[] {
     const { reward } = achievement;
@@ -133,7 +196,17 @@
           {#each activeGoals as goal}
             {@const progressDetail = getProgressDetail(goal)}
             {@const progressPercent = getAchievementProgress(goal.id)}
-            <div class="objective-item achievement" class:important={goal.important}>
+            {@const isExpanded = expandedGoalId === goal.id}
+            {@const condDetails = isExpanded ? getConditionDetails(goal) : []}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <div
+              class="objective-item achievement"
+              class:important={goal.important}
+              class:expanded={isExpanded}
+              on:click={() => toggleDetail(goal.id)}
+              role="button"
+              tabindex="0"
+            >
               <div class="objective-main">
                 <div class="objective-icon">
                   <AchievementCategoryIcon category={goal.category} size="medium" />
@@ -148,16 +221,37 @@
                   <div class="objective-hint">{goal.hint}</div>
                 </div>
               </div>
-              <div class="objective-rewards">
-                <span class="reward-label">報酬:</span>
-                {#each getRewardSummary(goal) as reward}
-                  <span class="reward-item">{reward}</span>
-                {/each}
-              </div>
-              {#if progressPercent > 0 && progressDetail}
-                <div class="progress-bar">
-                  <div class="progress-fill" style="width: {progressPercent}%"></div>
+              {#if isExpanded}
+                <div class="objective-detail">
+                  <div class="detail-description">{goal.description}</div>
+                  <div class="detail-conditions">
+                    {#each condDetails as cond}
+                      <div class="condition-row" class:met={cond.met}>
+                        <span class="condition-check">{cond.met ? '✓' : '○'}</span>
+                        <span class="condition-label">{cond.label}</span>
+                        <span class="condition-value">{cond.current} / {cond.target}</span>
+                      </div>
+                    {/each}
+                  </div>
+                  <div class="objective-rewards">
+                    <span class="reward-label">報酬:</span>
+                    {#each getRewardSummary(goal) as reward}
+                      <span class="reward-item">{reward}</span>
+                    {/each}
+                  </div>
                 </div>
+              {:else}
+                <div class="objective-rewards">
+                  <span class="reward-label">報酬:</span>
+                  {#each getRewardSummary(goal) as reward}
+                    <span class="reward-item">{reward}</span>
+                  {/each}
+                </div>
+                {#if progressPercent > 0 && progressDetail}
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: {progressPercent}%"></div>
+                  </div>
+                {/if}
               {/if}
             </div>
           {/each}
@@ -303,5 +397,66 @@
 
   .reward-item {
     color: #c9a959;
+  }
+
+  .objective-item.achievement {
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .objective-item.achievement:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .objective-item.expanded {
+    grid-column: 1 / -1;
+  }
+
+  .objective-detail {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .detail-description {
+    color: #c0c0d0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .detail-conditions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .condition-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #a0a0b0;
+  }
+
+  .condition-row.met {
+    color: #80c080;
+  }
+
+  .condition-check {
+    width: 1.2em;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .condition-label {
+    flex: 0 0 auto;
+  }
+
+  .condition-value {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
   }
 </style>

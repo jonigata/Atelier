@@ -29,6 +29,14 @@ import type {
   RewardDisplay,
 } from '$lib/models/types';
 
+/**
+ * ストーリー/チュートリアル系アチーブメントかどうかを判定
+ * これらは「達成」バッジや「目標達成」トーストを表示しない
+ */
+export function isStoryAchievement(achievement: AchievementDef): boolean {
+  return achievement.id.startsWith('ach_story_') || achievement.category === 'tutorial';
+}
+
 // 前回の発動済み目標IDを追跡
 let previousActiveGoalIds: Set<string> = new Set();
 
@@ -310,16 +318,20 @@ export function getAchievementDialogue(achievementId: string): EventDialogue | n
   const rewards = getDetailedRewards(achievement);
   const structuredRewards = getStructuredRewards(achievement);
 
+  // ストーリー/チュートリアル系は「達成」バッジを表示しない
+  const isStory = isStoryAchievement(achievement);
+
   // システムメッセージ系（キャラクターなし）
   if (!character) {
     return {
       characterName: '',
       characterTitle: '',
       lines: achievement.narrativeLines,
-      achievementTitle: achievement.title,
-      achievementCategory: achievement.category,
+      achievementTitle: isStory ? undefined : achievement.title,
+      achievementCategory: isStory ? undefined : achievement.category,
       rewards,
       structuredRewards,
+      rewardsTitle: isStory ? '報酬' : undefined,
     };
   }
 
@@ -327,10 +339,11 @@ export function getAchievementDialogue(achievementId: string): EventDialogue | n
     characterName: character.name,
     characterTitle: character.title,
     lines: achievement.narrativeLines,
-    achievementTitle: achievement.title,
-    achievementCategory: achievement.category,
+    achievementTitle: isStory ? undefined : achievement.title,
+    achievementCategory: isStory ? undefined : achievement.category,
     rewards,
     structuredRewards,
+    rewardsTitle: isStory ? '報酬' : undefined,
   };
 }
 
