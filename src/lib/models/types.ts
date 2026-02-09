@@ -259,6 +259,7 @@ export interface AchievementReward {
   recipes?: string[];
   unlocks?: ActionType[];  // アクションアンロック
   facilities?: string[];   // 設備アンロック
+  originLabel?: string;    // 報酬アイテムの入手元ラベル（省略時はアチーブメントtitle）
 }
 
 // アチーブメント条件の種類
@@ -276,7 +277,8 @@ export type AchievementConditionType =
   | 'consecutive_quests'
   | 'total_sales'
   | 'day'                   // 日付条件（ゲーム開始時など）
-  | 'village_development';  // 村発展度
+  | 'village_development'   // 村発展度
+  | 'inventory_opened';     // 所持品を開いた
 
 // アチーブメント条件
 export interface AchievementCondition {
@@ -326,4 +328,5 @@ export interface GameStats {
   consecutiveQuestSuccess: number;
   highestQualityCrafted: number;
   totalSalesAmount: number;
+  inventoryOpened: boolean;
 }

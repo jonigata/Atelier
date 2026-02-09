@@ -258,18 +258,18 @@
                       {#if ownedItem.origin.type === 'initial'}
                         師匠からの餞別
                       {:else if ownedItem.origin.type === 'expedition' && ownedItem.origin.areaId}
-                        {getArea(ownedItem.origin.areaId)?.name ?? ownedItem.origin.areaId} · {ownedItem.origin.day}日目
+                        {getArea(ownedItem.origin.areaId)?.name ?? ownedItem.origin.areaId}
                       {:else if ownedItem.origin.type === 'shop'}
-                        ショップ · {ownedItem.origin.day}日目
+                        ショップ
                       {:else if ownedItem.origin.type === 'crafted'}
-                        調合 · {ownedItem.origin.day}日目
+                        調合
+                      {:else if ownedItem.origin.type === 'reward' && ownedItem.origin.flavorText}
+                        {ownedItem.origin.flavorText}
                       {:else if ownedItem.origin.type === 'reward'}
-                        報酬 · {ownedItem.origin.day}日目
-                      {:else}
-                        {ownedItem.origin.day}日目
+                        報酬
                       {/if}
                     </span>
-                    {#if ownedItem.origin.flavorText}
+                    {#if ownedItem.origin.flavorText && ownedItem.origin.type !== 'reward'}
                       <span class="detail-flavor">「{ownedItem.origin.flavorText}」</span>
                     {/if}
                   {/if}

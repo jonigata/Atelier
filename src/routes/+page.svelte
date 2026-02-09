@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { gameState } from '$lib/stores/game';
+  import { gameState, markInventoryOpened } from '$lib/stores/game';
   import { initializeGame } from '$lib/services/gameLoop';
   import { checkMilestoneProgress } from '$lib/services/tutorial';
   import HUD from '../components/HUD.svelte';
@@ -35,6 +35,10 @@
 
   function handleActionSelect(action: ActionType) {
     selectedAction = action;
+    if (action === 'inventory') {
+      markInventoryOpened();
+      checkMilestoneProgress();
+    }
   }
 
   function handleBackToMenu() {

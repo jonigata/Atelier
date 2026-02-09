@@ -90,6 +90,8 @@ function evaluateCondition(condition: AchievementCondition, state: GameState): b
     case 'village_development':
       currentValue = state.villageDevelopment;
       break;
+    case 'inventory_opened':
+      return state.stats.inventoryOpened;
     default:
       return false;
   }
@@ -262,7 +264,7 @@ export function claimReward(achievementId: string): void {
         addItem({
           itemId: item.itemId,
           quality: item.quality,
-          origin: { type: 'reward', day: state.day },
+          origin: { type: 'reward', day: state.day, flavorText: reward.originLabel ?? achievement.title },
         });
       }
     }
@@ -602,6 +604,8 @@ export function getAchievementProgress(achievementId: string): number {
       case 'village_development':
         current = state.villageDevelopment;
         break;
+      case 'inventory_opened':
+        return state.stats.inventoryOpened ? 100 : 0;
       default:
         return 0;
     }

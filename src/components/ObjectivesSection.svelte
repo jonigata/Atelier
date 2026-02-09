@@ -30,6 +30,7 @@
     total_sales: '累計売上',
     day: '経過日数',
     village_development: '村発展度',
+    inventory_opened: '所持品を確認',
   };
 
   function getConditionCurrentValue(cond: AchievementCondition): number {
@@ -46,6 +47,7 @@
       case 'total_sales': return $gameState.stats.totalSalesAmount;
       case 'day': return $gameState.day;
       case 'village_development': return $gameState.villageDevelopment;
+      case 'inventory_opened': return $gameState.stats.inventoryOpened ? 1 : 0;
       default: return 0;
     }
   }

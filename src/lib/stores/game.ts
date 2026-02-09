@@ -23,16 +23,7 @@ function createInitialState(): GameState {
     stamina: 0,
     maxStamina: 100,
 
-    inventory: [
-      { itemId: 'herb_01', quality: 45, origin: { type: 'initial', day: 0 } },
-      { itemId: 'herb_01', quality: 52, origin: { type: 'initial', day: 0 } },
-      { itemId: 'herb_01', quality: 38, origin: { type: 'initial', day: 0 } },
-      { itemId: 'herb_01', quality: 61, origin: { type: 'initial', day: 0 } },
-      { itemId: 'herb_01', quality: 44, origin: { type: 'initial', day: 0 } },
-      { itemId: 'water_01', quality: 30, origin: { type: 'initial', day: 0 } },
-      { itemId: 'water_01', quality: 55, origin: { type: 'initial', day: 0 } },
-      { itemId: 'water_01', quality: 42, origin: { type: 'initial', day: 0 } },
-    ],
+    inventory: [],
     ownedBooks: ['book_basics'],   // 錬金術入門を所持
     knownRecipes: [],              // まだ勉強していない
 
@@ -71,6 +62,7 @@ function createInitialState(): GameState {
       consecutiveQuestSuccess: 0,
       highestQualityCrafted: 0,
       totalSalesAmount: 0,
+      inventoryOpened: false,
     },
   };
 }
@@ -163,6 +155,13 @@ export function addReputation(amount: number): void {
   gameState.update((state) => ({
     ...state,
     reputation: Math.max(0, Math.min(100, state.reputation + amount)),
+  }));
+}
+
+export function markInventoryOpened(): void {
+  gameState.update((state) => ({
+    ...state,
+    stats: { ...state.stats, inventoryOpened: true },
   }));
 }
 
