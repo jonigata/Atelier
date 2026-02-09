@@ -34,25 +34,28 @@
 
   import { onMount } from 'svelte';
 
+  function onVideoEnded() {
+    phase = 'reveal';
+    setTimeout(() => {
+      phase = 'done';
+      mounted = true;
+    }, 600);
+  }
+
+  function skipVideo() {
+    if (phase !== 'brewing') return;
+    onVideoEnded();
+  }
+
   onMount(() => {
     // マウント後に少し遅延してからクリック受付開始
     const mountGuard = setTimeout(() => {
-      mounted = true;
-    }, 50);
-
-    // 醸造エフェクト → 結果表示
-    const timer1 = setTimeout(() => {
-      phase = 'reveal';
-    }, 800);
-
-    const timer2 = setTimeout(() => {
-      phase = 'done';
-    }, 1400);
+      // brewingフェーズ中はスキップ可能にするためmountedを立てる
+      if (phase === 'brewing') mounted = true;
+    }, 500);
 
     return () => {
       clearTimeout(mountGuard);
-      clearTimeout(timer1);
-      clearTimeout(timer2);
     };
   });
 
@@ -61,22 +64,29 @@
   }
 
   function handleKeydown(event: KeyboardEvent) {
-    if (!canClose()) return;
     if (event.key === 'Enter' || event.key === ' ' || event.key === 'Escape') {
       event.preventDefault();
-      onClose();
+      if (phase === 'brewing' && mounted) {
+        skipVideo();
+      } else if (canClose()) {
+        onClose();
+      }
     }
   }
 
   function handleOverlayClick(event: MouseEvent) {
-    if (!canClose()) return;
-    onClose();
+    if (phase === 'brewing' && mounted) {
+      skipVideo();
+    } else if (canClose()) {
+      onClose();
+    }
   }
 
   function handleBoxClick(event: MouseEvent) {
     event.stopPropagation();
-    if (!canClose()) return;
-    onClose();
+    if (canClose()) {
+      onClose();
+    }
   }
 </script>
 
@@ -84,16 +94,17 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div class="dialog-overlay" class:clickable={phase === 'done' && mounted} on:click={handleOverlayClick} role="button" tabindex="-1">
-  <!-- 醸造中エフェクト -->
+  <!-- 醸造中: 動画 -->
   {#if phase === 'brewing'}
     <div class="brewing-effect">
-      <div class="cauldron-glow" class:fail-glow={allFail}></div>
-      <div class="bubble b1"></div>
-      <div class="bubble b2"></div>
-      <div class="bubble b3"></div>
-      <div class="bubble b4"></div>
-      <div class="bubble b5"></div>
+      <!-- svelte-ignore a11y_media_has_caption -->
+      <video class="craft-video" autoplay muted on:ended={onVideoEnded}>
+        <source src="/movies/craft.mp4" type="video/mp4" />
+      </video>
       <p class="brewing-text">調合中...</p>
+      {#if mounted}
+        <p class="skip-hint">クリック または Enter でスキップ</p>
+      {/if}
     </div>
   {/if}
 
@@ -269,56 +280,30 @@
 
 
 
-  /* === 醸造中エフェクト === */
+  /* === 醸造中: 動画 === */
   .brewing-effect {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: relative;
+    gap: 1rem;
   }
 
-  .cauldron-glow {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(201, 169, 89, 0.6) 0%, rgba(201, 169, 89, 0) 70%);
-    animation: pulse 0.6s ease-in-out infinite alternate;
+  .craft-video {
+    max-width: 480px;
+    width: 90vw;
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(201, 169, 89, 0.2);
   }
 
-  .cauldron-glow.fail-glow {
-    background: radial-gradient(circle, rgba(180, 80, 80, 0.6) 0%, rgba(180, 80, 80, 0) 70%);
-  }
-
-  @keyframes pulse {
-    from { transform: scale(0.8); opacity: 0.5; }
-    to { transform: scale(1.2); opacity: 1; }
-  }
-
-  .bubble {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(201, 169, 89, 0.5);
-    animation: bubbleUp 0.8s ease-out infinite;
-  }
-
-  .b1 { left: 45%; animation-delay: 0s; }
-  .b2 { left: 55%; animation-delay: 0.15s; }
-  .b3 { left: 40%; animation-delay: 0.3s; width: 8px; height: 8px; }
-  .b4 { left: 60%; animation-delay: 0.45s; width: 10px; height: 10px; }
-  .b5 { left: 50%; animation-delay: 0.6s; width: 6px; height: 6px; }
-
-  @keyframes bubbleUp {
-    0% { transform: translateY(0); opacity: 0.8; }
-    100% { transform: translateY(-80px); opacity: 0; }
+  .skip-hint {
+    font-size: 0.85rem;
+    color: #6a6a8a;
   }
 
   .brewing-text {
     color: #c9a959;
     font-size: 1.2rem;
-    margin-top: 1rem;
     animation: textPulse 0.6s ease-in-out infinite alternate;
   }
 
