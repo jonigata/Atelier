@@ -12,6 +12,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     category: 'tutorial',
     narrative: 'village_growth',
     narrativeCharacter: { name: '村長', title: 'フォンテ村長' },
+    eventImage: 'arrival_village',
     narrativeLines: [
       'おお、ついに来てくれたか！ 君がイリーナ先生の弟子だな',
       '私はこの村の村長をやっている。もう何年も組合に頼み続けてな……',
