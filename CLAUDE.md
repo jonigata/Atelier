@@ -43,6 +43,18 @@ falで画像生成するときは
 背景透過でないものはflux.2.kleinで。
 同じ種別のもの（例えば素材アイコン）を作るときに同じスタイルプロンプトを使うため、image-prompts.mdを参照・更新して下さい。
 
+## イベント画像
+
+キャラクタ画像は`documents/characters/`にあるので、それを利用して
+seedream v4.5 **edit**モデル(`fal-ai/bytedance/seedream/v4.5/edit`)で作成してください。
+画像は`static/images/events/`へ。
+
+手順:
+1. キャラ画像を`upload.sh`でfal CDNにアップロード
+2. `--extra '{"image_urls": [...]}'`で参照渡しし、プロンプト内で`Figure 1`, `Figure 2`で参照
+3. 生成画像をダウンロードして`static/images/events/`に保存
+
+詳細な手順・プロンプト規約・生成済み一覧は [`documents/image-prompts.md`](documents/image-prompts.md) の「イベント画像」セクションを参照。
 
 ## Project Overview
 

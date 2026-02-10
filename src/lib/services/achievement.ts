@@ -323,6 +323,11 @@ export function getAchievementDialogue(achievementId: string): EventDialogue | n
   // ストーリー/チュートリアル系は「達成」バッジを表示しない
   const isStory = isStoryAchievement(achievement);
 
+  // イベントCG画像パス
+  const eventImage = achievement.eventImage
+    ? `/images/events/${achievement.eventImage}.png`
+    : undefined;
+
   // システムメッセージ系（キャラクターなし）
   if (!character) {
     return {
@@ -334,6 +339,7 @@ export function getAchievementDialogue(achievementId: string): EventDialogue | n
       rewards,
       structuredRewards,
       rewardsTitle: isStory ? '報酬' : undefined,
+      eventImage,
     };
   }
 
@@ -346,6 +352,7 @@ export function getAchievementDialogue(achievementId: string): EventDialogue | n
     rewards,
     structuredRewards,
     rewardsTitle: isStory ? '報酬' : undefined,
+    eventImage,
   };
 }
 

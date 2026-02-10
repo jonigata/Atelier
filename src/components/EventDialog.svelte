@@ -135,7 +135,12 @@
       </div>
     {:else}
       <!-- 通常のダイアログ -->
-      <div class="dialogue-box">
+      <div class="dialogue-box" class:has-event-image={!!dialogue.eventImage}>
+        {#if dialogue.eventImage}
+          <div class="event-image-container">
+            <img class="event-image" src={dialogue.eventImage} alt="イベント" />
+          </div>
+        {/if}
         {#if dialogue.achievementTitle}
           <div class="achievement-header">
             {#if dialogue.achievementCategory}
@@ -207,6 +212,22 @@
     max-width: 700px;
     width: 90%;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  .dialogue-box.has-event-image {
+    padding-top: 0;
+    overflow: hidden;
+  }
+
+  .event-image-container {
+    margin: 0 -2rem;
+    margin-bottom: 1rem;
+  }
+
+  .event-image {
+    width: 100%;
+    display: block;
+    border-bottom: 2px solid #8b7355;
   }
 
   .achievement-header {

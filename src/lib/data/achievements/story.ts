@@ -37,6 +37,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     prerequisite: ['ach_game_start'],
     priority: 605,
     important: true,
+    eventImage: 'first_meeting_liene',
   },
 
   ach_story_merchant_first: {

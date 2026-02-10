@@ -155,6 +155,7 @@ export interface EventDialogue {
   characterName: string;
   characterTitle: string;
   lines: string[];
+  eventImage?: string;  // イベントCG画像パス
   achievementTitle?: string;  // アチーブメント達成時のタイトル
   achievementCategory?: AchievementCategory;  // アチーブメントカテゴリ（アイコン表示用）
   rewardsTitle?: string;      // 報酬画面のメインタイトル（デフォルト: "報酬獲得！"）
@@ -303,6 +304,7 @@ export interface AchievementDef {
   priority: number;
   autoComplete?: boolean;  // ゲーム開始時に自動達成
   important?: boolean;  // HUDに目標として表示するか
+  eventImage?: string;  // イベントCG画像ID（static/images/events/{id}.png）
 }
 
 // アチーブメント進行状態

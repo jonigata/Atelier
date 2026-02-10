@@ -1,6 +1,6 @@
 # Image Prompts
 
-素材アイコン生成時のスタイルプロンプト記録。同じ種別のアイテムには同じスタイルを使用すること。
+画像生成時のスタイルプロンプト記録。同じ種別のものには同じスタイル・手順を使用すること。
 
 ## 錬金素材アイコン (Material Icons)
 
@@ -52,3 +52,44 @@ bash /home/hirayama/.claude/skills/fal-generate/scripts/generate.sh \
 | ID | アクション | プロンプト | ファイル |
 |----|----------|----------|----------|
 | album | アルバム | old leather-bound album book with golden clasp, item encyclopedia journal | static/icons/actions/album.png |
+
+## イベント画像 (Event CG)
+
+**モデル**: `fal-ai/bytedance/seedream/v4.5/edit`（キャラクター参照画像付き）
+
+**キャラクター参照画像**: `documents/characters/` 配下の立ち絵を使用
+
+### 生成手順
+
+1. キャラクター画像をfal CDNにアップロード:
+```bash
+HEROINE_URL=$(bash /home/hirayama/.claude/skills/fal-generate/scripts/upload.sh \
+  --file "documents/characters/heroine.png")
+LIENE_URL=$(bash /home/hirayama/.claude/skills/fal-generate/scripts/upload.sh \
+  --file "documents/characters/liene.png")
+```
+
+2. seedream v4.5 **edit**モデルで生成（`image_urls`でキャラ画像を参照渡し）:
+```bash
+bash /home/hirayama/.claude/skills/fal-generate/scripts/generate.sh \
+  --prompt "プロンプト（Figure 1, Figure 2 でキャラを参照）" \
+  --model "fal-ai/bytedance/seedream/v4.5/edit" \
+  --size landscape_4_3 \
+  --extra '{"image_urls": ["<heroine_url>", "<liene_url>"], "enable_safety_checker": false}' \
+  --logs --timeout 180
+```
+
+3. 生成画像を `static/images/events/` にダウンロード保存
+
+### プロンプト規約
+
+- `image_urls` の順番に応じて `Figure 1`, `Figure 2`, ... で参照する
+- 各キャラの配置（左/右）、表情、ポーズを明示する
+- 背景の場所・時間帯・雰囲気を具体的に記述する
+- 末尾に `Anime illustration style, warm color palette, detailed background, visual novel event CG quality.` を付ける
+
+### 生成済みイベント画像
+
+| ID | シーン | image_urls順 | プロンプト要約 | ファイル |
+|----|--------|-------------|--------------|----------|
+| first_meeting_liene | リーネとの初対面（冷たい視線） | Figure 1: heroine, Figure 2: liene | Liene(左)腕組み冷たい表情、主人公(右)ベレー帽を手に緊張した笑顔、村の石畳道・木組みの家・夕暮れ | static/images/events/first_meeting_liene.png |
