@@ -69,5 +69,13 @@ if [ -z "$IMG_URL" ]; then
 fi
 
 curl -sL "$IMG_URL" -o "$OUTPUT_FILE"
+
+# プロンプト保存
+PROMPT_DIR="documents/image-prompts/icons/$TYPE"
+PROMPT_FILE="$PROMPT_DIR/${NAME}.txt"
+mkdir -p "$PROMPT_DIR"
+echo "$FULL_PROMPT" > "$PROMPT_FILE"
+echo "Prompt saved to $PROMPT_FILE" >&2
+
 echo "Done! Saved to $OUTPUT_FILE" >&2
 echo "$OUTPUT_FILE"
