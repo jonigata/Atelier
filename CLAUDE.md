@@ -36,25 +36,24 @@ UIのテストについては、限定的に、初手でそれが表示される
 
 # 画像
 
-画像を作れと言われたらスキルを使ってください。
-環境変数はsetting.jsonに書いてあります
-falで画像生成するときは
-背景透過のもの(アイコンなど)はgpt-image-1.5(medium, transparent)で。
-背景透過でないものはflux.2.kleinで。
-同じ種別のもの（例えば素材アイコン）を作るときに同じスタイルプロンプトを使うため、image-prompts.mdを参照・更新して下さい。
+画像を作れと言われたらラッパースクリプトを使ってください。
+環境変数はsetting.jsonに書いてあります。
+プロンプトのスタイルや生成済み一覧は [`documents/image-prompts.md`](documents/image-prompts.md) を参照・更新すること。
 
-## イベント画像
+```bash
+# アイコン（素材・アクション）— gpt-image-1.5, 背景透過
+bash scripts/generate-icon.sh --name <id> --desc "item description" [--type materials|actions]
 
-キャラクタ画像は`documents/characters/`にあるので、それを利用して
-seedream v4.5 **edit**モデル(`fal-ai/bytedance/seedream/v4.5/edit`)で作成してください。
-画像は`static/images/events/`へ。
+# イベントCG — seedream v4.5, キャラ参照対応
+bash scripts/generate-event.sh --name <id> --prompt "..." [--chars heroine,liene]
+```
 
-手順:
-1. キャラ画像を`upload.sh`でfal CDNにアップロード
-2. `--extra '{"image_urls": [...]}'`で参照渡しし、プロンプト内で`Figure 1`, `Figure 2`で参照
-3. 生成画像をダウンロードして`static/images/events/`に保存
+## 画像関連リファレンス
 
-詳細な手順・プロンプト規約・生成済み一覧は [`documents/image-prompts.md`](documents/image-prompts.md) の「イベント画像」セクションを参照。
+- [`documents/image-prompts.md`](documents/image-prompts.md) — プロンプト規約・生成済み一覧・スクリプト詳細
+- [`documents/setting_designs.md`](documents/setting_designs.md) — ロケーション・背景ビジュアル設定
+- [`documents/characters/character_designs.md`](documents/characters/character_designs.md) — キャラクター容姿設定
+- `documents/characters/*.png` — キャラクター立ち絵（イベントCGのFigure参照用）
 
 ## Project Overview
 
@@ -145,3 +144,6 @@ ID convention: `category_number` (e.g., `herb_01`, `ore_02`, `potion_01`)
 
 - `documents/game_design.md` - Game concept, systems, balance
 - `documents/technical_design.md` - Implementation details, status
+- `documents/characters/character_designs.md` - キャラクター容姿設定
+- `documents/setting_designs.md` - ロケーション・背景ビジュアル設定
+- `documents/image-prompts.md` - 画像生成プロンプト記録・手順

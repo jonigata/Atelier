@@ -2,24 +2,26 @@
 
 画像生成時のスタイルプロンプト記録。同じ種別のものには同じスタイル・手順を使用すること。
 
+---
+
 ## 錬金素材アイコン (Material Icons)
 
 **モデル**: `fal-ai/gpt-image-1.5`
+**出力先**: `static/icons/materials/`
 
 **スタイルプロンプト**:
 ```
 [アイテム名], simple alchemy game item illustration, cute fantasy RPG item, flat vector style, clean shapes, subtle highlights, centered single object, die-cut sticker / cutout, isolated, transparent background (alpha), no UI, no frame, no border, no rounded square tile, no panel, no card, no button, no badge, no text, no watermark
 ```
 
-**コマンドライン**:
+**生成コマンド**:
 ```bash
-bash /home/hirayama/.claude/skills/fal-generate/scripts/generate.sh \
-  --prompt "上記プロンプト" \
-  --model "fal-ai/gpt-image-1.5" \
-  --extra '{"background": "transparent", "quality": "medium", "image_size": "1024x1024"}'
-```
+# 単体生成
+bash scripts/generate-icon.sh --name herb_03 --desc "glowing blue herb with spiral leaves"
 
-**一括生成スクリプト**: `scripts/generate-icons.sh`
+# 一括生成（既存スキップ）
+bash scripts/generate-icons.sh
+```
 
 ### 生成済みアイコン
 
@@ -43,9 +45,17 @@ bash /home/hirayama/.claude/skills/fal-generate/scripts/generate.sh \
 | unknown | 未発見アイテム | mysterious question mark symbol wrapped in swirling mist and shadows, unknown item | static/icons/materials/unknown.png |
 | fallback | フォールバック | broken cracked empty bottle or flask, missing item placeholder | static/icons/materials/fallback.png |
 
+---
+
 ## アクションアイコン (Action Icons)
 
-**モデル**: `fal-ai/gpt-image-1.5`（同じスタイルプロンプト）
+**モデル**: `fal-ai/gpt-image-1.5`（素材アイコンと同じスタイル）
+**出力先**: `static/icons/actions/`
+
+**生成コマンド**:
+```bash
+bash scripts/generate-icon.sh --name shop --type actions --desc "small wooden shop stall with awning"
+```
 
 ### 生成済みアイコン
 
@@ -53,43 +63,60 @@ bash /home/hirayama/.claude/skills/fal-generate/scripts/generate.sh \
 |----|----------|----------|----------|
 | album | アルバム | old leather-bound album book with golden clasp, item encyclopedia journal | static/icons/actions/album.png |
 
+---
+
 ## イベント画像 (Event CG)
 
-**モデル**: `fal-ai/bytedance/seedream/v4.5/edit`（キャラクター参照画像付き）
+**モデル**: `fal-ai/bytedance/seedream/v4.5/edit`（キャラクター参照あり） / `text-to-image`（参照なし）
+**出力先**: `static/images/events/`
+**キャラクター参照画像**: `documents/characters/` 配下の立ち絵
 
-**キャラクター参照画像**: `documents/characters/` 配下の立ち絵を使用
-
-### 生成手順
-
-1. キャラクター画像をfal CDNにアップロード:
+**生成コマンド**:
 ```bash
-HEROINE_URL=$(bash /home/hirayama/.claude/skills/fal-generate/scripts/upload.sh \
-  --file "documents/characters/heroine.png")
-LIENE_URL=$(bash /home/hirayama/.claude/skills/fal-generate/scripts/upload.sh \
-  --file "documents/characters/liene.png")
+# キャラ参照あり（edit モデル）
+bash scripts/generate-event.sh \
+  --name first_meeting_liene \
+  --chars heroine,liene \
+  --prompt "Figure 1 is protagonist, Figure 2 is Liene. ..."
+
+# キャラ参照なし（text-to-image モデル）
+bash scripts/generate-event.sh \
+  --name village_crisis \
+  --prompt "Village square in the rain, villagers gathered..."
+
+# ヘルプ（利用可能キャラ一覧も表示）
+bash scripts/generate-event.sh --help
 ```
 
-2. seedream v4.5 **edit**モデルで生成（`image_urls`でキャラ画像を参照渡し）:
-```bash
-bash /home/hirayama/.claude/skills/fal-generate/scripts/generate.sh \
-  --prompt "プロンプト（Figure 1, Figure 2 でキャラを参照）" \
-  --model "fal-ai/bytedance/seedream/v4.5/edit" \
-  --size landscape_4_3 \
-  --extra '{"image_urls": ["<heroine_url>", "<liene_url>"], "enable_safety_checker": false}' \
-  --logs --timeout 180
-```
+### スタイル指定（統一用）
 
-3. 生成画像を `static/images/events/` にダウンロード保存
+プロンプトの末尾に必ず以下のスタイル指定を付けること:
+```
+soft watercolor anime style, hand-painted illustrated background,
+NOT photorealistic, painted style like Studio Ghibli or Atelier game series,
+muted earthy tones, visual novel event CG quality.
+```
 
 ### プロンプト規約
 
-- `image_urls` の順番に応じて `Figure 1`, `Figure 2`, ... で参照する
+- `--chars` で指定した順に `Figure 1`, `Figure 2`, ... でプロンプト内から参照する
 - 各キャラの配置（左/右）、表情、ポーズを明示する
-- 背景の場所・時間帯・雰囲気を具体的に記述する
-- 末尾に `Anime illustration style, warm color palette, detailed background, visual novel event CG quality.` を付ける
+- 背景は `documents/setting_designs.md` のビジュアルキーワードを使う
+- 参照画像のポーズと矛盾する指示は避ける（例: 帽子を被った参照画像で「帽子を手に持つ」は競合する）
+- `single unified illustration, no split screen` を入れて一枚絵を保証する
 
 ### 生成済みイベント画像
 
-| ID | シーン | image_urls順 | プロンプト要約 | ファイル |
-|----|--------|-------------|--------------|----------|
-| first_meeting_liene | リーネとの初対面（冷たい視線） | Figure 1: heroine, Figure 2: liene | Liene(左)腕組み冷たい表情、主人公(右)ベレー帽を手に緊張した笑顔、村の石畳道・木組みの家・夕暮れ | static/images/events/first_meeting_liene.png |
+| ID | シーン | --chars | プロンプト要約 | ファイル |
+|----|--------|---------|--------------|----------|
+| first_meeting_liene | リーネとの初対面（冷たい視線） | heroine,liene | Liene(左)腕組み冷たい表情、主人公(右)ベレー帽のつばに手をかけ挨拶、辺境の寂れた農村・土の道・茅葺き屋根・丘と森・曇り空 | static/images/events/first_meeting_liene.png |
+
+---
+
+## スクリプト一覧
+
+| スクリプト | 用途 | 使い方 |
+|-----------|------|--------|
+| `scripts/generate-icon.sh` | アイコン単体生成（素材・アクション） | `--name ID --desc "説明"` |
+| `scripts/generate-icons.sh` | 素材アイコン一括生成（既存スキップ） | 引数なし |
+| `scripts/generate-event.sh` | イベントCG生成（キャラ参照対応） | `--name ID --prompt "..." [--chars a,b]` |
