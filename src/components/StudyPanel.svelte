@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { gameState, addMessage, learnRecipesFromBook } from '$lib/stores/game';
+  import { gameState, addMessage, learnRecipesFromBook, consumeStamina } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
   import { books } from '$lib/data/books';
   import { items, getItemIcon } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
+  import { STAMINA } from '$lib/data/balance';
   import type { RecipeBookDef } from '$lib/models/types';
   import StudyCompleteDialog from './StudyCompleteDialog.svelte';
   import VideoOverlay from './common/VideoOverlay.svelte';
@@ -40,8 +41,14 @@
     ? selectedBook.recipeIds.filter(id => !$gameState.knownRecipes.includes(id))
     : [];
 
+  $: canStudy = selectedBookId && selectedBook && $gameState.stamina >= STAMINA.STUDY_COST;
+
   function handleStudy() {
     if (!selectedBookId || !selectedBook) return;
+    if (!consumeStamina(STAMINA.STUDY_COST)) {
+      addMessage('体力が足りません。休息して体力を回復しましょう。');
+      return;
+    }
     showVideo = true;
   }
 
@@ -87,7 +94,7 @@
 <div class="study-panel">
   <button class="back-btn" on:click={onBack}>← 戻る</button>
   <h2>📚 勉強</h2>
-  <p>本を選んで読みます。{selectedBook ? selectedBook.studyDays : 1}日経過します。</p>
+  <p>本を選んで読みます。{selectedBook ? selectedBook.studyDays : 1}日経過・体力{STAMINA.STUDY_COST}消費します。</p>
   <p class="known-recipes">
     習得済みレシピ: {$gameState.knownRecipes.length}個 / 錬金術Lv: {$gameState.alchemyLevel}
   </p>
@@ -135,9 +142,15 @@
   <button
     class="action-btn"
     on:click={handleStudy}
-    disabled={!selectedBookId}
+    disabled={!canStudy}
   >
-    {selectedBookId && selectedBook ? `「${selectedBook.name}」を読む` : '本を選んでください'}
+    {#if !selectedBookId}
+      本を選んでください
+    {:else if $gameState.stamina < STAMINA.STUDY_COST}
+      体力不足（必要: {STAMINA.STUDY_COST} / 現在: {$gameState.stamina}）
+    {:else}
+      「{selectedBook?.name}」を読む（体力 -{STAMINA.STUDY_COST}）
+    {/if}
   </button>
 </div>
 

@@ -101,6 +101,8 @@ export const STAMINA = {
   CRAFT_BASE_COST: 5,
   /** 調合時の体力消費（難易度1あたり） */
   CRAFT_DIFFICULTY_COST: 3,
+  /** 勉強時の体力消費 */
+  STUDY_COST: 20,
 
   /** 疲労なし閾値（この値以上なら成功率ペナルティなし） */
   FATIGUE_THRESHOLD_NONE: 50,

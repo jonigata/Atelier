@@ -28,15 +28,14 @@ export const storyAchievements: Record<string, AchievementDef> = {
       'ふうん。思ってたより……普通ね',
       'どうせまたすぐ帰るんでしょ。前にもそういう人、何人も来たから',
       '……期待なんてしないわ。勝手にすれば',
-      'お父さんが「これを渡せ」って。レシピ本？ ……知らないわよ、勝手に読めば',
+      '……これ、お父さんが「渡せ」って。私が裏山で摘んできたやつだけど',
     ],
     conditions: [{ type: 'day', target: 2, comparison: '>=' }],
     reward: {
-      unlocks: ['study'],
+      items: [{ itemId: 'herb_01', quality: 70, quantity: 2 }],
     },
     prerequisite: ['ach_game_start'],
     priority: 605,
-    important: true,
     eventImage: 'first_meeting_liene',
   },
 
