@@ -13,7 +13,7 @@ import { calcExpForLevel, ALCHEMY } from '$lib/data/balance';
 
 function createInitialState(): GameState {
   return {
-    playerName: '見習い錬金術士',
+    playerName: 'コレット',
     day: 1,
     money: 500,
     reputation: 0,

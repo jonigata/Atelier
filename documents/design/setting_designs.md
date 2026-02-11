@@ -46,6 +46,7 @@ no cobblestone, no brick, not urban, not prosperous
 ### 色彩パレット
 
 - 建物: くすんだ茶、灰色の石、古い白漆喰
+
 - 屋根: 茅葺きの黄土色〜暗い茶
 - 地面: 土色、泥混じりの薄茶
 - 植物: 深い緑、野草の淡い黄色や白

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ../.bareのworktree構造です。
 
-ゲームデザインに関するオーダーを受けたときは、まず最初にdocuments/を読んでください。
+ゲームデザインに関するオーダーを受けたときは、まず最初にdocuments/design/を読んでください。
 
 mainブランチではサーバは基本的に5473で起動しっぱなしなので、いちいち立ち上げ直す必要はありません
 featureブランチでは5474あたりから空いてるポートを探して起動してください
@@ -38,7 +38,7 @@ UIのテストについては、限定的に、初手でそれが表示される
 
 画像を作れと言われたらラッパースクリプトを使ってください。
 環境変数はsetting.jsonに書いてあります。
-プロンプトのスタイルや生成済み一覧は [`documents/image-prompts.md`](documents/image-prompts.md) を参照・更新すること。
+プロンプトのスタイルや生成済み一覧は [`documents/technical/image-prompts.md`](documents/technical/image-prompts.md) を参照・更新すること。
 
 ```bash
 # アイコン（素材・アクション）— gpt-image-1.5, 背景透過
@@ -50,10 +50,10 @@ bash scripts/generate-event.sh --name <id> --prompt "..." [--chars heroine,liene
 
 ## 画像関連リファレンス
 
-- [`documents/image-prompts.md`](documents/image-prompts.md) — プロンプト規約・生成済み一覧・スクリプト詳細
-- [`documents/setting_designs.md`](documents/setting_designs.md) — ロケーション・背景ビジュアル設定
-- [`documents/characters/character_designs.md`](documents/characters/character_designs.md) — キャラクター容姿設定
-- `documents/characters/*.png` — キャラクター立ち絵（イベントCGのFigure参照用）
+- [`documents/technical/image-prompts.md`](documents/technical/image-prompts.md) — プロンプト規約・生成済み一覧・スクリプト詳細
+- [`documents/design/setting_designs.md`](documents/design/setting_designs.md) — ロケーション・背景ビジュアル設定
+- [`documents/design/characters/character_designs.md`](documents/design/characters/character_designs.md) — キャラクター容姿設定
+- `documents/design/characters/*.png` — キャラクター立ち絵（イベントCGのFigure参照用）
 
 ## Project Overview
 
@@ -142,8 +142,5 @@ ID convention: `category_number` (e.g., `herb_01`, `ore_02`, `potion_01`)
 
 ## Design Documents
 
-- `documents/game_design.md` - Game concept, systems, balance
-- `documents/technical_design.md` - Implementation details, status
-- `documents/characters/character_designs.md` - キャラクター容姿設定
-- `documents/setting_designs.md` - ロケーション・背景ビジュアル設定
-- `documents/image-prompts.md` - 画像生成プロンプト記録・手順
+- `documents/design/` - ゲームデザイン・設定・ストーリー関連
+- `documents/technical/` - 実装計画・画像生成プロンプト関連
