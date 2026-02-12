@@ -158,6 +158,8 @@ bash scripts/generate-character.sh --help
 | mayor | 村長 | documents/design/characters/mayor-1.png | documents/design/characters/mayor.png |
 | marco | マルコ（旅商人） | documents/design/characters/marco-1.png | documents/design/characters/marco.png |
 | melda | メルダ（パン屋） | documents/design/characters/melda-1.png | documents/design/characters/melda.png |
+| ren | レン（冒険者・剣士） | documents/design/characters/ren-1.png | documents/design/characters/ren.png |
+| fee | フィー（冒険者・斥候） | documents/design/characters/fee-1.png | documents/design/characters/fee.png |
 
 ---
 
