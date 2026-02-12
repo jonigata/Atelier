@@ -160,6 +160,10 @@ bash scripts/generate-character.sh --help
 | melda | メルダ（パン屋） | documents/design/characters/melda-1.png | documents/design/characters/melda.png |
 | ren | レン（冒険者・剣士） | documents/design/characters/ren-1.png | documents/design/characters/ren.png |
 | fee | フィー（冒険者・斥候） | documents/design/characters/fee-1.png | documents/design/characters/fee.png |
+| irina | イリーナ（師匠） | documents/design/characters/irina-1.png | documents/design/characters/irina.png |
+| vict | ヴィクト（ライバル錬金術師） | documents/design/characters/vict-1.png | documents/design/characters/vict.png |
+| gord | ゴルド（鍛冶屋） | documents/design/characters/gord-1.png | documents/design/characters/gord.png |
+| inspector | 査察官 | documents/design/characters/inspector-1.png | documents/design/characters/inspector.png |
 
 ---
 
