@@ -13,7 +13,7 @@
 set -e
 
 SKILL_DIR="/home/hirayama/.claude/skills/fal-generate/scripts"
-CHARS_DIR="documents/characters"
+CHARS_DIR="documents/design/characters"
 OUTPUT_DIR="static/images/events"
 CACHE_DIR="/tmp/fal-upload-cache"
 MODEL="fal-ai/bytedance/seedream/v4.5/edit"
@@ -64,13 +64,13 @@ while [[ $# -gt 0 ]]; do
       echo "  --name, -n    Output filename (without extension). Required."
       echo "  --prompt, -p  Generation prompt. Required."
       echo "  --chars, -c   Comma-separated character image names (e.g. heroine,liene)."
-      echo "                Files are loaded from documents/characters/{name}.png"
+      echo "                Files are loaded from documents/design/characters/{name}/{name}-1.png"
       echo "                Referenced as Figure 1, Figure 2, ... in prompt."
       echo "                If omitted, uses text-to-image model instead."
       echo "  --size, -s    Image size (default: landscape_4_3)"
       echo ""
       echo "Available characters:"
-      ls -1 "$CHARS_DIR"/*.png 2>/dev/null | xargs -I{} basename {} .png | sed 's/^/  /'
+      ls -1d "$CHARS_DIR"/*/ 2>/dev/null | xargs -I{} basename {} | sed 's/^/  /'
       echo ""
       echo "Upload cache: $CACHE_DIR (24h TTL, invalidated on file change)"
       exit 0
@@ -96,7 +96,7 @@ if [ -n "$CHARS" ]; then
 
   for char in "${CHAR_ARRAY[@]}"; do
     char=$(echo "$char" | xargs)  # trim
-    FILE="$CHARS_DIR/${char}.png"
+    FILE="$CHARS_DIR/${char}/${char}-1.png"
     if [ ! -f "$FILE" ]; then
       echo "Error: Character image not found: $FILE" >&2
       exit 1

@@ -47,9 +47,11 @@ bash scripts/generate-icon.sh --name <id> --desc "item description" [--type mate
 # イベントCG — seedream v4.5, キャラ参照対応
 bash scripts/generate-event.sh --name <id> --prompt "..." [--chars heroine,liene]
 
-# キャラクター立ち絵＋シート — seedream v4.5 + nano-banana-pro
+# キャラクター立ち絵＋シート＋表情 — seedream v4.5 + nano-banana-pro
 bash scripts/generate-character.sh --name <id> --desc "character appearance"
-bash scripts/generate-character.sh --name <id> --from 2  # step1完了済みならstep2から
+bash scripts/generate-character.sh --name <id> --from 2   # step1完了済みならstep2から
+bash scripts/generate-character.sh --name <id> --from 4   # 表情だけ全生成
+bash scripts/generate-character.sh --name <id> --expr angry  # 特定表情だけ再生成
 ```
 
 ## 画像関連リファレンス
@@ -57,7 +59,7 @@ bash scripts/generate-character.sh --name <id> --from 2  # step1完了済みな�
 - [`documents/technical/image-prompts.md`](documents/technical/image-prompts.md) — プロンプト規約・生成済み一覧・スクリプト詳細
 - [`documents/design/setting_designs.md`](documents/design/setting_designs.md) — ロケーション・背景ビジュアル設定
 - [`documents/design/characters/character_designs.md`](documents/design/characters/character_designs.md) — キャラクター容姿設定
-- `documents/design/characters/*.png` — キャラクター立ち絵（イベントCGのFigure参照用）
+- `documents/design/characters/<name>/` — キャラクター画像（立ち絵・シート・表情）
 
 ## Project Overview
 

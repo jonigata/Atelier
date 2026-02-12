@@ -116,28 +116,44 @@ muted earthy tones, visual novel event CG quality.
 
 ## キャラクター画像 (Character Images)
 
-**出力先**: `documents/design/characters/`
+**出力先**: `documents/design/characters/<name>/`
 **参照テンプレート**: `documents/design/characters/character_sheet.png`
 
-3ステップで立ち絵とキャラクターシートを生成する。
+4ステップで立ち絵・キャラクターシート・表情画像を生成する。
 
 | Step | モデル | 内容 | 出力 |
 |------|--------|------|------|
-| 1 | `fal-ai/bytedance/seedream/v4.5/edit` | 参照画像のスタイルに合わせた全身立ち絵 (1920x1920) | `<name>-1.png` |
+| 1 | `fal-ai/bytedance/seedream/v4.5/edit` | 参照画像のスタイルに合わせた全身立ち絵 (1920x1920) | `<name>/<name>-1.png` |
 | 2 | `fal-ai/bytedance/seedream/v4.5/edit` | 正面向き・手を下ろした設定画ポーズに修正 | (中間データ) |
-| 3 | `fal-ai/nano-banana-pro/edit` | キャラクターシート（正面・横・背面 + 表情3種） | `<name>.png` |
+| 3 | `fal-ai/nano-banana-pro/edit` | キャラクターシート（正面・横・背面 + 表情3種） | `<name>/<name>.png` |
+| 4a | `fal-ai/bytedance/seedream/v4.5/edit` | -1.png からneutral（証明写真画角）を生成 | `<name>/<name>-face-neutral.png` |
+| 4b | `fal-ai/bytedance/seedream/v4.5/edit` | neutralから表情差し替えで8枚派生 | `<name>/<name>-face-*.png` |
 
-**生成コマンド**:
+#### 表情一覧（9種）
+
+neutral, happy, angry, sad, surprised, embarrassed, smug, worried, determined
+
+#### 生成コマンド
+
 ```bash
 # 全ステップ実行（新規キャラ）
 bash scripts/generate-character.sh --name melda \
-  --desc "A plump, cheerful bakery woman in her late 40s. Fluffy flax-colored hair in a bun on top of her head. Straight-cut bangs. Round large brown eyes. Rosy chubby cheeks. Light pink blouse with cream-colored apron. Bread memo pad in apron pocket. Comfortable clogs. Flour on arms. Sturdy build."
+  --desc "A plump, cheerful bakery woman in her late 40s. ..."
 
-# Step 1 が完了済み → Step 2 から実行（既存の <name>-1.png を使用）
+# Step 1 が完了済み → Step 2 から実行
 bash scripts/generate-character.sh --name melda --from 2
 
-# スタイル参照画像を変更（デフォルト: heroine-1.png）
-bash scripts/generate-character.sh --name ren --desc "..." --ref liene-1.png
+# 表情画像だけ全部生成（neutral → 派生8枚）
+bash scripts/generate-character.sh --name melda --from 4
+
+# 特定の表情だけ再生成（既存neutralから派生）
+bash scripts/generate-character.sh --name melda --expr angry
+
+# neutralだけ再生成
+bash scripts/generate-character.sh --name melda --expr neutral
+
+# スタイル参照画像を変更（デフォルト: heroine/heroine-1.png）
+bash scripts/generate-character.sh --name ren --desc "..." --ref liene/liene-1.png
 
 # ヘルプ
 bash scripts/generate-character.sh --help
@@ -151,19 +167,19 @@ bash scripts/generate-character.sh --help
 
 ### 生成済みキャラクター画像
 
-| ID | キャラクター | 立ち絵 | シート |
-|----|------------|--------|--------|
-| heroine | コレット（主人公） | documents/design/characters/heroine-1.png | documents/design/characters/heroine.png |
-| liene | リーネ（村娘） | documents/design/characters/liene-1.png | documents/design/characters/liene.png |
-| mayor | 村長 | documents/design/characters/mayor-1.png | documents/design/characters/mayor.png |
-| marco | マルコ（旅商人） | documents/design/characters/marco-1.png | documents/design/characters/marco.png |
-| melda | メルダ（パン屋） | documents/design/characters/melda-1.png | documents/design/characters/melda.png |
-| ren | レン（冒険者・剣士） | documents/design/characters/ren-1.png | documents/design/characters/ren.png |
-| fee | フィー（冒険者・斥候） | documents/design/characters/fee-1.png | documents/design/characters/fee.png |
-| irina | イリーナ（師匠） | documents/design/characters/irina-1.png | documents/design/characters/irina.png |
-| vict | ヴィクト（ライバル錬金術師） | documents/design/characters/vict-1.png | documents/design/characters/vict.png |
-| gord | ゴルド（鍛冶屋） | documents/design/characters/gord-1.png | documents/design/characters/gord.png |
-| inspector | 査察官 | documents/design/characters/inspector-1.png | documents/design/characters/inspector.png |
+| ID | キャラクター | ディレクトリ |
+|----|------------|------------|
+| heroine | コレット（主人公） | `documents/design/characters/heroine/` |
+| liene | リーネ（村娘） | `documents/design/characters/liene/` |
+| mayor | 村長 | `documents/design/characters/mayor/` |
+| marco | マルコ（旅商人） | `documents/design/characters/marco/` |
+| melda | メルダ（パン屋） | `documents/design/characters/melda/` |
+| ren | レン（冒険者・剣士） | `documents/design/characters/ren/` |
+| fee | フィー（冒険者・斥候） | `documents/design/characters/fee/` |
+| irina | イリーナ（師匠） | `documents/design/characters/irina/` |
+| vict | ヴィクト（ライバル錬金術師） | `documents/design/characters/vict/` |
+| gord | ゴルド（鍛冶屋） | `documents/design/characters/gord/` |
+| inspector | 査察官 | `documents/design/characters/inspector/` |
 
 ---
 
