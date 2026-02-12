@@ -46,6 +46,10 @@ bash scripts/generate-icon.sh --name <id> --desc "item description" [--type mate
 
 # イベントCG — seedream v4.5, キャラ参照対応
 bash scripts/generate-event.sh --name <id> --prompt "..." [--chars heroine,liene]
+
+# キャラクター立ち絵＋シート — seedream v4.5 + nano-banana-pro
+bash scripts/generate-character.sh --name <id> --desc "character appearance"
+bash scripts/generate-character.sh --name <id> --from 2  # step1完了済みならstep2から
 ```
 
 ## 画像関連リファレンス

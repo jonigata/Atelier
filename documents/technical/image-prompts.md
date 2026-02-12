@@ -114,6 +114,53 @@ muted earthy tones, visual novel event CG quality.
 
 ---
 
+## キャラクター画像 (Character Images)
+
+**出力先**: `documents/design/characters/`
+**参照テンプレート**: `documents/design/characters/character_sheet.png`
+
+3ステップで立ち絵とキャラクターシートを生成する。
+
+| Step | モデル | 内容 | 出力 |
+|------|--------|------|------|
+| 1 | `fal-ai/bytedance/seedream/v4.5/edit` | 参照画像のスタイルに合わせた全身立ち絵 (1920x1920) | `<name>-1.png` |
+| 2 | `fal-ai/bytedance/seedream/v4.5/edit` | 正面向き・手を下ろした設定画ポーズに修正 | (中間データ) |
+| 3 | `fal-ai/nano-banana-pro/edit` | キャラクターシート（正面・横・背面 + 表情3種） | `<name>.png` |
+
+**生成コマンド**:
+```bash
+# 全ステップ実行（新規キャラ）
+bash scripts/generate-character.sh --name melda \
+  --desc "A plump, cheerful bakery woman in her late 40s. Fluffy flax-colored hair in a bun on top of her head. Straight-cut bangs. Round large brown eyes. Rosy chubby cheeks. Light pink blouse with cream-colored apron. Bread memo pad in apron pocket. Comfortable clogs. Flour on arms. Sturdy build."
+
+# Step 1 が完了済み → Step 2 から実行（既存の <name>-1.png を使用）
+bash scripts/generate-character.sh --name melda --from 2
+
+# スタイル参照画像を変更（デフォルト: heroine-1.png）
+bash scripts/generate-character.sh --name ren --desc "..." --ref liene-1.png
+
+# ヘルプ
+bash scripts/generate-character.sh --help
+```
+
+### --desc の書き方
+
+- `documents/design/characters/character_designs.md` の容姿設定を英訳して使う
+- 年齢・髪・目・体格・服装・靴・小物を含める
+- スタイル指定（線・背景・質感）はスクリプト側で自動付与されるため不要
+
+### 生成済みキャラクター画像
+
+| ID | キャラクター | 立ち絵 | シート |
+|----|------------|--------|--------|
+| heroine | コレット（主人公） | documents/design/characters/heroine-1.png | documents/design/characters/heroine.png |
+| liene | リーネ（村娘） | documents/design/characters/liene-1.png | documents/design/characters/liene.png |
+| mayor | 村長 | documents/design/characters/mayor-1.png | documents/design/characters/mayor.png |
+| marco | マルコ（旅商人） | documents/design/characters/marco-1.png | documents/design/characters/marco.png |
+| melda | メルダ（パン屋） | documents/design/characters/melda-1.png | documents/design/characters/melda.png |
+
+---
+
 ## スクリプト一覧
 
 | スクリプト | 用途 | 使い方 |
@@ -121,3 +168,4 @@ muted earthy tones, visual novel event CG quality.
 | `scripts/generate-icon.sh` | アイコン単体生成（素材・アクション） | `--name ID --desc "説明"` |
 | `scripts/generate-icons.sh` | 素材アイコン一括生成（既存スキップ） | 引数なし |
 | `scripts/generate-event.sh` | イベントCG生成（キャラ参照対応） | `--name ID --prompt "..." [--chars a,b]` |
+| `scripts/generate-character.sh` | キャラクター立ち絵＋シート生成 | `--name ID --desc "..." [--from N] [--ref img]` |
