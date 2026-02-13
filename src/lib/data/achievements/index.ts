@@ -3,6 +3,16 @@ import { tutorialAchievements } from './tutorial';
 import { milestoneAchievements } from './milestones';
 import { storyAchievements } from './story';
 
+// キャラクター名 → 顔画像ディレクトリ名のマッピング
+// 新しいキャラの顔画像を追加したら、ここに1行追加するだけでダイアログに表示される
+export const characterFaceIds: Record<string, string> = {
+  'コレット': 'heroine',
+  '村長': 'mayor',
+  'オルト': 'mayor',
+  'リーネ': 'liene',
+  'フィー': 'fee',
+};
+
 // ナラティブごとのキャラクター設定
 export const narrativeCharacters: Record<
   AchievementNarrative,

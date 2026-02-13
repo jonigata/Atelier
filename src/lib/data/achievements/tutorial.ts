@@ -14,7 +14,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     narrativeCharacter: { name: '村長', title: 'フォンテ村長' },
     eventImage: 'arrival_village',
     narrativeLines: [
-      'おお、ついに来てくれたか！ 君がイリーナ先生の弟子だな',
+      { text: 'おお、ついに来てくれたか！ 君がイリーナ先生の弟子だな', expression: 'happy' },
       '私はこの村の村長をやっている。もう何年も組合に頼み続けてな……',
       'ここが君の工房だ。少し古いが、娘と一緒に掃除しておいた',
       'フォンテ村を頼む。君が来てくれるのを、村のみんなが待っていたんだ',
@@ -134,7 +134,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     narrative: 'village_growth',
     narrativeCharacter: { name: '村長', title: 'フォンテ村長' },
     narrativeLines: [
-      '聞いたぞ、依頼を達成したそうだな。やるじゃないか',
+      { text: '聞いたぞ、依頼を達成したそうだな。やるじゃないか', expression: 'happy' },
       '村の者が喜んでいたよ。これは心付けだ、受け取ってくれ',
       'こうして一つずつ……この村の役に立ってくれれば嬉しい',
     ],

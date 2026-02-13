@@ -16,6 +16,7 @@ import {
   getAllAchievements,
   getAchievementById,
   narrativeCharacters,
+  characterFaceIds,
 } from '$lib/data/achievements';
 import { items } from '$lib/data/items';
 import { recipes } from '$lib/data/recipes';
@@ -328,6 +329,9 @@ export function getAchievementDialogue(achievementId: string): EventDialogue | n
     ? `/images/events/${achievement.eventImage}.png`
     : undefined;
 
+  // 顔画像IDを取得
+  const characterFaceId = character ? characterFaceIds[character.name] : undefined;
+
   // システムメッセージ系（キャラクターなし）
   if (!character) {
     return {
@@ -346,6 +350,7 @@ export function getAchievementDialogue(achievementId: string): EventDialogue | n
   return {
     characterName: character.name,
     characterTitle: character.title,
+    characterFaceId,
     lines: achievement.narrativeLines,
     achievementTitle: isStory ? undefined : achievement.title,
     achievementCategory: isStory ? undefined : achievement.category,

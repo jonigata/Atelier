@@ -151,10 +151,14 @@ export interface RewardDisplay {
   };
 }
 
+// ダイアログ1行分（文字列 or 表情付き）
+export type NarrativeLine = string | { text: string; expression: string };
+
 export interface EventDialogue {
   characterName: string;
   characterTitle: string;
-  lines: string[];
+  characterFaceId?: string;  // キャラクター顔画像ディレクトリ名
+  lines: NarrativeLine[];
   eventImage?: string;  // イベントCG画像パス
   achievementTitle?: string;  // アチーブメント達成時のタイトル
   achievementCategory?: AchievementCategory;  // アチーブメントカテゴリ（アイコン表示用）
@@ -297,7 +301,7 @@ export interface AchievementDef {
   category: AchievementCategory;
   narrative: AchievementNarrative;
   narrativeCharacter?: { name: string; title: string };
-  narrativeLines: string[];  // 複数行のダイアログ
+  narrativeLines: NarrativeLine[];  // 複数行のダイアログ（表情指定可）
   conditions: AchievementCondition[];
   reward: AchievementReward;
   prerequisite?: string[];

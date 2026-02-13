@@ -4,6 +4,20 @@
   import ItemCard from './common/ItemCard.svelte';
   import AnimatedGauge from './common/AnimatedGauge.svelte';
   import AchievementCategoryIcon from './common/AchievementCategoryIcon.svelte';
+  import type { NarrativeLine } from '$lib/models/types';
+
+  function getLineText(line: NarrativeLine): string {
+    return typeof line === 'string' ? line : line.text;
+  }
+
+  function getLineExpression(line: NarrativeLine): string {
+    return typeof line === 'string' ? 'neutral' : line.expression;
+  }
+
+  function getFaceImageUrl(faceId: string | undefined, expression: string): string | undefined {
+    if (!faceId) return undefined;
+    return `/images/characters/${faceId}/${faceId}-face-${expression}.png`;
+  }
 
   type GaugeColor = 'gold' | 'blue' | 'green';
   function getGaugeColor(type: string): GaugeColor {
@@ -154,12 +168,21 @@
             </div>
           </div>
         {/if}
-        <div class="character-info">
-          <span class="character-name">{dialogue.characterName}</span>
-          <span class="character-title">{dialogue.characterTitle}</span>
-        </div>
-        <div class="dialogue-text">
-          「{dialogue.lines[currentLine]}」
+        <div class="dialogue-body" class:has-face={!!dialogue.characterFaceId}>
+          {#if dialogue.characterFaceId}
+            <div class="face-column">
+              <img class="character-face" src={getFaceImageUrl(dialogue.characterFaceId, getLineExpression(dialogue.lines[currentLine]))} alt={dialogue.characterName} />
+            </div>
+          {/if}
+          <div class="text-column">
+            <div class="character-info">
+              <span class="character-name">{dialogue.characterName}</span>
+              <span class="character-title">{dialogue.characterTitle}</span>
+            </div>
+            <div class="dialogue-text">
+              「{getLineText(dialogue.lines[currentLine])}」
+            </div>
+          </div>
         </div>
         <div class="continue-hint">
           <span class="hint-text">クリック または Enter で続ける</span>
@@ -269,12 +292,38 @@
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
   }
 
+  .dialogue-body {
+    display: flex;
+    gap: 1.25rem;
+    min-height: 120px;
+  }
+
+  .face-column {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .character-face {
+    width: 120px;
+    height: 120px;
+    border: 2px solid #8b7355;
+    object-fit: cover;
+  }
+
+  .text-column {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
   .character-info {
     display: flex;
     align-items: baseline;
     gap: 0.75rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid #4a4a6a;
   }
 
@@ -293,7 +342,7 @@
     font-size: 1.1rem;
     line-height: 1.8;
     color: #e0e0f0;
-    min-height: 3.6rem;
+    flex: 1;
   }
 
   .continue-hint {
