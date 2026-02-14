@@ -181,7 +181,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       money: 300,
       reputation: 5,
     },
-    prerequisite: ['ach_story_girl_soften'],
+    prerequisite: ['ach_story_report_notice'],
     priority: 690,
     important: true,
   },
