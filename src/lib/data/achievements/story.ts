@@ -89,6 +89,30 @@ export const storyAchievements: Record<string, AchievementDef> = {
     priority: 620,
   },
 
+  ach_story_master_advice: {
+    id: 'ach_story_master_advice',
+    title: '師匠の忠告',
+    description: '師匠から査察制度について警告を受けた',
+    hint: '依頼を達成して実績を積もう',
+    category: 'quest',
+    narrative: 'master_teaching',
+    narrativeCharacter: { name: 'イリーナ', title: '師匠（手紙）' },
+    narrativeLines: [
+      '師匠からの手紙が届いた――',
+      'そろそろ生活にも慣れた頃かしら。一つ、大事なことを伝えておくわ',
+      '組合は派遣先の錬金術師に、90日ごとの経過報告を求めるの',
+      '依頼をこなして実績を積みなさい。報告に書けることが何もない……なんてことにならないように',
+      '最初の報告日まで、あと少し。しっかりね',
+    ],
+    conditions: [
+      { type: 'day', target: 14, comparison: '>=' },
+      { type: 'quest_count', target: 1 },
+    ],
+    reward: {},
+    prerequisite: ['ach_first_complete'],
+    priority: 625,
+  },
+
   ach_story_baker_rumor: {
     id: 'ach_story_baker_rumor',
     title: '隣村の噂',
@@ -112,6 +136,26 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_first_complete'],
     priority: 630,
+  },
+
+  ach_story_report_notice: {
+    id: 'ach_story_report_notice',
+    title: '届いた封書',
+    description: '師匠組合から経過報告の通知が届いた',
+    hint: '90日目の報告に備えよう',
+    category: 'quest',
+    narrative: 'patron_support',
+    narrativeCharacter: { name: '査察官', title: '師匠組合' },
+    narrativeLines: [
+      '工房の郵便受けに、見慣れない封蝋の手紙が入っていた',
+      '師匠組合 査察部より通達',
+      '派遣錬金術師の経過報告期限が近づいております。活動実績の整理をお願いいたします',
+      '……そうだ、師匠が言ってた90日ごとの報告。もうそんな時期なんだ',
+    ],
+    conditions: [{ type: 'day', target: 75, comparison: '>=' }],
+    reward: {},
+    prerequisite: ['ach_story_master_advice'],
+    priority: 670,
   },
 
   ach_story_q1_checkpoint: {
