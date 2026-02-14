@@ -64,8 +64,8 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     narrativeCharacter: { name: 'イリーナ', title: '師匠（手紙）' },
     narrativeLines: [
       '師匠からの手紙が届いた――',
-      '「まずは基本を思い出しなさい。あなたの座学は誰にも負けないはずよ」',
-      '「これは餞別。実地でこそ錬金術は身につくもの。頑張りなさい」',
+      'まずは基本を思い出しなさい。あなたの座学は誰にも負けないはずよ',
+      'これは餞別。実地でこそ錬金術は身につくもの。頑張りなさい',
     ],
     conditions: [{ type: 'recipe_count', target: 1 }],
     reward: {
@@ -84,10 +84,10 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     hint: 'アイテムを調合してみよう',
     category: 'tutorial',
     narrative: 'villager_gift',
-    narrativeCharacter: { name: 'メルダ', title: 'パン屋のおばちゃん' },
+    narrativeCharacter: { name: 'メルダ', title: 'よろず屋のおばちゃん' },
     narrativeLines: [
-      'あらあら、あんたが噂の先生かい？ 私はメルダ、パン屋をやってるのよ',
-      'もう薬が作れるの？ すごいねえ！',
+      'あらあら、あんたが噂の先生かい？ 私はメルダよ',
+      { text: 'もう薬が作れるの？ すごいねえ！', expression: 'happy' },
       '実はちょっと頼みたいことがあるんだけど……',
       '村長んとこに言ってあるから、依頼を見てちょうだいな',
     ],
@@ -101,23 +101,21 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     important: true,
   },
 
-  ach_first_quest: {
-    id: 'ach_first_quest',
-    title: '村との繋がり',
-    description: '初めて依頼を受注した',
+  ach_first_shop: {
+    id: 'ach_first_shop',
+    title: 'よろず屋の誘い',
+    description: 'メルダの店を利用できるようになった',
     hint: '依頼を受けてみよう',
     category: 'tutorial',
-    narrative: 'merchant_visit',
-    narrativeCharacter: { name: 'マルコ', title: '旅商人' },
+    narrative: 'villager_gift',
+    narrativeCharacter: { name: 'メルダ', title: 'よろず屋のおばちゃん' },
     narrativeLines: [
-      'よぉ、新しい先生ってのはあんたかい。俺はマルコ、旅商人さ',
-      '依頼を受けたなら素材がいるだろ？ ちょうどいいのがあるぜ',
-      'まぁ……ちょっとだけ色をつけさせてもらうがね。商売だからな',
-      'これはご挨拶代わりだ。困ったらいつでも声かけな',
+      { text: 'あら先生、依頼引き受けてくれたんだって？ ありがとねぇ！', expression: 'happy' },
+      '素材集めが大変でしょ？ うちの店に来なさいよ',
+      '色々取り揃えてるから、きっと役に立つわよ',
     ],
     conditions: [{ type: 'active_quest_count', target: 1 }],
     reward: {
-      items: [{ itemId: 'water_01', quality: 50, quantity: 2 }],
       unlocks: ['shop'],
     },
     priority: 30,
@@ -141,7 +139,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     conditions: [{ type: 'quest_count', target: 1 }],
     reward: { money: 50, reputation: 2 },
     priority: 40,
-    prerequisite: ['ach_first_quest'],
+    prerequisite: ['ach_first_craft'],
     important: true,
   },
 

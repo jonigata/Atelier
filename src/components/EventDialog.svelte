@@ -189,7 +189,7 @@
               <span class="character-title">{dialogue.characterTitle}</span>
             </div>
             <div class="dialogue-text">
-              「{getLineText(dialogue.lines[currentLine])}」
+              {getLineText(dialogue.lines[currentLine])}
             </div>
           </div>
         </div>

@@ -28,7 +28,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       'ふうん。思ってたより……普通ね',
       'どうせまたすぐ帰るんでしょ。前にもそういう人、何人も来たから',
       '……期待なんてしないわ。勝手にすれば',
-      '……これ、お父さんが「渡せ」って。私が裏山で摘んできたやつだけど',
+      { text: '……これ、お父さんが「渡せ」って。私が裏山で摘んできたやつだけど', expression: 'embarrassed' },
     ],
     conditions: [{ type: 'day', target: 2, comparison: '>=' }],
     reward: {
@@ -50,7 +50,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     narrativeLines: [
       'いやぁ、辺境にも錬金術師が来たって聞いてさ',
       'こいつは「霧草の種」ってやつだ。この辺じゃ珍しいぞ？',
-      '特別価格で……まぁ、ちょーっとだけ上乗せさせてもらうがな',
+      { text: '特別価格で……まぁ、ちょーっとだけ上乗せさせてもらうがな', expression: 'smug' },
       'これからもちょくちょく顔を出すぜ。いい商売しようや、先生',
     ],
     conditions: [
@@ -76,7 +76,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       '……ねえ。あんた、この薬草の使い方知ってるの？',
       'うちのおばあちゃんが昔、これで傷薬を作ってたんだけど……',
       'あんたの錬金術と、おばあちゃんの知恵……似てるところ、あるのかも',
-      '……べっ、別に認めたわけじゃないから。ただの興味よ',
+      { text: '……べっ、別に認めたわけじゃないから。ただの興味よ', expression: 'embarrassed' },
     ],
     conditions: [
       { type: 'craft_count', target: 1 },
@@ -96,12 +96,12 @@ export const storyAchievements: Record<string, AchievementDef> = {
     hint: '村での評判を築こう',
     category: 'quest',
     narrative: 'client_gratitude',
-    narrativeCharacter: { name: 'メルダ', title: 'パン屋のおばちゃん' },
+    narrativeCharacter: { name: 'メルダ', title: 'よろず屋のおばちゃん' },
     narrativeLines: [
       'ねえ先生、聞いた？ 隣の村にも錬金術師が来たんだって',
       'なんでもすごい腕前で、もう村おこしが始まってるとか……',
-      'でもね、あたしはあんたの方を応援してるからね！',
-      'はい、パンのおすそ分け。頑張んなさいよ！',
+      { text: 'でもね、あたしはあんたの方を応援してるからね！', expression: 'happy' },
+      'はい、差し入れよ。頑張んなさいよ！',
     ],
     conditions: [
       { type: 'day', target: 40, comparison: '>=' },
@@ -124,8 +124,8 @@ export const storyAchievements: Record<string, AchievementDef> = {
     narrativeCharacter: { name: '査察官', title: '師匠組合' },
     narrativeLines: [
       '師匠組合からの書簡が届いた――',
-      '「派遣錬金術師 各位。90日目の経過報告を求む」',
-      '「到着後の活動実績、村との関係構築状況を書面にて提出のこと」',
+      '派遣錬金術師 各位。90日目の経過報告を求む',
+      '到着後の活動実績、村との関係構築状況を書面にて提出のこと',
       '……ひとまず、やってきたことを報告すればいいのかな',
       '（※ 現在の実績が自動的に報告されます）',
     ],
@@ -176,7 +176,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     narrativeLines: [
       '……ねえ、あんた。この前の薬草のこと、もっと教えてくれない？',
       'おばあちゃんが昔集めてた場所、私なら案内できるけど',
-      '別にあんたのためじゃないわよ。おばあちゃんの知恵が役に立つなら……嬉しいってだけ',
+      { text: '別にあんたのためじゃないわよ。おばあちゃんの知恵が役に立つなら……嬉しいってだけ', expression: 'embarrassed' },
       'これからは一緒に採りに行ってあげる。……感謝しなさいよね',
     ],
     conditions: [
@@ -251,12 +251,12 @@ export const storyAchievements: Record<string, AchievementDef> = {
     hint: '村の発展に貢献しよう',
     category: 'quest',
     narrative: 'client_gratitude',
-    narrativeCharacter: { name: 'メルダ', title: 'パン屋のおばちゃん' },
+    narrativeCharacter: { name: 'メルダ', title: 'よろず屋のおばちゃん' },
     narrativeLines: [
-      '先生、大変よ！ 隣村の錬金術師、もう特産品を売り出してるんだって！',
+      { text: '先生、大変よ！ 隣村の錬金術師、もう特産品を売り出してるんだって！', expression: 'worried' },
       'お客さんがみんなあっちに行っちゃうかもしれないって、村長が心配してて……',
       '先生も何か……この村ならではのもの、作れないかしら？',
-      'あたしは信じてるからね、先生のこと！',
+      { text: 'あたしは信じてるからね、先生のこと！', expression: 'determined' },
     ],
     conditions: [
       { type: 'day', target: 160, comparison: '>=' },
@@ -279,10 +279,10 @@ export const storyAchievements: Record<string, AchievementDef> = {
     narrativeCharacter: { name: '査察官', title: '師匠組合' },
     narrativeLines: [
       '師匠組合の査察官が村を訪れた',
-      '「ふむ……半年の折り返し地点ですね。活動報告を確認しました」',
-      '「正直に申し上げると、隣村のヴィクト君の方が進捗は良い」',
-      '「しかし、村との関係構築は評価に値します。残り半分、期待していますよ」',
-      '「特に……この村ならではの何か、を見つけてほしい」',
+      'ふむ……半年の折り返し地点ですね。活動報告を確認しました',
+      '正直に申し上げると、隣村のヴィクト君の方が進捗は良い',
+      'しかし、村との関係構築は評価に値します。残り半分、期待していますよ',
+      '特に……この村ならではの何か、を見つけてほしい',
     ],
     conditions: [
       { type: 'day', target: 180, comparison: '>=' },
@@ -312,7 +312,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       'ねえ、この薬草……おばあちゃんが「フォンテの恵み」って呼んでた種類よ',
       '普通の使い方じゃダメみたい。錬金術で何かできないかな',
       '私の知ってる薬草の特性と、あなたの錬金術を合わせたら……',
-      '……一緒に、この村だけの何かを作りましょうよ！',
+      { text: '……一緒に、この村だけの何かを作りましょうよ！', expression: 'determined' },
     ],
     conditions: [
       { type: 'day', target: 190, comparison: '>=' },
@@ -337,7 +337,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     narrative: 'village_girl',
     narrativeCharacter: { name: 'リーネ', title: '村娘' },
     narrativeLines: [
-      '……ダメだったね',
+      { text: '……ダメだったね', expression: 'sad' },
       '薬草の配合が足りないのか、それとも手順が違うのか……',
       'でも、おばあちゃんも言ってた。「良い薬は、何度も失敗した先にある」って',
       '……もう一回、やってみよ。私も手伝うから',
@@ -365,7 +365,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       'よぉ先生、久しぶりだな！ 今日はとっておきを持ってきたぜ',
       'こいつは「月光の露」ってやつだ。この辺じゃまず手に入らない',
       '実はな、あんたの噂を聞いてわざわざ仕入れてきたんだ',
-      '高くつくがね……まぁ、先生への投資ってやつさ。期待してるぜ？',
+      { text: '高くつくがね……まぁ、先生への投資ってやつさ。期待してるぜ？', expression: 'smug' },
     ],
     conditions: [
       { type: 'day', target: 220, comparison: '>=' },
@@ -410,7 +410,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     narrative: 'village_growth',
     narrativeCharacter: { name: '村長', title: 'フォンテ村長' },
     narrativeLines: [
-      '先生、大変だ！ 村に病が広がっている',
+      { text: '先生、大変だ！ 村に病が広がっている', expression: 'worried' },
       '症状は軽いが、このままでは秋の収穫に響く……',
       '頼む、お前さんの錬金術で何とかならないか',
       '……この村には、お前さんしかいないんだ',
@@ -441,7 +441,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     narrativeLines: [
       '……助かったわ。みんな、本当に感謝してる',
       '正直に言うとね……最初、あなたのこと全然信用してなかった',
-      'でも今は違う。あなたは――この村の、錬金術師よ',
+      { text: 'でも今は違う。あなたは――この村の、錬金術師よ', expression: 'happy' },
       '……だから、特産品のこと……絶対に諦めないでね。私も一緒だから',
     ],
     conditions: [
@@ -464,11 +464,11 @@ export const storyAchievements: Record<string, AchievementDef> = {
     narrative: 'patron_support',
     narrativeCharacter: { name: '査察官', title: '師匠組合' },
     narrativeLines: [
-      '「お久しぶりです。最終査察の前に、経過確認に参りました」',
-      '「特産品の開発状況はいかがですか？ 方向性だけでも見せていただきたい」',
-      '「ヴィクト君はすでに成果を上げています。率直に言って、あなたは厳しい」',
-      '「しかし……この村の人々は、あなたを信頼している。それは事実です」',
-      '「残り3ヶ月。結果を出してください。期待しています」',
+      'お久しぶりです。最終査察の前に、経過確認に参りました',
+      '特産品の開発状況はいかがですか？ 方向性だけでも見せていただきたい',
+      'ヴィクト君はすでに成果を上げています。率直に言って、あなたは厳しい',
+      'しかし……この村の人々は、あなたを信頼している。それは事実です',
+      '残り3ヶ月。結果を出してください。期待しています',
     ],
     conditions: [
       { type: 'day', target: 270, comparison: '>=' },
@@ -527,7 +527,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       '「どうせまた帰るんでしょ」って……ひどいこと言ったわよね',
       'ごめんね。でも……あなたが残ってくれて、本当に良かった',
       'あなたはもうこの村の人よ。……ううん、私の一番の友達',
-      '……これからも、ずっとここにいてね',
+      { text: '……これからも、ずっとここにいてね', expression: 'happy' },
     ],
     conditions: [
       { type: 'day', target: 320, comparison: '>=' },
@@ -577,10 +577,10 @@ export const storyAchievements: Record<string, AchievementDef> = {
     narrativeCharacter: { name: 'イリーナ', title: '師匠（手紙）' },
     narrativeLines: [
       '師匠からの手紙が届いた――',
-      '「あなたの噂は聞いています。フォンテ村の錬金術師、と」',
-      '「最初は心配したけれど……やっぱり、あなたを送り出して正解だったわ」',
-      '「査察では、あなたの答えを見せてもらいます。楽しみにしていますよ」',
-      '「――お前の師匠であることを、誇りに思う。イリーナ」',
+      'あなたの噂は聞いています。フォンテ村の錬金術師、と',
+      '最初は心配したけれど……やっぱり、あなたを送り出して正解だったわ',
+      '査察では、あなたの答えを見せてもらいます。楽しみにしていますよ',
+      '――お前の師匠であることを、誇りに思う。イリーナ',
     ],
     conditions: [
       { type: 'day', target: 350, comparison: '>=' },
@@ -601,10 +601,10 @@ export const storyAchievements: Record<string, AchievementDef> = {
     narrative: 'patron_support',
     narrativeCharacter: { name: '査察官', title: '師匠組合' },
     narrativeLines: [
-      '「さて……1年が経ちました。最終査察を行います」',
-      '「あなたの活動実績、村への貢献、そして特産品の出来栄え」',
-      '「すべてを総合的に評価し、錬金術師としての認定を判断します」',
-      '「では、あなたの成果を見せてください」',
+      'さて……1年が経ちました。最終査察を行います',
+      'あなたの活動実績、村への貢献、そして特産品の出来栄え',
+      'すべてを総合的に評価し、錬金術師としての認定を判断します',
+      'では、あなたの成果を見せてください',
     ],
     conditions: [
       { type: 'day', target: 360, comparison: '>=' },
