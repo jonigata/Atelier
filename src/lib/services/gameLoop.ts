@@ -38,7 +38,7 @@ export function endTurn(daysSpent: number): void {
   const state = get(gameState);
 
   // ゲーム終了チェック
-  if (state.day > 360) {
+  if (state.day > 336) {
     setPhase('ending');
     addMessage('1年が経過しました。最終評価を行います...');
     return;

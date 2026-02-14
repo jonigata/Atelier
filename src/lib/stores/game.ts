@@ -86,9 +86,9 @@ export const gameState = writable<GameState>(createInitialState());
 // 派生ストア
 // =====================================
 
-export const daysRemaining = derived(gameState, ($state) => 360 - $state.day);
+export const daysRemaining = derived(gameState, ($state) => 336 - $state.day);
 
-export const isGameOver = derived(gameState, ($state) => $state.day > 360);
+export const isGameOver = derived(gameState, ($state) => $state.day > 336);
 
 export const expForNextLevel = derived(gameState, ($state) => {
   return calcExpForLevel($state.alchemyLevel);

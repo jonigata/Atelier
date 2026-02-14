@@ -264,7 +264,7 @@ export interface TutorialProgress {
 // ゲーム状態
 export interface GameState {
   playerName: string;
-  day: number;              // 1-365
+  day: number;              // 1-336
   money: number;
   reputation: number;       // 0-100
   villageDevelopment: number; // 0-100 村発展度

@@ -102,7 +102,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     narrativeLines: [
       '師匠からの手紙が届いた――',
       'そろそろ生活にも慣れた頃かしら。一つ、大事なことを伝えておくわ',
-      '組合は派遣先の錬金術師に、90日ごとの経過報告を求めるの',
+      '組合は派遣先の錬金術師に、3ヶ月ごとの経過報告を求めるの',
       '依頼をこなして実績を積みなさい。報告に書けることが何もない……なんてことにならないように',
       '最初の報告日まで、あと少し。しっかりね',
     ],
@@ -144,7 +144,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     id: 'ach_story_report_notice',
     title: '届いた封書',
     description: '師匠組合から経過報告の通知が届いた',
-    hint: '<strong>90日目</strong>の報告に備えよう',
+    hint: '<strong>3ヶ月目</strong>の報告に備えよう',
     category: 'quest',
     narrative: 'patron_support',
     narrativeCharacter: { name: '査察官', title: '師匠組合' },
@@ -152,9 +152,9 @@ export const storyAchievements: Record<string, AchievementDef> = {
       '工房の郵便受けに、見慣れない封蝋の手紙が入っていた',
       '師匠組合 査察部より通達',
       '派遣錬金術師の経過報告期限が近づいております。活動実績の整理をお願いいたします',
-      '……そうだ、師匠が言ってた90日ごとの報告。もうそんな時期なんだ',
+      '……そうだ、師匠が言ってた3ヶ月ごとの報告。もうそんな時期なんだ',
     ],
-    conditions: [{ type: 'day', target: 75, comparison: '>=' }],
+    conditions: [{ type: 'day', target: 70, comparison: '>=' }],
     reward: {},
     prerequisite: ['ach_story_master_advice'],
     priority: 670,
@@ -163,20 +163,20 @@ export const storyAchievements: Record<string, AchievementDef> = {
   ach_story_q1_checkpoint: {
     id: 'ach_story_q1_checkpoint',
     title: '最初の報告書',
-    description: '師匠組合への90日目の経過報告',
+    description: '師匠組合への3ヶ月目の経過報告',
     hint: '<strong>依頼5件</strong>を完了して報告に備えよう',
     category: 'quest',
     narrative: 'patron_support',
     narrativeCharacter: { name: '査察官', title: '師匠組合' },
     narrativeLines: [
       '師匠組合からの書簡が届いた――',
-      '派遣錬金術師 各位。90日目の経過報告を求む',
+      '派遣錬金術師 各位。3ヶ月目の経過報告を求む',
       '到着後の活動実績、村との関係構築状況を書面にて提出のこと',
       '……ひとまず、やってきたことを報告すればいいのかな',
       '（※ 現在の実績が自動的に報告されます）',
     ],
     conditions: [
-      { type: 'day', target: 90, comparison: '>=' },
+      { type: 'day', target: 84, comparison: '>=' },
       { type: 'quest_count', target: 5 },
     ],
     reward: {
@@ -201,10 +201,10 @@ export const storyAchievements: Record<string, AchievementDef> = {
       'ああ、君がここの担当か。僕はヴィクト、隣村の錬金術師だ',
       'イリーナ先生の弟子だって？ ふうん……回復薬は作れるようになった？',
       '僕の村はもう特産品の目処が立ってるよ。君はどう？',
-      'まぁ、頑張ってね。半年後の査察、楽しみにしてるよ',
+      'まぁ、頑張ってね。次の査察、楽しみにしてるよ',
     ],
     conditions: [
-      { type: 'day', target: 100, comparison: '>=' },
+      { type: 'day', target: 94, comparison: '>=' },
     ],
     reward: {},
     prerequisite: ['ach_story_q1_checkpoint'],
@@ -254,7 +254,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       '（※ 新しい採取エリア「枯泉の丘」が解放されました）',
     ],
     conditions: [
-      { type: 'day', target: 130, comparison: '>=' },
+      { type: 'day', target: 122, comparison: '>=' },
       { type: 'expedition_count', target: 8 },
     ],
     reward: {
@@ -333,7 +333,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       '特に……この村ならではの何か、を見つけてほしい',
     ],
     conditions: [
-      { type: 'day', target: 180, comparison: '>=' },
+      { type: 'day', target: 168, comparison: '>=' },
       { type: 'quest_count', target: 10 },
       { type: 'level', target: 5 },
     ],
@@ -363,7 +363,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       { text: '……一緒に、この村だけの何かを作りましょうよ！', expression: 'determined' },
     ],
     conditions: [
-      { type: 'day', target: 190, comparison: '>=' },
+      { type: 'day', target: 178, comparison: '>=' },
       { type: 'level', target: 8 },
       { type: 'craft_count', target: 40 },
     ],
@@ -443,7 +443,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       '……まぁ、無理はしない方がいいよ。身の丈に合ったことをしなよ',
     ],
     conditions: [
-      { type: 'day', target: 230, comparison: '>=' },
+      { type: 'day', target: 216, comparison: '>=' },
     ],
     reward: {},
     prerequisite: ['ach_story_specialty_fail'],
@@ -520,7 +520,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       '残り3ヶ月。結果を出してください。期待しています',
     ],
     conditions: [
-      { type: 'day', target: 270, comparison: '>=' },
+      { type: 'day', target: 252, comparison: '>=' },
       { type: 'level', target: 12 },
       { type: 'quest_count', target: 20 },
     ],
@@ -548,7 +548,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       '「フォンテの恵み」―― これが、私の答え',
     ],
     conditions: [
-      { type: 'day', target: 300, comparison: '>=' },
+      { type: 'day', target: 280, comparison: '>=' },
       { type: 'level', target: 15 },
       { type: 'craft_quality', target: 80 },
       { type: 'craft_count', target: 80 },
@@ -608,7 +608,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       '次は負けないからな。……覚えておけ',
     ],
     conditions: [
-      { type: 'day', target: 340, comparison: '>=' },
+      { type: 'day', target: 318, comparison: '>=' },
     ],
     reward: {
       reputation: 5,
@@ -633,7 +633,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       '――お前の師匠であることを、誇りに思う。イリーナ',
     ],
     conditions: [
-      { type: 'day', target: 350, comparison: '>=' },
+      { type: 'day', target: 328, comparison: '>=' },
     ],
     reward: {
       exp: 500,
@@ -646,7 +646,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     id: 'ach_story_final_inspection',
     title: '査察の日',
     description: '師匠組合の最終査察を受けた',
-    hint: '<strong>360日目</strong>を迎えよう',
+    hint: '<strong>336日目</strong>を迎えよう',
     category: 'quest',
     narrative: 'patron_support',
     narrativeCharacter: { name: '査察官', title: '師匠組合' },
@@ -657,7 +657,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       'では、あなたの成果を見せてください',
     ],
     conditions: [
-      { type: 'day', target: 360, comparison: '>=' },
+      { type: 'day', target: 336, comparison: '>=' },
     ],
     reward: {},
     prerequisite: ['ach_story_q3_checkpoint'],
