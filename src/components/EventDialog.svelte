@@ -1,6 +1,7 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
   import { resolveDialogue } from '$lib/services/presentation';
+  import { skipOpening } from '$lib/services/gameLoop';
   import ItemCard from './common/ItemCard.svelte';
   import AnimatedGauge from './common/AnimatedGauge.svelte';
   import AchievementCategoryIcon from './common/AchievementCategoryIcon.svelte';
@@ -37,6 +38,14 @@
   // 日数表示との同期は presentation サービスが async/await で制御する
   $: dialogue = $gameState.tutorialProgress.pendingDialogue;
   $: hasRewards = dialogue?.structuredRewards && dialogue.structuredRewards.length > 0;
+
+  // オープニングイベント判定（ゲーム開始ダイアログ表示中）
+  $: isOpeningEvent = $gameState.achievementProgress.pendingReward === 'ach_game_start';
+
+  function handleSkipOpening(event: MouseEvent) {
+    event.stopPropagation();
+    skipOpening();
+  }
 
   // ゲージ報酬と通常報酬を分離
   $: gaugeRewards = dialogue?.structuredRewards?.filter(r => r.gaugeData) ?? [];
@@ -190,6 +199,9 @@
             <span class="progress">{currentLine + 1} / {dialogue.lines.length}{hasRewards ? ' + 報酬' : ''}</span>
             {#if dialogue.lines.length > 1 || hasRewards}
               <button class="skip-button" on:click={skipDialogue}>スキップ</button>
+            {/if}
+            {#if isOpeningEvent}
+              <button class="skip-opening-button" on:click={handleSkipOpening}>全スキップ</button>
             {/if}
           </div>
         </div>
@@ -385,6 +397,23 @@
     background: rgba(255, 255, 255, 0.1);
     border-color: #8a8aaa;
     color: #8a8aaa;
+  }
+
+  .skip-opening-button {
+    padding: 0.3rem 0.75rem;
+    background: rgba(201, 169, 89, 0.15);
+    border: 1px solid #c9a959;
+    border-radius: 4px;
+    color: #c9a959;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .skip-opening-button:hover {
+    background: rgba(201, 169, 89, 0.3);
+    border-color: #ffd700;
+    color: #ffd700;
   }
 
   /* 報酬画面 */

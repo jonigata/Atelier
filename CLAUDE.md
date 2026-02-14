@@ -8,7 +8,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 mainブランチではサーバは基本的に5473で起動しっぱなしなので、いちいち立ち上げ直す必要はありません
 featureブランチでは5474あたりから空いてるポートを探して起動してください
-コミットは頼まれたときだけやってください
 
 ブランチを切って～しろ、と指示されたらまず先にブランチを切って、
 そのブランチ(worktree)でドキュメント生成や作業を始めてください。
@@ -53,6 +52,11 @@ bash scripts/generate-character.sh --name <id> --from 2   # step1完了済みな
 bash scripts/generate-character.sh --name <id> --from 4   # 表情だけ全生成
 bash scripts/generate-character.sh --name <id> --expr angry  # 特定表情だけ再生成
 ```
+
+## コミット
+
+コミットは頼まれたときだけやってください
+コミットを命じられてコミットした後は、/typescript-writeしてください。
 
 ## 画像関連リファレンス
 

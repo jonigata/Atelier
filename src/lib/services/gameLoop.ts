@@ -240,6 +240,110 @@ export function startActionPhase(): void {
 }
 
 /**
+ * オープニングチュートリアルをスキップして4日目から開始
+ * ach_game_start〜ach_first_craft + ストーリー2つを完了済みにする
+ */
+export function skipOpening(): void {
+  gameState.set({
+    playerName: 'コレット',
+    day: 4,
+    money: 600,
+    reputation: 3,
+    villageDevelopment: 0,
+    alchemyLevel: 1,
+    alchemyExp: 10,
+    stamina: 72,
+    maxStamina: 100,
+
+    inventory: [
+      // 持参品: herb_01 x5 → 2消費(調合) = 3残り
+      { itemId: 'herb_01', quality: 50, origin: { type: 'reward', day: 1, flavorText: '持参品' } },
+      { itemId: 'herb_01', quality: 50, origin: { type: 'reward', day: 1, flavorText: '持参品' } },
+      { itemId: 'herb_01', quality: 50, origin: { type: 'reward', day: 1, flavorText: '持参品' } },
+      // 師匠の手紙: herb_01 x3
+      { itemId: 'herb_01', quality: 50, origin: { type: 'reward', day: 2, flavorText: '知識の扉' } },
+      { itemId: 'herb_01', quality: 50, origin: { type: 'reward', day: 2, flavorText: '知識の扉' } },
+      { itemId: 'herb_01', quality: 50, origin: { type: 'reward', day: 2, flavorText: '知識の扉' } },
+      // リーネの贈り物: herb_01 x2 q70
+      { itemId: 'herb_01', quality: 70, origin: { type: 'reward', day: 2, flavorText: '冷たい視線' } },
+      { itemId: 'herb_01', quality: 70, origin: { type: 'reward', day: 2, flavorText: '冷たい視線' } },
+      // 持参品: water_01 x3 → 1消費(調合) = 2残り
+      { itemId: 'water_01', quality: 50, origin: { type: 'reward', day: 1, flavorText: '持参品' } },
+      { itemId: 'water_01', quality: 50, origin: { type: 'reward', day: 1, flavorText: '持参品' } },
+      // 調合済み回復薬
+      { itemId: 'potion_01', quality: 50, origin: { type: 'crafted', day: 3 } },
+    ],
+    ownedBooks: ['book_basics'],
+    knownRecipes: ['potion_01', 'antidote'],
+
+    activeQuests: [],
+    availableQuests: [],
+    completedQuestCount: 0,
+    failedQuestCount: 0,
+    newQuestCount: 0,
+    selectedQuestId: null,
+
+    expedition: null,
+
+    craftedItems: ['potion_01'],
+    discoveredItems: ['herb_01', 'water_01', 'potion_01'],
+    facilities: [],
+
+    ownedEquipment: [],
+    activeCauldron: null,
+
+    merchantLineup: null,
+    merchantVisitedMonths: [],
+
+    phase: 'action',
+    morningEvents: [],
+    messageLog: [
+      'ゲームを開始しました。',
+      'フォンテ村での1年間が始まります。',
+      '--- チュートリアルをスキップしました ---',
+    ],
+
+    pendingDayTransition: null,
+
+    tutorialProgress: {
+      unlockedActions: ['inventory', 'rest', 'study', 'alchemy', 'quest', 'album'],
+      pendingDialogue: null,
+    },
+
+    achievementProgress: {
+      completed: [
+        'ach_game_start',
+        'ach_check_inventory',
+        'ach_first_recipe',
+        'ach_first_craft',
+        'ach_story_village_girl_cold',
+        'ach_story_girl_soften',
+      ],
+      pendingReward: null,
+    },
+
+    stats: {
+      totalCraftCount: 1,
+      totalExpeditionCount: 0,
+      consecutiveQuestSuccess: 0,
+      highestQualityCrafted: 50,
+      totalSalesAmount: 0,
+      inventoryOpened: true,
+    },
+  });
+
+  // 初期依頼を設定
+  const state = get(gameState);
+  const templates = getAvailableQuestTemplates(state.alchemyLevel, state.reputation);
+  const initialQuests = templates.slice(0, 2);
+  setAvailableQuests(initialQuests);
+  incrementNewQuestCount(initialQuests.length);
+
+  // 目標追跡を初期化
+  initializeActiveGoalTracking();
+}
+
+/**
  * ゲーム開始時の初期化
  */
 export function initializeGame(): void {
