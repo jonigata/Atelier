@@ -9,6 +9,8 @@
   export let craftQuantity: number;
   export let currentIngredient: Ingredient | null;
   export let onUndoLast: () => void;
+  export let onAutoFill: (sortOrder: 'asc' | 'desc') => void;
+  export let onClear: () => void;
 
   interface IngredientStatus {
     ingredient: Ingredient;
@@ -41,7 +43,16 @@
 </script>
 
 <div class="material-slots">
-  <h4>素材を選択 ({selectedItems.length}/{totalRequired})</h4>
+  <div class="material-header">
+    <h4>素材を選択 ({selectedItems.length}/{totalRequired})</h4>
+    <div class="auto-fill-buttons">
+      <button class="auto-fill-btn" on:click={() => onAutoFill('asc')}>▼ 低品質から</button>
+      <button class="auto-fill-btn" on:click={() => onAutoFill('desc')}>▲ 高品質から</button>
+      {#if selectedItems.length > 0}
+        <button class="auto-fill-btn clear" on:click={onClear}>クリア</button>
+      {/if}
+    </div>
+  </div>
   {#each ingredientStatus as status}
     {@const isActive = currentIngredient === status.ingredient}
     {@const isComplete = status.selectedCount >= status.totalNeeded}
@@ -87,10 +98,52 @@
     border-radius: 8px;
   }
 
+  .material-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+
   h4 {
     font-size: 1rem;
     color: #c9a959;
-    margin-bottom: 0.5rem;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .auto-fill-buttons {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .auto-fill-btn {
+    padding: 0.25rem 0.5rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid #4a4a6a;
+    border-radius: 4px;
+    color: #a0a0b0;
+    cursor: pointer;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .auto-fill-btn:hover {
+    background: rgba(201, 169, 89, 0.2);
+    border-color: #c9a959;
+    color: #f4e4bc;
+  }
+
+  .auto-fill-btn.clear {
+    color: #ff8080;
+    border-color: #5a3a3a;
+  }
+
+  .auto-fill-btn.clear:hover {
+    background: rgba(255, 100, 100, 0.15);
+    border-color: #ff6b6b;
+    color: #ff6b6b;
   }
 
   .ingredient-row {

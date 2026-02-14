@@ -140,6 +140,48 @@
     selectedItems = selectedItems.slice(0, -1);
   }
 
+  function clearSelection() {
+    selectedItems = [];
+  }
+
+  function autoFillAll(sortOrder: 'asc' | 'desc') {
+    if (!selectedRecipe) return;
+
+    let newSelectedItems = [...selectedItems];
+
+    for (const ing of selectedRecipe.ingredients) {
+      const totalNeeded = ing.quantity * craftQuantity;
+      const alreadySelected = newSelectedItems.filter((item) => matchesIngredient(item, ing)).length;
+      const remaining = totalNeeded - alreadySelected;
+
+      if (remaining <= 0) continue;
+
+      // 在庫から一致するアイテムを取得（選択済みを除外）
+      const matching = getMatchingItems(ing);
+      const available = [...matching];
+      for (const selected of newSelectedItems) {
+        const idx = available.findIndex(
+          (item) => item.itemId === selected.itemId && item.quality === selected.quality
+        );
+        if (idx !== -1) available.splice(idx, 1);
+      }
+
+      // 品質順でソート
+      if (sortOrder === 'asc') {
+        available.sort((a, b) => a.quality - b.quality);
+      } else {
+        available.sort((a, b) => b.quality - a.quality);
+      }
+
+      // スロットに投入
+      for (let i = 0; i < remaining && i < available.length; i++) {
+        newSelectedItems.push(available[i]);
+      }
+    }
+
+    selectedItems = newSelectedItems;
+  }
+
   function executeCraft() {
     if (!selectedRecipe || !selectionComplete) return;
 
@@ -247,6 +289,8 @@
         {craftQuantity}
         {currentIngredient}
         onUndoLast={undoLastSelection}
+        onAutoFill={autoFillAll}
+        onClear={clearSelection}
       />
 
       {#if !selectionComplete}
@@ -421,4 +465,5 @@
   .tab:hover:not(.active) {
     background: rgba(255, 255, 255, 0.1);
   }
+
 </style>
