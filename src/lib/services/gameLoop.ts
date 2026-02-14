@@ -291,6 +291,7 @@ export function skipOpening(): void {
 
     ownedEquipment: [],
     activeCauldron: null,
+    shopEquipment: [],
 
     merchantLineup: null,
     merchantVisitedMonths: [],

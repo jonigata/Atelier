@@ -245,6 +245,7 @@ export interface GameState {
   // 機材システム
   ownedEquipment: string[];          // 所持している機材IDの配列
   activeCauldron: string | null;     // 現在セットしている錬金釜ID
+  shopEquipment: { id: string; purchased: boolean }[]; // ショップの機材ラインナップ
 
   // 旅商人マルコ
   merchantLineup: MerchantLineup | null;  // 現在の月のラインナップ

@@ -43,6 +43,7 @@ function createInitialState(): GameState {
     // 機材システム
     ownedEquipment: [],
     activeCauldron: null,
+    shopEquipment: [],
 
     // 旅商人マルコ
     merchantLineup: null,

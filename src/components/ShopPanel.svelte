@@ -2,10 +2,11 @@
   import { gameState, addMessage, addMoney, addItem } from '$lib/stores/game';
   import { addSalesAmount } from '$lib/stores/stats';
   import { items, getItem, getItemIcon, handleIconError } from '$lib/data/items';
+  import { getAllEquipment, getEquipment } from '$lib/data/equipment';
   import { removeItemFromInventory } from '$lib/services/inventory';
   import { SHOP } from '$lib/data/balance';
   import { shopFlavors, pickRandom } from '$lib/data/flavorTexts';
-  import type { OwnedItem, ItemDef } from '$lib/models/types';
+  import type { OwnedItem, ItemDef, EquipmentDef } from '$lib/models/types';
 
   export let onBack: () => void;
 
@@ -14,6 +15,28 @@
 
   // 村発展度に応じた購入可能アイテム
   $: buyableItems = getBuyableItems($gameState.villageDevelopment);
+
+  // ショップ機材ラインナップの初期化
+  $: if ($gameState.shopEquipment.length === 0) {
+    initShopEquipment();
+  }
+
+  $: shopEquipmentList = $gameState.shopEquipment
+    .map((slot) => ({ slot, def: getEquipment(slot.id) }))
+    .filter((e): e is { slot: typeof e.slot; def: EquipmentDef } => e.def !== undefined);
+
+  function initShopEquipment() {
+    const all = getAllEquipment();
+    const unowned = all.filter((e) => !$gameState.ownedEquipment.includes(e.id));
+    // シャッフルして3つ選出
+    const shuffled = [...unowned].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, 3);
+    if (selected.length === 0) return;
+    gameState.update((s) => ({
+      ...s,
+      shopEquipment: selected.map((e) => ({ id: e.id, purchased: false })),
+    }));
+  }
 
   function getBuyableItems(development: number): ItemDef[] {
     const allMaterials = Object.values(items).filter(
@@ -59,6 +82,37 @@
       },
     });
     addMessage(`${item.name}（品質${quality}）を${price}Gで購入しました`);
+  }
+
+  // 機材購入処理
+  function buyEquipment(slotIndex: number) {
+    const slot = $gameState.shopEquipment[slotIndex];
+    if (!slot || slot.purchased) return;
+
+    const equipDef = getEquipment(slot.id);
+    if (!equipDef) return;
+
+    if ($gameState.money < equipDef.price) {
+      addMessage(`所持金が足りません（必要: ${equipDef.price}G）`);
+      return;
+    }
+
+    if ($gameState.ownedEquipment.includes(slot.id)) {
+      addMessage(`${equipDef.name}は既に所持しています`);
+      return;
+    }
+
+    addMoney(-equipDef.price);
+    gameState.update((s) => ({
+      ...s,
+      ownedEquipment: [...s.ownedEquipment, slot.id],
+      activeCauldron:
+        equipDef.category === 'cauldron' && !s.activeCauldron ? slot.id : s.activeCauldron,
+      shopEquipment: s.shopEquipment.map((sl, i) =>
+        i === slotIndex ? { ...sl, purchased: true } : sl,
+      ),
+    }));
+    addMessage(`機材「${equipDef.name}」を購入した！`);
   }
 
   // 売却処理
@@ -145,6 +199,35 @@
           </div>
         </div>
       {/each}
+
+      {#if shopEquipmentList.length > 0}
+        <h3 class="section-header">機材</h3>
+        {#each shopEquipmentList as { slot, def }, i}
+          {@const owned = $gameState.ownedEquipment.includes(slot.id)}
+          {@const canBuy = !slot.purchased && !owned && $gameState.money >= def.price}
+          <div class="shop-item equip-item" class:disabled={!canBuy && !slot.purchased && !owned} class:purchased={slot.purchased || owned}>
+            <div class="equip-badge">{def.category === 'cauldron' ? '釜' : '機材'}</div>
+            <div class="item-info">
+              <span class="item-name">{def.name}</span>
+              <span class="item-desc">{def.effectDescription}</span>
+            </div>
+            <div class="item-action">
+              {#if slot.purchased || owned}
+                <span class="sold-label">{owned && !slot.purchased ? '所持済' : '購入済'}</span>
+              {:else}
+                <span class="item-price">{def.price.toLocaleString()}G</span>
+                <button
+                  class="buy-btn"
+                  disabled={!canBuy}
+                  on:click={() => buyEquipment(i)}
+                >
+                  購入
+                </button>
+              {/if}
+            </div>
+          </div>
+        {/each}
+      {/if}
     </div>
 
   {:else}
@@ -204,6 +287,12 @@
     margin-bottom: 1rem;
   }
 
+  h3 {
+    font-size: 1rem;
+    color: #c9a959;
+    margin: 0;
+  }
+
   h4 {
     font-size: 1rem;
     color: #c9a959;
@@ -255,6 +344,11 @@
     overflow-y: auto;
   }
 
+  .section-header {
+    padding-top: 0.5rem;
+    border-top: 1px solid #4a4a6a;
+  }
+
   .shop-item {
     display: flex;
     align-items: center;
@@ -263,6 +357,10 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid #4a4a6a;
     border-radius: 6px;
+  }
+
+  .equip-item {
+    border-color: #ff980050;
   }
 
   .item-icon {
@@ -283,11 +381,26 @@
     opacity: 0.5;
   }
 
+  .shop-item.purchased {
+    opacity: 0.5;
+  }
+
+  .equip-badge {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border-radius: 3px;
+    color: #1a1a2e;
+    background: #ff9800;
+    flex-shrink: 0;
+  }
+
   .item-info {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     flex: 1;
+    min-width: 0;
   }
 
   .item-name {
@@ -304,11 +417,13 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    flex-shrink: 0;
   }
 
   .item-price {
     color: #c9a959;
     font-weight: bold;
+    white-space: nowrap;
   }
 
   .buy-btn, .sell-btn {
@@ -328,6 +443,12 @@
 
   .buy-btn:hover:not(:disabled), .sell-btn:hover {
     transform: translateY(-1px);
+  }
+
+  .sold-label {
+    color: #9e9e9e;
+    font-weight: bold;
+    font-size: 0.9rem;
   }
 
   .empty {
