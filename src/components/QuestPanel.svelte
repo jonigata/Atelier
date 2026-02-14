@@ -19,6 +19,7 @@
   import { removeItemsFromInventory } from '$lib/services/inventory';
   import { checkMilestoneProgress } from '$lib/services/tutorial';
   import { setEventDialogue } from '$lib/stores/tutorial';
+  import { getQuestMoneyMult, getQuestReputationBonus, getQuestQualityBonus } from '$lib/services/equipmentEffects';
   import { get } from 'svelte/store';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
   import QuestTypeIcon from './common/QuestTypeIcon.svelte';
@@ -104,24 +105,32 @@
     const avgQuality = itemsToConsume.reduce((sum, i) => sum + i.quality, 0) / itemsToConsume.length;
     if (avgQuality >= 70) developmentGain += 1;
 
+    // 機材効果: 報酬補正
+    const moneyMult = getQuestMoneyMult();
+    const repBonus = getQuestReputationBonus();
+    const qualityBonus = getQuestQualityBonus(avgQuality);
+
+    const finalMoney = Math.floor(quest.rewardMoney * moneyMult) + qualityBonus.money;
+    const finalReputation = quest.rewardReputation + repBonus + qualityBonus.reputation;
+
     // ゲージ用にbefore値をキャプチャ
     const state = get(gameState);
     const repBefore = state.reputation;
     const devBefore = state.villageDevelopment;
 
-    // 報酬付与
-    addMoney(quest.rewardMoney);
-    addReputation(quest.rewardReputation);
+    // 報酬付与（機材効果適用済み）
+    addMoney(finalMoney);
+    addReputation(finalReputation);
     addVillageDevelopment(developmentGain);
     incrementCompletedQuests();
     removeActiveQuest(quest.id);
 
     // 完了ダイアログを表示
     const structuredRewards: RewardDisplay[] = [
-      { text: `${quest.rewardMoney.toLocaleString()} G`, type: 'money' },
+      { text: `${finalMoney.toLocaleString()} G`, type: 'money' },
       {
-        text: `名声 +${quest.rewardReputation}`, type: 'reputation',
-        gaugeData: { before: repBefore, after: Math.min(100, repBefore + quest.rewardReputation), max: 100, label: '名声' },
+        text: `名声 +${finalReputation}`, type: 'reputation',
+        gaugeData: { before: repBefore, after: Math.min(100, repBefore + finalReputation), max: 100, label: '名声' },
       },
       {
         text: `村発展度 +${developmentGain}`, type: 'villageDevelopment',
@@ -140,7 +149,7 @@
     setEventDialogue(dialogue);
 
     addMessage(
-      `依頼「${quest.title}」を達成しました！ 報酬: ${quest.rewardMoney}G, 名声+${quest.rewardReputation}, 村発展+${developmentGain}`
+      `依頼「${quest.title}」を達成しました！ 報酬: ${finalMoney}G, 名声+${finalReputation}, 村発展+${developmentGain}`
     );
   }
 

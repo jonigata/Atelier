@@ -7,6 +7,7 @@
   import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient, calculateStaminaCost, calculateFatiguePenalty, getFatigueLabel } from '$lib/services/alchemy';
   import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
   import { calcExpForLevel } from '$lib/data/balance';
+  import { getEffectiveCraftDays, getEffectiveIngredientCount } from '$lib/services/equipmentEffects';
   import type { RecipeDef, OwnedItem, Ingredient } from '$lib/models/types';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
 
@@ -41,18 +42,18 @@
       selectedRecipe.ingredients.every((ing) => countAvailableIngredients(ing) >= ing.quantity)
     : false;
 
-  // 現在のレシピで作成可能な最大個数
+  // 現在のレシピで作成可能な最大個数（機材効果適用済み）
   $: maxCraftable = selectedRecipe
     ? Math.min(
         ...selectedRecipe.ingredients.map((ing) =>
-          Math.floor(countAvailableIngredients(ing) / ing.quantity)
+          Math.floor(countAvailableIngredients(ing) / getEffectiveIngredientCount(ing.quantity))
         )
       )
     : 0;
 
-  // 1個あたりの必要素材数
+  // 1個あたりの必要素材数（機材効果適用済み）
   $: itemsPerCraft = selectedRecipe
-    ? selectedRecipe.ingredients.reduce((sum, ing) => sum + ing.quantity, 0)
+    ? selectedRecipe.ingredients.reduce((sum, ing) => sum + getEffectiveIngredientCount(ing.quantity), 0)
     : 0;
 
   // 合計必要素材数
@@ -61,11 +62,11 @@
   // 選択完了したか
   $: selectionComplete = selectedItems.length === requiredItemCount;
 
-  // 現在選択すべき素材
+  // 現在選択すべき素材（機材効果適用済み）
   $: currentIngredient = (() => {
     if (!selectedRecipe) return null;
     for (const ing of selectedRecipe.ingredients) {
-      const totalNeeded = ing.quantity * craftQuantity;
+      const totalNeeded = getEffectiveIngredientCount(ing.quantity) * craftQuantity;
       const selectedCount = selectedItems.filter((item) => matchesIngredient(item, ing)).length;
       if (selectedCount < totalNeeded) {
         return ing;
@@ -150,7 +151,7 @@
     let newSelectedItems = [...selectedItems];
 
     for (const ing of selectedRecipe.ingredients) {
-      const totalNeeded = ing.quantity * craftQuantity;
+      const totalNeeded = getEffectiveIngredientCount(ing.quantity) * craftQuantity;
       const alreadySelected = newSelectedItems.filter((item) => matchesIngredient(item, ing)).length;
       const remaining = totalNeeded - alreadySelected;
 
@@ -237,7 +238,7 @@
 
   function finishCraft() {
     if (!selectedRecipe) return;
-    const days = selectedRecipe.daysRequired * craftQuantity;
+    const days = getEffectiveCraftDays(selectedRecipe) * craftQuantity;
     // 先にendTurn → DayTransitionが上から被さる
     endTurn(days);
     // DayTransitionの暗転(0.3s)後にダイアログを片付け
@@ -280,7 +281,7 @@
           <button class="qty-btn" on:click={() => adjustQuantity(1)} disabled={craftQuantity >= maxCraftable || selectedItems.length > 0}>+</button>
           <span class="qty-max">/ 最大 {maxCraftable}個</span>
         </div>
-        <p class="quantity-hint">所要日数: {selectedRecipe.daysRequired * craftQuantity}日</p>
+        <p class="quantity-hint">所要日数: {getEffectiveCraftDays(selectedRecipe) * craftQuantity}日</p>
       </div>
 
       <MaterialSlots
@@ -304,7 +305,7 @@
           {successRate}
           {expectedQuality}
           {craftQuantity}
-          daysRequired={selectedRecipe.daysRequired * craftQuantity}
+          daysRequired={getEffectiveCraftDays(selectedRecipe) * craftQuantity}
           recipe={selectedRecipe}
           {staminaCost}
           {totalStaminaCost}

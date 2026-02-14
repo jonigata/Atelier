@@ -6,6 +6,7 @@
   import { items, getItemIcon } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
   import { STAMINA } from '$lib/data/balance';
+  import { getEffectiveStudyDays } from '$lib/services/equipmentEffects';
   import type { RecipeBookDef } from '$lib/models/types';
   import StudyCompleteDialog from './StudyCompleteDialog.svelte';
   import VideoOverlay from './common/VideoOverlay.svelte';
@@ -70,10 +71,17 @@
     showStudyDialog = true;
   }
 
+  // 機材効果適用済みの勉強日数を取得
+  function getStudyDays(book: RecipeBookDef): number {
+    // 本に含まれるレシピの最大レベルを取得
+    const maxLevel = Math.max(...book.recipeIds.map(id => recipes[id]?.requiredLevel ?? 1));
+    return getEffectiveStudyDays(book, maxLevel);
+  }
+
   function handleStudyDialogClose() {
     if (!studyCompletedBook) return;
 
-    const days = studyCompletedBook.studyDays;
+    const days = getStudyDays(studyCompletedBook);
     // 先にendTurn → DayTransitionが上から被さる
     endTurn(days);
     // DayTransitionの暗転(0.3s)後にダイアログを片付け
@@ -94,7 +102,7 @@
 <div class="study-panel">
   <button class="back-btn" on:click={onBack}>← 戻る</button>
   <h2>📚 勉強</h2>
-  <p>本を選んで読みます。{selectedBook ? selectedBook.studyDays : 1}日経過・体力{STAMINA.STUDY_COST}消費します。</p>
+  <p>本を選んで読みます。{selectedBook ? getStudyDays(selectedBook) : 1}日経過・体力{STAMINA.STUDY_COST}消費します。</p>
   <p class="known-recipes">
     習得済みレシピ: {$gameState.knownRecipes.length}個 / 錬金術Lv: {$gameState.alchemyLevel}
   </p>

@@ -25,14 +25,62 @@ export interface ItemOrigin {
 // 機材カテゴリ
 export type EquipmentCategory = 'cauldron' | 'time' | 'material' | 'economy' | 'special';
 
+// 機材レアリティ
+export type EquipmentRarity = 'common' | 'rare';
+
+// 機材効果（データドリブン）
+export type EquipmentEffect =
+  // === 調合系 ===
+  | { type: 'craft_duplicate'; chance: number; qualityVariance: number }
+  | { type: 'craft_quality_cap'; cap: number; failBelowQuality?: number }
+  | { type: 'craft_fail_save'; chance: number }
+  | { type: 'craft_fail_accumulate'; rate: number }
+  | { type: 'craft_combo'; bonusPerCombo: number; maxCombo?: number }
+  | { type: 'craft_quality_variance_mult'; value: number }
+  | { type: 'craft_stamina_mult'; value: number }
+  | { type: 'craft_days_halve' }
+  | { type: 'craft_days_reduce'; value: number; minOriginalDays?: number }
+  // === 素材系 ===
+  | { type: 'material_quality_floor'; value: number }
+  | { type: 'material_quality_bonus'; value: number }
+  | { type: 'material_count_reduce'; value: number; minOriginalCount?: number }
+  // === 勉強系 ===
+  | { type: 'study_days_reduce'; value: number }
+  | { type: 'study_instant'; maxLevel?: number }
+  // === 行動系 ===
+  | { type: 'action_extra'; frequency: number; staminaMult: number }
+  | { type: 'craft_success_bonus'; value: number }
+  | { type: 'craft_quality_bonus'; value: number }
+  // === 採取系 ===
+  | { type: 'expedition_drops_mult'; value: number; materialCategory?: ItemCategory }
+  | { type: 'expedition_rare_bonus'; value: number }
+  // === 経済系 ===
+  | { type: 'sell_price_mult'; value: number; minQuality?: number; itemCategory?: ItemCategory }
+  | { type: 'buy_price_mult'; value: number }
+  | { type: 'quest_money_mult'; value: number }
+  | { type: 'quest_reputation_bonus'; value: number }
+  | { type: 'quest_quality_bonus'; qualityThreshold: number; moneyBonus?: number; reputationBonus?: number }
+  | { type: 'craft_fail_recover'; count: number }
+  | { type: 'sell_same_day_bonus'; minCount: number; value: number }
+  // === 特殊系 ===
+  | { type: 'preview_quests'; days: number; count?: number }
+  | { type: 'preview_weather'; days: number }
+  | { type: 'preview_events'; days: number }
+  | { type: 'decompose'; qualityLossMult: number; hintChance: number; maxQuality?: number }
+  | { type: 'decompose_extra'; count: number }
+  | { type: 'inventory_expand'; value: number }
+  | { type: 'all_probability_bonus'; value: number };
+
 // 機材定義（マスタ）
 export interface EquipmentDef {
   id: string;
   name: string;
   description: string;
   category: EquipmentCategory;
+  rarity: EquipmentRarity;
   price: number;
   effectDescription: string; // UI表示用の効果説明
+  effects: EquipmentEffect[];
 }
 
 // =====================================

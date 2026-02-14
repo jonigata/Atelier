@@ -6,6 +6,7 @@
   import { removeItemFromInventory } from '$lib/services/inventory';
   import { SHOP } from '$lib/data/balance';
   import { shopFlavors, pickRandom } from '$lib/data/flavorTexts';
+  import { getSellPriceMult, getBuyPriceMult, recordSell } from '$lib/services/equipmentEffects';
   import type { OwnedItem, ItemDef, EquipmentDef } from '$lib/models/types';
 
   export let onBack: () => void;
@@ -61,9 +62,10 @@
     });
   }
 
-  // 購入処理
+  // 購入処理（機材効果: 購入割引適用）
   function buyItem(item: ItemDef) {
-    const price = item.basePrice;
+    const buyMult = getBuyPriceMult();
+    const price = Math.max(1, Math.floor(item.basePrice * buyMult));
     if ($gameState.money < price) {
       addMessage(`所持金が足りません（必要: ${price}G）`);
       return;
@@ -115,13 +117,14 @@
     addMessage(`機材「${equipDef.name}」を購入した！`);
   }
 
-  // 売却処理
+  // 売却処理（機材効果: 売却価格補正適用）
   function sellItem(item: OwnedItem) {
     const def = getItem(item.itemId);
     if (!def) return;
 
-    // 売却価格 = 基本価格 × (品質 / 50) × 売却係数
-    const price = Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
+    // 売却価格 = 基本価格 × (品質 / 50) × 売却係数 × 機材効果
+    const basePrice = Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
+    const price = Math.max(1, Math.floor(basePrice * getSellPriceMult(item)));
 
     // インベントリから削除
     gameState.update((state) => ({
@@ -131,6 +134,7 @@
 
     addMoney(price);
     addSalesAmount(price);
+    recordSell();
     addMessage(`${def.name}（品質${item.quality}）を${price}Gで売却しました`);
   }
 
@@ -148,7 +152,8 @@
   function getSellPrice(item: OwnedItem): number {
     const def = getItem(item.itemId);
     if (!def) return 0;
-    return Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
+    const basePrice = Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
+    return Math.max(1, Math.floor(basePrice * getSellPriceMult(item)));
   }
 </script>
 
@@ -180,7 +185,9 @@
   {#if activeTab === 'buy'}
     <div class="item-list">
       {#each buyableItems as item}
-        {@const canBuy = $gameState.money >= item.basePrice}
+        {@const buyMult = getBuyPriceMult()}
+        {@const displayPrice = Math.max(1, Math.floor(item.basePrice * buyMult))}
+        {@const canBuy = $gameState.money >= displayPrice}
         <div class="shop-item" class:disabled={!canBuy}>
           <img class="item-icon" src={getItemIcon(item.id)} alt={item.name} on:error={handleIconError} />
           <div class="item-info">
@@ -188,7 +195,7 @@
             <span class="item-desc">{item.description}</span>
           </div>
           <div class="item-action">
-            <span class="item-price">{item.basePrice}G</span>
+            <span class="item-price">{displayPrice}G{buyMult < 1 ? ' (割引)' : ''}</span>
             <button
               class="buy-btn"
               disabled={!canBuy}

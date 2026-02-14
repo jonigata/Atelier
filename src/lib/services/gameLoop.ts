@@ -21,6 +21,8 @@ import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import { checkAutoCompleteAchievements } from '$lib/services/tutorial';
 import { checkMerchantEvents } from '$lib/services/merchant';
 import { expeditionFlavors, pickRandom } from '$lib/data/flavorTexts';
+import { getExpeditionDropsMult, getExpeditionRareBonus } from '$lib/services/equipmentEffects';
+import { getItem as getItemDef } from '$lib/data/items';
 import type { OwnedItem, MorningEvent, GameState } from '$lib/models/types';
 import skipDataJson from '$lib/data/skipData.json';
 
@@ -126,7 +128,7 @@ function checkExpeditionReturn(): void {
 }
 
 /**
- * 採取隊のドロップアイテム計算
+ * 採取隊のドロップアイテム計算（機材効果適用済み）
  */
 function calculateExpeditionDrops(areaId: string, duration: number): OwnedItem[] {
   const area = getArea(areaId);
@@ -135,9 +137,16 @@ function calculateExpeditionDrops(areaId: string, duration: number): OwnedItem[]
   const items: OwnedItem[] = [];
   const baseDropCount = duration * EXPEDITION.DROPS_PER_DAY;
 
-  for (let i = 0; i < baseDropCount; i++) {
-    // レアドロップ判定
-    const isRare = Math.random() < area.rareChance && area.rareDrops.length > 0;
+  // 機材効果: 汎用ドロップ乗数（カテゴリ指定なし）
+  const generalMult = getExpeditionDropsMult();
+  const effectiveDropCount = Math.round(baseDropCount * generalMult);
+
+  // 機材効果: レア素材確率ボーナス
+  const rareBonus = getExpeditionRareBonus();
+
+  for (let i = 0; i < effectiveDropCount; i++) {
+    // レアドロップ判定（機材効果で確率上昇）
+    const isRare = Math.random() < (area.rareChance + rareBonus) && area.rareDrops.length > 0;
     const dropTable = isRare ? area.rareDrops : area.drops;
 
     // 重み付き抽選
@@ -151,7 +160,7 @@ function calculateExpeditionDrops(areaId: string, duration: number): OwnedItem[]
         const quality = Math.floor(Math.random() * (maxQ - minQ + 1)) + minQ;
         const areaFlavors = expeditionFlavors[areaId] ?? [];
         const state = get(gameState);
-        items.push({
+        const droppedItem: OwnedItem = {
           itemId: drop.itemId,
           quality,
           origin: {
@@ -160,7 +169,18 @@ function calculateExpeditionDrops(areaId: string, duration: number): OwnedItem[]
             areaId,
             flavorText: areaFlavors.length > 0 ? pickRandom(areaFlavors) : undefined,
           },
-        });
+        };
+
+        // 機材効果: カテゴリ別の追加ドロップ
+        const itemInfo = getItemDef(drop.itemId);
+        const catMult = itemInfo ? getExpeditionDropsMult(itemInfo.category) : 1;
+        // カテゴリ乗数が汎用と異なる場合、追加ドロップとして処理
+        const extraFromCat = catMult > generalMult ? Math.round(catMult - generalMult) : 0;
+
+        items.push(droppedItem);
+        for (let j = 0; j < extraFromCat; j++) {
+          items.push({ ...droppedItem, quality: Math.floor(Math.random() * (maxQ - minQ + 1)) + minQ });
+        }
         break;
       }
     }
