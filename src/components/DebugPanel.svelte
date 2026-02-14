@@ -10,6 +10,14 @@
     clearLogs,
     type AutoplayLog,
   } from '$lib/services/autoplay';
+  import {
+    getAllSlotMeta,
+    saveToSlot,
+    loadFromSlot,
+    deleteSlot,
+    updateSlotLabel,
+    type SaveSlotMeta,
+  } from '$lib/services/saveLoad';
 
   let isOpen = false;
   let isRunning = false;
@@ -17,6 +25,90 @@
   let speed = 100;
   let maxDays = 30;
   let updateInterval: ReturnType<typeof setInterval>;
+
+  // セーブ・ロード
+  let slotMeta: (SaveSlotMeta | null)[] = [];
+  let showSaveLoad = false;
+  let editingLabel: number | null = null;
+  let editLabelValue = '';
+  let confirmAction: { type: 'load' | 'overwrite' | 'delete'; index: number } | null = null;
+
+  function refreshSlots() {
+    slotMeta = getAllSlotMeta();
+  }
+
+  function handleSave(index: number) {
+    if (slotMeta[index]) {
+      confirmAction = { type: 'overwrite', index };
+      return;
+    }
+    doSave(index);
+  }
+
+  function doSave(index: number) {
+    const existing = slotMeta[index];
+    saveToSlot(index, existing?.label ?? '');
+    refreshSlots();
+    confirmAction = null;
+  }
+
+  function handleLoad(index: number) {
+    confirmAction = { type: 'load', index };
+  }
+
+  function doLoad(index: number) {
+    loadFromSlot(index);
+    confirmAction = null;
+  }
+
+  function handleDelete(index: number) {
+    confirmAction = { type: 'delete', index };
+  }
+
+  function doDelete(index: number) {
+    deleteSlot(index);
+    refreshSlots();
+    confirmAction = null;
+  }
+
+  function confirmYes() {
+    if (!confirmAction) return;
+    const { type, index } = confirmAction;
+    if (type === 'load') doLoad(index);
+    else if (type === 'overwrite') doSave(index);
+    else if (type === 'delete') doDelete(index);
+  }
+
+  function confirmNo() {
+    confirmAction = null;
+  }
+
+  function startEditLabel(index: number) {
+    editingLabel = index;
+    editLabelValue = slotMeta[index]?.label ?? '';
+  }
+
+  function finishEditLabel(index: number) {
+    if (editingLabel === index) {
+      updateSlotLabel(index, editLabelValue);
+      refreshSlots();
+      editingLabel = null;
+    }
+  }
+
+  function toggleSaveLoad() {
+    showSaveLoad = !showSaveLoad;
+    if (showSaveLoad) refreshSlots();
+  }
+
+  function formatDate(iso: string): string {
+    const d = new Date(iso);
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    return `${mm}/${dd} ${hh}:${mi}`;
+  }
 
   // 状態を定期更新
   $: if (isOpen) {
@@ -158,6 +250,71 @@
           </div>
         {/each}
       </div>
+    </div>
+
+    <div class="section">
+      <h4>
+        <button class="save-load-toggle" on:click={toggleSaveLoad}>
+          {showSaveLoad ? '▼' : '▶'} セーブ・ロード
+        </button>
+      </h4>
+      {#if showSaveLoad}
+        {#if confirmAction}
+          <div class="confirm-bar">
+            <span>
+              {#if confirmAction.type === 'load'}スロット{confirmAction.index}をロードしますか？
+              {:else if confirmAction.type === 'overwrite'}スロット{confirmAction.index}を上書きしますか？
+              {:else}スロット{confirmAction.index}を削除しますか？
+              {/if}
+            </span>
+            <div class="confirm-buttons">
+              <button class="confirm-yes" on:click={confirmYes}>はい</button>
+              <button class="confirm-no" on:click={confirmNo}>いいえ</button>
+            </div>
+          </div>
+        {/if}
+        <div class="save-slots">
+          {#each slotMeta as meta, i}
+            <div class="slot" class:slot-empty={!meta} class:slot-filled={!!meta}>
+              <div class="slot-header">
+                <span class="slot-number">#{i}</span>
+                {#if meta}
+                  {#if editingLabel === i}
+                    <input
+                      class="label-input"
+                      type="text"
+                      bind:value={editLabelValue}
+                      on:blur={() => finishEditLabel(i)}
+                      on:keydown={(e) => { if (e.key === 'Enter') finishEditLabel(i); }}
+                      placeholder="ラベル"
+                      maxlength="20"
+                    />
+                  {:else}
+                    <span class="slot-label" on:dblclick={() => startEditLabel(i)} title="ダブルクリックで編集">
+                      {meta.label || `Day ${meta.day} / Lv.${meta.alchemyLevel}`}
+                    </span>
+                  {/if}
+                {:else}
+                  <span class="slot-empty-text">-- 空 --</span>
+                {/if}
+              </div>
+              {#if meta}
+                <div class="slot-info">
+                  <span>Day {meta.day} / Lv.{meta.alchemyLevel} / {meta.money}G</span>
+                  <span class="slot-date">{formatDate(meta.savedAt)}</span>
+                </div>
+              {/if}
+              <div class="slot-actions">
+                <button class="save-btn" on:click={() => handleSave(i)}>保存</button>
+                {#if meta}
+                  <button class="load-btn" on:click={() => handleLoad(i)}>読込</button>
+                  <button class="delete-btn" on:click={() => handleDelete(i)}>削除</button>
+                {/if}
+              </div>
+            </div>
+          {/each}
+        </div>
+      {/if}
     </div>
   </div>
 {/if}
@@ -341,5 +498,162 @@
 
   .message {
     color: inherit;
+  }
+
+  /* セーブ・ロード */
+  .save-load-toggle {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .save-load-toggle:hover {
+    color: #ddd;
+    background: none;
+  }
+
+  .save-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .slot {
+    background: #1a1a2a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 6px 8px;
+  }
+
+  .slot-filled {
+    border-color: #4a4a5a;
+  }
+
+  .slot-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+
+  .slot-number {
+    color: #666;
+    font-size: 0.75rem;
+    font-weight: bold;
+    min-width: 18px;
+  }
+
+  .slot-label {
+    color: #c9a959;
+    font-size: 0.8rem;
+    cursor: default;
+  }
+
+  .slot-empty-text {
+    color: #555;
+    font-size: 0.75rem;
+    font-style: italic;
+  }
+
+  .slot-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: #888;
+    margin-bottom: 4px;
+    padding-left: 24px;
+  }
+
+  .slot-date {
+    color: #666;
+  }
+
+  .slot-actions {
+    display: flex;
+    gap: 4px;
+    padding-left: 24px;
+  }
+
+  .slot-actions button {
+    padding: 2px 8px;
+    font-size: 0.7rem;
+  }
+
+  .save-btn {
+    background: #2e5a2e;
+    border-color: #4a8a4a;
+  }
+
+  .save-btn:hover {
+    background: #3a6e3a;
+  }
+
+  .load-btn {
+    background: #1a3a6e;
+    border-color: #3a5a9e;
+  }
+
+  .load-btn:hover {
+    background: #2a4a7e;
+  }
+
+  .delete-btn {
+    background: #5a2a2a;
+    border-color: #8a4a4a;
+  }
+
+  .delete-btn:hover {
+    background: #6e3a3a;
+  }
+
+  .label-input {
+    background: #222;
+    border: 1px solid #c9a959;
+    color: #c9a959;
+    font-size: 0.8rem;
+    padding: 1px 4px;
+    border-radius: 2px;
+    width: 140px;
+    outline: none;
+  }
+
+  .confirm-bar {
+    background: #2a2a1a;
+    border: 1px solid #8a7a3a;
+    border-radius: 4px;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #dda;
+  }
+
+  .confirm-buttons {
+    display: flex;
+    gap: 4px;
+  }
+
+  .confirm-yes {
+    background: #6a3a2a;
+    border-color: #9a5a3a;
+    color: #fca;
+    font-size: 0.7rem;
+    padding: 2px 10px;
+  }
+
+  .confirm-yes:hover {
+    background: #7a4a3a;
+  }
+
+  .confirm-no {
+    font-size: 0.7rem;
+    padding: 2px 10px;
   }
 </style>
