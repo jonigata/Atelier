@@ -129,6 +129,27 @@ export const FACILITY = {
 } as const;
 
 // =====================================
+// 旅商人マルコ
+// =====================================
+
+export const MERCHANT = {
+  /** マルコ来訪開始日（月内） */
+  VISIT_START_DAY: 8,
+  /** マルコ来訪終了日（月内） */
+  VISIT_END_DAY: 14,
+  /** レア素材の品質範囲（最小） */
+  RARE_MATERIAL_QUALITY_MIN: 60,
+  /** レア素材の品質範囲（最大） */
+  RARE_MATERIAL_QUALITY_MAX: 90,
+  /** レア素材の価格係数（basePrice に対して） */
+  RARE_MATERIAL_PRICE_RATE: 2.5,
+  /** レシピ本の価格係数（basePrice に対して） */
+  RECIPE_BOOK_PRICE_RATE: 1.2,
+  /** 4枠目が出現する確率 */
+  EXTRA_SLOT_CHANCE: 0.5,
+} as const;
+
+// =====================================
 // ヘルパー関数
 // =====================================
 

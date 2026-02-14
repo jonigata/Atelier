@@ -11,13 +11,19 @@
     {#each $gameState.morningEvents as event}
       <div class="event" class:expedition={event.type === 'expedition_return'}
            class:quest={event.type === 'new_quest'}
-           class:expired={event.type === 'quest_expired'}>
+           class:expired={event.type === 'quest_expired'}
+           class:merchant-arrival={event.type === 'merchant_arrival'}
+           class:merchant-departure={event.type === 'merchant_departure'}>
         {#if event.type === 'expedition_return'}
           <span class="icon">📦</span>
         {:else if event.type === 'new_quest'}
           <span class="icon">📜</span>
         {:else if event.type === 'quest_expired'}
           <span class="icon">⚠️</span>
+        {:else if event.type === 'merchant_arrival'}
+          <span class="icon">🐪</span>
+        {:else if event.type === 'merchant_departure'}
+          <span class="icon">👋</span>
         {/if}
         <span class="text">{event.message}</span>
       </div>
@@ -78,6 +84,14 @@
 
   .event.expired {
     border-left: 3px solid #f44336;
+  }
+
+  .event.merchant-arrival {
+    border-left: 3px solid #ff9800;
+  }
+
+  .event.merchant-departure {
+    border-left: 3px solid #9e9e9e;
   }
 
   .icon {

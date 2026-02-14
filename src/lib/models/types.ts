@@ -12,10 +12,48 @@ export interface ItemDef {
 
 // アイテムの来歴
 export interface ItemOrigin {
-  type: 'expedition' | 'shop' | 'crafted' | 'reward' | 'initial';
+  type: 'expedition' | 'shop' | 'crafted' | 'reward' | 'initial' | 'merchant';
   day: number;
   areaId?: string;       // 採取地（expedition時）
   flavorText?: string;   // 短い情景描写
+}
+
+// =====================================
+// 機材システム
+// =====================================
+
+// 機材カテゴリ
+export type EquipmentCategory = 'cauldron' | 'time' | 'material' | 'economy' | 'special';
+
+// 機材定義（マスタ）
+export interface EquipmentDef {
+  id: string;
+  name: string;
+  description: string;
+  category: EquipmentCategory;
+  price: number;
+  effectDescription: string; // UI表示用の効果説明
+}
+
+// =====================================
+// 旅商人マルコ
+// =====================================
+
+// マルコの商品枠の種類
+export type MerchantSlotType = 'equipment' | 'recipe_book' | 'rare_material';
+
+// マルコの商品枠
+export interface MerchantSlot {
+  type: MerchantSlotType;
+  id: string;           // equipmentId, bookId, or itemId
+  price: number;
+  purchased: boolean;   // この訪問中に購入済みか
+}
+
+// マルコの今月のラインナップ
+export interface MerchantLineup {
+  month: number;        // 何月のラインナップか (1-12)
+  slots: MerchantSlot[];
 }
 
 // 所持アイテム（品質付き）
@@ -134,7 +172,9 @@ export type GamePhase =
 export type MorningEvent =
   | { type: 'expedition_return'; message: string; data: OwnedItem[] }
   | { type: 'new_quest'; message: string }
-  | { type: 'quest_expired'; message: string };
+  | { type: 'quest_expired'; message: string }
+  | { type: 'merchant_arrival'; message: string }
+  | { type: 'merchant_departure'; message: string };
 
 // チュートリアル会話
 // 構造化された報酬アイテム（アイコン表示用）
@@ -202,6 +242,14 @@ export interface GameState {
   discoveredItems: string[];
   facilities: string[]; // 解放済み永続設備ID
 
+  // 機材システム
+  ownedEquipment: string[];          // 所持している機材IDの配列
+  activeCauldron: string | null;     // 現在セットしている錬金釜ID
+
+  // 旅商人マルコ
+  merchantLineup: MerchantLineup | null;  // 現在の月のラインナップ
+  merchantVisitedMonths: number[];         // 訪問があった月の記録
+
   phase: GamePhase;
   morningEvents: MorningEvent[];
   messageLog: string[];
@@ -223,7 +271,8 @@ export type ActionType =
   | 'rest'
   | 'study'
   | 'inventory'
-  | 'album';
+  | 'album'
+  | 'traveling_merchant';
 
 // =====================================
 // アチーブメントシステム

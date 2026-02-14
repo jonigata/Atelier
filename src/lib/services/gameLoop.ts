@@ -19,6 +19,7 @@ import { getAvailableQuestTemplates } from '$lib/data/quests';
 import { EXPEDITION, QUEST } from '$lib/data/balance';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import { checkAutoCompleteAchievements } from '$lib/services/tutorial';
+import { checkMerchantEvents } from '$lib/services/merchant';
 import { expeditionFlavors, pickRandom } from '$lib/data/flavorTexts';
 import type { OwnedItem, MorningEvent } from '$lib/models/types';
 
@@ -61,6 +62,9 @@ function processMorningPhase(): void {
 
   // 3. 新しい依頼の生成
   generateNewQuests();
+
+  // 4. マルコの来訪・出発チェック
+  checkMerchantEvents();
 
   // イベントがあればmorning画面を表示、なければ直接actionへ
   const updatedState = get(gameState);

@@ -7,6 +7,7 @@
   import AlbumPanel from './AlbumPanel.svelte';
   import RestPanel from './RestPanel.svelte';
   import StudyPanel from './StudyPanel.svelte';
+  import TravelingMerchantPanel from './TravelingMerchantPanel.svelte';
   import type { ActionType } from '$lib/models/types';
 
   export let action: ActionType;
@@ -29,4 +30,6 @@
   <RestPanel {onBack} />
 {:else if action === 'study'}
   <StudyPanel {onBack} />
+{:else if action === 'traveling_merchant'}
+  <TravelingMerchantPanel {onBack} />
 {/if}

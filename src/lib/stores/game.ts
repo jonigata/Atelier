@@ -40,6 +40,14 @@ function createInitialState(): GameState {
     discoveredItems: ['herb_01', 'water_01'],
     facilities: [],
 
+    // 機材システム
+    ownedEquipment: [],
+    activeCauldron: null,
+
+    // 旅商人マルコ
+    merchantLineup: null,
+    merchantVisitedMonths: [],
+
     phase: 'morning',
     morningEvents: [],
     messageLog: ['ゲームを開始しました。'],

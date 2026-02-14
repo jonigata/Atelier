@@ -2,6 +2,7 @@
   import { gameState } from '$lib/stores/game';
   import { setSelectedQuestId } from '$lib/stores/quests';
   import { showingUnlockActions, pendingUnlockActions } from '$lib/stores/toast';
+  import { isMerchantVisiting } from '$lib/services/calendar';
   import ObjectivesSection from './ObjectivesSection.svelte';
   import type { ActionType, ActiveQuest } from '$lib/models/types';
 
@@ -28,6 +29,7 @@
   }
 
   $: isDayTransition = $gameState.pendingDayTransition !== null;
+  $: merchantInTown = isMerchantVisiting($gameState.day);
 
   $: actionStates = actions.map(action => {
     const actionType = action.type;
@@ -52,6 +54,21 @@
 
 <div class="action-menu">
   <h3>行動を選択してください</h3>
+
+  {#if merchantInTown}
+    <div class="special-actions">
+      <button
+        class="action-btn merchant-btn"
+        on:click={() => onSelect('traveling_merchant')}
+      >
+        <img class="icon" src="/images/characters/marco/marco-face-smug.png" alt="マルコ" />
+        <span class="label">旅商人マルコ</span>
+        <span class="description">マルコの行商を覗く</span>
+        <span class="badge merchant">来訪中</span>
+      </button>
+    </div>
+  {/if}
+
   <div class="actions">
     {#each actionStates as action}
       {#if action.isLocked}
@@ -202,8 +219,46 @@
     animation: badgePulse 2s ease-in-out infinite;
   }
 
+  .badge.merchant {
+    background: #ff9800;
+  }
+
   @keyframes badgePulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.7; }
+  }
+
+  .special-actions {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(201, 169, 89, 0.3);
+  }
+
+  .merchant-btn {
+    width: 100%;
+    flex-direction: row;
+    min-height: auto;
+    padding: 1rem 1.25rem;
+    border-color: #ff9800 !important;
+    animation: merchantPulse 3s ease-in-out infinite;
+  }
+
+  .merchant-btn .icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+
+  .merchant-btn .label {
+    font-size: 1.1rem;
+  }
+
+  .merchant-btn .description {
+    text-align: left;
+  }
+
+  @keyframes merchantPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
+    50% { box-shadow: 0 0 15px 3px rgba(255, 152, 0, 0.3); }
   }
 </style>
