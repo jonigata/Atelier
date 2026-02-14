@@ -8,6 +8,9 @@
 #   Step 3: nano-banana-pro/edit — キャラクターシート生成（3方向 + 3表情） → <name>.png
 #   Step 4: seedream v4.5/edit — 表情画像5枚（証明写真画角） → <name>-face-*.png
 #
+# チビ画像生成:
+#   --chibi オプションで立ち絵からデフォルメ版を生成 → <name>-chibi.png
+#
 # Examples:
 #   # 全ステップ実行
 #   bash scripts/generate-character.sh --name melda \
@@ -18,6 +21,9 @@
 #
 #   # 表情画像だけ生成
 #   bash scripts/generate-character.sh --name melda --from 4
+#
+#   # チビ画像だけ生成（立ち絵が必要）
+#   bash scripts/generate-character.sh --name melda --chibi
 
 set -e
 
@@ -32,6 +38,7 @@ DESC=""
 FROM_STEP=1
 REF_IMAGE="heroine/heroine-1.png"
 EXPR_ONLY=""  # --expr: 特定表情だけ再生成
+CHIBI_ONLY=false  # --chibi: チビ画像だけ生成
 
 # --- アップロードキャッシュ（generate-event.sh と同じ仕組み） ---
 get_cached_url() {
@@ -87,6 +94,7 @@ while [[ $# -gt 0 ]]; do
     --from|-f)  FROM_STEP="$2"; shift 2 ;;
     --ref|-r)   REF_IMAGE="$2"; shift 2 ;;
     --expr|-e)  EXPR_ONLY="$2"; FROM_STEP=4; shift 2 ;;
+    --chibi)    CHIBI_ONLY=true; shift ;;
     --help|-h)
       echo "Usage: bash scripts/generate-character.sh --name <id> --desc \"...\" [options]"
       echo ""
@@ -100,6 +108,9 @@ while [[ $# -gt 0 ]]; do
       echo "               (default: heroine/heroine-1.png)"
       echo "  --expr, -e   Regenerate a specific expression only (e.g. --expr angry)."
       echo "               Requires existing neutral. Implies --from 4."
+      echo "  --chibi      Generate chibi/deformed version only."
+      echo "               Requires existing <name>-1.png."
+      echo "               Output: $CHARS_DIR/<name>/<name>-chibi.png"
       echo ""
       echo "Steps:"
       echo "  1: Generate character standing image (seedream v4.5/edit, 1920x1920)"
@@ -129,7 +140,7 @@ if [ -z "$NAME" ]; then
   exit 1
 fi
 
-if [ "$FROM_STEP" -le 1 ] && [ -z "$DESC" ]; then
+if [ "$CHIBI_ONLY" = false ] && [ "$FROM_STEP" -le 1 ] && [ -z "$DESC" ]; then
   echo "Error: --desc is required for step 1" >&2
   echo "Use --from 2 to skip step 1 (requires existing ${NAME}-1.png)" >&2
   exit 1
@@ -139,6 +150,42 @@ CHAR_DIR="$CHARS_DIR/${NAME}"
 mkdir -p "$CHAR_DIR"
 
 STEP1_FILE="$CHAR_DIR/${NAME}-1.png"
+
+# --- --chibi モード: チビ画像だけ生成して終了 ---
+if [ "$CHIBI_ONLY" = true ]; then
+  if [ ! -f "$STEP1_FILE" ]; then
+    echo "Error: $STEP1_FILE not found. Run step 1 first." >&2
+    exit 1
+  fi
+
+  CHIBI_FILE="$CHAR_DIR/${NAME}-chibi.png"
+  CHIBI_STYLE="chibi super-deformed anime character, 2.5 head tall proportions, big round head, large cute round eyes, small rounded body, same outfit details and color scheme as Figure 1, full body standing pose, cheerful expression, clean anime illustration, soft pastel colors, simple light background, single character only, no text"
+
+  echo "=== Generating chibi version ===" >&2
+  CHAR_REF_URL=$(upload_file "$STEP1_FILE" "${NAME}-1.png")
+
+  RESULT=$(bash "$SKILL_DIR/generate.sh" \
+    --prompt "$CHIBI_STYLE" \
+    --model "$EDIT_MODEL" \
+    --size "square" \
+    --extra "{\"image_urls\": [\"$CHAR_REF_URL\"], \"enable_safety_checker\": false}" \
+    --timeout 180 2>/dev/null)
+
+  IMG_URL=$(echo "$RESULT" | grep -o '"url":"[^"]*"' | head -1 | cut -d'"' -f4)
+  if [ -z "$IMG_URL" ]; then
+    echo "Error: Chibi generation failed" >&2
+    echo "$RESULT" >&2
+    exit 1
+  fi
+
+  curl -sL "$IMG_URL" -o "$CHIBI_FILE"
+  echo "  Saved: $CHIBI_FILE" >&2
+
+  echo "" >&2
+  echo "Done! Chibi image: $CHIBI_FILE" >&2
+  echo "$CHIBI_FILE"
+  exit 0
+fi
 SHEET_FILE="$CHAR_DIR/${NAME}.png"
 SHEET_TEMPLATE="$CHARS_DIR/character_sheet.png"
 

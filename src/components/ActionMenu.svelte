@@ -24,8 +24,8 @@
     { type: 'album', label: 'アルバム', description: 'アイテム図鑑' },
   ];
 
-  function getActionIcon(type: ActionType): string {
-    return `/icons/actions/${type}.png`;
+  function getActionBanner(type: ActionType): string {
+    return `/images/actions/${type}.png`;
   }
 
   $: isDayTransition = $gameState.pendingDayTransition !== null;
@@ -82,8 +82,8 @@
           class:newly-unlocked={action.isNewlyUnlocked}
           on:click={() => onSelect(action.type)}
           disabled={action.type === 'expedition' && $gameState.expedition !== null}
+          style="background-image: url({getActionBanner(action.type)})"
         >
-          <img class="icon" src={getActionIcon(action.type)} alt={action.label} />
           <span class="label">{action.label}</span>
           <span class="description">{action.description}</span>
           {#if action.type === 'expedition' && $gameState.expedition !== null}
@@ -121,11 +121,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 1.25rem;
+    justify-content: flex-end;
+    gap: 0;
+    padding: 0.4rem 0.5rem;
     min-height: 120px;
-    background: rgba(255, 255, 255, 0.05);
+    background-size: cover;
+    background-position: center;
     border: 2px solid #4a4a6a;
     border-radius: 8px;
     color: #e0e0f0;
@@ -135,9 +136,9 @@
   }
 
   .action-btn:hover:not(:disabled):not(.locked) {
-    background: rgba(201, 169, 89, 0.15);
     border-color: #c9a959;
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
   .action-btn:disabled {
@@ -146,14 +147,15 @@
   }
 
   .action-btn.locked {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.3) !important;
+    background-image: none !important;
     border: 2px dashed #3a3a5a;
     cursor: not-allowed;
   }
 
   .lock-icon {
-    width: 64px;
-    height: 64px;
+    width: 48px;
+    height: 48px;
     object-fit: contain;
     opacity: 0.5;
   }
@@ -172,7 +174,6 @@
     0% {
       box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
       border-color: #4caf50;
-      background: rgba(76, 175, 80, 0.2);
     }
     50% {
       box-shadow: 0 0 20px 10px rgba(76, 175, 80, 0);
@@ -180,25 +181,38 @@
     100% {
       box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
       border-color: #4a4a6a;
-      background: rgba(255, 255, 255, 0.05);
     }
-  }
-
-  .icon {
-    width: 64px;
-    height: 64px;
-    object-fit: contain;
   }
 
   .label {
     font-size: 1.1rem;
     font-weight: bold;
+    line-height: 1.2;
+    color: #fff;
+    text-shadow:
+      -2px -2px 0 rgba(20, 20, 40, 0.95),
+       2px -2px 0 rgba(20, 20, 40, 0.95),
+      -2px  2px 0 rgba(20, 20, 40, 0.95),
+       2px  2px 0 rgba(20, 20, 40, 0.95),
+       0   -2px 0 rgba(20, 20, 40, 0.95),
+       0    2px 0 rgba(20, 20, 40, 0.95),
+      -2px  0   0 rgba(20, 20, 40, 0.95),
+       2px  0   0 rgba(20, 20, 40, 0.95);
   }
 
   .description {
-    font-size: 0.8rem;
-    color: #a0a0b0;
-    text-align: center;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    color: #ddd;
+    text-shadow:
+      -1px -1px 0 rgba(20, 20, 40, 0.95),
+       1px -1px 0 rgba(20, 20, 40, 0.95),
+      -1px  1px 0 rgba(20, 20, 40, 0.95),
+       1px  1px 0 rgba(20, 20, 40, 0.95),
+       0   -1px 0 rgba(20, 20, 40, 0.95),
+       0    1px 0 rgba(20, 20, 40, 0.95),
+      -1px  0   0 rgba(20, 20, 40, 0.95),
+       1px  0   0 rgba(20, 20, 40, 0.95);
   }
 
   .badge {

@@ -119,7 +119,7 @@ muted earthy tones, visual novel event CG quality.
 **出力先**: `documents/design/characters/<name>/`
 **参照テンプレート**: `documents/design/characters/character_sheet.png`
 
-4ステップで立ち絵・キャラクターシート・表情画像を生成する。
+4ステップで立ち絵・キャラクターシート・表情画像を生成する。`--chibi` でデフォルメ版も生成可能。
 
 | Step | モデル | 内容 | 出力 |
 |------|--------|------|------|
@@ -128,6 +128,7 @@ muted earthy tones, visual novel event CG quality.
 | 3 | `fal-ai/nano-banana-pro/edit` | キャラクターシート（正面・横・背面 + 表情3種） | `<name>/<name>.png` |
 | 4a | `fal-ai/bytedance/seedream/v4.5/edit` | -1.png からneutral（証明写真画角）を生成 | `<name>/<name>-face-neutral.png` |
 | 4b | `fal-ai/bytedance/seedream/v4.5/edit` | neutralから表情差し替えで8枚派生 | `<name>/<name>-face-*.png` |
+| chibi | `fal-ai/bytedance/seedream/v4.5/edit` | -1.png からデフォルメ/チビ版を生成 | `<name>/<name>-chibi.png` |
 
 #### 表情一覧（9種）
 
@@ -155,6 +156,9 @@ bash scripts/generate-character.sh --name melda --expr neutral
 # スタイル参照画像を変更（デフォルト: heroine/heroine-1.png）
 bash scripts/generate-character.sh --name ren --desc "..." --ref liene/liene-1.png
 
+# チビ（デフォルメ）版を生成（立ち絵が必要）
+bash scripts/generate-character.sh --name melda --chibi
+
 # ヘルプ
 bash scripts/generate-character.sh --help
 ```
@@ -167,19 +171,57 @@ bash scripts/generate-character.sh --help
 
 ### 生成済みキャラクター画像
 
-| ID | キャラクター | ディレクトリ |
-|----|------------|------------|
-| heroine | コレット（主人公） | `documents/design/characters/heroine/` |
-| liene | リーネ（村娘） | `documents/design/characters/liene/` |
-| mayor | 村長 | `documents/design/characters/mayor/` |
-| marco | マルコ（旅商人） | `documents/design/characters/marco/` |
-| melda | メルダ（パン屋） | `documents/design/characters/melda/` |
-| ren | レン（冒険者・剣士） | `documents/design/characters/ren/` |
-| fee | フィー（冒険者・斥候） | `documents/design/characters/fee/` |
-| irina | イリーナ（師匠） | `documents/design/characters/irina/` |
-| vict | ヴィクト（ライバル錬金術師） | `documents/design/characters/vict/` |
-| gord | ゴルド（鍛冶屋） | `documents/design/characters/gord/` |
-| inspector | 査察官 | `documents/design/characters/inspector/` |
+| ID | キャラクター | ディレクトリ | チビ画像 |
+|----|------------|------------|---------|
+| heroine | コレット（主人公） | `documents/design/characters/heroine/` | あり |
+| liene | リーネ（村娘） | `documents/design/characters/liene/` | あり |
+| mayor | 村長 | `documents/design/characters/mayor/` | |
+| marco | マルコ（旅商人） | `documents/design/characters/marco/` | |
+| melda | メルダ（パン屋） | `documents/design/characters/melda/` | あり |
+| ren | レン（冒険者・剣士） | `documents/design/characters/ren/` | あり |
+| fee | フィー（冒険者・斥候） | `documents/design/characters/fee/` | あり |
+| irina | イリーナ（師匠） | `documents/design/characters/irina/` | |
+| vict | ヴィクト（ライバル錬金術師） | `documents/design/characters/vict/` | |
+| gord | ゴルド（鍛冶屋） | `documents/design/characters/gord/` | |
+| inspector | 査察官 | `documents/design/characters/inspector/` | |
+
+---
+
+## アクションバナー画像 (Action Banners)
+
+**モデル**: `fal-ai/bytedance/seedream/v4.5/edit`（デフォルメキャラ参照あり）
+**出力先**: `static/images/actions/`
+**チビ参照画像**: `documents/design/characters/<name>/<name>-chibi.png`
+
+コマンドボタン用の横長バナー画像。2段階で生成する:
+1. **Phase 1**: 各キャラの立ち絵からデフォルメ版を生成（`--chibi`）
+2. **Phase 2**: デフォルメ版を参照画像として、シーンバナーを生成
+
+**生成コマンド**:
+```bash
+# Phase 1: チビ参照画像生成（generate-character.sh --chibi を使用）
+bash scripts/generate-character.sh --name heroine --chibi
+
+# Phase 2: バナー生成（全8種 or 指定のみ）
+bash scripts/generate-action-banners.sh --phase2
+bash scripts/generate-action-banners.sh --phase2 alchemy
+
+# 全行程（Phase 1 + Phase 2）
+bash scripts/generate-action-banners.sh
+```
+
+### 生成済みバナー
+
+| ID | アクション | 参照キャラ | ファイル |
+|----|----------|----------|----------|
+| alchemy | 調合 | heroine | `static/images/actions/alchemy.png` |
+| quest | 依頼 | heroine, liene | `static/images/actions/quest.png` |
+| expedition | 採取 | heroine, ren, fee | `static/images/actions/expedition.png` |
+| shop | ショップ | heroine, melda | `static/images/actions/shop.png` |
+| inventory | 所持品 | heroine | `static/images/actions/inventory.png` |
+| rest | 休息 | heroine | `static/images/actions/rest.png` |
+| study | 勉強 | heroine | `static/images/actions/study.png` |
+| album | アルバム | heroine, liene | `static/images/actions/album.png` |
 
 ---
 
@@ -190,4 +232,5 @@ bash scripts/generate-character.sh --help
 | `scripts/generate-icon.sh` | アイコン単体生成（素材・アクション） | `--name ID --desc "説明"` |
 | `scripts/generate-icons.sh` | 素材アイコン一括生成（既存スキップ） | 引数なし |
 | `scripts/generate-event.sh` | イベントCG生成（キャラ参照対応） | `--name ID --prompt "..." [--chars a,b]` |
-| `scripts/generate-character.sh` | キャラクター立ち絵＋シート生成 | `--name ID --desc "..." [--from N] [--ref img]` |
+| `scripts/generate-character.sh` | キャラクター立ち絵＋シート＋チビ画像生成 | `--name ID --desc "..." [--from N] [--ref img] [--chibi]` |
+| `scripts/generate-action-banners.sh` | コマンドボタン用バナー画像生成 | `[--phase1] [--phase2 [action]]` |
