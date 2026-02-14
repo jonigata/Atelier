@@ -3,8 +3,9 @@
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getArea } from '$lib/data/areas';
   import { formatOrigin } from '$lib/data/flavorTexts';
-  import type { OwnedItem } from '$lib/models/types';
+  import type { OwnedItem, EquipmentDef } from '$lib/models/types';
   import { CATEGORY_NAMES, getCategoryName } from '$lib/data/categories';
+  import { getEquipment } from '$lib/data/equipment';
   import ItemCard from './common/ItemCard.svelte';
 
   export let onBack: () => void;
@@ -166,6 +167,28 @@
 
   // 合計アイテム数
   $: totalItems = $gameState.inventory.length;
+
+  // 所持機材
+  const EQUIP_CATEGORY_NAMES: Record<string, string> = {
+    cauldron: '錬金釜',
+    time: '時間・行動',
+    material: '素材・調合',
+    economy: '経済・報酬',
+    special: '特殊',
+  };
+
+  $: ownedEquipmentDefs = $gameState.ownedEquipment
+    .map((id) => getEquipment(id))
+    .filter((def): def is EquipmentDef => def !== undefined);
+
+  $: equipmentByCategory = ownedEquipmentDefs.reduce(
+    (acc, def) => {
+      if (!acc[def.category]) acc[def.category] = [];
+      acc[def.category].push(def);
+      return acc;
+    },
+    {} as Record<string, EquipmentDef[]>,
+  );
 </script>
 
 <div class="inventory-panel">
@@ -277,6 +300,30 @@
               {/each}
             </div>
           {/if}
+        </div>
+      {/each}
+    </div>
+  {/if}
+
+  <!-- 所持機材セクション -->
+  {#if ownedEquipmentDefs.length > 0}
+    <div class="equipment-section">
+      <h3 class="equipment-header">所持機材 ({ownedEquipmentDefs.length})</h3>
+      {#each Object.entries(equipmentByCategory) as [category, defs]}
+        <div class="equip-category-group">
+          <div class="equip-category-label">{EQUIP_CATEGORY_NAMES[category] || category}</div>
+          {#each defs as def}
+            <div class="equip-row" class:active-cauldron={def.id === $gameState.activeCauldron}>
+              <div class="equip-row-main">
+                <span class="equip-rarity-dot" class:rare={def.rarity === 'rare'}></span>
+                <span class="equip-name">{def.name}</span>
+                {#if def.id === $gameState.activeCauldron}
+                  <span class="equip-active-badge">使用中</span>
+                {/if}
+              </div>
+              <div class="equip-effect">{def.effectDescription}</div>
+            </div>
+          {/each}
         </div>
       {/each}
     </div>
@@ -592,5 +639,85 @@
     font-size: 0.8rem;
     color: #6a7a6a;
     font-style: italic;
+  }
+
+  /* 所持機材セクション */
+  .equipment-section {
+    margin-top: 1.5rem;
+    border-top: 1px solid #4a4a6a;
+    padding-top: 1rem;
+  }
+
+  .equipment-header {
+    font-size: 1.1rem;
+    color: #e8a840;
+    margin-bottom: 0.75rem;
+  }
+
+  .equip-category-group {
+    margin-bottom: 0.75rem;
+  }
+
+  .equip-category-label {
+    font-size: 0.8rem;
+    color: #808090;
+    margin-bottom: 0.25rem;
+    padding-left: 0.25rem;
+  }
+
+  .equip-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid #3a3a5a;
+    border-radius: 5px;
+    margin-bottom: 0.3rem;
+  }
+
+  .equip-row.active-cauldron {
+    border-color: #c9a959;
+    background: rgba(201, 169, 89, 0.08);
+  }
+
+  .equip-row-main {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .equip-rarity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6a7a8a;
+    flex-shrink: 0;
+  }
+
+  .equip-rarity-dot.rare {
+    background: #e8a840;
+    box-shadow: 0 0 4px rgba(232, 168, 64, 0.5);
+  }
+
+  .equip-name {
+    font-weight: bold;
+    color: #e0e0f0;
+    font-size: 0.95rem;
+  }
+
+  .equip-active-badge {
+    font-size: 0.7rem;
+    background: #c9a959;
+    color: #1a1a2e;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-weight: bold;
+  }
+
+  .equip-effect {
+    font-size: 0.8rem;
+    color: #8a9a8a;
+    padding-left: 1.25rem;
   }
 </style>
