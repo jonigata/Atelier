@@ -1,0 +1,96 @@
+{
+  "playerName": "コレット",
+  "day": 4,
+  "money": 600,
+  "reputation": 3,
+  "villageDevelopment": 0,
+  "alchemyLevel": 1,
+  "alchemyExp": 10,
+  "stamina": 72,
+  "maxStamina": 100,
+  "inventory": [
+    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
+    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
+    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
+    { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
+    { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
+    { "itemId": "herb_01", "quality": 70, "origin": { "type": "reward", "day": 2, "flavorText": "冷たい視線" } },
+    { "itemId": "herb_01", "quality": 70, "origin": { "type": "reward", "day": 2, "flavorText": "冷たい視線" } },
+    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 3, "flavorText": "知識の扉" } },
+    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 3, "flavorText": "知識の扉" } },
+    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 3, "flavorText": "知識の扉" } },
+    { "itemId": "potion_01", "quality": 47, "origin": { "type": "crafted", "day": 3, "flavorText": "配合に集中して作り上げた" } }
+  ],
+  "ownedBooks": ["book_basics"],
+  "knownRecipes": ["potion_01", "antidote"],
+  "activeQuests": [],
+  "availableQuests": [
+    {
+      "id": "quest_potion_basic",
+      "title": "回復薬を届けて！",
+      "description": "村の診療所で回復薬が足りないんだ。",
+      "type": "deliver",
+      "requiredItemId": "potion_01",
+      "requiredQuantity": 3,
+      "rewardMoney": 200,
+      "rewardReputation": 5,
+      "deadlineDays": 10
+    },
+    {
+      "id": "quest_potion_quality",
+      "title": "良質な回復薬を",
+      "description": "村長への贈り物にしたいんだ。品質の良いものを頼む。",
+      "type": "quality",
+      "requiredItemId": "potion_01",
+      "requiredQuantity": 1,
+      "requiredQuality": 50,
+      "rewardMoney": 300,
+      "rewardReputation": 8,
+      "deadlineDays": 12
+    }
+  ],
+  "completedQuestCount": 0,
+  "failedQuestCount": 0,
+  "newQuestCount": 0,
+  "selectedQuestId": null,
+  "expedition": null,
+  "craftedItems": ["potion_01"],
+  "discoveredItems": ["herb_01", "water_01", "potion_01"],
+  "facilities": [],
+  "ownedEquipment": [],
+  "activeCauldron": null,
+  "shopEquipment": [],
+  "merchantLineup": null,
+  "merchantVisitedMonths": [],
+  "phase": "action",
+  "morningEvents": [],
+  "messageLog": [
+    "ゲームを開始しました。",
+    "フォンテ村での1年間が始まります。",
+    "--- チュートリアルをスキップしました ---"
+  ],
+  "pendingDayTransition": null,
+  "tutorialProgress": {
+    "unlockedActions": ["inventory", "rest", "study", "alchemy", "quest", "album"],
+    "pendingDialogue": null
+  },
+  "achievementProgress": {
+    "completed": [
+      "ach_game_start",
+      "ach_check_inventory",
+      "ach_story_village_girl_cold",
+      "ach_first_recipe",
+      "ach_first_craft",
+      "ach_story_girl_soften"
+    ],
+    "pendingReward": null
+  },
+  "stats": {
+    "totalCraftCount": 1,
+    "totalExpeditionCount": 0,
+    "consecutiveQuestSuccess": 0,
+    "highestQualityCrafted": 47,
+    "totalSalesAmount": 0,
+    "inventoryOpened": true
+  }
+}
