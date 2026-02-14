@@ -46,8 +46,8 @@
   <div class="material-header">
     <h4>素材を選択 ({selectedItems.length}/{totalRequired})</h4>
     <div class="auto-fill-buttons">
-      <button class="auto-fill-btn" on:click={() => onAutoFill('asc')}>▼ 低品質から</button>
       <button class="auto-fill-btn" on:click={() => onAutoFill('desc')}>▲ 高品質から</button>
+      <button class="auto-fill-btn" on:click={() => onAutoFill('asc')}>▼ 低品質から</button>
       {#if selectedItems.length > 0}
         <button class="auto-fill-btn clear" on:click={onClear}>クリア</button>
       {/if}

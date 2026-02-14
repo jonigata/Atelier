@@ -125,6 +125,7 @@
     gap: 0;
     padding: 0.4rem 0.5rem;
     min-height: 120px;
+    background-color: #2a2a4a;
     background-size: cover;
     background-position: center;
     border: 2px solid #4a4a6a;
