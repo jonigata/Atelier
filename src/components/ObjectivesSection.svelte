@@ -220,7 +220,7 @@
                       <span class="progress-badge">{progressDetail.label}: {progressDetail.current}/{progressDetail.target}</span>
                     {/if}
                   </div>
-                  <div class="objective-hint">{goal.hint}</div>
+                  <div class="objective-hint">{@html goal.hint}</div>
                 </div>
               </div>
               {#if isExpanded}
@@ -359,6 +359,11 @@
   .objective-hint {
     color: #a0a0b0;
     font-size: 0.85rem;
+  }
+
+  .objective-hint :global(strong) {
+    color: #6cc4e0;
+    font-weight: bold;
   }
 
   .progress-badge {

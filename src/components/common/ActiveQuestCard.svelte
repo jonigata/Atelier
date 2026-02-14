@@ -237,12 +237,19 @@
 
   .ready-badge {
     margin-left: auto;
-    padding: 0.1rem 0.4rem;
-    background: #4caf50;
-    border-radius: 3px;
-    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    background: linear-gradient(135deg, #0097a7, #26c6da);
+    border-radius: 4px;
+    font-size: 0.75rem;
     font-weight: bold;
-    color: white;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(38, 198, 218, 0.6);
+    animation: badge-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes badge-pulse {
+    0%, 100% { box-shadow: 0 0 6px rgba(38, 198, 218, 0.5); }
+    50% { box-shadow: 0 0 14px rgba(38, 198, 218, 0.9); }
   }
 
   /* コンパクトモード */
