@@ -347,8 +347,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    max-height: 400px;
-    overflow-y: auto;
   }
 
   .section-header {
