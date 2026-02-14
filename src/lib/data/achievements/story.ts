@@ -33,6 +33,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     conditions: [{ type: 'day', target: 2, comparison: '>=' }],
     reward: {
       items: [{ itemId: 'herb_01', quality: 70, quantity: 2 }],
+      originLabel: 'リーネが裏山で摘んできてくれた',
     },
     prerequisite: ['ach_game_start'],
     priority: 605,
@@ -59,6 +60,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     reward: {
       items: [{ itemId: 'herb_02', quality: 55, quantity: 2 }],
+      originLabel: '旅商人マルコが売り込みに持ってきた',
     },
     prerequisite: ['ach_first_craft'],
     priority: 610,
@@ -231,6 +233,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     reward: {
       reputation: 5,
       items: [{ itemId: 'herb_01', quality: 70, quantity: 3 }],
+      originLabel: 'リーネと一緒に採りに行った',
     },
     prerequisite: ['ach_story_girl_soften', 'ach_story_rival_appear'],
     priority: 715,
@@ -256,6 +259,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     reward: {
       items: [{ itemId: 'herb_03', quality: 65, quantity: 2 }],
+      originLabel: '枯泉の跡地で見つけた固有種',
       villageDevelopment: 5,
     },
     prerequisite: ['ach_story_girl_partner'],
@@ -417,6 +421,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     reward: {
       items: [{ itemId: 'misc_02', quality: 80, quantity: 1 }],
+      originLabel: 'マルコがわざわざ仕入れてきてくれた',
     },
     prerequisite: ['ach_story_specialty_fail'],
     priority: 825,
@@ -580,6 +585,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     reward: {
       reputation: 10,
       items: [{ itemId: 'herb_03', quality: 90, quantity: 1 }],
+      originLabel: '親友リーネからの贈り物',
     },
     prerequisite: ['ach_story_specialty_complete'],
     priority: 920,

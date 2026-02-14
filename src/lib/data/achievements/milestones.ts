@@ -65,7 +65,10 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     narrative: 'self_investment',
     narrativeLines: ['高品質な調合ができるようになった証として、工房の棚から良質な素材を発見した'],
     conditions: [{ type: 'craft_quality', target: 70 }],
-    reward: { items: [{ itemId: 'water_02', quality: 80, quantity: 1 }] },
+    reward: {
+      items: [{ itemId: 'water_02', quality: 80, quantity: 1 }],
+      originLabel: '工房の棚の奥から見つけた',
+    },
     priority: 140,
   },
 
@@ -111,6 +114,7 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
         { itemId: 'herb_01', quality: 50, quantity: 5 },
         { itemId: 'herb_02', quality: 50, quantity: 3 },
       ],
+      originLabel: '村人たちからの感謝の品',
     },
     priority: 210,
     important: true,
@@ -185,7 +189,10 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     narrativeCharacter: { name: 'ガルド', title: '冒険者' },
     narrativeLines: ['ガルド「いい依頼主だ。これは俺からだ」'],
     conditions: [{ type: 'expedition_count', target: 5 }],
-    reward: { items: [{ itemId: 'ore_01', quality: 60, quantity: 3 }] },
+    reward: {
+      items: [{ itemId: 'ore_01', quality: 60, quantity: 3 }],
+      originLabel: 'ガルドがおまけで持ち帰ってくれた',
+    },
     priority: 310,
   },
 
@@ -203,6 +210,7 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
         { itemId: 'ore_02', quality: 70, quantity: 2 },
         { itemId: 'misc_02', quality: 70, quantity: 1 },
       ],
+      originLabel: '採取隊が特別に探してくれた',
     },
     priority: 320,
     prerequisite: ['ach_expedition_5'],
@@ -218,7 +226,10 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     narrative: 'self_investment',
     narrativeLines: ['貯蓄の成果で設備が改善された'],
     conditions: [{ type: 'money', target: 5000 }],
-    reward: { items: [{ itemId: 'water_01', quality: 60, quantity: 5 }] },
+    reward: {
+      items: [{ itemId: 'water_01', quality: 60, quantity: 5 }],
+      originLabel: '設備改善のついでに見つけた備蓄品',
+    },
     priority: 410,
   },
 
@@ -265,6 +276,7 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
         { itemId: 'herb_01', quality: 55, quantity: 2 },
         { itemId: 'water_01', quality: 55, quantity: 2 },
       ],
+      originLabel: 'マルコが贔屓のしるしにくれた',
     },
     priority: 440,
   },
@@ -344,6 +356,7 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     reward: {
       money: 1000,
       items: [{ itemId: 'water_02', quality: 80, quantity: 2 }],
+      originLabel: '名誉村民の祝いに村人から贈られた',
     },
     priority: 550,
   },

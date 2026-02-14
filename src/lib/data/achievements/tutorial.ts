@@ -70,6 +70,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     conditions: [{ type: 'recipe_count', target: 1 }],
     reward: {
       items: [{ itemId: 'herb_01', quality: 50, quantity: 3 }],
+      originLabel: '師匠イリーナからの仕送り',
       unlocks: ['alchemy'],
     },
     prerequisite: ['ach_check_inventory'],
@@ -179,7 +180,10 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
       'レン「……見込みがあるな。次も頼んでくれ」',
     ],
     conditions: [{ type: 'expedition_count', target: 1 }],
-    reward: { items: [{ itemId: 'herb_01', quality: 60, quantity: 2 }] },
+    reward: {
+      items: [{ itemId: 'herb_01', quality: 60, quantity: 2 }],
+      originLabel: 'フィーが帰り道で見つけたおまけ',
+    },
     priority: 50,
     prerequisite: ['ach_adventurer_arrival'],
     important: true,
