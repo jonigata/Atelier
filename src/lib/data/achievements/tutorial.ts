@@ -152,6 +152,48 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     important: true,
   },
 
+  ach_inspection_intro: {
+    id: 'ach_inspection_intro',
+    title: '試験の代価',
+    description: '査察官から査察制度の説明を受けた',
+    hint: '',
+    category: 'tutorial',
+    narrative: 'patron_support',
+    narrativeCharacter: { name: '査察官', title: '師匠組合' },
+    eventImage: 'inspection_intro',
+    narrativeLines: [
+      '師匠組合の査察部です。派遣錬金術師の初期登録確認に参りました',
+      '制度を説明します。組合は3ヶ月ごとに経過報告を求め、1年後に最終査察を行います',
+      '依頼の実績、錬金術の腕前、村への貢献……すべてが評価対象です',
+      '実績なき者は召還。それだけのことです。……精励を期待します',
+    ],
+    conditions: [],
+    reward: {},
+    priority: 42,
+    prerequisite: ['ach_first_complete'],
+  },
+
+  ach_rival_intro: {
+    id: 'ach_rival_intro',
+    title: '同期の錬金術師',
+    description: 'ライバル錬金術師ヴィクトに出会った',
+    hint: '',
+    category: 'tutorial',
+    narrative: 'rival_pressure',
+    narrativeCharacter: { name: 'ヴィクト', title: 'ライバル錬金術師' },
+    eventImage: 'inspection_intro',
+    narrativeLines: [
+      'ああ、君がここの担当か。僕はヴィクト、隣村に派遣された錬金術師だ',
+      'イリーナ先生の弟子だって？ ふうん……まぁ、お互い頑張ろうじゃないか',
+      { text: 'もっとも、僕はもう工房の整備も終わってるけどね', expression: 'smug' },
+      '次の査察で会おう。……楽しみにしてるよ',
+    ],
+    conditions: [],
+    reward: {},
+    priority: 43,
+    prerequisite: ['ach_inspection_intro'],
+  },
+
   ach_adventurer_arrival: {
     id: 'ach_adventurer_arrival',
     title: '冒険者の到来',

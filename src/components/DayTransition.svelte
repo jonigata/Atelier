@@ -2,11 +2,20 @@
   import { gameState } from '$lib/stores/game';
   import { resolveDayTransition } from '$lib/services/presentation';
 
+  const INSPECTION_DAYS = [84, 168, 252, 336];
+
   let visible = true; // 初期表示は黒画面から
   let initialLoad = true;
   let transitioning = false;
   let displayDay = 0;
   let daysAdvanced = 0;
+
+  $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_inspection_intro');
+  $: nextInspectionDay = INSPECTION_DAYS.find((d) => d > displayDay) ?? null;
+  $: daysUntilInspection = nextInspectionDay !== null ? nextInspectionDay - displayDay : null;
+  $: inspectionUrgency = daysUntilInspection !== null
+    ? daysUntilInspection <= 7 ? 'red' : daysUntilInspection <= 21 ? 'yellow' : 'green'
+    : 'green';
   let showText = false;
   let fading: 'in' | 'out' | null = null;
   let timers: ReturnType<typeof setTimeout>[] = [];
@@ -65,6 +74,11 @@
       <div class="current-day">
         {displayDay}日目
       </div>
+      {#if inspectionKnown && daysUntilInspection !== null}
+        <div class="inspection-countdown {inspectionUrgency}">
+          査察まで あと{daysUntilInspection}日
+        </div>
+      {/if}
     </div>
   </div>
 {/if}
@@ -126,5 +140,25 @@
     font-weight: bold;
     color: #f4e4bc;
     text-shadow: 0 0 10px rgba(244, 228, 188, 0.3);
+  }
+
+  .inspection-countdown {
+    font-size: 1.2rem;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+    margin-top: 0.5rem;
+    text-shadow: 0 0 8px currentColor;
+  }
+
+  .inspection-countdown.green {
+    color: #81c784;
+  }
+
+  .inspection-countdown.yellow {
+    color: #ffd54f;
+  }
+
+  .inspection-countdown.red {
+    color: #ff8a65;
   }
 </style>

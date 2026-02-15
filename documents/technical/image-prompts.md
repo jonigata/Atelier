@@ -111,6 +111,7 @@ muted earthy tones, visual novel event CG quality.
 |----|--------|---------|--------------|----------|
 | first_meeting_liene | リーネとの初対面（冷たい視線） | heroine,liene | Liene(左)腕組み冷たい表情、主人公(右)ベレー帽のつばに手をかけ挨拶、辺境の寂れた農村・土の道・茅葺き屋根・丘と森・曇り空 | static/images/events/first_meeting_liene.png |
 | arrival_village | 村到着・村長の出迎え | heroine,mayor | 村長(左)笑顔で工房を示す、主人公(右)驚き・革リュック背負い、朽ちた石造りの工房・蔦・茅葺き屋根・土の道・夕方の光 | static/images/events/arrival_village.png |
+| inspection_intro | 査察官初訪問・ライバル登場 | inspector,vict,heroine | 査察官(左)書類を手に説明、ヴィクト(中右)腕組み余裕の笑み、主人公(右)緊張気味、工房前・蔦の石壁・茅葺き屋根・曇り空 | static/images/events/inspection_intro.png |
 
 ---
 

@@ -13,6 +13,8 @@ export const characterFaceIds: Record<string, string> = {
   'フィー': 'fee',
   'メルダ': 'melda',
   'マルコ': 'marco',
+  '査察官': 'inspector',
+  'ヴィクト': 'vict',
 };
 
 // ナラティブごとのキャラクター設定

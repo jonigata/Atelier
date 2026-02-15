@@ -1,6 +1,15 @@
 <script lang="ts">
   import { gameState, daysRemaining, expForNextLevel } from '$lib/stores/game';
   import MoneyIndicator from './MoneyIndicator.svelte';
+
+  const INSPECTION_DAYS = [84, 168, 252, 336];
+
+  $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_inspection_intro');
+  $: nextInspectionDay = INSPECTION_DAYS.find((d) => d > $gameState.day) ?? null;
+  $: daysUntilInspection = nextInspectionDay !== null ? nextInspectionDay - $gameState.day : null;
+  $: inspectionUrgency = daysUntilInspection !== null
+    ? daysUntilInspection <= 7 ? 'red' : daysUntilInspection <= 21 ? 'yellow' : 'green'
+    : 'green';
 </script>
 
 <div class="hud">
@@ -12,6 +21,16 @@
         <span class="remaining">残り {$daysRemaining}日</span>
       </div>
     </div>
+
+    {#if inspectionKnown && daysUntilInspection !== null}
+      <div class="hud-section inspection-section">
+        <div class="section-icon">📋</div>
+        <div class="section-content">
+          <span class="inspection-label">次の査察</span>
+          <span class="inspection-days {inspectionUrgency}">あと {daysUntilInspection}日</span>
+        </div>
+      </div>
+    {/if}
 
     <div class="hud-section money-section">
       <div class="section-icon">💰</div>
@@ -107,6 +126,33 @@
     font-size: 1.1rem;
     font-weight: bold;
     color: #ffd700;
+  }
+
+  .inspection-section {
+    padding-left: 0.75rem;
+    border-left: 1px solid rgba(139, 105, 20, 0.5);
+  }
+
+  .inspection-label {
+    font-size: 0.7rem;
+    color: #c9a959;
+  }
+
+  .inspection-days {
+    font-size: 0.95rem;
+    font-weight: bold;
+  }
+
+  .inspection-days.green {
+    color: #81c784;
+  }
+
+  .inspection-days.yellow {
+    color: #ffd54f;
+  }
+
+  .inspection-days.red {
+    color: #ff8a65;
   }
 
   .stats-section,
