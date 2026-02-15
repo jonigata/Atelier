@@ -148,10 +148,8 @@
         const qty = getRewardQuantity(reward.text);
         spawnStamps(qty);
       }
-      timer = setTimeout(() => {
-        hideReward();
-      }, 700);
-    }, 200);
+      // クリック待ち（自動進行しない）
+    }, 100);
   }
 
   function hideReward() {
@@ -165,7 +163,7 @@
       } else {
         showReward();
       }
-    }, 250);
+    }, 120);
   }
 
   onDestroy(() => stopTimer());
@@ -177,10 +175,9 @@
       if (isQuestReward) {
         closeDialogue();
       } else {
-        // ショーケース：次へ進める
-        if (showcasePhase !== 'out') {
-          hideReward();
-        }
+        // ショーケース：どのフェーズでもクリックで次へ
+        if (showcasePhase === 'out') return;
+        hideReward();
       }
     } else if (currentLine < dialogue.lines.length - 1) {
       currentLine++;
@@ -679,11 +676,11 @@
   }
 
   .showcase.phase-in {
-    animation: showcaseIn 0.2s ease-out forwards;
+    animation: showcaseIn 0.1s ease-out forwards;
   }
 
   .showcase.phase-out {
-    animation: showcaseOut 0.2s ease-in forwards;
+    animation: showcaseOut 0.12s ease-in forwards;
   }
 
   @keyframes showcaseIn {
