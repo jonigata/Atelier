@@ -89,12 +89,16 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     narrativeLines: [
       'あらあら、あんたが噂の先生かい？ 私はメルダよ',
       { text: 'もう薬が作れるの？ すごいねえ！', expression: 'happy' },
-      '実はちょっと頼みたいことがあるんだけど……',
-      '村長んとこに言ってあるから、依頼を見てちょうだいな',
+      'はい、これ使いなさいな。うちの店にあった素材だけど、先生の方が上手に使えるでしょ',
+      '実はちょっと頼みたいこともあるの。村長んとこに言ってあるから、依頼を見てちょうだいな',
     ],
     conditions: [{ type: 'craft_count', target: 1 }],
     reward: {
-      money: 100,
+      items: [
+        { itemId: 'water_01', quality: 50, quantity: 3 },
+        { itemId: 'ore_01', quality: 40, quantity: 2 },
+      ],
+      originLabel: 'メルダが店から分けてくれた',
       unlocks: ['quest'],
     },
     priority: 20,
