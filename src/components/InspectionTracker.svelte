@@ -21,8 +21,11 @@
     S: '#ffd700',
   };
 
-  function getCriterionInfo(criterion: InspectionCriterion) {
-    const value = values[criterion.key] ?? 0;
+  function getCriterionInfo(
+    criterion: InspectionCriterion,
+    currentValues: Record<string, number>
+  ) {
+    const value = currentValues[criterion.key] ?? 0;
     const grade = getGradeForValue(criterion.thresholds, value);
     const met = grade !== 'D';
     const maxVal = criterion.thresholds.S;
@@ -30,9 +33,9 @@
     return { value, grade, met, progress, maxVal };
   }
 
-  $: allMet = inspection.criteria.every((c) => getCriterionInfo(c).met);
+  $: allMet = inspection.criteria.every((c) => getCriterionInfo(c, values).met);
 
-  $: metCount = inspection.criteria.filter((c) => getCriterionInfo(c).met).length;
+  $: metCount = inspection.criteria.filter((c) => getCriterionInfo(c, values).met).length;
 
   // ── ポーション瓶 (level) ──
   // 液面の高さを progress に応じて変化
@@ -91,14 +94,12 @@
   }
 
   // ── 村 (villageDev) ──
-  // 発展度に応じて建物が増える簡易SVGイラスト
-  function getVillageLevel(value: number, maxVal: number): number {
+  // 発展度に応じて画像が変わる
+  function getVillageImage(value: number, maxVal: number): string {
     const ratio = value / maxVal;
-    if (ratio >= 0.8) return 4;
-    if (ratio >= 0.5) return 3;
-    if (ratio >= 0.25) return 2;
-    if (ratio > 0) return 1;
-    return 0;
+    if (ratio >= 0.6) return '/images/village/village_prosperous.png';
+    if (ratio >= 0.25) return '/images/village/village_medium.png';
+    return '/images/village/village_small.png';
   }
 
   // ── 人々 (reputation) ──
@@ -140,7 +141,7 @@
 
   <div class="criteria-grid">
     {#each inspection.criteria as criterion}
-        {@const info = getCriterionInfo(criterion)}
+        {@const info = getCriterionInfo(criterion, values)}
 
         {#if criterion.key === 'level'}
           <!-- ═══ 錬金Lv: ポーション瓶 ═══ -->
@@ -247,66 +248,11 @@
           </div>
 
         {:else if criterion.key === 'villageDev'}
-          <!-- ═══ 村発展: 村のイラスト + バー ═══ -->
-          {@const villageLevel = getVillageLevel(info.value, info.maxVal)}
+          <!-- ═══ 村発展: 村の画像 + バー ═══ -->
+          {@const villageImage = getVillageImage(info.value, info.maxVal)}
           <div class="criterion-card village-card">
             <div class="village-scene">
-              <svg viewBox="0 0 160 60" class="village-svg">
-                <!-- 地面 -->
-                <rect x="0" y="48" width="160" height="12" fill="#2a3a20"/>
-                <path d="M0 48 Q40 44 80 48 Q120 52 160 48 L160 60 L0 60 Z" fill="#3a4a28"/>
-                <!-- 木 (常に表示) -->
-                <circle cx="15" cy="38" r="8" fill="#4a6a3a" opacity="0.7"/>
-                <rect x="14" y="38" width="2" height="12" fill="#5a4a3a"/>
-                <circle cx="145" cy="36" r="9" fill="#4a6a3a" opacity="0.6"/>
-                <rect x="144" y="36" width="2" height="14" fill="#5a4a3a"/>
-
-                {#if villageLevel >= 1}
-                  <!-- 小屋1つ -->
-                  <rect x="55" y="32" width="20" height="18" fill="#6a5040"/>
-                  <polygon points="55,32 65,22 75,32" fill="#8a4030"/>
-                  <rect x="62" y="40" width="6" height="10" fill="#4a3020"/>
-                  <!-- 煙突の煙 -->
-                  <circle cx="70" cy="18" r="2" fill="rgba(200,200,200,0.3)"/>
-                {/if}
-
-                {#if villageLevel >= 2}
-                  <!-- 小屋2つ目 + 井戸 -->
-                  <rect x="90" y="34" width="18" height="16" fill="#6a5545"/>
-                  <polygon points="90,34 99,25 108,34" fill="#7a4535"/>
-                  <rect x="96" y="42" width="5" height="8" fill="#4a3525"/>
-                  <!-- 井戸 -->
-                  <circle cx="40" cy="46" r="5" fill="none" stroke="#888" stroke-width="1.5"/>
-                  <line x1="40" y1="38" x2="40" y2="41" stroke="#888" stroke-width="1"/>
-                {/if}
-
-                {#if villageLevel >= 3}
-                  <!-- 大きな建物 + 柵 -->
-                  <rect x="115" y="28" width="24" height="22" fill="#7a6050"/>
-                  <polygon points="115,28 127,18 139,28" fill="#9a5040"/>
-                  <rect x="123" y="38" width="8" height="12" fill="#5a4030"/>
-                  <!-- 窓 -->
-                  <rect x="118" y="34" width="4" height="4" fill="#ffd54f" opacity="0.6"/>
-                  <!-- 柵 -->
-                  {#each [25, 30, 35] as fx}
-                    <line x1={fx} y1="43" x2={fx} y2="50" stroke="#8a7a5a" stroke-width="1"/>
-                  {/each}
-                  <line x1="23" y1="46" x2="37" y2="46" stroke="#8a7a5a" stroke-width="0.8"/>
-                {/if}
-
-                {#if villageLevel >= 4}
-                  <!-- 塔 + 旗 + 花 -->
-                  <rect x="78" y="20" width="10" height="30" fill="#8a7060"/>
-                  <polygon points="78,20 83,10 88,20" fill="#c9a959"/>
-                  <!-- 旗 -->
-                  <line x1="83" y1="10" x2="83" y2="5" stroke="#c9a959" stroke-width="0.8"/>
-                  <polygon points="83,5 93,7 83,9" fill="#e74c3c" opacity="0.8"/>
-                  <!-- 花壇 -->
-                  <circle cx="50" cy="46" r="2" fill="#ff8a80"/>
-                  <circle cx="55" cy="47" r="2" fill="#ffab91"/>
-                  <circle cx="47" cy="47" r="1.5" fill="#ce93d8"/>
-                {/if}
-              </svg>
+              <img src={villageImage} alt="村の発展" class="village-img" />
             </div>
             <!-- 発展度バー -->
             <div class="village-bar">
@@ -545,11 +491,14 @@
   .village-scene {
     width: 100%;
     max-width: 160px;
+    border-radius: 6px;
+    overflow: hidden;
   }
 
-  .village-svg {
+  .village-img {
     width: 100%;
     height: auto;
+    display: block;
   }
 
   .village-bar {

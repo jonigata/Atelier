@@ -1,23 +1,18 @@
+<svelte:options runes={true} />
+
 <script lang="ts">
   import { inspections } from '$lib/data/inspection';
   import type { InspectionDef } from '$lib/data/inspection';
   import InspectionTracker from '../../../components/InspectionTracker.svelte';
 
-  let level = 1;
-  let quests = 0;
-  let villageDev = 0;
-  let reputation = 0;
-  let daysUntil = 78;
+  let level = $state(1);
+  let quests = $state(0);
+  let villageDev = $state(0);
+  let reputation = $state(0);
+  let daysUntil = $state(78);
 
   // Q3（全4項目）を表示
   const inspection: InspectionDef = inspections[2];
-
-  $: values = {
-    level,
-    quests,
-    villageDev,
-    reputation,
-  };
 </script>
 
 <div class="test-page">
@@ -47,7 +42,11 @@
   </div>
 
   <div class="preview">
-    <InspectionTracker {inspection} {values} {daysUntil} />
+    <InspectionTracker
+      {inspection}
+      values={{ level, quests, villageDev, reputation }}
+      {daysUntil}
+    />
   </div>
 </div>
 
