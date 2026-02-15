@@ -284,6 +284,7 @@ export function craft(
 
 /**
  * 複数個の調合を実行（自動で素材を選択）
+ * 成功/失敗は1回だけ判定し、全個数に適用する
  */
 export function craftMultiple(
   recipeId: string,
@@ -315,38 +316,105 @@ export function craftMultiple(
     };
   }
 
-  let successCount = 0;
-  let failCount = 0;
-  const items: OwnedItem[] = [];
-  let totalExpGained = 0;
-  let duplicatedCount = 0;
-
+  // 全個数分の素材を先に収集
+  const allBatchItems: OwnedItem[][] = [];
   for (let i = 0; i < quantity; i++) {
     const selectedItems = autoSelectItems(recipe);
     if (selectedItems.length === 0) break;
-
     consumeItems(selectedItems);
+    allBatchItems.push(selectedItems);
+  }
 
-    const currentState = get(gameState);
-    const result = executeCraftAttempt(recipe, selectedItems, currentState.alchemyLevel);
-    totalExpGained += result.expGained;
+  if (allBatchItems.length === 0) {
+    return {
+      successCount: 0,
+      failCount: 0,
+      items: [],
+      duplicatedCount: 0,
+      totalExpGained: 0,
+      message: '素材が足りませんでした',
+    };
+  }
 
-    if (result.success && result.item) {
-      successCount++;
-      items.push(result.item);
-      if (result.duplicatedItem) {
+  const actualQuantity = allBatchItems.length;
+
+  // 1回だけ成功判定（最初の素材セットで判定）
+  const firstItems = allBatchItems[0];
+  const currentState = get(gameState);
+
+  // 低品質素材による強制失敗チェック
+  const lowQualityFail = checkLowQualityFail(firstItems);
+
+  // 成功率を計算し、1回だけ判定
+  const successRate = lowQualityFail ? 0 : calculateSuccessRate(recipe, currentState.alchemyLevel, currentState.stamina);
+  const isSuccess = Math.random() < successRate;
+
+  // 体力を全個数分一括消費
+  const staminaCost = calculateStaminaCost(recipe) * actualQuantity;
+  gameState.update((s) => ({
+    ...s,
+    stamina: Math.max(0, s.stamina - staminaCost),
+  }));
+
+  const resultItems: OwnedItem[] = [];
+  let totalExpGained = 0;
+  let duplicatedCount = 0;
+
+  if (isSuccess) {
+    // 全成功: 品質は1回だけ計算し全個数に適用
+    const quality = calculateQuality(recipe, firstItems, currentState.alchemyLevel);
+    const stateForOrigin = get(gameState);
+
+    for (let i = 0; i < actualQuantity; i++) {
+      const newItem: OwnedItem = {
+        itemId: recipe.resultItemId,
+        quality,
+        origin: {
+          type: 'crafted',
+          day: stateForOrigin.day,
+          flavorText: pickRandom(craftedFlavors),
+        },
+      };
+      addItem(newItem);
+      markItemCrafted(recipe.resultItemId);
+      incrementCraftCount(quality);
+      resultItems.push(newItem);
+
+      // 複製判定は個別
+      const duplicatedItem = tryDuplicate(newItem);
+      if (duplicatedItem) {
         duplicatedCount++;
-        items.push(result.duplicatedItem);
+        resultItems.push(duplicatedItem);
       }
-    } else {
-      failCount++;
-      // 失敗時の素材保全
+    }
+
+    let expGained = recipe.expReward * actualQuantity;
+    if (quality >= ALCHEMY.HIGH_QUALITY_THRESHOLD) {
+      expGained = Math.floor(expGained * ALCHEMY.HIGH_QUALITY_EXP_BONUS);
+    }
+    addExp(expGained);
+    totalExpGained = expGained;
+    recordSuccess(recipe.id);
+  } else {
+    // 全失敗
+    const expGained = Math.floor(recipe.expReward * ALCHEMY.FAIL_EXP_RATE) * actualQuantity;
+    addExp(expGained);
+    totalExpGained = expGained;
+    resetCombo();
+    recordFailure(recipe.id);
+
+    if (lowQualityFail) {
+      addMessage('低品質素材のせいで釜が暴走した！');
+    }
+
+    // 失敗時の素材保全（全バッチ分）
+    for (const batchItems of allBatchItems) {
       if (shouldSaveMaterials()) {
-        selectedItems.forEach((item) => addItem(item));
+        batchItems.forEach((item) => addItem(item));
       } else {
         const recoverCount = getFailRecoverCount();
-        if (recoverCount > 0 && selectedItems.length > 0) {
-          selectedItems.slice(0, recoverCount).forEach((item) => addItem(item));
+        if (recoverCount > 0 && batchItems.length > 0) {
+          batchItems.slice(0, recoverCount).forEach((item) => addItem(item));
         }
       }
     }
@@ -354,12 +422,19 @@ export function craftMultiple(
 
   const itemDef = getItem(recipe.resultItemId);
   const itemName = itemDef?.name || recipe.name;
-  const message = generateBatchMessage(itemName, successCount, failCount, items, totalExpGained, duplicatedCount);
+  const message = generateBatchMessage(
+    itemName,
+    isSuccess ? actualQuantity : 0,
+    isSuccess ? 0 : actualQuantity,
+    resultItems,
+    totalExpGained,
+    duplicatedCount,
+  );
 
   return {
-    successCount,
-    failCount,
-    items,
+    successCount: isSuccess ? actualQuantity : 0,
+    failCount: isSuccess ? 0 : actualQuantity,
+    items: resultItems,
     duplicatedCount,
     totalExpGained,
     message,
@@ -368,6 +443,7 @@ export function craftMultiple(
 
 /**
  * 手動選択された素材でバッチ調合を実行
+ * 成功/失敗は1回だけ判定し、全個数に適用する
  */
 export function craftBatch(
   recipeId: string,
@@ -402,34 +478,96 @@ export function craftBatch(
 
   const itemsPerCraft = recipe.ingredients.reduce((sum, ing) => sum + ing.quantity, 0);
 
-  let successCount = 0;
-  let failCount = 0;
+  // 全個数分の素材を先に収集・消費
+  const allBatchItems: OwnedItem[][] = [];
+  for (let i = 0; i < quantity; i++) {
+    const startIdx = i * itemsPerCraft;
+    const batchItems = allSelectedItems.slice(startIdx, startIdx + itemsPerCraft);
+    if (batchItems.length < itemsPerCraft) break;
+    consumeItems(batchItems);
+    allBatchItems.push(batchItems);
+  }
+
+  if (allBatchItems.length === 0) {
+    return {
+      successCount: 0,
+      failCount: 0,
+      items: [],
+      duplicatedCount: 0,
+      totalExpGained: 0,
+      message: '素材が足りませんでした',
+    };
+  }
+
+  const actualQuantity = allBatchItems.length;
+  const firstItems = allBatchItems[0];
+  const currentState = get(gameState);
+
+  // 低品質素材による強制失敗チェック
+  const lowQualityFail = checkLowQualityFail(firstItems);
+
+  // 成功率を計算し、1回だけ判定
+  const successRate = lowQualityFail ? 0 : calculateSuccessRate(recipe, currentState.alchemyLevel, currentState.stamina);
+  const isSuccess = Math.random() < successRate;
+
+  // 体力を全個数分一括消費
+  const staminaCost = calculateStaminaCost(recipe) * actualQuantity;
+  gameState.update((s) => ({
+    ...s,
+    stamina: Math.max(0, s.stamina - staminaCost),
+  }));
+
   const resultItems: OwnedItem[] = [];
   let totalExpGained = 0;
   let duplicatedCount = 0;
 
-  for (let i = 0; i < quantity; i++) {
-    const startIdx = i * itemsPerCraft;
-    const batchItems = allSelectedItems.slice(startIdx, startIdx + itemsPerCraft);
+  if (isSuccess) {
+    // 全成功: 品質は1回だけ計算し全個数に適用
+    const quality = calculateQuality(recipe, firstItems, currentState.alchemyLevel);
+    const stateForOrigin = get(gameState);
 
-    if (batchItems.length < itemsPerCraft) break;
+    for (let i = 0; i < actualQuantity; i++) {
+      const newItem: OwnedItem = {
+        itemId: recipe.resultItemId,
+        quality,
+        origin: {
+          type: 'crafted',
+          day: stateForOrigin.day,
+          flavorText: pickRandom(craftedFlavors),
+        },
+      };
+      addItem(newItem);
+      markItemCrafted(recipe.resultItemId);
+      incrementCraftCount(quality);
+      resultItems.push(newItem);
 
-    consumeItems(batchItems);
-
-    const currentState = get(gameState);
-    const result = executeCraftAttempt(recipe, batchItems, currentState.alchemyLevel);
-    totalExpGained += result.expGained;
-
-    if (result.success && result.item) {
-      successCount++;
-      resultItems.push(result.item);
-      if (result.duplicatedItem) {
+      const duplicatedItem = tryDuplicate(newItem);
+      if (duplicatedItem) {
         duplicatedCount++;
-        resultItems.push(result.duplicatedItem);
+        resultItems.push(duplicatedItem);
       }
-    } else {
-      failCount++;
-      // 失敗時の素材保全
+    }
+
+    let expGained = recipe.expReward * actualQuantity;
+    if (quality >= ALCHEMY.HIGH_QUALITY_THRESHOLD) {
+      expGained = Math.floor(expGained * ALCHEMY.HIGH_QUALITY_EXP_BONUS);
+    }
+    addExp(expGained);
+    totalExpGained = expGained;
+    recordSuccess(recipe.id);
+  } else {
+    // 全失敗
+    const expGained = Math.floor(recipe.expReward * ALCHEMY.FAIL_EXP_RATE) * actualQuantity;
+    addExp(expGained);
+    totalExpGained = expGained;
+    resetCombo();
+    recordFailure(recipe.id);
+
+    if (lowQualityFail) {
+      addMessage('低品質素材のせいで釜が暴走した！');
+    }
+
+    for (const batchItems of allBatchItems) {
       if (shouldSaveMaterials()) {
         batchItems.forEach((item) => addItem(item));
       } else {
@@ -443,11 +581,18 @@ export function craftBatch(
 
   const itemDef = getItem(recipe.resultItemId);
   const itemName = itemDef?.name || recipe.name;
-  const message = generateBatchMessage(itemName, successCount, failCount, resultItems, totalExpGained, duplicatedCount);
+  const message = generateBatchMessage(
+    itemName,
+    isSuccess ? actualQuantity : 0,
+    isSuccess ? 0 : actualQuantity,
+    resultItems,
+    totalExpGained,
+    duplicatedCount,
+  );
 
   return {
-    successCount,
-    failCount,
+    successCount: isSuccess ? actualQuantity : 0,
+    failCount: isSuccess ? 0 : actualQuantity,
     items: resultItems,
     duplicatedCount,
     totalExpGained,

@@ -188,10 +188,11 @@
         {@const buyMult = getBuyPriceMult()}
         {@const displayPrice = Math.max(1, Math.floor(item.basePrice * buyMult))}
         {@const canBuy = $gameState.money >= displayPrice}
+        {@const ownedCount = $gameState.inventory.filter(i => i.itemId === item.id).length}
         <div class="shop-item" class:disabled={!canBuy}>
           <img class="item-icon" src={getItemIcon(item.id)} alt={item.name} on:error={handleIconError} />
           <div class="item-info">
-            <span class="item-name">{item.name}</span>
+            <span class="item-name">{item.name}<span class="owned-count">所持 {ownedCount}</span></span>
             <span class="item-desc">{item.description}</span>
           </div>
           <div class="item-action">
@@ -411,6 +412,15 @@
   .item-name {
     color: #e0e0f0;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .owned-count {
+    font-size: 0.75rem;
+    font-weight: normal;
+    color: #8a8a9a;
   }
 
   .item-desc {

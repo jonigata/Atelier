@@ -34,7 +34,7 @@ export const CRAFT_SUCCESS = {
   /** レベル超過1ごとの成功率ボーナス */
   LEVEL_BONUS: 0.05,
   /** 最大成功率 */
-  MAX_RATE: 0.99,
+  MAX_RATE: 1.0,
 } as const;
 
 // =====================================
