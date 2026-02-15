@@ -3,6 +3,7 @@
   import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
+  import { formatCraftDays } from '$lib/services/equipmentEffects';
   import type { RecipeDef, Ingredient } from '$lib/models/types';
 
   export let recipes: RecipeDef[];
@@ -55,7 +56,7 @@
         <div class="recipe-header">
           <img class="recipe-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
           <span class="recipe-name">{recipe.name}</span>
-          <span class="recipe-days">{recipe.daysRequired}日</span>
+          <span class="recipe-days">{formatCraftDays(recipe.daysRequired)}</span>
         </div>
         <div class="recipe-ingredients">
           {#each recipe.ingredients as ing}

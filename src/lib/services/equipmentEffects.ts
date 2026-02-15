@@ -163,7 +163,7 @@ export function getStaminaCostMult(): number {
 // 調合: 日数
 // =====================================================================
 
-/** 調合日数を計算 */
+/** 調合日数を計算（0.1日単位の内部値を返す） */
 export function getEffectiveCraftDays(recipe: RecipeDef): number {
   let days = recipe.daysRequired;
 
@@ -181,6 +181,20 @@ export function getEffectiveCraftDays(recipe: RecipeDef): number {
   }
 
   return Math.max(1, days);
+}
+
+/** 0.1日単位の内部値を実日数に変換（切り上げ） */
+export function craftDaysToActual(tenths: number): number {
+  return Math.ceil(tenths / 10);
+}
+
+/** 0.1日単位の内部値を表示用文字列に変換 */
+export function formatCraftDays(tenths: number): string {
+  const days = tenths / 10;
+  if (Number.isInteger(days)) {
+    return `${days}日`;
+  }
+  return `${days}日`;
 }
 
 // =====================================================================
