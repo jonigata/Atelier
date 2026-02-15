@@ -3,6 +3,8 @@
   import { setSelectedQuestId } from '$lib/stores/quests';
   import { showingUnlockActions, pendingUnlockActions } from '$lib/stores/toast';
   import { isMerchantVisiting } from '$lib/services/calendar';
+  import { getNextInspection, INSPECTION_DAYS } from '$lib/data/inspection';
+  import InspectionTracker from './InspectionTracker.svelte';
   import ObjectivesSection from './ObjectivesSection.svelte';
   import type { ActionType, ActiveQuest } from '$lib/models/types';
 
@@ -31,6 +33,15 @@
   $: isDayTransition = $gameState.pendingDayTransition !== null;
   $: merchantInTown = isMerchantVisiting($gameState.day);
 
+  // 査察トラッカー用データ
+  $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_inspection_intro');
+  $: nextInspection = getNextInspection($gameState.day);
+  $: nextInspectionDay = INSPECTION_DAYS.find((d) => d > $gameState.day) ?? null;
+  $: daysUntilInspection = nextInspectionDay !== null ? nextInspectionDay - $gameState.day : null;
+  $: inspectionValues = nextInspection
+    ? Object.fromEntries(nextInspection.criteria.map(c => [c.key, c.getValue($gameState)]))
+    : {};
+
   $: actionStates = actions.map(action => {
     const actionType = action.type;
     const unlockedActions = $gameState.tutorialProgress.unlockedActions;
@@ -53,6 +64,9 @@
 </script>
 
 <div class="action-menu">
+  {#if inspectionKnown && nextInspection && daysUntilInspection !== null}
+    <InspectionTracker inspection={nextInspection} values={inspectionValues} daysUntil={daysUntilInspection} />
+  {/if}
   <h3>行動を選択してください</h3>
 
   {#if merchantInTown}

@@ -1,8 +1,7 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
   import { resolveDayTransition } from '$lib/services/presentation';
-
-  const INSPECTION_DAYS = [84, 168, 252, 336];
+  import { INSPECTION_DAYS } from '$lib/data/inspection';
 
   let visible = true; // 初期表示は黒画面から
   let initialLoad = true;
