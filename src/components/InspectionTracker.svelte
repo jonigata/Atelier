@@ -94,12 +94,16 @@
   }
 
   // ── 村 (villageDev) ──
-  // 発展度に応じて画像が変わる
+  // 発展度に応じて画像が変わる（7段階）
   function getVillageImage(value: number, maxVal: number): string {
     const ratio = value / maxVal;
-    if (ratio >= 0.6) return '/images/village/village_prosperous.png';
-    if (ratio >= 0.25) return '/images/village/village_medium.png';
-    return '/images/village/village_small.png';
+    if (ratio >= 0.85) return '/images/village/village_7.png';
+    if (ratio >= 0.70) return '/images/village/village_6.png';
+    if (ratio >= 0.55) return '/images/village/village_5.png';
+    if (ratio >= 0.40) return '/images/village/village_4.png';
+    if (ratio >= 0.25) return '/images/village/village_3.png';
+    if (ratio >= 0.10) return '/images/village/village_2.png';
+    return '/images/village/village_1.png';
   }
 
   // ── 人々 (reputation) ──
