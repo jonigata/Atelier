@@ -15,6 +15,9 @@ export const characterFaceIds: Record<string, string> = {
   'マルコ': 'marco',
   '査察官': 'inspector',
   'ヴィクト': 'vict',
+  'ゴルド': 'gord',
+  'イリーナ': 'irina',
+  'レン': 'ren',
 };
 
 // ナラティブごとのキャラクター設定
