@@ -54,7 +54,7 @@ export const equipment: Record<string, EquipmentDef> = {
   hourglass: {
     id: 'hourglass',
     name: '時渡りの砂時計',
-    description: '全ての調合日数が半減（切り上げ）。5日→3日、3日→2日',
+    description: '全ての調合日数が半減（切り上げ）。5日→2.5日、3日→1.5日',
     category: 'time',
     rarity: 'rare',
     price: 1200,
@@ -292,7 +292,7 @@ export const equipment: Record<string, EquipmentDef> = {
     rarity: 'common',
     price: 300,
     effectDescription: '4日以上の調合を1日短縮',
-    effects: [{ type: 'craft_days_reduce', value: 1, minOriginalDays: 4 }],
+    effects: [{ type: 'craft_days_reduce', value: 10, minOriginalDays: 40 }],
   },
   potion_timer: {
     id: 'potion_timer',
@@ -302,7 +302,7 @@ export const equipment: Record<string, EquipmentDef> = {
     rarity: 'common',
     price: 350,
     effectDescription: '調合日数-1日',
-    effects: [{ type: 'craft_days_reduce', value: 1 }],
+    effects: [{ type: 'craft_days_reduce', value: 10 }],
   },
   quick_sand_watch: {
     id: 'quick_sand_watch',

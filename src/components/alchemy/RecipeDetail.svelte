@@ -4,6 +4,7 @@
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
   import { gameState } from '$lib/stores/game';
+  import { formatCraftDays } from '$lib/services/equipmentEffects';
   import type { RecipeDef, Ingredient } from '$lib/models/types';
 
   export let recipe: RecipeDef;
@@ -42,7 +43,7 @@
   <div class="detail-info">
     <div class="info-row">
       <span class="info-label">所要日数</span>
-      <span class="info-value">{recipe.daysRequired}日</span>
+      <span class="info-value">{formatCraftDays(recipe.daysRequired)}</span>
     </div>
     <div class="info-row">
       <span class="info-label">難易度</span>
