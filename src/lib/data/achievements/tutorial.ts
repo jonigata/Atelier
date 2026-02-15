@@ -194,6 +194,24 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     prerequisite: ['ach_inspection_intro'],
   },
 
+  ach_q1_goal_reminder: {
+    id: 'ach_q1_goal_reminder',
+    title: '84日目までに',
+    description: '最初の査察に向けて目標を確認した',
+    hint: '',
+    category: 'tutorial',
+    narrative: 'workshop_discovery',
+    narrativeCharacter: { name: 'コレット', title: '駆け出し錬金術師' },
+    narrativeLines: [
+      '84日目までに、錬金術レベル4以上……',
+      'それと依頼を8件以上。……やるしかない',
+    ],
+    conditions: [],
+    reward: {},
+    priority: 44,
+    prerequisite: ['ach_rival_intro'],
+  },
+
   ach_adventurer_arrival: {
     id: 'ach_adventurer_arrival',
     title: '冒険者の到来',
