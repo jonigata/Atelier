@@ -66,31 +66,6 @@ export const storyAchievements: Record<string, AchievementDef> = {
     priority: 610,
   },
 
-  ach_story_girl_soften: {
-    id: 'ach_story_girl_soften',
-    title: 'おばあちゃんの知恵',
-    description: 'リーネが少し態度を軟化させた',
-    hint: '<strong>調合</strong>を続けて村での暮らしを定着させよう',
-    category: 'quest',
-    narrative: 'village_girl',
-    narrativeCharacter: { name: 'リーネ', title: '村娘' },
-    narrativeLines: [
-      '……ねえ。あんた、この薬草の使い方知ってるの？',
-      'うちのおばあちゃんが昔、これで傷薬を作ってたんだけど……',
-      'あんたの錬金術と、おばあちゃんの知恵……似てるところ、あるのかも',
-      { text: '……べっ、別に認めたわけじゃないから。ただの興味よ', expression: 'embarrassed' },
-    ],
-    conditions: [
-      { type: 'craft_count', target: 1 },
-    ],
-    reward: {
-      reputation: 3,
-      unlocks: ['album'],
-    },
-    prerequisite: ['ach_story_village_girl_cold', 'ach_first_craft'],
-    priority: 620,
-  },
-
   ach_story_master_advice: {
     id: 'ach_story_master_advice',
     title: '師匠の忠告',
@@ -235,7 +210,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       items: [{ itemId: 'herb_01', quality: 70, quantity: 3 }],
       originLabel: 'リーネと一緒に採りに行った',
     },
-    prerequisite: ['ach_story_girl_soften', 'ach_story_rival_appear'],
+    prerequisite: ['ach_first_complete', 'ach_story_rival_appear'],
     priority: 715,
     important: true,
   },
