@@ -171,6 +171,16 @@
     }
   }
 
+  // 掲示板の依頼をいますぐ納品可能かチェック
+  function canFulfill(quest: QuestDef): boolean {
+    const matchingItems = $gameState.inventory.filter((item) => {
+      if (item.itemId !== quest.requiredItemId) return false;
+      if (quest.requiredQuality && item.quality < quest.requiredQuality) return false;
+      return true;
+    });
+    return matchingItems.length >= quest.requiredQuantity;
+  }
+
   // 納品可能なクエスト数
   $: deliverableCount = $gameState.activeQuests.filter((quest) => canDeliver(quest)).length;
 </script>
@@ -229,6 +239,9 @@
             <div class="quest-rewards">
               <span class="reward-money">{quest.rewardMoney}G</span>
               <span class="reward-rep">名声+{quest.rewardReputation}</span>
+              {#if canFulfill(quest)}
+                <span class="ready-badge">納品可</span>
+              {/if}
             </div>
             <button
               class="accept-btn"
@@ -409,6 +422,23 @@
 
   .reward-rep {
     color: #81c784;
+  }
+
+  .ready-badge {
+    margin-left: auto;
+    padding: 0.2rem 0.5rem;
+    background: linear-gradient(135deg, #0097a7, #26c6da);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(38, 198, 218, 0.6);
+    animation: badge-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes badge-pulse {
+    0%, 100% { box-shadow: 0 0 6px rgba(38, 198, 218, 0.5); }
+    50% { box-shadow: 0 0 14px rgba(38, 198, 218, 0.9); }
   }
 
   .accept-btn {
