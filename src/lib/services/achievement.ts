@@ -498,7 +498,7 @@ function getStructuredRewards(achievement: AchievementDef): RewardDisplay[] {
       structured.push({
         text: `「${label}」解放`,
         type: 'unlock',
-        iconUrl: `/icons/actions/${action}.png`,
+        iconUrl: `/images/actions/${action}.png`,
       });
     }
   }

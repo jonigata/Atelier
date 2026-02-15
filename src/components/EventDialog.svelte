@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import { gameState } from '$lib/stores/game';
   import { resolveDialogue } from '$lib/services/presentation';
   import { skipOpening } from '$lib/services/gameLoop';
+  import { getItemIcon, handleIconError } from '$lib/data/items';
   import ItemCard from './common/ItemCard.svelte';
   import AnimatedGauge from './common/AnimatedGauge.svelte';
   import AchievementCategoryIcon from './common/AchievementCategoryIcon.svelte';
@@ -33,40 +35,161 @@
   let currentLine = 0;
   let showingRewards = false;
   let closing = false;
+  let timer: ReturnType<typeof setTimeout> | null = null;
 
-  // ダイアログは pendingDialogue がセットされたら即座に表示
-  // 日数表示との同期は presentation サービスが async/await で制御する
+  // ショーケース用（アチーブメント報酬：1つずつ表示）
+  let showcaseIndex = 0;
+  let showcasePhase: 'in' | 'show' | 'out' = 'in';
+
+  // スタンプ演出（アイテム取得時、個数分ペタペタ表示）
+  interface Stamp {
+    id: number;
+    x: number; // px（中央からのオフセット）
+    y: number; // px
+    delay: number;
+    rotation: number;
+  }
+  let stamps: Stamp[] = [];
+  let stampIdCounter = 0;
+
+  function getRewardQuantity(text: string): number {
+    const m = text.match(/[×x](\d+)/);
+    return m ? parseInt(m[1], 10) : 1;
+  }
+
+  function spawnStamps(count: number) {
+    const sX = 300, sY = 200;
+    const newStamps: Stamp[] = [];
+
+    if (count === 1) {
+      newStamps.push({ id: stampIdCounter++, x: 0, y: 0, delay: 0, rotation: 0 });
+    } else {
+      const cols = Math.max(1, Math.round(Math.sqrt(count * (sX / sY))));
+      const rows = Math.max(1, Math.ceil(count / cols));
+      const cellW = sX / cols;
+      const cellH = sY / rows;
+
+      let placed = 0;
+      for (let row = 0; row < rows && placed < count; row++) {
+        for (let col = 0; col < cols && placed < count; col++) {
+          const cx = -sX / 2 + (col + 0.5) * cellW;
+          const cy = -sY / 2 + (row + 0.5) * cellH;
+          newStamps.push({
+            id: stampIdCounter++,
+            x: cx + (Math.random() - 0.5) * cellW * 0.8,
+            y: cy + (Math.random() - 0.5) * cellH * 0.8,
+            delay: placed * 0.1,
+            rotation: (Math.random() - 0.5) * 30,
+          });
+          placed++;
+        }
+      }
+    }
+    for (let i = newStamps.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = newStamps[i].delay;
+      newStamps[i].delay = newStamps[j].delay;
+      newStamps[j].delay = tmp;
+    }
+    stamps = newStamps;
+  }
+
   $: dialogue = $gameState.tutorialProgress.pendingDialogue;
   $: hasRewards = dialogue?.structuredRewards && dialogue.structuredRewards.length > 0;
-
-  // オープニングイベント判定（ゲーム開始ダイアログ表示中）
   $: isOpeningEvent = $gameState.achievementProgress.pendingReward === 'ach_game_start';
+
+  // 依頼報酬かどうか（依頼はボックス形式、それ以外はショーケース形式）
+  $: isQuestReward = dialogue?.rewardsTitle === '依頼達成！';
+
+  // 依頼報酬用：ゲージと通常を分離
+  $: gaugeRewards = dialogue?.structuredRewards?.filter(r => r.gaugeData) ?? [];
+  $: normalRewards = dialogue?.structuredRewards?.filter(r => !r.gaugeData) ?? [];
+  // ショーケース用：全報酬リスト
+  $: allRewards = dialogue?.structuredRewards ?? [];
 
   function handleSkipOpening(event: MouseEvent) {
     event.stopPropagation();
     skipOpening();
   }
 
-  // ゲージ報酬と通常報酬を分離
-  $: gaugeRewards = dialogue?.structuredRewards?.filter(r => r.gaugeData) ?? [];
-  $: normalRewards = dialogue?.structuredRewards?.filter(r => !r.gaugeData) ?? [];
-
   // ダイアログが変わったらリセット
   $: if (dialogue) {
     currentLine = 0;
     showingRewards = false;
     closing = false;
+    showcaseIndex = 0;
+    showcasePhase = 'in';
+    stamps = [];
+    stopTimer();
   }
+
+  function stopTimer() {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  }
+
+  // --- ショーケース（アチーブメント報酬）---
+  function startShowcase() {
+    showingRewards = true;
+    showcaseIndex = 0;
+    showReward();
+  }
+
+  function showReward() {
+    showcasePhase = 'in';
+    stamps = [];
+    timer = setTimeout(() => {
+      showcasePhase = 'show';
+      // アイテム報酬ならスタンプ演出
+      const reward = allRewards[showcaseIndex];
+      if (reward && reward.itemId) {
+        const qty = getRewardQuantity(reward.text);
+        spawnStamps(qty);
+      }
+      timer = setTimeout(() => {
+        hideReward();
+      }, 700);
+    }, 200);
+  }
+
+  function hideReward() {
+    stopTimer();
+    showcasePhase = 'out';
+    stamps = [];
+    timer = setTimeout(() => {
+      showcaseIndex++;
+      if (showcaseIndex >= allRewards.length) {
+        closeDialogue();
+      } else {
+        showReward();
+      }
+    }, 250);
+  }
+
+  onDestroy(() => stopTimer());
 
   function nextLine() {
     if (!dialogue || closing) return;
 
     if (showingRewards) {
-      closeDialogue();
+      if (isQuestReward) {
+        closeDialogue();
+      } else {
+        // ショーケース：次へ進める
+        if (showcasePhase !== 'out') {
+          hideReward();
+        }
+      }
     } else if (currentLine < dialogue.lines.length - 1) {
       currentLine++;
     } else if (hasRewards) {
-      showingRewards = true;
+      if (isQuestReward) {
+        showingRewards = true;
+      } else {
+        startShowcase();
+      }
     } else {
       closeDialogue();
     }
@@ -75,19 +198,25 @@
   function closeDialogue() {
     if (closing) return;
     closing = true;
+    stopTimer();
   }
 
   function handleFadeOutEnd() {
     closing = false;
     currentLine = 0;
     showingRewards = false;
+    showcaseIndex = 0;
     resolveDialogue();
   }
 
   function skipDialogue(event: MouseEvent) {
     event.stopPropagation();
     if (!showingRewards && hasRewards) {
-      showingRewards = true;
+      if (isQuestReward) {
+        showingRewards = true;
+      } else {
+        startShowcase();
+      }
     } else {
       closeDialogue();
     }
@@ -102,7 +231,11 @@
     } else if (event.key === 'Escape') {
       event.preventDefault();
       if (!showingRewards && hasRewards) {
-        showingRewards = true;
+        if (isQuestReward) {
+          showingRewards = true;
+        } else {
+          startShowcase();
+        }
       } else {
         closeDialogue();
       }
@@ -116,30 +249,54 @@
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <div class="dialogue-overlay" class:closing on:click={nextLine} on:animationend={closing ? handleFadeOutEnd : undefined} role="button" tabindex="0">
     {#if showingRewards && dialogue.structuredRewards}
-      <!-- 報酬画面 -->
-      <div class="rewards-screen" class:quest-reward={!!dialogue.rewardsTitle}>
-        <div class="rewards-header">
-          <span class="rewards-title">{dialogue.rewardsTitle ?? '目標達成！'}</span>
-          {#if dialogue.achievementTitle}
-            <span class="achievement-subtitle">{dialogue.achievementTitle}</span>
-          {/if}
-        </div>
-        {#if normalRewards.length > 0}
-          <div class="rewards-grid">
-            {#each normalRewards as reward}
-              <ItemCard
-                itemId={reward.itemId}
-                label={reward.text}
-                iconUrl={reward.iconUrl}
-                emoji={!reward.itemId && !reward.iconUrl ? (reward.type === 'money' ? '💰' : '🎁') : null}
-              />
-            {/each}
+      {#if isQuestReward}
+        <!-- 依頼報酬：ボックス形式（従来通り） -->
+        <div class="rewards-screen quest-reward">
+          <div class="rewards-header">
+            <span class="rewards-title">{dialogue.rewardsTitle}</span>
+            {#if dialogue.achievementTitle}
+              <span class="achievement-subtitle">{dialogue.achievementTitle}</span>
+            {/if}
           </div>
-        {/if}
-        {#if gaugeRewards.length > 0}
-          <div class="gauge-rewards">
-            {#each gaugeRewards as reward}
-              {#if reward.gaugeData}
+          {#if normalRewards.length > 0}
+            <div class="rewards-grid">
+              {#each normalRewards as reward}
+                <ItemCard
+                  itemId={reward.itemId}
+                  label={reward.text}
+                  iconUrl={reward.iconUrl}
+                  emoji={!reward.itemId && !reward.iconUrl ? (reward.type === 'money' ? '💰' : '🎁') : null}
+                />
+              {/each}
+            </div>
+          {/if}
+          {#if gaugeRewards.length > 0}
+            <div class="gauge-rewards">
+              {#each gaugeRewards as reward}
+                {#if reward.gaugeData}
+                  <AnimatedGauge
+                    before={reward.gaugeData.before}
+                    after={reward.gaugeData.after}
+                    max={reward.gaugeData.max}
+                    label={reward.gaugeData.label}
+                    text={reward.text}
+                    color={getGaugeColor(reward.type)}
+                  />
+                {/if}
+              {/each}
+            </div>
+          {/if}
+          <div class="rewards-footer">
+            <span class="hint-text">クリック または Enter で閉じる</span>
+          </div>
+        </div>
+      {:else}
+        <!-- アチーブメント報酬：ショーケース形式（1つずつ大きく表示） -->
+        {#if showcaseIndex < allRewards.length}
+          {@const reward = allRewards[showcaseIndex]}
+          <div class="showcase" class:phase-in={showcasePhase === 'in'} class:phase-out={showcasePhase === 'out'}>
+            {#if reward.gaugeData}
+              <div class="showcase-gauge">
                 <AnimatedGauge
                   before={reward.gaugeData.before}
                   after={reward.gaugeData.after}
@@ -148,14 +305,36 @@
                   text={reward.text}
                   color={getGaugeColor(reward.type)}
                 />
-              {/if}
-            {/each}
+              </div>
+            {:else if !reward.itemId}
+              <div class="showcase-icon">
+                {#if reward.iconUrl}
+                  <img src={reward.iconUrl} alt="" class:wide-img={reward.type === 'unlock'} on:error={handleIconError} />
+                {:else}
+                  <span class="showcase-emoji">{reward.type === 'money' ? '💰' : reward.type === 'recipe' ? '📖' : '🎁'}</span>
+                {/if}
+              </div>
+              <div class="showcase-text">{reward.text}</div>
+            {:else}
+              <div class="stamps-zone">
+                {#if stamps.length > 0 && reward.itemId}
+                  {#each stamps as s (s.id)}
+                    <img
+                      class="stamp"
+                      src={getItemIcon(reward.itemId)}
+                      alt=""
+                      style="left: calc(50% + {s.x}px); top: calc(50% + {s.y}px); --delay: {s.delay}s; --rot: {s.rotation}deg;"
+                      on:error={handleIconError}
+                    />
+                  {/each}
+                {/if}
+              </div>
+              <div class="showcase-text">{reward.text}</div>
+            {/if}
+            <div class="showcase-counter">{showcaseIndex + 1} / {allRewards.length}</div>
           </div>
         {/if}
-        <div class="rewards-footer">
-          <span class="hint-text">クリック または Enter で閉じる</span>
-        </div>
-      </div>
+      {/if}
     {:else}
       <!-- 通常のダイアログ -->
       <div class="dialogue-box" class:has-event-image={!!dialogue.eventImage}>
@@ -416,7 +595,7 @@
     color: #ffd700;
   }
 
-  /* 報酬画面 */
+  /* ========== 依頼報酬：ボックス形式 ========== */
   .rewards-screen {
     background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
     border: 3px solid #c9a959;
@@ -430,7 +609,6 @@
     animation: rewardPopIn 0.3s ease-out;
   }
 
-  /* 依頼達成 */
   .rewards-screen.quest-reward {
     border-color: #5a8abf;
     box-shadow:
@@ -448,14 +626,8 @@
   }
 
   @keyframes rewardPopIn {
-    from {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
   }
 
   .rewards-header {
@@ -490,11 +662,120 @@
     border-top: 1px solid #4a4a6a;
   }
 
-  /* ゲージ報酬 */
   .gauge-rewards {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
+  }
+
+  /* ========== アチーブメント報酬：ショーケース形式 ========== */
+  .showcase {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .showcase.phase-in {
+    animation: showcaseIn 0.2s ease-out forwards;
+  }
+
+  .showcase.phase-out {
+    animation: showcaseOut 0.2s ease-in forwards;
+  }
+
+  @keyframes showcaseIn {
+    from { opacity: 0.5; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes showcaseOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(1.15); }
+  }
+
+  .showcase-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .showcase-icon img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 16px rgba(201, 169, 89, 0.5));
+  }
+
+  .showcase-icon img.wide-img {
+    width: min(400px, 80vw);
+    height: auto;
+    max-height: 200px;
+    border-radius: 10px;
+    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.6));
+  }
+
+  .showcase-emoji {
+    font-size: 4.5rem;
+    filter: drop-shadow(0 0 16px rgba(201, 169, 89, 0.5));
+  }
+
+  .showcase-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #f0e0c0;
+    text-shadow: 0 0 15px rgba(240, 224, 192, 0.3);
+    text-align: center;
+  }
+
+  .showcase-gauge {
+    width: min(400px, 85vw);
+  }
+
+  .showcase-counter {
+    font-size: 0.8rem;
+    color: #6a6a8a;
+    margin-top: 0.5rem;
+  }
+
+  /* ========== スタンプ演出（アイテム取得） ========== */
+  .stamps-zone {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    pointer-events: none;
+  }
+
+  .stamp {
+    position: absolute;
+    width: 170px;
+    height: 170px;
+    object-fit: contain;
+    transform: translate(-50%, -50%) rotate(var(--rot)) scale(0);
+    animation: stampIn 0.15s ease-out forwards;
+    animation-delay: var(--delay);
+    pointer-events: none;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+    opacity: 0;
+  }
+
+  @keyframes stampIn {
+    0% {
+      transform: translate(-50%, -50%) rotate(var(--rot)) scale(0);
+      opacity: 0;
+    }
+    40% {
+      opacity: 0.85;
+    }
+    60% {
+      transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.15);
+      opacity: 0.85;
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(var(--rot)) scale(1);
+      opacity: 0.8;
+    }
   }
 </style>
