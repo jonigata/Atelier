@@ -132,7 +132,7 @@
 >
   <div class="tracker-header">
     <div class="tracker-title">
-      <span class="quarter-badge">Q{inspection.quarter}</span>
+      <span class="quarter-badge">{inspection.month}月末</span>
       <span class="title-text">査察: {inspection.title}</span>
     </div>
     <div class="tracker-meta">

@@ -34,6 +34,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     hint: '<strong>所持品</strong>を開いて持ち物を調べよう',
     category: 'tutorial',
     narrative: 'workshop_discovery',
+    narrativeCharacter: { name: 'コレット', title: '駆け出し錬金術師' },
     narrativeLines: [
       '工房に運び込まれた荷物を整理した',
       '師匠が持たせてくれた道具と素材……それに、何冊かの教本',
@@ -163,7 +164,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     eventImage: 'inspection_intro',
     narrativeLines: [
       '師匠組合の査察部です。派遣錬金術師の初期登録確認に参りました',
-      '制度を説明します。組合は3ヶ月ごとに経過報告を求め、1年後に最終査察を行います',
+      '制度を説明します。組合は定期的に査察を行い、1年後に最終査察で認定を判断します',
       '依頼の実績、錬金術の腕前、村への貢献……すべてが評価対象です',
       '実績なき者は召還。それだけのことです。……精励を期待します',
     ],
@@ -196,15 +197,15 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
 
   ach_q1_goal_reminder: {
     id: 'ach_q1_goal_reminder',
-    title: '84日目までに',
+    title: '28日目までに',
     description: '最初の査察に向けて目標を確認した',
     hint: '',
     category: 'tutorial',
     narrative: 'workshop_discovery',
     narrativeCharacter: { name: 'コレット', title: '駆け出し錬金術師' },
     narrativeLines: [
-      '84日目までに、錬金術レベル4以上……',
-      'それと依頼を8件以上。……やるしかない',
+      '28日目までに、錬金術レベル2以上……',
+      'それと依頼を2件以上。……やるしかない',
     ],
     conditions: [],
     reward: {},

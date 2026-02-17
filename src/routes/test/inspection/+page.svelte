@@ -11,8 +11,8 @@
   let reputation = $state(0);
   let daysUntil = $state(78);
 
-  // Q3（全4項目）を表示
-  const inspection: InspectionDef = inspections[2];
+  // 9月末（全4項目）を表示
+  const inspection: InspectionDef = inspections[5];
 </script>
 
 <div class="test-page">
