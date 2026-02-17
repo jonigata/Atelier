@@ -2,6 +2,9 @@
   import { gameState, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel } from '$lib/stores/game';
   import { calcExpForLevel, calcExpProgress } from '$lib/data/balance';
   import MoneyIndicator from './MoneyIndicator.svelte';
+
+  $: staminaRatio = $gameState.stamina / $gameState.maxStamina;
+  $: staminaClass = staminaRatio <= 0.2 ? 'critical' : staminaRatio <= 0.5 ? 'low' : '';
 </script>
 
 <div class="hud">
@@ -47,11 +50,11 @@
     </div>
 
     <div class="hud-section character-section">
-      <div class="stat-item stamina">
+      <div class="stat-item stamina {staminaClass}">
         <span class="stat-label">体力</span>
         <span class="stat-value">{$gameState.stamina}/{$gameState.maxStamina}</span>
         <div class="stamina-bar">
-          <div class="stamina-fill" style="width: {($gameState.stamina / $gameState.maxStamina) * 100}%"></div>
+          <div class="stamina-fill" style="width: {staminaRatio * 100}%"></div>
         </div>
       </div>
     </div>
@@ -175,7 +178,30 @@
   .stamina-fill {
     height: 100%;
     background: linear-gradient(90deg, #4caf50, #81c784);
-    transition: width 0.3s ease;
+    transition: width 0.3s ease, background 0.3s ease;
+  }
+
+  .stamina.low .stat-value {
+    color: #ffa726;
+  }
+
+  .stamina.low .stamina-fill {
+    background: linear-gradient(90deg, #e65100, #ffa726);
+  }
+
+  .stamina.critical .stat-value {
+    color: #ef5350;
+    animation: blink 1s ease-in-out infinite;
+  }
+
+  .stamina.critical .stamina-fill {
+    background: linear-gradient(90deg, #c62828, #ef5350);
+    animation: blink 1s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
   }
 
   @media (max-width: 600px) {
