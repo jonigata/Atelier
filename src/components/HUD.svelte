@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { gameState, daysRemaining, expForNextLevel } from '$lib/stores/game';
+  import { gameState, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel } from '$lib/stores/game';
+  import { calcExpForLevel, calcExpProgress } from '$lib/data/balance';
   import MoneyIndicator from './MoneyIndicator.svelte';
 </script>
 
@@ -24,22 +25,28 @@
     <div class="hud-section stats-section">
       <div class="stat-item">
         <span class="stat-label">村発展</span>
-        <span class="stat-value village">{$gameState.villageDevelopment}</span>
+        <span class="stat-value village">Lv.{$villageLevel}</span>
+        <div class="exp-bar">
+          <div class="exp-fill village-fill" style="width: {Math.min(100, (calcExpProgress($gameState.villageExp) / calcExpForLevel($villageLevel)) * 100)}%"></div>
+        </div>
       </div>
       <div class="stat-item">
         <span class="stat-label">名声</span>
-        <span class="stat-value">{$gameState.reputation}</span>
+        <span class="stat-value reputation">Lv.{$reputationLevel}</span>
+        <div class="exp-bar">
+          <div class="exp-fill reputation-fill" style="width: {Math.min(100, (calcExpProgress($gameState.reputationExp) / calcExpForLevel($reputationLevel)) * 100)}%"></div>
+        </div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">錬金術</span>
+        <span class="stat-value">Lv.{$alchemyLevel}</span>
+        <div class="exp-bar">
+          <div class="exp-fill" style="width: {Math.min(100, (calcExpProgress($gameState.alchemyExp) / $expForNextLevel) * 100)}%"></div>
+        </div>
       </div>
     </div>
 
     <div class="hud-section character-section">
-      <div class="stat-item">
-        <span class="stat-label">錬金術</span>
-        <span class="stat-value">Lv.{$gameState.alchemyLevel}</span>
-        <div class="exp-bar">
-          <div class="exp-fill" style="width: {Math.min(100, ($gameState.alchemyExp / $expForNextLevel) * 100)}%"></div>
-        </div>
-      </div>
       <div class="stat-item stamina">
         <span class="stat-label">体力</span>
         <span class="stat-value">{$gameState.stamina}/{$gameState.maxStamina}</span>
@@ -151,6 +158,18 @@
     height: 100%;
     background: linear-gradient(90deg, #6a5acd, #9370db);
     transition: width 0.3s ease;
+  }
+
+  .exp-fill.village-fill {
+    background: linear-gradient(90deg, #388e3c, #81c784);
+  }
+
+  .exp-fill.reputation-fill {
+    background: linear-gradient(90deg, #c9a959, #e0c080);
+  }
+
+  .stat-value.reputation {
+    color: #e0c080;
   }
 
   .stamina-fill {

@@ -8,7 +8,7 @@ import { resolveDialogue } from './presentation';
 import { areas } from '$lib/data/areas';
 import { items } from '$lib/data/items';
 import { removeItemsFromInventory } from '$lib/services/inventory';
-import { calcExpForLevel, ALCHEMY } from '$lib/data/balance';
+import { calcLevelFromExp } from '$lib/data/balance';
 import type { GameState, ActionType, OwnedItem, Expedition } from '$lib/models/types';
 
 export interface AutoplayLog {
@@ -210,8 +210,8 @@ function tryBuyMaterials(state: GameState): boolean {
 
   if (!needHerb && !needWater) return false;
 
-  // 購入可能なアイテムをチェック（村発展度に応じて）
-  const buyableItemIds = getBuyableItemIds(state.villageDevelopment);
+  // 購入可能なアイテムをチェック（村発展レベルに応じて）
+  const buyableItemIds = getBuyableItemIds(calcLevelFromExp(state.villageExp));
 
   // ハルマム草を優先購入
   if (needHerb && buyableItemIds.includes('herb_01')) {
@@ -247,16 +247,16 @@ function tryBuyMaterials(state: GameState): boolean {
 }
 
 /**
- * 村発展度に応じた購入可能アイテムIDを取得
+ * 村発展レベルに応じた購入可能アイテムIDを取得
  */
-function getBuyableItemIds(development: number): string[] {
-  if (development < 10) {
+function getBuyableItemIds(level: number): string[] {
+  if (level < 2) {
     return ['herb_01', 'water_01'];
   }
-  if (development < 20) {
+  if (level < 4) {
     return ['herb_01', 'herb_02', 'water_01', 'ore_01'];
   }
-  if (development < 50) {
+  if (level < 7) {
     return ['herb_01', 'herb_02', 'water_01', 'ore_01', 'misc_01'];
   }
   return Object.keys(items).filter(id => items[id].category !== 'product');
@@ -323,8 +323,8 @@ function tryDeliverQuest(state: GameState): boolean {
           ...s,
           inventory: newInventory,
           money: s.money + quest.rewardMoney,
-          reputation: Math.min(100, s.reputation + quest.rewardReputation),
-          villageDevelopment: Math.min(100, s.villageDevelopment + developmentGain),
+          reputationExp: s.reputationExp + quest.rewardReputation,
+          villageExp: s.villageExp + developmentGain,
           completedQuestCount: s.completedQuestCount + 1,
           activeQuests: s.activeQuests.filter(q => q.id !== quest.id),
           stats: {
@@ -368,20 +368,11 @@ function tryCraft(state: GameState): boolean {
     newInventory.push({ itemId: 'potion_01', quality: Math.min(100, resultQuality) });
 
     const expGain = 15;
-    let newExp = s.alchemyExp + expGain;
-    let newLevel = s.alchemyLevel;
-    let expNeeded = calcExpForLevel(newLevel);
-    while (newExp >= expNeeded && newLevel < ALCHEMY.MAX_LEVEL) {
-      newExp -= expNeeded;
-      newLevel++;
-      expNeeded = calcExpForLevel(newLevel);
-    }
 
     return {
       ...s,
       inventory: newInventory,
-      alchemyExp: newExp,
-      alchemyLevel: newLevel,
+      alchemyExp: s.alchemyExp + expGain,
       craftedItems: s.craftedItems.includes('potion_01')
         ? s.craftedItems
         : [...s.craftedItems, 'potion_01'],

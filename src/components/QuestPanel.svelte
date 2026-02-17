@@ -4,8 +4,8 @@
     gameState,
     addMessage,
     addMoney,
-    addReputation,
-    addVillageDevelopment,
+    addReputationExp,
+    addVillageExp,
   } from '$lib/stores/game';
   import {
     addActiveQuest,
@@ -113,29 +113,18 @@
     const finalMoney = Math.floor(quest.rewardMoney * moneyMult) + qualityBonus.money;
     const finalReputation = quest.rewardReputation + repBonus + qualityBonus.reputation;
 
-    // ゲージ用にbefore値をキャプチャ
-    const state = get(gameState);
-    const repBefore = state.reputation;
-    const devBefore = state.villageDevelopment;
-
     // 報酬付与（機材効果適用済み）
     addMoney(finalMoney);
-    addReputation(finalReputation);
-    addVillageDevelopment(developmentGain);
+    addReputationExp(finalReputation);
+    addVillageExp(developmentGain);
     incrementCompletedQuests();
     removeActiveQuest(quest.id);
 
     // 完了ダイアログを表示
     const structuredRewards: RewardDisplay[] = [
       { text: `${finalMoney.toLocaleString()} G`, type: 'money' },
-      {
-        text: `名声 +${finalReputation}`, type: 'reputation',
-        gaugeData: { before: repBefore, after: Math.min(100, repBefore + finalReputation), max: 100, label: '名声' },
-      },
-      {
-        text: `村発展度 +${developmentGain}`, type: 'villageDevelopment',
-        gaugeData: { before: devBefore, after: Math.min(100, devBefore + developmentGain), max: 100, label: '村発展度' },
-      },
+      { text: `名声Exp +${finalReputation}`, type: 'reputation' },
+      { text: `村発展Exp +${developmentGain}`, type: 'villageDevelopment' },
     ];
 
     const dialogue: EventDialogue = {

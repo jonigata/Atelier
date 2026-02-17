@@ -266,10 +266,9 @@ export interface GameState {
   playerName: string;
   day: number;              // 1-336
   money: number;
-  reputation: number;       // 0-100
-  villageDevelopment: number; // 0-100 村発展度
-  alchemyLevel: number;
-  alchemyExp: number;
+  reputationExp: number;       // 累計経験値（レベルは関数で算出）
+  villageExp: number;          // 累計経験値（レベルは関数で算出）
+  alchemyExp: number;          // 累計経験値（レベルは関数で算出）
   stamina: number;          // 0-100
   maxStamina: number;
 
@@ -356,9 +355,9 @@ export type AchievementCategory =
 export interface AchievementReward {
   money?: number;
   items?: { itemId: string; quality: number; quantity: number }[];
-  reputation?: number;
-  exp?: number;              // 錬金経験値
-  villageDevelopment?: number; // 村発展度
+  reputationExp?: number;      // 名声経験値
+  exp?: number;                // 錬金経験値
+  villageExp?: number;         // 村発展度経験値
   recipes?: string[];
   unlocks?: ActionType[];  // アクションアンロック
   facilities?: string[];   // 設備アンロック

@@ -10,7 +10,7 @@ import { getMonth, isMerchantVisiting } from './calendar';
 import { getAllEquipment, getEquipment } from '$lib/data/equipment';
 import { books, getBook } from '$lib/data/books';
 import { items, getItem } from '$lib/data/items';
-import { MERCHANT } from '$lib/data/balance';
+import { MERCHANT, calcLevelFromExp } from '$lib/data/balance';
 import type { MerchantLineup, MerchantSlot, GameState } from '$lib/models/types';
 
 /**
@@ -130,8 +130,8 @@ function getRareMaterialPool(state: GameState): { id: string; basePrice: number 
       // basePrice 80以上をレアとみなす
       if (item.basePrice < 80) return false;
       // レベルによるゲート
-      if (item.basePrice >= 500 && state.alchemyLevel < 10) return false;
-      if (item.basePrice >= 150 && state.alchemyLevel < 5) return false;
+      if (item.basePrice >= 500 && calcLevelFromExp(state.alchemyExp) < 10) return false;
+      if (item.basePrice >= 150 && calcLevelFromExp(state.alchemyExp) < 5) return false;
       return true;
     })
     .map((item) => ({ id: item.id, basePrice: item.basePrice }));

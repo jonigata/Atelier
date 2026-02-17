@@ -10,7 +10,7 @@ import { incrementCraftCount } from '$lib/stores/stats';
 import { getRecipe } from '$lib/data/recipes';
 import { getItem } from '$lib/data/items';
 import { removeItemsFromInventory } from '$lib/services/inventory';
-import { ALCHEMY, CRAFT_SUCCESS, QUALITY, STAMINA } from '$lib/data/balance';
+import { ALCHEMY, CRAFT_SUCCESS, QUALITY, STAMINA, calcLevelFromExp } from '$lib/data/balance';
 import { getFacilityBonuses, hasRequiredFacilities } from '$lib/services/facility';
 import { craftedFlavors, pickRandom } from '$lib/data/flavorTexts';
 import {
@@ -166,7 +166,7 @@ export function canCraftRecipe(recipeId: string): boolean {
   const state = get(gameState);
   const recipe = getRecipe(recipeId);
   if (!recipe) return false;
-  if (recipe.requiredLevel > state.alchemyLevel) return false;
+  if (recipe.requiredLevel > calcLevelFromExp(state.alchemyExp)) return false;
   if (!state.knownRecipes.includes(recipeId)) return false;
   if (!hasRequiredFacilities(recipe)) return false;
 
@@ -223,7 +223,7 @@ export function craft(
     return { success: false, expGained: 0, message: 'レシピが見つかりません' };
   }
 
-  if (recipe.requiredLevel > state.alchemyLevel) {
+  if (recipe.requiredLevel > calcLevelFromExp(state.alchemyExp)) {
     return {
       success: false,
       expGained: 0,
@@ -239,7 +239,7 @@ export function craft(
   consumeItems(selectedItems);
 
   // 調合実行
-  const result = executeCraftAttempt(recipe, selectedItems, state.alchemyLevel);
+  const result = executeCraftAttempt(recipe, selectedItems, calcLevelFromExp(state.alchemyExp));
   const itemDef = getItem(recipe.resultItemId);
   const itemName = itemDef?.name || recipe.name;
 
@@ -305,7 +305,7 @@ export function craftMultiple(
 
   const state = get(gameState);
 
-  if (recipe.requiredLevel > state.alchemyLevel) {
+  if (recipe.requiredLevel > calcLevelFromExp(state.alchemyExp)) {
     return {
       successCount: 0,
       failCount: 0,
@@ -346,7 +346,7 @@ export function craftMultiple(
   const lowQualityFail = checkLowQualityFail(firstItems);
 
   // 成功率を計算し、1回だけ判定
-  const successRate = lowQualityFail ? 0 : calculateSuccessRate(recipe, currentState.alchemyLevel, currentState.stamina);
+  const successRate = lowQualityFail ? 0 : calculateSuccessRate(recipe, calcLevelFromExp(currentState.alchemyExp), currentState.stamina);
   const isSuccess = Math.random() < successRate;
 
   // 体力を全個数分一括消費
@@ -362,7 +362,7 @@ export function craftMultiple(
 
   if (isSuccess) {
     // 全成功: 品質は1回だけ計算し全個数に適用
-    const quality = calculateQuality(recipe, firstItems, currentState.alchemyLevel);
+    const quality = calculateQuality(recipe, firstItems, calcLevelFromExp(currentState.alchemyExp));
     const stateForOrigin = get(gameState);
 
     for (let i = 0; i < actualQuantity; i++) {
@@ -465,7 +465,7 @@ export function craftBatch(
 
   const state = get(gameState);
 
-  if (recipe.requiredLevel > state.alchemyLevel) {
+  if (recipe.requiredLevel > calcLevelFromExp(state.alchemyExp)) {
     return {
       successCount: 0,
       failCount: 0,
@@ -507,7 +507,7 @@ export function craftBatch(
   const lowQualityFail = checkLowQualityFail(firstItems);
 
   // 成功率を計算し、1回だけ判定
-  const successRate = lowQualityFail ? 0 : calculateSuccessRate(recipe, currentState.alchemyLevel, currentState.stamina);
+  const successRate = lowQualityFail ? 0 : calculateSuccessRate(recipe, calcLevelFromExp(currentState.alchemyExp), currentState.stamina);
   const isSuccess = Math.random() < successRate;
 
   // 体力を全個数分一括消費
@@ -523,7 +523,7 @@ export function craftBatch(
 
   if (isSuccess) {
     // 全成功: 品質は1回だけ計算し全個数に適用
-    const quality = calculateQuality(recipe, firstItems, currentState.alchemyLevel);
+    const quality = calculateQuality(recipe, firstItems, calcLevelFromExp(currentState.alchemyExp));
     const stateForOrigin = get(gameState);
 
     for (let i = 0; i < actualQuantity; i++) {

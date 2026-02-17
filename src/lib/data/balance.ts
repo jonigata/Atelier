@@ -4,16 +4,22 @@
  */
 
 // =====================================
-// 経験値・レベル
+// 経験値・レベル（3軸共通）
 // =====================================
 
-export const ALCHEMY = {
+/** 3軸共通のレベル設定 */
+export const LEVEL = {
   /** レベルアップ基本経験値 */
   EXP_BASE: 100,
   /** レベルごとの経験値成長率 */
   EXP_GROWTH: 1.5,
   /** 最大レベル */
-  MAX_LEVEL: 20,
+  MAX_LEVEL: 10,
+} as const;
+
+/** 錬金術固有の設定 */
+export const ALCHEMY = {
+  ...LEVEL,
   /** 失敗時の経験値係数（成功時の30%） */
   FAIL_EXP_RATE: 0.3,
   /** 高品質ボーナスの閾値 */
@@ -154,8 +160,38 @@ export const MERCHANT = {
 // =====================================
 
 /**
- * レベルアップに必要な経験値を計算
+ * 指定レベルから次のレベルに必要な経験値を計算
  */
 export function calcExpForLevel(level: number): number {
-  return Math.floor(ALCHEMY.EXP_BASE * Math.pow(ALCHEMY.EXP_GROWTH, level - 1));
+  return Math.floor(LEVEL.EXP_BASE * Math.pow(LEVEL.EXP_GROWTH, level - 1));
+}
+
+/**
+ * 累計経験値からレベルを算出
+ */
+export function calcLevelFromExp(totalExp: number): number {
+  let level = 1;
+  let remaining = totalExp;
+  while (level < LEVEL.MAX_LEVEL) {
+    const needed = calcExpForLevel(level);
+    if (remaining < needed) break;
+    remaining -= needed;
+    level++;
+  }
+  return level;
+}
+
+/**
+ * 累計経験値から現在レベル内の進捗（現在レベルで溜まったXP）を算出
+ */
+export function calcExpProgress(totalExp: number): number {
+  let remaining = totalExp;
+  let level = 1;
+  while (level < LEVEL.MAX_LEVEL) {
+    const needed = calcExpForLevel(level);
+    if (remaining < needed) break;
+    remaining -= needed;
+    level++;
+  }
+  return remaining;
 }

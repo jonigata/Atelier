@@ -1,16 +1,17 @@
 <script lang="ts">
-  import { gameState, resetGame } from '$lib/stores/game';
+  import { gameState, resetGame, alchemyLevel, villageLevel, reputationLevel } from '$lib/stores/game';
 
   type EndingType = 'true' | 'good' | 'normal' | 'mediocre' | 'fail';
 
   function getEnding(): { type: EndingType; title: string; description: string } {
     const state = $gameState;
-    const dev = state.villageDevelopment;
+    const devLv = $villageLevel;
+    const alcLv = $alchemyLevel;
 
-    // 真ED: 村発展度90以上, Lv15以上, エリクサー作成済
+    // 真ED: 村発展Lv10, 錬金Lv10, エリクサー作成済
     if (
-      dev >= 90 &&
-      state.alchemyLevel >= 15 &&
+      devLv >= 10 &&
+      alcLv >= 10 &&
       state.craftedItems.includes('elixir')
     ) {
       return {
@@ -21,8 +22,8 @@
       };
     }
 
-    // 良ED: 村発展度70以上, Lv10以上
-    if (dev >= 70 && state.alchemyLevel >= 10) {
+    // 良ED: 村発展Lv8以上, 錬金Lv8以上
+    if (devLv >= 8 && alcLv >= 8) {
       return {
         type: 'good',
         title: '村の恩人',
@@ -31,8 +32,8 @@
       };
     }
 
-    // 普通ED: 村発展度50以上
-    if (dev >= 50) {
+    // 普通ED: 村発展Lv6以上
+    if (devLv >= 6) {
       return {
         type: 'normal',
         title: '貢献者',
@@ -41,8 +42,8 @@
       };
     }
 
-    // 微妙ED: 村発展度30以上
-    if (dev >= 30) {
+    // 微妙ED: 村発展Lv4以上
+    if (devLv >= 4) {
       return {
         type: 'mediocre',
         title: 'まあまあ',
@@ -85,15 +86,15 @@
       <div class="stat-grid">
         <div class="stat highlight">
           <span class="label">村発展度</span>
-          <span class="value">{$gameState.villageDevelopment}</span>
+          <span class="value">Lv.{$villageLevel}</span>
         </div>
         <div class="stat">
           <span class="label">錬金術レベル</span>
-          <span class="value">{$gameState.alchemyLevel}</span>
+          <span class="value">Lv.{$alchemyLevel}</span>
         </div>
         <div class="stat">
           <span class="label">名声</span>
-          <span class="value">{$gameState.reputation}</span>
+          <span class="value">Lv.{$reputationLevel}</span>
         </div>
         <div class="stat">
           <span class="label">所持金</span>

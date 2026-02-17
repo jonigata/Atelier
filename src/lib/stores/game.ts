@@ -5,7 +5,7 @@ import type {
   MorningEvent,
 } from '$lib/models/types';
 import { removeItemFromInventory } from '$lib/services/inventory';
-import { calcExpForLevel, ALCHEMY } from '$lib/data/balance';
+import { calcExpForLevel, calcLevelFromExp, calcExpProgress, ALCHEMY, LEVEL } from '$lib/data/balance';
 
 // =====================================
 // 初期状態
@@ -16,9 +16,8 @@ function createInitialState(): GameState {
     playerName: 'コレット',
     day: 1,
     money: 500,
-    reputation: 0,
-    villageDevelopment: 0,
-    alchemyLevel: 1,
+    reputationExp: 0,
+    villageExp: 0,
     alchemyExp: 0,
     stamina: 0,
     maxStamina: 100,
@@ -90,8 +89,13 @@ export const daysRemaining = derived(gameState, ($state) => 336 - $state.day);
 
 export const isGameOver = derived(gameState, ($state) => $state.day > 336);
 
+// 3軸のレベル（派生ストア）
+export const alchemyLevel = derived(gameState, ($state) => calcLevelFromExp($state.alchemyExp));
+export const villageLevel = derived(gameState, ($state) => calcLevelFromExp($state.villageExp));
+export const reputationLevel = derived(gameState, ($state) => calcLevelFromExp($state.reputationExp));
+
 export const expForNextLevel = derived(gameState, ($state) => {
-  return calcExpForLevel($state.alchemyLevel);
+  return calcExpForLevel(calcLevelFromExp($state.alchemyExp));
 });
 
 // =====================================
@@ -160,11 +164,16 @@ export function addMoney(amount: number): void {
   }));
 }
 
-export function addReputation(amount: number): void {
-  gameState.update((state) => ({
-    ...state,
-    reputation: Math.max(0, Math.min(100, state.reputation + amount)),
-  }));
+export function addReputationExp(amount: number): void {
+  gameState.update((state) => {
+    const oldLevel = calcLevelFromExp(state.reputationExp);
+    const newExp = Math.max(0, state.reputationExp + amount);
+    const newLevel = calcLevelFromExp(newExp);
+    if (newLevel > oldLevel) {
+      pendingReputationLevelUp.set({ oldLevel, newLevel });
+    }
+    return { ...state, reputationExp: newExp };
+  });
 }
 
 export function markInventoryOpened(): void {
@@ -174,11 +183,16 @@ export function markInventoryOpened(): void {
   }));
 }
 
-export function addVillageDevelopment(amount: number): void {
-  gameState.update((state) => ({
-    ...state,
-    villageDevelopment: Math.max(0, Math.min(100, state.villageDevelopment + amount)),
-  }));
+export function addVillageExp(amount: number): void {
+  gameState.update((state) => {
+    const oldLevel = calcLevelFromExp(state.villageExp);
+    const newExp = Math.max(0, state.villageExp + amount);
+    const newLevel = calcLevelFromExp(newExp);
+    if (newLevel > oldLevel) {
+      pendingVillageLevelUp.set({ oldLevel, newLevel });
+    }
+    return { ...state, villageExp: newExp };
+  });
 }
 
 export interface LevelUpInfo {
@@ -187,19 +201,14 @@ export interface LevelUpInfo {
 }
 
 export const pendingLevelUp = writable<LevelUpInfo | null>(null);
+export const pendingVillageLevelUp = writable<LevelUpInfo | null>(null);
+export const pendingReputationLevelUp = writable<LevelUpInfo | null>(null);
 
 export function addExp(amount: number): void {
   gameState.update((state) => {
-    let newExp = state.alchemyExp + amount;
-    let newLevel = state.alchemyLevel;
-    const oldLevel = state.alchemyLevel;
-    let expNeeded = calcExpForLevel(newLevel);
-
-    while (newExp >= expNeeded && newLevel < ALCHEMY.MAX_LEVEL) {
-      newExp -= expNeeded;
-      newLevel++;
-      expNeeded = calcExpForLevel(newLevel);
-    }
+    const oldLevel = calcLevelFromExp(state.alchemyExp);
+    const newExp = state.alchemyExp + amount;
+    const newLevel = calcLevelFromExp(newExp);
 
     if (newLevel > oldLevel) {
       pendingLevelUp.set({ oldLevel, newLevel });
@@ -208,7 +217,6 @@ export function addExp(amount: number): void {
     return {
       ...state,
       alchemyExp: newExp,
-      alchemyLevel: newLevel,
     };
   });
 }

@@ -8,7 +8,7 @@ import {
   advanceDay,
   setExpedition,
   addItem,
-  addReputation,
+  addReputationExp,
   setDayTransition,
 } from '$lib/stores/game';
 import { removeActiveQuest, incrementFailedQuests, setAvailableQuests, incrementNewQuestCount } from '$lib/stores/quests';
@@ -16,7 +16,7 @@ import { isActionUnlocked } from '$lib/stores/tutorial';
 import { getArea } from '$lib/data/areas';
 import { getItem } from '$lib/data/items';
 import { getAvailableQuestTemplates } from '$lib/data/quests';
-import { EXPEDITION, QUEST } from '$lib/data/balance';
+import { EXPEDITION, QUEST, calcLevelFromExp } from '$lib/data/balance';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import { checkAutoCompleteAchievements } from '$lib/services/tutorial';
 import { checkMerchantEvents } from '$lib/services/merchant';
@@ -206,7 +206,7 @@ function checkQuestDeadlines(): void {
       addMorningEvent(event);
       addMessage(event.message);
 
-      addReputation(-5);
+      addReputationExp(-5);
       incrementFailedQuests();
       removeActiveQuest(quest.id);
     }
@@ -226,7 +226,7 @@ function generateNewQuests(): void {
 
   // 一定確率で新しい依頼を追加
   if (Math.random() < QUEST.NEW_QUEST_CHANCE || state.availableQuests.length === 0) {
-    const templates = getAvailableQuestTemplates(state.alchemyLevel, state.reputation);
+    const templates = getAvailableQuestTemplates(calcLevelFromExp(state.alchemyExp), calcLevelFromExp(state.reputationExp));
 
     if (templates.length > 0) {
       // ランダムに1-2個選択
@@ -277,7 +277,7 @@ export function skipOpening(): void {
 export function initializeGame(): void {
   // 初期依頼を設定
   const state = get(gameState);
-  const templates = getAvailableQuestTemplates(state.alchemyLevel, state.reputation);
+  const templates = getAvailableQuestTemplates(calcLevelFromExp(state.alchemyExp), calcLevelFromExp(state.reputationExp));
   const initialQuests = templates.slice(0, 2);
   setAvailableQuests(initialQuests);
 

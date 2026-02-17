@@ -1,5 +1,6 @@
 import { get } from 'svelte/store';
 import { gameState } from '$lib/stores/game';
+import { calcLevelFromExp } from '$lib/data/balance';
 import type { GameState } from '$lib/models/types';
 
 const STORAGE_KEY_PREFIX = 'atelier_save_slot_';
@@ -52,7 +53,7 @@ export function saveToSlot(index: number, label: string = ''): SaveSlotMeta {
     slotIndex: index,
     savedAt: new Date().toISOString(),
     day: state.day,
-    alchemyLevel: state.alchemyLevel,
+    alchemyLevel: calcLevelFromExp(state.alchemyExp),
     money: state.money,
     playerName: state.playerName,
     label,

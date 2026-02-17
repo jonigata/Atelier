@@ -3,13 +3,13 @@ import {
   gameState,
   addMoney,
   addItem,
-  addReputation,
+  addReputationExp,
   addExp,
-  addVillageDevelopment,
+  addVillageExp,
   learnRecipe,
   unlockFacility,
 } from '$lib/stores/game';
-import { calcExpForLevel } from '$lib/data/balance';
+import { calcExpForLevel, calcLevelFromExp, calcExpProgress } from '$lib/data/balance';
 import { completeAchievement, clearPendingReward, isAchievementCompleted } from '$lib/stores/achievements';
 import { unlockAction } from '$lib/stores/tutorial';
 import {
@@ -50,10 +50,10 @@ function evaluateCondition(condition: AchievementCondition, state: GameState): b
 
   switch (condition.type) {
     case 'level':
-      currentValue = state.alchemyLevel;
+      currentValue = calcLevelFromExp(state.alchemyExp);
       break;
     case 'reputation':
-      currentValue = state.reputation;
+      currentValue = calcLevelFromExp(state.reputationExp);
       break;
     case 'money':
       currentValue = state.money;
@@ -89,7 +89,7 @@ function evaluateCondition(condition: AchievementCondition, state: GameState): b
       currentValue = state.day;
       break;
     case 'village_development':
-      currentValue = state.villageDevelopment;
+      currentValue = calcLevelFromExp(state.villageExp);
       break;
     case 'inventory_opened':
       return state.stats.inventoryOpened;
@@ -271,16 +271,16 @@ export function claimReward(achievementId: string): void {
     }
   }
 
-  if (reward.reputation) {
-    addReputation(reward.reputation);
+  if (reward.reputationExp) {
+    addReputationExp(reward.reputationExp);
   }
 
   if (reward.exp) {
     addExp(reward.exp);
   }
 
-  if (reward.villageDevelopment) {
-    addVillageDevelopment(reward.villageDevelopment);
+  if (reward.villageExp) {
+    addVillageExp(reward.villageExp);
   }
 
   if (reward.recipes) {
@@ -382,16 +382,16 @@ function getDetailedRewards(achievement: AchievementDef): string[] {
     }
   }
 
-  if (reward.reputation) {
-    details.push(`名声 +${reward.reputation}`);
+  if (reward.reputationExp) {
+    details.push(`名声Exp +${reward.reputationExp}`);
   }
 
   if (reward.exp) {
     details.push(`経験値 +${reward.exp}`);
   }
 
-  if (reward.villageDevelopment) {
-    details.push(`村発展度 +${reward.villageDevelopment}`);
+  if (reward.villageExp) {
+    details.push(`村発展Exp +${reward.villageExp}`);
   }
 
   if (reward.recipes) {
@@ -449,34 +449,39 @@ function getStructuredRewards(achievement: AchievementDef): RewardDisplay[] {
     }
   }
 
-  if (reward.reputation) {
-    const before = state.reputation;
-    const after = Math.min(100, before + reward.reputation);
+  if (reward.reputationExp) {
+    const level = calcLevelFromExp(state.reputationExp);
+    const before = calcExpProgress(state.reputationExp);
+    const max = calcExpForLevel(level);
+    const after = Math.min(max, before + reward.reputationExp);
     structured.push({
-      text: `名声 +${reward.reputation}`,
+      text: `名声Exp +${reward.reputationExp}`,
       type: 'reputation',
-      gaugeData: { before, after, max: 100, label: '名声' },
+      gaugeData: { before, after, max, label: `Lv.${level}` },
     });
   }
 
   if (reward.exp) {
-    const before = state.alchemyExp;
-    const max = calcExpForLevel(state.alchemyLevel);
+    const level = calcLevelFromExp(state.alchemyExp);
+    const before = calcExpProgress(state.alchemyExp);
+    const max = calcExpForLevel(level);
     const after = Math.min(max, before + reward.exp);
     structured.push({
       text: `経験値 +${reward.exp}`,
       type: 'exp',
-      gaugeData: { before, after, max, label: `Lv.${state.alchemyLevel}` },
+      gaugeData: { before, after, max, label: `Lv.${level}` },
     });
   }
 
-  if (reward.villageDevelopment) {
-    const before = state.villageDevelopment;
-    const after = Math.min(100, before + reward.villageDevelopment);
+  if (reward.villageExp) {
+    const level = calcLevelFromExp(state.villageExp);
+    const before = calcExpProgress(state.villageExp);
+    const max = calcExpForLevel(level);
+    const after = Math.min(max, before + reward.villageExp);
     structured.push({
-      text: `村発展度 +${reward.villageDevelopment}`,
+      text: `村発展Exp +${reward.villageExp}`,
       type: 'villageDevelopment',
-      gaugeData: { before, after, max: 100, label: '村発展度' },
+      gaugeData: { before, after, max, label: `Lv.${level}` },
     });
   }
 
@@ -538,16 +543,16 @@ export function getRewardDescription(achievementId: string): string[] {
     }
   }
 
-  if (reward.reputation) {
-    descriptions.push(`名声 +${reward.reputation}`);
+  if (reward.reputationExp) {
+    descriptions.push(`名声Exp +${reward.reputationExp}`);
   }
 
   if (reward.exp) {
     descriptions.push(`経験値 +${reward.exp}`);
   }
 
-  if (reward.villageDevelopment) {
-    descriptions.push(`村発展度 +${reward.villageDevelopment}`);
+  if (reward.villageExp) {
+    descriptions.push(`村発展Exp +${reward.villageExp}`);
   }
 
   if (reward.recipes) {
@@ -578,10 +583,10 @@ export function getAchievementProgress(achievementId: string): number {
     let current = 0;
     switch (cond.type) {
       case 'level':
-        current = state.alchemyLevel;
+        current = calcLevelFromExp(state.alchemyExp);
         break;
       case 'reputation':
-        current = state.reputation;
+        current = calcLevelFromExp(state.reputationExp);
         break;
       case 'money':
         current = state.money;
@@ -614,7 +619,7 @@ export function getAchievementProgress(achievementId: string): number {
         current = state.day;
         break;
       case 'village_development':
-        current = state.villageDevelopment;
+        current = calcLevelFromExp(state.villageExp);
         break;
       case 'inventory_opened':
         return state.stats.inventoryOpened ? 100 : 0;

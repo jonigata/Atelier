@@ -14,8 +14,10 @@
   type Tab = 'buy' | 'sell';
   let activeTab: Tab = 'buy';
 
-  // 村発展度に応じた購入可能アイテム
-  $: buyableItems = getBuyableItems($gameState.villageDevelopment);
+  import { villageLevel } from '$lib/stores/game';
+
+  // 村発展レベルに応じた購入可能アイテム
+  $: buyableItems = getBuyableItems($villageLevel);
 
   // ショップ機材ラインナップの初期化
   $: if ($gameState.shopEquipment.length === 0) {
@@ -39,25 +41,25 @@
     }));
   }
 
-  function getBuyableItems(development: number): ItemDef[] {
+  function getBuyableItems(villageLv: number): ItemDef[] {
     const allMaterials = Object.values(items).filter(
       (item) => item.category !== 'product'
     );
 
     return allMaterials.filter((item) => {
-      // 発展度0-9: 基本素材のみ（ハルマム草、清水）
-      if (development < 10) {
+      // Lv1: 基本素材のみ（ハルマム草、清水）
+      if (villageLv <= 1) {
         return item.id === 'herb_01' || item.id === 'water_01';
       }
-      // 発展度10-19: 中級素材追加（毒消し草、鉄鉱石）
-      if (development < 20) {
+      // Lv2-3: 中級素材追加（毒消し草、鉄鉱石）
+      if (villageLv <= 3) {
         return ['herb_01', 'herb_02', 'water_01', 'ore_01'].includes(item.id);
       }
-      // 発展度20-49: さらに拡大（獣の皮）
-      if (development < 50) {
+      // Lv4-6: さらに拡大（獣の皮）
+      if (villageLv <= 6) {
         return ['herb_01', 'herb_02', 'water_01', 'ore_01', 'misc_01'].includes(item.id);
       }
-      // 発展度50+: レア素材も購入可能
+      // Lv7+: レア素材も購入可能
       return true;
     });
   }

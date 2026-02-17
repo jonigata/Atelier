@@ -5,7 +5,7 @@
   import { books } from '$lib/data/books';
   import { items, getItemIcon } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
-  import { STAMINA } from '$lib/data/balance';
+  import { STAMINA, calcLevelFromExp } from '$lib/data/balance';
   import { getEffectiveStudyDays } from '$lib/services/equipmentEffects';
   import type { RecipeBookDef } from '$lib/models/types';
   import StudyCompleteDialog from './StudyCompleteDialog.svelte';
@@ -104,7 +104,7 @@
   <h2>📚 勉強</h2>
   <p>本を選んで読みます。{selectedBook ? getStudyDays(selectedBook) : 1}日経過・体力{STAMINA.STUDY_COST}消費します。</p>
   <p class="known-recipes">
-    習得済みレシピ: {$gameState.knownRecipes.length}個 / 錬金術Lv: {$gameState.alchemyLevel}
+    習得済みレシピ: {$gameState.knownRecipes.length}個 / 錬金術Lv: {calcLevelFromExp($gameState.alchemyExp)}
   </p>
 
   {#if availableBooks.length > 0}

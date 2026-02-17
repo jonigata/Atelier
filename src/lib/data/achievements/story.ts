@@ -132,7 +132,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     reward: {
       money: 300,
-      reputation: 5,
+      reputationExp: 5,
     },
     prerequisite: ['ach_story_report_notice'],
     priority: 690,
@@ -182,7 +182,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       { type: 'craft_count', target: 20 },
     ],
     reward: {
-      reputation: 5,
+      reputationExp: 5,
       items: [{ itemId: 'herb_01', quality: 70, quantity: 3 }],
       originLabel: 'リーネと一緒に採りに行った',
     },
@@ -211,7 +211,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     reward: {
       items: [{ itemId: 'herb_03', quality: 65, quantity: 2 }],
       originLabel: '枯泉の跡地で見つけた固有種',
-      villageDevelopment: 5,
+      villageExp: 5,
     },
     prerequisite: ['ach_story_girl_partner'],
     priority: 725,
@@ -262,7 +262,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       { type: 'village_development', target: 30 },
     ],
     reward: {
-      reputation: 3,
+      reputationExp: 3,
     },
     prerequisite: ['ach_story_rival_appear'],
     priority: 745,
@@ -290,7 +290,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     reward: {
       money: 500,
-      reputation: 5,
+      reputationExp: 5,
       exp: 200,
     },
     prerequisite: ['ach_story_q1_checkpoint'],
@@ -320,7 +320,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     reward: {
       recipes: ['fonte_prototype_01'],
-      reputation: 5,
+      reputationExp: 5,
     },
     prerequisite: ['ach_story_fonte_spring', 'ach_story_q2_checkpoint'],
     priority: 805,
@@ -422,8 +422,8 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     reward: {
       money: 800,
-      reputation: 15,
-      villageDevelopment: 10,
+      reputationExp: 15,
+      villageExp: 10,
     },
     prerequisite: ['ach_story_specialty_fail'],
     priority: 845,
@@ -448,7 +448,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       { type: 'quest_count', target: 20 },
     ],
     reward: {
-      reputation: 10,
+      reputationExp: 10,
     },
     prerequisite: ['ach_story_village_crisis'],
     priority: 855,
@@ -477,7 +477,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     reward: {
       money: 500,
-      reputation: 5,
+      reputationExp: 5,
     },
     prerequisite: ['ach_story_crisis_resolved'],
     priority: 890,
@@ -506,8 +506,8 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     reward: {
       money: 2000,
-      reputation: 20,
-      villageDevelopment: 15,
+      reputationExp: 20,
+      villageExp: 15,
     },
     prerequisite: ['ach_story_q3_checkpoint'],
     priority: 905,
@@ -534,7 +534,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       { type: 'reputation', target: 60 },
     ],
     reward: {
-      reputation: 10,
+      reputationExp: 10,
       items: [{ itemId: 'herb_03', quality: 90, quantity: 1 }],
       originLabel: '親友リーネからの贈り物',
     },
@@ -562,7 +562,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       { type: 'day', target: 318, comparison: '>=' },
     ],
     reward: {
-      reputation: 5,
+      reputationExp: 5,
     },
     prerequisite: ['ach_story_specialty_complete'],
     priority: 930,

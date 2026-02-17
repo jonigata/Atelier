@@ -145,7 +145,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     ],
     conditions: [{ type: 'quest_count', target: 1 }],
     reward: {
-      reputation: 3,
+      reputationExp: 3,
       unlocks: ['album'],
     },
     priority: 40,

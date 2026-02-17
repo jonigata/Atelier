@@ -4,6 +4,7 @@
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
   import { gameState } from '$lib/stores/game';
+  import { calcLevelFromExp } from '$lib/data/balance';
   import { formatCraftDays } from '$lib/services/equipmentEffects';
   import type { RecipeDef, Ingredient } from '$lib/models/types';
 
@@ -23,7 +24,7 @@
 
   $: facilityOk = hasRequiredFacilities(recipe);
   $: missingFacilities = getMissingFacilities(recipe);
-  $: successRate = calculateSuccessRate(recipe, $gameState.alchemyLevel);
+  $: successRate = calculateSuccessRate(recipe, calcLevelFromExp($gameState.alchemyExp));
   $: resultItem = getItem(recipe.resultItemId);
 </script>
 

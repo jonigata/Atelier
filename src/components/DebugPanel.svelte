@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { gameState, resetGame, addVillageDevelopment, addExp, consumeStamina, restoreStamina } from '$lib/stores/game';
+  import { gameState, resetGame, addVillageExp, addReputationExp, addExp, consumeStamina, restoreStamina, alchemyLevel, villageLevel, reputationLevel } from '$lib/stores/game';
   import { unlockActions } from '$lib/stores/tutorial';
   import type { ActionType } from '$lib/models/types';
   import {
@@ -143,7 +143,7 @@
   }
 
   function handleAddDevelopment(amount: number) {
-    addVillageDevelopment(amount);
+    addVillageExp(amount);
   }
 
   const allActions: ActionType[] = ['alchemy', 'quest', 'expedition', 'shop', 'rest', 'study', 'inventory', 'album'];
@@ -197,27 +197,37 @@
     </div>
 
     <div class="section">
-      <h4>村発展度操作</h4>
+      <h4>村発展Exp</h4>
       <div class="buttons">
         <button on:click={() => handleAddDevelopment(10)}>+10</button>
         <button on:click={() => handleAddDevelopment(20)}>+20</button>
         <button on:click={() => handleAddDevelopment(-10)}>-10</button>
       </div>
-      <p class="info">現在: {$gameState.villageDevelopment}</p>
+      <p class="info">Lv.{$villageLevel} (Exp: {$gameState.villageExp})</p>
     </div>
 
     <div class="section">
-      <h4>経験値操作</h4>
+      <h4>名声Exp</h4>
       <div class="buttons">
-        <button on:click={() => addExp(50)}>+50 Exp</button>
-        <button on:click={() => addExp(90)}>+90 Exp</button>
-        <button on:click={() => addExp(100)}>+100 Exp</button>
+        <button on:click={() => addReputationExp(10)}>+10</button>
+        <button on:click={() => addReputationExp(20)}>+20</button>
+        <button on:click={() => addReputationExp(-10)}>-10</button>
       </div>
-      <p class="info">現在: {$gameState.alchemyExp} / Lv.{$gameState.alchemyLevel}</p>
+      <p class="info">Lv.{$reputationLevel} (Exp: {$gameState.reputationExp})</p>
     </div>
 
     <div class="section">
-      <h4>体力操作</h4>
+      <h4>錬金術Exp</h4>
+      <div class="buttons">
+        <button on:click={() => addExp(50)}>+50</button>
+        <button on:click={() => addExp(90)}>+90</button>
+        <button on:click={() => addExp(100)}>+100</button>
+      </div>
+      <p class="info">Lv.{$alchemyLevel} (Exp: {$gameState.alchemyExp})</p>
+    </div>
+
+    <div class="section">
+      <h4>体力</h4>
       <div class="buttons">
         <button on:click={() => consumeStamina(30)}>-30</button>
         <button on:click={() => consumeStamina(50)}>-50</button>
@@ -232,9 +242,9 @@
       <div class="status-grid">
         <span>日数:</span><span>{$gameState.day}</span>
         <span>所持金:</span><span>{$gameState.money}G</span>
-        <span>村発展:</span><span>{$gameState.villageDevelopment}</span>
-        <span>名声:</span><span>{$gameState.reputation}</span>
-        <span>Lv:</span><span>{$gameState.alchemyLevel}</span>
+        <span>村発展:</span><span>Lv.{$villageLevel}</span>
+        <span>名声:</span><span>Lv.{$reputationLevel}</span>
+        <span>錬金:</span><span>Lv.{$alchemyLevel}</span>
         <span>依頼完了:</span><span>{$gameState.completedQuestCount}</span>
       </div>
     </div>

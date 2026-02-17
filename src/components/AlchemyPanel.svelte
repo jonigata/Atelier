@@ -6,7 +6,7 @@
   import { recipes } from '$lib/data/recipes';
   import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient, calculateStaminaCost, calculateFatiguePenalty, getFatigueLabel } from '$lib/services/alchemy';
   import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
-  import { calcExpForLevel } from '$lib/data/balance';
+  import { calcExpForLevel, calcLevelFromExp, calcExpProgress } from '$lib/data/balance';
   import { getEffectiveCraftDays, getEffectiveIngredientCount, craftDaysToActual, formatCraftDays } from '$lib/services/equipmentEffects';
   import type { RecipeDef, OwnedItem, Ingredient } from '$lib/models/types';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
@@ -33,7 +33,7 @@
 
   // 習得済みかつレベル条件を満たすレシピ
   $: availableRecipes = Object.values(recipes).filter(
-    (r) => $gameState.knownRecipes.includes(r.id) && r.requiredLevel <= $gameState.alchemyLevel
+    (r) => $gameState.knownRecipes.includes(r.id) && r.requiredLevel <= calcLevelFromExp($gameState.alchemyExp)
   );
 
   // 選択中のレシピが調合可能か
@@ -100,12 +100,12 @@
 
   // 成功率（体力による疲労ペナルティ込み）
   $: successRate = selectedRecipe
-    ? calculateSuccessRate(selectedRecipe, $gameState.alchemyLevel, $gameState.stamina)
+    ? calculateSuccessRate(selectedRecipe, calcLevelFromExp($gameState.alchemyExp), $gameState.stamina)
     : 0;
 
   // 予想品質
   $: expectedQuality = selectedRecipe && selectedItems.length >= itemsPerCraft
-    ? calculateExpectedQuality(selectedRecipe, selectedItems.slice(0, itemsPerCraft), $gameState.alchemyLevel)
+    ? calculateExpectedQuality(selectedRecipe, selectedItems.slice(0, itemsPerCraft), calcLevelFromExp($gameState.alchemyExp))
     : null;
 
   function selectRecipe(recipe: RecipeDef) {
@@ -191,8 +191,8 @@
 
     // ゲージ用にbefore値をキャプチャ
     const stateBefore = get(gameState);
-    const expBefore = stateBefore.alchemyExp;
-    const levelBefore = stateBefore.alchemyLevel;
+    const levelBefore = calcLevelFromExp(stateBefore.alchemyExp);
+    const expBefore = calcExpProgress(stateBefore.alchemyExp);
     const expMax = calcExpForLevel(levelBefore);
     const staminaBefore = stateBefore.stamina;
 
@@ -201,10 +201,11 @@
 
     // 経験値ゲージデータを構築
     const stateAfter = get(gameState);
-    const leveledUp = stateAfter.alchemyLevel > levelBefore;
+    const levelAfter = calcLevelFromExp(stateAfter.alchemyExp);
+    const leveledUp = levelAfter > levelBefore;
     expGaugeData = {
       before: expBefore,
-      after: leveledUp ? expMax : stateAfter.alchemyExp,
+      after: leveledUp ? expMax : calcExpProgress(stateAfter.alchemyExp),
       max: expMax,
       label: `Lv.${levelBefore}`,
     };

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameState } from '$lib/stores/game';
+  import { gameState, alchemyLevel, villageLevel, reputationLevel } from '$lib/stores/game';
   import { getActiveGoals, getAchievementProgress } from '$lib/services/achievement';
   import { items } from '$lib/data/items';
   import { recipes } from '$lib/data/recipes';
@@ -35,8 +35,8 @@
 
   function getConditionCurrentValue(cond: AchievementCondition): number {
     switch (cond.type) {
-      case 'level': return $gameState.alchemyLevel;
-      case 'reputation': return $gameState.reputation;
+      case 'level': return $alchemyLevel;
+      case 'reputation': return $reputationLevel;
       case 'money': return $gameState.money;
       case 'quest_count': return $gameState.completedQuestCount;
       case 'craft_count': return $gameState.stats.totalCraftCount;
@@ -46,7 +46,7 @@
       case 'consecutive_quests': return $gameState.stats.consecutiveQuestSuccess;
       case 'total_sales': return $gameState.stats.totalSalesAmount;
       case 'day': return $gameState.day;
-      case 'village_development': return $gameState.villageDevelopment;
+      case 'village_development': return $villageLevel;
       case 'inventory_opened': return $gameState.stats.inventoryOpened ? 1 : 0;
       default: return 0;
     }
@@ -87,14 +87,14 @@
         summaries.push(`${itemDef?.name || item.itemId}x${item.quantity}`);
       }
     }
-    if (reward.reputation) {
-      summaries.push(`名声+${reward.reputation}`);
+    if (reward.reputationExp) {
+      summaries.push(`名声Exp+${reward.reputationExp}`);
     }
     if (reward.exp) {
       summaries.push(`経験値+${reward.exp}`);
     }
-    if (reward.villageDevelopment) {
-      summaries.push(`村発展+${reward.villageDevelopment}`);
+    if (reward.villageExp) {
+      summaries.push(`村発展Exp+${reward.villageExp}`);
     }
     if (reward.recipes) {
       for (const recipeId of reward.recipes) {
@@ -124,7 +124,7 @@
     void $gameState.stats.totalCraftCount;
     void $gameState.completedQuestCount;
     void $gameState.stats.totalExpeditionCount;
-    void $gameState.alchemyLevel;
+    void $alchemyLevel;
     return getActiveGoals();
   })();
 
@@ -138,12 +138,12 @@
 
     switch (cond.type) {
       case 'level':
-        current = $gameState.alchemyLevel;
+        current = $alchemyLevel;
         label = '錬金Lv';
         break;
       case 'reputation':
-        current = $gameState.reputation;
-        label = '名声';
+        current = $reputationLevel;
+        label = '名声Lv';
         break;
       case 'money':
         current = $gameState.money;
@@ -178,8 +178,8 @@
         label = '累計売上';
         break;
       case 'village_development':
-        current = $gameState.villageDevelopment;
-        label = '村発展度';
+        current = $villageLevel;
+        label = '村発展Lv';
         break;
       default:
         return null;
