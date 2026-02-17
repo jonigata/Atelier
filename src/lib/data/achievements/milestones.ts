@@ -18,11 +18,11 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     category: 'alchemy',
     narrative: 'workshop_discovery',
     narrativeLines: [
-      '工房の奥を整理していると、前の住人が残した大釜と魔法陣の設計図を見つけた',
-      '大釜を改良すれば調合の成功率が上がり、魔法陣があれば魔法系の調合ができるようになる',
+      '工房の奥を整理していると、前の住人が残した大釜の改良設計図を見つけた',
+      '大釜を改良すれば調合の成功率が上がる。早速取りかかろう',
     ],
     conditions: [{ type: 'craft_count', target: 10 }],
-    reward: { money: 200, reputationExp: 5, facilities: ['improved_cauldron', 'magic_circle'] },
+    reward: { money: 200, reputationExp: 5, facilities: ['improved_cauldron'] },
     priority: 110,
     important: true,
     prerequisite: ['ach_rival_intro'],
@@ -35,9 +35,12 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     hint: '<strong>調合50回</strong>を達成しよう',
     category: 'alchemy',
     narrative: 'village_growth',
-    narrativeLines: ['村の評判が近隣にも広まり始めた'],
+    narrativeLines: [
+      '村の評判が近隣にも広まり始めた',
+      '熟練の技に見合う高等作業台を完成させた。調合品質がさらに上がるだろう',
+    ],
     conditions: [{ type: 'craft_count', target: 50 }],
-    reward: { money: 500, reputationExp: 10 },
+    reward: { money: 500, reputationExp: 10, facilities: ['advanced_workbench'] },
     priority: 120,
     prerequisite: ['ach_craft_10'],
   },
@@ -107,7 +110,10 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     hint: '<strong>依頼</strong>を5件完了しよう',
     category: 'quest',
     narrative: 'villager_gift',
-    narrativeLines: ['村人たちから感謝の品が届いた'],
+    narrativeLines: [
+      '村人たちから感謝の品が届いた',
+      '工房の掃除を手伝ってくれた村人が、床下から古い魔法陣の設計図を見つけてくれた',
+    ],
     conditions: [{ type: 'quest_count', target: 5 }],
     reward: {
       items: [
@@ -115,6 +121,7 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
         { itemId: 'herb_02', quality: 50, quantity: 3 },
       ],
       originLabel: '村人たちからの感謝の品',
+      facilities: ['magic_circle'],
     },
     priority: 210,
     important: true,
@@ -312,47 +319,17 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     important: true,
   },
 
-  ach_level_15: {
-    id: 'ach_level_15',
-    title: '熟練者',
-    description: '錬金術レベル15に到達した',
-    hint: '錬金術<strong>レベル15</strong>に到達しよう',
-    category: 'mastery',
-    narrative: 'village_growth',
-    narrativeCharacter: { name: 'オルト', title: '村長' },
-    narrativeLines: [
-      'オルト「もう立派な錬金術士だな。イリーナも喜んでいるだろう」',
-      '「工房の作業台も新調してやろう。これでもっと精密な仕事ができるはずだ」',
-    ],
-    conditions: [{ type: 'level', target: 15 }],
-    reward: { money: 1500, reputationExp: 15, facilities: ['advanced_workbench'] },
-    priority: 530,
-    prerequisite: ['ach_level_10'],
-  },
+  // ach_level_15, ach_level_20 は削除（最大レベル10のため）
 
-  ach_level_20: {
-    id: 'ach_level_20',
-    title: '究極の境地',
-    description: '錬金術レベル20に到達した',
-    hint: '錬金術<strong>レベル20</strong>に到達しよう',
-    category: 'mastery',
-    narrative: 'master_teaching',
-    narrativeLines: ['師匠からの手紙「お前はもう私を超えた。誇りに思う」'],
-    conditions: [{ type: 'level', target: 20 }],
-    reward: { money: 3000, reputationExp: 20 },
-    priority: 540,
-    prerequisite: ['ach_level_15'],
-  },
-
-  ach_reputation_50: {
-    id: 'ach_reputation_50',
+  ach_reputation_5: {
+    id: 'ach_reputation_5',
     title: '名声を馳せる',
-    description: '名声50に到達した',
-    hint: '<strong>名声50</strong>に到達しよう',
+    description: '名声レベル5に到達した',
+    hint: '名声<strong>レベル5</strong>に到達しよう',
     category: 'mastery',
     narrative: 'village_festival',
     narrativeLines: ['村の祭りで名誉村民に選出された'],
-    conditions: [{ type: 'reputation', target: 50 }],
+    conditions: [{ type: 'reputation', target: 5 }],
     reward: {
       money: 1000,
       items: [{ itemId: 'water_02', quality: 80, quantity: 2 }],
@@ -361,17 +338,17 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     priority: 550,
   },
 
-  ach_reputation_80: {
-    id: 'ach_reputation_80',
+  ach_reputation_8: {
+    id: 'ach_reputation_8',
     title: '伝説の錬金術士',
-    description: '名声80に到達した',
-    hint: '<strong>名声80</strong>に到達しよう',
+    description: '名声レベル8に到達した',
+    hint: '名声<strong>レベル8</strong>に到達しよう',
     category: 'mastery',
     narrative: 'village_festival',
     narrativeLines: ['年末の祭りで最優秀貢献者として表彰された'],
-    conditions: [{ type: 'reputation', target: 80 }],
+    conditions: [{ type: 'reputation', target: 8 }],
     reward: { money: 2000, reputationExp: 5 },
     priority: 560,
-    prerequisite: ['ach_reputation_50'],
+    prerequisite: ['ach_reputation_5'],
   },
 };

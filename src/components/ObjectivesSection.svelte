@@ -3,6 +3,7 @@
   import { getActiveGoals, getAchievementProgress } from '$lib/services/achievement';
   import { items } from '$lib/data/items';
   import { recipes } from '$lib/data/recipes';
+  import { getFacility } from '$lib/data/facilities';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
   import AchievementCategoryIcon from './common/AchievementCategoryIcon.svelte';
   import type { AchievementDef, AchievementCondition, ActiveQuest } from '$lib/models/types';
@@ -112,7 +113,10 @@
       }
     }
     if (reward.facilities) {
-      summaries.push(`設備解放`);
+      for (const facilityId of reward.facilities) {
+        const facility = getFacility(facilityId);
+        summaries.push(`設備:${facility?.name || facilityId}`);
+      }
     }
 
     return summaries;

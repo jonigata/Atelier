@@ -216,8 +216,8 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
   ach_adventurer_arrival: {
     id: 'ach_adventurer_arrival',
     title: '冒険者の到来',
-    description: '村発展度が20に達した',
-    hint: '<strong>村発展度20</strong>を目指そう',
+    description: '村発展レベル2に到達した',
+    hint: '<strong>村発展Lv2</strong>を目指そう',
     category: 'tutorial',
     narrative: 'character_trial',
     narrativeCharacter: { name: 'レン', title: '冒険者' },
@@ -227,7 +227,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
       '森の奥まで行ける。金は貰うが、悪い取引にはならないさ',
       'フィー「よろしくねー！ 珍しいもの見つけたら教えるから！」',
     ],
-    conditions: [{ type: 'village_development', target: 20 }],
+    conditions: [{ type: 'village_development', target: 2 }],
     reward: {
       unlocks: ['expedition'],
     },
