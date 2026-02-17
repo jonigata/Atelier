@@ -1,8 +1,8 @@
 {
   "playerName": "コレット",
   "day": 4,
-  "money": 600,
-  "reputationExp": 3,
+  "money": 500,
+  "reputationExp": 0,
   "villageExp": 0,
   "alchemyExp": 10,
   "stamina": 72,
@@ -11,14 +11,19 @@
     { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
     { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
     { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
+    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
+    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
     { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
     { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
-    { "itemId": "herb_01", "quality": 70, "origin": { "type": "reward", "day": 2, "flavorText": "リーネが裏山で摘んできてくれた" } },
-    { "itemId": "herb_01", "quality": 70, "origin": { "type": "reward", "day": 2, "flavorText": "リーネが裏山で摘んできてくれた" } },
     { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 3, "flavorText": "師匠イリーナからの仕送り" } },
     { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 3, "flavorText": "師匠イリーナからの仕送り" } },
     { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 3, "flavorText": "師匠イリーナからの仕送り" } },
-    { "itemId": "potion_01", "quality": 47, "origin": { "type": "crafted", "day": 3, "flavorText": "配合に集中して作り上げた" } }
+    { "itemId": "potion_01", "quality": 55, "origin": { "type": "crafted", "day": 3, "flavorText": "慎重に仕上げた一品" } },
+    { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
+    { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
+    { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
+    { "itemId": "ore_01", "quality": 40, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
+    { "itemId": "ore_01", "quality": 40, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } }
   ],
   "ownedBooks": ["book_basics"],
   "knownRecipes": ["potion_01", "antidote"],
@@ -54,7 +59,7 @@
   "selectedQuestId": null,
   "expedition": null,
   "craftedItems": ["potion_01"],
-  "discoveredItems": ["herb_01", "water_01", "potion_01"],
+  "discoveredItems": ["herb_01", "water_01", "potion_01", "ore_01"],
   "facilities": [],
   "ownedEquipment": [],
   "activeCauldron": null,
@@ -70,7 +75,7 @@
   ],
   "pendingDayTransition": null,
   "tutorialProgress": {
-    "unlockedActions": ["inventory", "rest", "study", "alchemy", "quest", "album"],
+    "unlockedActions": ["inventory", "rest", "study", "alchemy", "quest"],
     "pendingDialogue": null
   },
   "achievementProgress": {
@@ -79,8 +84,7 @@
       "ach_check_inventory",
       "ach_story_village_girl_cold",
       "ach_first_recipe",
-      "ach_first_craft",
-      "ach_story_girl_soften"
+      "ach_first_craft"
     ],
     "pendingReward": null
   },
@@ -88,7 +92,7 @@
     "totalCraftCount": 1,
     "totalExpeditionCount": 0,
     "consecutiveQuestSuccess": 0,
-    "highestQualityCrafted": 47,
+    "highestQualityCrafted": 55,
     "totalSalesAmount": 0,
     "inventoryOpened": true
   }
