@@ -9,7 +9,9 @@
   let displayDay = 0;
   let daysAdvanced = 0;
 
-  $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_inspection_intro');
+  $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_q1_goal_reminder')
+    && !$gameState.achievementProgress.pendingReward
+    && !$gameState.tutorialProgress.pendingDialogue;
   $: nextInspectionDay = INSPECTION_DAYS.find((d) => d > displayDay) ?? null;
   $: daysUntilInspection = nextInspectionDay !== null ? nextInspectionDay - displayDay : null;
   $: inspectionUrgency = daysUntilInspection !== null

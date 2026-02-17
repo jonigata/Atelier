@@ -11,14 +11,38 @@
   let reputation = $state(0);
   let daysUntil = $state(78);
 
-  // 9月末（全4項目）を表示
-  const inspection: InspectionDef = inspections[5];
+  // 査察選択
+  let inspectionIndex = $state(5); // デフォルト: 9月末（全4項目）
+  let inspection: InspectionDef = $derived(inspections[inspectionIndex]);
+
+  // 初回登場エフェクトテスト用
+  let showTracker = $state(true);
+  let firstReveal = $state(false);
+  let revealKey = $state(0);
+
+  function triggerReveal() {
+    showTracker = false;
+    firstReveal = true;
+    revealKey++;
+    // 次のフレームで表示
+    requestAnimationFrame(() => {
+      showTracker = true;
+    });
+  }
 </script>
 
 <div class="test-page">
   <h2>InspectionTracker Test</h2>
 
   <div class="controls">
+    <label>
+      <span>査察:</span>
+      <select bind:value={inspectionIndex}>
+        {#each inspections as insp, i}
+          <option value={i}>{insp.month}月末 - {insp.title}（{insp.criteria.length}項目）</option>
+        {/each}
+      </select>
+    </label>
     <label>
       <span>錬金Lv: {level}</span>
       <input type="range" min="1" max="15" bind:value={level} />
@@ -41,12 +65,23 @@
     </label>
   </div>
 
+  <div class="reveal-controls">
+    <button class="reveal-btn" onclick={triggerReveal}>
+      初回登場エフェクトを再生
+    </button>
+  </div>
+
   <div class="preview">
-    <InspectionTracker
-      {inspection}
-      values={{ level, quests, villageDev, reputation }}
-      {daysUntil}
-    />
+    {#if showTracker}
+      {#key revealKey}
+        <InspectionTracker
+          {inspection}
+          values={{ level, quests, villageDev, reputation }}
+          {daysUntil}
+          {firstReveal}
+        />
+      {/key}
+    {/if}
   </div>
 </div>
 
@@ -69,7 +104,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     padding: 1rem;
     background: rgba(255,255,255,0.05);
     border-radius: 8px;
@@ -87,14 +122,44 @@
     font-weight: bold;
   }
 
+  select {
+    flex: 1;
+    padding: 0.4rem;
+    background: #2a2a3e;
+    color: #e0e0f0;
+    border: 1px solid #4a4a6a;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+
   input[type="range"] {
     flex: 1;
     accent-color: #c9a959;
+  }
+
+  .reveal-controls {
+    margin-bottom: 1rem;
+  }
+
+  .reveal-btn {
+    padding: 0.6rem 1.2rem;
+    background: linear-gradient(135deg, #8b6914, #c9a959);
+    border: none;
+    border-radius: 6px;
+    color: #1a1a2e;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  .reveal-btn:hover {
+    filter: brightness(1.1);
   }
 
   .preview {
     padding: 1rem;
     background: rgba(0,0,0,0.3);
     border-radius: 8px;
+    min-height: 200px;
   }
 </style>

@@ -20,6 +20,7 @@
   import { checkMilestoneProgress } from '$lib/services/tutorial';
   import { setEventDialogue } from '$lib/stores/tutorial';
   import { getQuestMoneyMult, getQuestReputationBonus, getQuestQualityBonus } from '$lib/services/equipmentEffects';
+  import { calcLevelFromExp, calcExpProgress, calcExpForLevel } from '$lib/data/balance';
   import { get } from 'svelte/store';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
   import QuestTypeIcon from './common/QuestTypeIcon.svelte';
@@ -113,6 +114,15 @@
     const finalMoney = Math.floor(quest.rewardMoney * moneyMult) + qualityBonus.money;
     const finalReputation = quest.rewardReputation + repBonus + qualityBonus.reputation;
 
+    // ゲージ用: 変更前の状態を保存
+    const stateBefore = get(gameState);
+    const repLevelBefore = calcLevelFromExp(stateBefore.reputationExp);
+    const repExpBefore = calcExpProgress(stateBefore.reputationExp);
+    const repExpMax = calcExpForLevel(repLevelBefore);
+    const vilLevelBefore = calcLevelFromExp(stateBefore.villageExp);
+    const vilExpBefore = calcExpProgress(stateBefore.villageExp);
+    const vilExpMax = calcExpForLevel(vilLevelBefore);
+
     // 報酬付与（機材効果適用済み）
     addMoney(finalMoney);
     addReputationExp(finalReputation);
@@ -120,11 +130,34 @@
     incrementCompletedQuests();
     removeActiveQuest(quest.id);
 
+    // ゲージ用: 変更後の状態を取得
+    const stateAfter = get(gameState);
+    const repLevelAfter = calcLevelFromExp(stateAfter.reputationExp);
+    const vilLevelAfter = calcLevelFromExp(stateAfter.villageExp);
+
     // 完了ダイアログを表示
     const structuredRewards: RewardDisplay[] = [
       { text: `${finalMoney.toLocaleString()} G`, type: 'money' },
-      { text: `名声Exp +${finalReputation}`, type: 'reputation' },
-      { text: `村発展Exp +${developmentGain}`, type: 'villageDevelopment' },
+      {
+        text: `名声Exp +${finalReputation}`,
+        type: 'reputation',
+        gaugeData: {
+          before: repExpBefore,
+          after: repLevelAfter > repLevelBefore ? repExpMax : calcExpProgress(stateAfter.reputationExp),
+          max: repExpMax,
+          label: `Lv.${repLevelBefore}`,
+        },
+      },
+      {
+        text: `村発展Exp +${developmentGain}`,
+        type: 'villageDevelopment',
+        gaugeData: {
+          before: vilExpBefore,
+          after: vilLevelAfter > vilLevelBefore ? vilExpMax : calcExpProgress(stateAfter.villageExp),
+          max: vilExpMax,
+          label: `Lv.${vilLevelBefore}`,
+        },
+      },
     ];
 
     const dialogue: EventDialogue = {

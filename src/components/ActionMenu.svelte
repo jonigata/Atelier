@@ -34,7 +34,15 @@
   $: merchantInTown = isMerchantVisiting($gameState.day);
 
   // 査察トラッカー用データ
-  $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_inspection_intro');
+  $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_q1_goal_reminder')
+    && !$gameState.achievementProgress.pendingReward
+    && !$gameState.tutorialProgress.pendingDialogue;
+  let inspectionRevealDone = false;
+  let inspectionFirstReveal = false;
+  $: if (inspectionKnown && !inspectionRevealDone) {
+    inspectionFirstReveal = true;
+    inspectionRevealDone = true;
+  }
   $: nextInspection = getNextInspection($gameState.day);
   $: nextInspectionDay = INSPECTION_DAYS.find((d) => d > $gameState.day) ?? null;
   $: daysUntilInspection = nextInspectionDay !== null ? nextInspectionDay - $gameState.day : null;
@@ -65,7 +73,7 @@
 
 <div class="action-menu">
   {#if inspectionKnown && nextInspection && daysUntilInspection !== null}
-    <InspectionTracker inspection={nextInspection} values={inspectionValues} daysUntil={daysUntilInspection} />
+    <InspectionTracker inspection={nextInspection} values={inspectionValues} daysUntil={daysUntilInspection} firstReveal={inspectionFirstReveal} />
   {/if}
   <h3>行動を選択してください</h3>
 

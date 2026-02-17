@@ -2,14 +2,24 @@
   import { getGradeForValue } from '$lib/data/inspection';
   import type { InspectionDef, InspectionCriterion, InspectionGrade } from '$lib/data/inspection';
 
+  import { onMount } from 'svelte';
+
   // props: 親から全データを受け取る
   export let inspection: InspectionDef;
   export let values: Record<string, number>; // { level: 5, quests: 10, ... }
   export let daysUntil: number;
+  export let firstReveal: boolean = false;
 
   $: urgency = daysUntil <= 7 ? 'red' : daysUntil <= 21 ? 'yellow' : 'green';
 
   let expanded = false;
+  let revealing = false;
+
+  onMount(() => {
+    if (firstReveal) {
+      revealing = true;
+    }
+  });
 
   const gradeList: InspectionGrade[] = ['D', 'C', 'B', 'A', 'S'];
 
@@ -126,7 +136,9 @@
   class="inspection-tracker"
   class:all-met={allMet}
   class:expanded
+  class:revealing
   on:click={() => expanded = !expanded}
+  on:animationend={() => { revealing = false; }}
   role="button"
   tabindex="0"
 >
@@ -325,6 +337,7 @@
 
 <style>
   .inspection-tracker {
+    position: relative;
     background: linear-gradient(135deg, rgba(30, 20, 40, 0.9) 0%, rgba(40, 30, 50, 0.9) 100%);
     border: 2px solid #4a3a5a;
     border-radius: 10px;
@@ -332,6 +345,33 @@
     margin-bottom: 1rem;
     cursor: pointer;
     transition: border-color 0.3s ease;
+  }
+
+  .inspection-tracker.revealing {
+    animation: revealEntrance 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes revealEntrance {
+    0% {
+      opacity: 0;
+      transform: translateY(15px);
+      border-color: rgba(201, 169, 89, 0.2);
+      box-shadow: 0 0 10px 2px rgba(201, 169, 89, 0.1);
+    }
+    /* slide in completes + glow peaks together */
+    18% {
+      opacity: 1;
+      transform: translateY(0);
+      border-color: #c9a959;
+      box-shadow: 0 0 30px 8px rgba(201, 169, 89, 0.45), inset 0 0 20px rgba(201, 169, 89, 0.12);
+    }
+    /* Phase 3: smooth decay to normal (no plateau) */
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+      border-color: #4a3a5a;
+      box-shadow: none;
+    }
   }
 
   .inspection-tracker:hover {
