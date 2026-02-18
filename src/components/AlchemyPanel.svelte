@@ -259,7 +259,7 @@
   {#if !selectedRecipe}
     <div class="tab-bar">
       <button class="tab" class:active={!showFacilities} on:click={() => showFacilities = false}>レシピ</button>
-      <button class="tab" class:active={showFacilities} on:click={() => showFacilities = true}>設備</button>
+      <button class="tab" class:active={showFacilities} on:click={() => showFacilities = true}>設備・機材</button>
     </div>
     {#if showFacilities}
       <FacilityInfo />
