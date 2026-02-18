@@ -2,12 +2,13 @@
   import { gameState, addMessage, addMoney, addItem } from '$lib/stores/game';
   import { addSalesAmount } from '$lib/stores/stats';
   import { items, getItem, getItemIcon, handleIconError } from '$lib/data/items';
-  import { getAllEquipment, getEquipment } from '$lib/data/equipment';
+  import { getAllEquipment, getEquipment, getEquipmentIcon } from '$lib/data/equipment';
   import { removeItemFromInventory } from '$lib/services/inventory';
   import { SHOP } from '$lib/data/balance';
   import { shopFlavors, pickRandom } from '$lib/data/flavorTexts';
   import { getSellPriceMult, getBuyPriceMult, recordSell } from '$lib/services/equipmentEffects';
   import type { OwnedItem, ItemDef, EquipmentDef } from '$lib/models/types';
+  import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
 
   export let onBack: () => void;
 
@@ -161,7 +162,7 @@
 
 <div class="shop-panel">
   <button class="back-btn" on:click={onBack}>← 戻る</button>
-  <h2>🏪 ショップ</h2>
+  <h2>🏪 ショップ <ActiveEquipmentIcons prefixes={['sell_', 'buy_']} /></h2>
 
   <div class="money-display">
     所持金: <span class="amount">{$gameState.money.toLocaleString()}G</span>
@@ -212,31 +213,39 @@
 
       {#if shopEquipmentList.length > 0}
         <h3 class="section-header">機材</h3>
-        {#each shopEquipmentList as { slot, def }, i}
-          {@const owned = $gameState.ownedEquipment.includes(slot.id)}
-          {@const canBuy = !slot.purchased && !owned && $gameState.money >= def.price}
-          <div class="shop-item equip-item" class:disabled={!canBuy && !slot.purchased && !owned} class:purchased={slot.purchased || owned}>
-            <div class="equip-badge">{def.category === 'cauldron' ? '釜' : '機材'}</div>
-            <div class="item-info">
-              <span class="item-name">{def.name}</span>
-              <span class="item-desc">{def.effectDescription}</span>
+        <div class="equip-grid">
+          {#each shopEquipmentList as { slot, def }, i}
+            {@const owned = $gameState.ownedEquipment.includes(slot.id)}
+            {@const canBuy = !slot.purchased && !owned && $gameState.money >= def.price}
+            <div class="equip-card" class:disabled={!canBuy && !slot.purchased && !owned} class:purchased={slot.purchased || owned} class:rare={def.rarity === 'rare'}>
+              <div class="equip-img-wrap">
+                <img class="equip-card-icon" src={getEquipmentIcon(def.id)} alt={def.name} />
+                <div class="equip-badge">{def.category === 'cauldron' ? '釜' : '機材'}</div>
+                {#if def.rarity === 'rare'}
+                  <span class="equip-rarity-tag">RARE</span>
+                {/if}
+              </div>
+              <div class="equip-card-info">
+                <span class="item-name">{def.name}</span>
+                <span class="item-desc">{def.effectDescription}</span>
+              </div>
+              <div class="equip-card-action">
+                {#if slot.purchased || owned}
+                  <span class="sold-label">{owned && !slot.purchased ? '所持済' : '購入済'}</span>
+                {:else}
+                  <span class="item-price">{def.price.toLocaleString()}G</span>
+                  <button
+                    class="buy-btn"
+                    disabled={!canBuy}
+                    on:click={() => buyEquipment(i)}
+                  >
+                    購入
+                  </button>
+                {/if}
+              </div>
             </div>
-            <div class="item-action">
-              {#if slot.purchased || owned}
-                <span class="sold-label">{owned && !slot.purchased ? '所持済' : '購入済'}</span>
-              {:else}
-                <span class="item-price">{def.price.toLocaleString()}G</span>
-                <button
-                  class="buy-btn"
-                  disabled={!canBuy}
-                  on:click={() => buyEquipment(i)}
-                >
-                  購入
-                </button>
-              {/if}
-            </div>
-          </div>
-        {/each}
+          {/each}
+        </div>
       {/if}
     </div>
 
@@ -367,8 +376,82 @@
     border-radius: 6px;
   }
 
-  .equip-item {
-    border-color: #ff980050;
+  .equip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .equip-card {
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #ff980050;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .equip-card:hover {
+    border-color: #ff9800;
+  }
+
+  .equip-card.rare {
+    border-color: rgba(232, 168, 64, 0.4);
+  }
+
+  .equip-card.disabled {
+    opacity: 0.5;
+  }
+
+  .equip-card.purchased {
+    opacity: 0.5;
+  }
+
+  .equip-img-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .equip-card-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .equip-rarity-tag {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    background: rgba(232, 168, 64, 0.85);
+    color: #1a1a2e;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+  }
+
+  .equip-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .equip-card-action {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0 0.65rem 0.65rem;
+    margin-top: auto;
   }
 
   .item-icon {
@@ -394,13 +477,15 @@
   }
 
   .equip-badge {
-    padding: 0.2rem 0.5rem;
-    font-size: 0.7rem;
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.65rem;
     font-weight: bold;
     border-radius: 3px;
     color: #1a1a2e;
     background: #ff9800;
-    flex-shrink: 0;
   }
 
   .item-info {

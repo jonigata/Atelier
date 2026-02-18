@@ -25,6 +25,7 @@
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
   import QuestTypeIcon from './common/QuestTypeIcon.svelte';
   import type { QuestDef, ActiveQuest, OwnedItem, EventDialogue, RewardDisplay } from '$lib/models/types';
+  import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
 
   export let onBack: () => void;
 
@@ -209,7 +210,7 @@
 
 <div class="quest-panel">
   <button class="back-btn" on:click={onBack}>← 戻る</button>
-  <h2>📜 依頼</h2>
+  <h2>📜 依頼 <ActiveEquipmentIcons prefixes={['quest_']} /></h2>
 
   <div class="tabs">
     <button

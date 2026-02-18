@@ -1,7 +1,7 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
   import { purchaseMerchantSlot } from '$lib/services/merchant';
-  import { getEquipment } from '$lib/data/equipment';
+  import { getEquipment, getEquipmentIcon } from '$lib/data/equipment';
   import { getBook } from '$lib/data/books';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getMonth } from '$lib/services/calendar';
@@ -24,7 +24,7 @@
         return {
           name: equip?.name ?? '???',
           description: equip?.effectDescription ?? '',
-          icon: '/icons/actions/alchemy.png',
+          icon: getEquipmentIcon(slot.id),
           typeLabel: '機材',
         };
       }

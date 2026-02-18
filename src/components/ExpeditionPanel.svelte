@@ -2,6 +2,7 @@
   import { gameState, addMessage, addMoney, setExpedition } from '$lib/stores/game';
   import { getAllAreas } from '$lib/data/areas';
   import type { AreaDef } from '$lib/models/types';
+  import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
 
   export let onBack: () => void;
 
@@ -42,7 +43,7 @@
 
 <div class="expedition-panel">
   <button class="back-btn" on:click={onBack}>← 戻る</button>
-  <h2>🏕️ 採取隊派遣</h2>
+  <h2>🏕️ 採取隊派遣 <ActiveEquipmentIcons prefixes={['expedition_', 'all_probability']} /></h2>
 
   {#if expeditionActive}
     <div class="status-box">

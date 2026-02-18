@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { gameState, resetGame, addVillageExp, addReputationExp, addExp, consumeStamina, restoreStamina, alchemyLevel, villageLevel, reputationLevel } from '$lib/stores/game';
+  import { gameState, resetGame, addVillageExp, addReputationExp, addExp, addMoney, consumeStamina, restoreStamina, alchemyLevel, villageLevel, reputationLevel } from '$lib/stores/game';
   import { unlockActions } from '$lib/stores/tutorial';
   import type { ActionType } from '$lib/models/types';
   import {
@@ -152,6 +152,18 @@
     unlockActions(allActions);
   }
 
+  function handleAddMoney(amount: number) {
+    addMoney(amount);
+  }
+
+  function handleAddTestEquipment() {
+    const testIds = ['bargain_book', 'silver_pot', 'energy_ring', 'study_lamp', 'gathering_bag', 'quest_badge', 'lucky_coin'];
+    gameState.update((s) => ({
+      ...s,
+      ownedEquipment: [...new Set([...s.ownedEquipment, ...testIds])],
+    }));
+  }
+
   function togglePanel() {
     isOpen = !isOpen;
   }
@@ -235,6 +247,22 @@
         <button on:click={() => restoreStamina(100)}>全回復</button>
       </div>
       <p class="info">現在: {$gameState.stamina} / {$gameState.maxStamina}</p>
+    </div>
+
+    <div class="section">
+      <h4>所持金</h4>
+      <div class="buttons">
+        <button on:click={() => handleAddMoney(500)}>+500G</button>
+        <button on:click={() => handleAddMoney(2000)}>+2000G</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h4>機材テスト</h4>
+      <div class="buttons">
+        <button on:click={handleAddTestEquipment}>テスト機材追加</button>
+      </div>
+      <p class="info">所持: {$gameState.ownedEquipment.length}個</p>
     </div>
 
     <div class="section">

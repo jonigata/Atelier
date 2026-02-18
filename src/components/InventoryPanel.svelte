@@ -5,7 +5,7 @@
   import { formatOrigin } from '$lib/data/flavorTexts';
   import type { OwnedItem, EquipmentDef } from '$lib/models/types';
   import { CATEGORY_NAMES, getCategoryName } from '$lib/data/categories';
-  import { getEquipment } from '$lib/data/equipment';
+  import { getEquipment, getEquipmentIcon } from '$lib/data/equipment';
   import ItemCard from './common/ItemCard.svelte';
 
   export let onBack: () => void;
@@ -309,23 +309,26 @@
   {#if ownedEquipmentDefs.length > 0}
     <div class="equipment-section">
       <h3 class="equipment-header">所持機材 ({ownedEquipmentDefs.length})</h3>
-      {#each Object.entries(equipmentByCategory) as [category, defs]}
-        <div class="equip-category-group">
-          <div class="equip-category-label">{EQUIP_CATEGORY_NAMES[category] || category}</div>
-          {#each defs as def}
-            <div class="equip-row" class:active-cauldron={def.id === $gameState.activeCauldron}>
-              <div class="equip-row-main">
-                <span class="equip-rarity-dot" class:rare={def.rarity === 'rare'}></span>
-                <span class="equip-name">{def.name}</span>
-                {#if def.id === $gameState.activeCauldron}
-                  <span class="equip-active-badge">使用中</span>
-                {/if}
-              </div>
-              <div class="equip-effect">{def.effectDescription}</div>
+      <div class="equip-grid">
+        {#each ownedEquipmentDefs as def}
+          <div class="equip-card" class:active-cauldron={def.id === $gameState.activeCauldron} class:rare={def.rarity === 'rare'}>
+            <div class="equip-img-wrap">
+              <img class="equip-icon" src={getEquipmentIcon(def.id)} alt={def.name} />
+              {#if def.rarity === 'rare'}
+                <span class="equip-rarity-badge">RARE</span>
+              {/if}
             </div>
-          {/each}
-        </div>
-      {/each}
+            <div class="equip-info">
+              <span class="equip-category-label">{EQUIP_CATEGORY_NAMES[def.category] || def.category}</span>
+              <span class="equip-name">{def.name}</span>
+              {#if def.id === $gameState.activeCauldron}
+                <span class="equip-active-badge">使用中</span>
+              {/if}
+              <span class="equip-effect">{def.effectDescription}</span>
+            </div>
+          </div>
+        {/each}
+      </div>
     </div>
   {/if}
 </div>
@@ -654,60 +657,87 @@
     margin-bottom: 0.75rem;
   }
 
-  .equip-category-group {
-    margin-bottom: 0.75rem;
+  .equip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
   }
 
-  .equip-category-label {
-    font-size: 0.8rem;
-    color: #808090;
-    margin-bottom: 0.25rem;
-    padding-left: 0.25rem;
-  }
-
-  .equip-row {
+  .equip-card {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
-    padding: 0.5rem 0.75rem;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid #3a3a5a;
-    border-radius: 5px;
-    margin-bottom: 0.3rem;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s;
   }
 
-  .equip-row.active-cauldron {
+  .equip-card:hover {
+    border-color: #6a6a8a;
+  }
+
+  .equip-card.rare {
+    border-color: rgba(232, 168, 64, 0.3);
+  }
+
+  .equip-card.active-cauldron {
     border-color: #c9a959;
     background: rgba(201, 169, 89, 0.08);
   }
 
-  .equip-row-main {
+  .equip-img-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
+    overflow: hidden;
   }
 
-  .equip-rarity-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #6a7a8a;
-    flex-shrink: 0;
+  .equip-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  .equip-rarity-dot.rare {
-    background: #e8a840;
-    box-shadow: 0 0 4px rgba(232, 168, 64, 0.5);
+  .equip-rarity-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    background: rgba(232, 168, 64, 0.85);
+    color: #1a1a2e;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+  }
+
+  .equip-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.5rem 0.65rem 0.65rem;
+  }
+
+  .equip-category-label {
+    font-size: 0.7rem;
+    color: #808090;
   }
 
   .equip-name {
     font-weight: bold;
     color: #e0e0f0;
     font-size: 0.95rem;
+    line-height: 1.2;
   }
 
   .equip-active-badge {
-    font-size: 0.7rem;
+    align-self: flex-start;
+    font-size: 0.65rem;
     background: #c9a959;
     color: #1a1a2e;
     padding: 0.1rem 0.4rem;
@@ -718,6 +748,6 @@
   .equip-effect {
     font-size: 0.8rem;
     color: #8a9a8a;
-    padding-left: 1.25rem;
+    line-height: 1.3;
   }
 </style>

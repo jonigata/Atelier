@@ -19,6 +19,7 @@
   import CraftResultDialog from './alchemy/CraftResultDialog.svelte';
   import LevelUpDialog from './LevelUpDialog.svelte';
   import FacilityInfo from './alchemy/FacilityInfo.svelte';
+  import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
 
   export let onBack: () => void;
 
@@ -254,7 +255,7 @@
 
 <div class="alchemy-panel">
   <button class="back-btn" on:click={onBack}>← 戻る</button>
-  <h2>⚗️ 調合</h2>
+  <h2>⚗️ 調合 <ActiveEquipmentIcons prefixes={['craft_', 'material_', 'all_probability']} /></h2>
 
   {#if !selectedRecipe}
     <div class="tab-bar">
