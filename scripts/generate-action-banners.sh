@@ -12,7 +12,7 @@ set -e
 
 SKILL_DIR="/home/hirayama/.claude/skills/fal-generate/scripts"
 EDIT_MODEL="fal-ai/bytedance/seedream/v4.5/edit"
-CHARS_DIR="documents/design/characters"
+CHARS_DIR="documents/images/characters"
 CHIBI_DIR="static/images/actions/chibi-refs"
 OUTPUT_DIR="static/images/actions"
 PROMPT_DIR="documents/image-prompts/actions"

@@ -13,7 +13,7 @@
 set -e
 
 SKILL_DIR="/home/hirayama/.claude/skills/fal-generate/scripts"
-CHARS_DIR="documents/design/characters"
+CHARS_DIR="documents/images/characters"
 OUTPUT_DIR="static/images/events"
 CACHE_DIR="/tmp/fal-upload-cache"
 MODEL="fal-ai/bytedance/seedream/v4.5/edit"
@@ -64,7 +64,7 @@ while [[ $# -gt 0 ]]; do
       echo "  --name, -n    Output filename (without extension). Required."
       echo "  --prompt, -p  Generation prompt. Required."
       echo "  --chars, -c   Comma-separated character image names (e.g. heroine,liene)."
-      echo "                Files are loaded from documents/design/characters/{name}/{name}-1.png"
+      echo "                Files are loaded from documents/images/characters/{name}/{name}-1.png"
       echo "                Referenced as Figure 1, Figure 2, ... in prompt."
       echo "                If omitted, uses text-to-image model instead."
       echo "  --size, -s    Image size (default: landscape_4_3)"

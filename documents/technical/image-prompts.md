@@ -69,7 +69,7 @@ bash scripts/generate-icon.sh --name shop --type actions --desc "small wooden sh
 
 **モデル**: `fal-ai/bytedance/seedream/v4.5/edit`（キャラクター参照あり） / `text-to-image`（参照なし）
 **出力先**: `static/images/events/`
-**キャラクター参照画像**: `documents/characters/` 配下の立ち絵
+**キャラクター参照画像**: `documents/images/characters/` 配下の立ち絵
 
 **生成コマンド**:
 ```bash
@@ -117,8 +117,8 @@ muted earthy tones, visual novel event CG quality.
 
 ## キャラクター画像 (Character Images)
 
-**出力先**: `documents/design/characters/<name>/`
-**参照テンプレート**: `documents/design/characters/character_sheet.png`
+**出力先**: `documents/images/characters/<name>/`
+**参照テンプレート**: `documents/images/characters/character_sheet.png`
 
 4ステップで立ち絵・キャラクターシート・表情画像を生成する。`--chibi` でデフォルメ版も生成可能。
 
@@ -166,7 +166,7 @@ bash scripts/generate-character.sh --help
 
 ### --desc の書き方
 
-- `documents/design/characters/character_designs.md` の容姿設定を英訳して使う
+- `documents/images/characters/character_designs.md` の容姿設定を英訳して使う
 - 年齢・髪・目・体格・服装・靴・小物を含める
 - スタイル指定（線・背景・質感）はスクリプト側で自動付与されるため不要
 
@@ -174,17 +174,17 @@ bash scripts/generate-character.sh --help
 
 | ID | キャラクター | ディレクトリ | チビ画像 |
 |----|------------|------------|---------|
-| heroine | コレット（主人公） | `documents/design/characters/heroine/` | あり |
-| liene | リーネ（村娘） | `documents/design/characters/liene/` | あり |
-| mayor | 村長 | `documents/design/characters/mayor/` | |
-| marco | マルコ（旅商人） | `documents/design/characters/marco/` | |
-| melda | メルダ（パン屋） | `documents/design/characters/melda/` | あり |
-| ren | レン（冒険者・剣士） | `documents/design/characters/ren/` | あり |
-| fee | フィー（冒険者・斥候） | `documents/design/characters/fee/` | あり |
-| irina | イリーナ（師匠） | `documents/design/characters/irina/` | |
-| vict | ヴィクト（ライバル錬金術師） | `documents/design/characters/vict/` | |
-| gord | ゴルド（鍛冶屋） | `documents/design/characters/gord/` | |
-| inspector | 査察官 | `documents/design/characters/inspector/` | |
+| heroine | コレット（主人公） | `documents/images/characters/heroine/` | あり |
+| liene | リーネ（村娘） | `documents/images/characters/liene/` | あり |
+| mayor | 村長 | `documents/images/characters/mayor/` | |
+| marco | マルコ（旅商人） | `documents/images/characters/marco/` | |
+| melda | メルダ（パン屋） | `documents/images/characters/melda/` | あり |
+| ren | レン（冒険者・剣士） | `documents/images/characters/ren/` | あり |
+| fee | フィー（冒険者・斥候） | `documents/images/characters/fee/` | あり |
+| irina | イリーナ（師匠） | `documents/images/characters/irina/` | |
+| vict | ヴィクト（ライバル錬金術師） | `documents/images/characters/vict/` | |
+| gord | ゴルド（鍛冶屋） | `documents/images/characters/gord/` | |
+| inspector | 査察官 | `documents/images/characters/inspector/` | |
 
 ---
 
@@ -192,7 +192,7 @@ bash scripts/generate-character.sh --help
 
 **モデル**: `fal-ai/bytedance/seedream/v4.5/edit`（デフォルメキャラ参照あり）
 **出力先**: `static/images/actions/`
-**チビ参照画像**: `documents/design/characters/<name>/<name>-chibi.png`
+**チビ参照画像**: `documents/images/characters/<name>/<name>-chibi.png`
 
 コマンドボタン用の横長バナー画像。2段階で生成する:
 1. **Phase 1**: 各キャラの立ち絵からデフォルメ版を生成（`--chibi`）

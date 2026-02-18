@@ -28,7 +28,7 @@
 set -e
 
 SKILL_DIR="/home/hirayama/.claude/skills/fal-generate/scripts"
-CHARS_DIR="documents/design/characters"
+CHARS_DIR="documents/images/characters"
 CACHE_DIR="/tmp/fal-upload-cache"
 EDIT_MODEL="fal-ai/bytedance/seedream/v4.5/edit"
 SHEET_MODEL="fal-ai/nano-banana-pro/edit"
