@@ -228,6 +228,7 @@ export type MorningEvent =
 // 構造化された報酬アイテム（アイコン表示用）
 export interface RewardDisplay {
   text: string;
+  subtitle?: string; // 補足テキスト（効果説明など、小さめに表示）
   itemId?: string;  // アイコン表示用（アイテム報酬の場合）
   iconUrl?: string; // カスタムアイコンURL（アクションアンロック等）
   type: 'money' | 'item' | 'reputation' | 'recipe' | 'unlock' | 'exp' | 'villageDevelopment';

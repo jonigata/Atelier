@@ -29,7 +29,23 @@ import type {
   GameState,
   EventDialogue,
   RewardDisplay,
+  EquipmentDef,
 } from '$lib/models/types';
+
+/**
+ * ランダムコモン機材を事前選択（適用はしない）
+ */
+export function preSelectRandomEquipment(count: number): EquipmentDef[] {
+  const currentState = get(gameState);
+  const commonEquipment = getEquipmentByRarity('common');
+  const unowned = commonEquipment.filter((e) => !currentState.ownedEquipment.includes(e.id));
+  const picked: EquipmentDef[] = [];
+  for (let i = 0; i < count && unowned.length > 0; i++) {
+    const idx = Math.floor(Math.random() * unowned.length);
+    picked.push(unowned.splice(idx, 1)[0]);
+  }
+  return picked;
+}
 
 /**
  * ストーリー/チュートリアル系アチーブメントかどうかを判定
@@ -249,7 +265,7 @@ export function getActiveGoals(): AchievementDef[] {
 /**
  * 報酬を付与
  */
-export function claimReward(achievementId: string): void {
+export function claimReward(achievementId: string, pickedEquipment?: EquipmentDef[]): void {
   const achievement = getAchievementById(achievementId);
   if (!achievement) return;
 
@@ -306,12 +322,8 @@ export function claimReward(achievementId: string): void {
 
   // ランダムコモン機材
   if (reward.randomCommonEquipment) {
-    const currentState = get(gameState);
-    const commonEquipment = getEquipmentByRarity('common');
-    const unowned = commonEquipment.filter((e) => !currentState.ownedEquipment.includes(e.id));
-    for (let i = 0; i < reward.randomCommonEquipment && unowned.length > 0; i++) {
-      const idx = Math.floor(Math.random() * unowned.length);
-      const picked = unowned.splice(idx, 1)[0];
+    const equipmentToAdd = pickedEquipment ?? preSelectRandomEquipment(reward.randomCommonEquipment);
+    for (const picked of equipmentToAdd) {
       gameState.update((s) => ({
         ...s,
         ownedEquipment: [...s.ownedEquipment, picked.id],
@@ -327,7 +339,7 @@ export function claimReward(achievementId: string): void {
 /**
  * アチーブメント達成時のダイアログを生成
  */
-export function getAchievementDialogue(achievementId: string): EventDialogue | null {
+export function getAchievementDialogue(achievementId: string, pickedEquipment?: EquipmentDef[]): EventDialogue | null {
   const achievement = getAchievementById(achievementId);
   if (!achievement) return null;
 
@@ -336,8 +348,8 @@ export function getAchievementDialogue(achievementId: string): EventDialogue | n
     achievement.narrativeCharacter ?? narrativeCharacters[achievement.narrative];
 
   // 報酬詳細を生成
-  const rewards = getDetailedRewards(achievement);
-  const structuredRewards = getStructuredRewards(achievement);
+  const rewards = getDetailedRewards(achievement, pickedEquipment);
+  const structuredRewards = getStructuredRewards(achievement, pickedEquipment);
 
   // ストーリー/チュートリアル系は「達成」バッジを表示しない
   const isStory = isStoryAchievement(achievement);
@@ -382,7 +394,7 @@ export function getAchievementDialogue(achievementId: string): EventDialogue | n
 /**
  * 報酬の詳細リストを生成
  */
-function getDetailedRewards(achievement: AchievementDef): string[] {
+function getDetailedRewards(achievement: AchievementDef, pickedEquipment?: EquipmentDef[]): string[] {
   const { reward } = achievement;
   const details: string[] = [];
 
@@ -435,7 +447,11 @@ function getDetailedRewards(achievement: AchievementDef): string[] {
     }
   }
 
-  if (reward.randomCommonEquipment) {
+  if (pickedEquipment && pickedEquipment.length > 0) {
+    for (const eq of pickedEquipment) {
+      details.push(`機材「${eq.name}」`);
+    }
+  } else if (reward.randomCommonEquipment) {
     const count = reward.randomCommonEquipment;
     details.push(`コモン機材 x${count}（ランダム）`);
   }
@@ -446,7 +462,7 @@ function getDetailedRewards(achievement: AchievementDef): string[] {
 /**
  * 構造化された報酬リストを生成（アイコン表示用）
  */
-function getStructuredRewards(achievement: AchievementDef): RewardDisplay[] {
+function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: EquipmentDef[]): RewardDisplay[] {
   const { reward } = achievement;
   const state = get(gameState);
   const structured: RewardDisplay[] = [];
@@ -542,7 +558,15 @@ function getStructuredRewards(achievement: AchievementDef): RewardDisplay[] {
     }
   }
 
-  if (reward.randomCommonEquipment) {
+  if (pickedEquipment && pickedEquipment.length > 0) {
+    for (const eq of pickedEquipment) {
+      structured.push({
+        text: `機材「${eq.name}」`,
+        subtitle: eq.effectDescription,
+        type: 'unlock',
+      });
+    }
+  } else if (reward.randomCommonEquipment) {
     const count = reward.randomCommonEquipment;
     structured.push({
       text: `コモン機材 x${count}（ランダム）`,

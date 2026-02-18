@@ -13,8 +13,10 @@ import {
   claimReward,
   checkNewActiveGoals,
   isStoryAchievement,
+  preSelectRandomEquipment,
 } from './achievement';
 import { getAchievementById } from '$lib/data/achievements';
+import type { EquipmentDef } from '$lib/models/types';
 import type { EventDialogue } from '$lib/models/types';
 
 // 日数表示の完了を待つための resolver
@@ -106,20 +108,26 @@ export async function processAchievementPresentation(achievementId: string): Pro
   // 1. 日数表示を待つ
   await waitForDayTransition();
 
-  // 2. ダイアログを表示して待つ
-  const dialogue = getAchievementDialogue(achievementId);
+  // 2. ランダム機材を事前選択（ダイアログに名前を表示するため）
+  const achievement = getAchievementById(achievementId);
+  let pickedEquipment: EquipmentDef[] = [];
+  if (achievement?.reward.randomCommonEquipment) {
+    pickedEquipment = preSelectRandomEquipment(achievement.reward.randomCommonEquipment);
+  }
+
+  // 3. ダイアログを表示して待つ
+  const dialogue = getAchievementDialogue(achievementId, pickedEquipment);
   if (dialogue) {
     await showDialogueAndWait(dialogue);
   }
 
-  // 3. 報酬を付与
-  claimReward(achievementId);
+  // 4. 報酬を付与（事前選択した機材を渡す）
+  claimReward(achievementId, pickedEquipment);
 
   // 4. アンロックアニメーション＆トースト
   await showUnlockToasts();
 
   // 5. 目標達成トースト（ストーリー/チュートリアル系はスキップ）
-  const achievement = getAchievementById(achievementId);
   if (achievement && !isStoryAchievement(achievement)) {
     await sleep(300);
     showGoalCompleteToast(achievement.title);

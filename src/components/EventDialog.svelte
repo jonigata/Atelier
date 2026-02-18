@@ -312,6 +312,9 @@
                 {/if}
               </div>
               <div class="showcase-text">{reward.text}</div>
+              {#if reward.subtitle}
+                <div class="showcase-subtitle">{reward.subtitle}</div>
+              {/if}
             {:else}
               <div class="stamps-zone">
                 {#if stamps.length > 0 && reward.itemId}
@@ -327,6 +330,9 @@
                 {/if}
               </div>
               <div class="showcase-text">{reward.text}</div>
+              {#if reward.subtitle}
+                <div class="showcase-subtitle">{reward.subtitle}</div>
+              {/if}
             {/if}
             <div class="showcase-counter">{showcaseIndex + 1} / {allRewards.length}</div>
           </div>
@@ -725,6 +731,13 @@
     color: #f0e0c0;
     text-shadow: 0 0 15px rgba(240, 224, 192, 0.3);
     text-align: center;
+  }
+
+  .showcase-subtitle {
+    font-size: 0.85rem;
+    color: #a0a0b0;
+    text-align: center;
+    margin-top: 0.3rem;
   }
 
   .showcase-gauge {
