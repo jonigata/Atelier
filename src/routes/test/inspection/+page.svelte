@@ -3,13 +3,18 @@
 <script lang="ts">
   import { inspections } from '$lib/data/inspection';
   import type { InspectionDef } from '$lib/data/inspection';
+  import { calcLevelFromExp } from '$lib/data/balance';
   import InspectionTracker from '../../../components/InspectionTracker.svelte';
 
-  let level = $state(1);
+  let levelExp = $state(0);      // 錬金 生XP
   let quests = $state(0);
-  let villageDev = $state(0);
-  let reputation = $state(0);
+  let villageDev = $state(0);    // 村発展Lv (discrete)
+  let reputationExp = $state(0); // 名声 生XP
   let daysUntil = $state(78);
+
+  // XPからレベルを自動計算
+  let level = $derived(calcLevelFromExp(levelExp));
+  let reputation = $derived(calcLevelFromExp(reputationExp));
 
   // 査察選択
   let inspectionIndex = $state(5); // デフォルト: 9月末（全4項目）
@@ -44,20 +49,20 @@
       </select>
     </label>
     <label>
-      <span>錬金Lv: {level}</span>
-      <input type="range" min="1" max="15" bind:value={level} />
+      <span>錬金Exp: {levelExp} (Lv.{level})</span>
+      <input type="range" min="0" max="8000" step="10" bind:value={levelExp} />
     </label>
     <label>
       <span>依頼完了: {quests}</span>
       <input type="range" min="0" max="50" bind:value={quests} />
     </label>
     <label>
-      <span>村発展: {villageDev}</span>
-      <input type="range" min="0" max="80" bind:value={villageDev} />
+      <span>村発展Lv: {villageDev}</span>
+      <input type="range" min="0" max="10" bind:value={villageDev} />
     </label>
     <label>
-      <span>名声: {reputation}</span>
-      <input type="range" min="0" max="80" bind:value={reputation} />
+      <span>名声Exp: {reputationExp} (Lv.{reputation})</span>
+      <input type="range" min="0" max="8000" step="10" bind:value={reputationExp} />
     </label>
     <label>
       <span>残り日数: {daysUntil}</span>
@@ -77,6 +82,7 @@
         <InspectionTracker
           {inspection}
           values={{ level, quests, villageDev, reputation }}
+          expValues={{ level: levelExp, reputation: reputationExp }}
           {daysUntil}
           {firstReveal}
         />
@@ -117,7 +123,7 @@
   }
 
   label span {
-    min-width: 120px;
+    min-width: 180px;
     font-size: 0.9rem;
     font-weight: bold;
   }

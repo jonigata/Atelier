@@ -21,6 +21,8 @@ export interface InspectionCriterion {
   unit: string; // 'Lv.' | '件' | '回' | '' etc
   thresholds: InspectionThresholds;
   getValue: (state: GameState) => number;
+  /** 生の経験値を返す（ビジュアル進捗用、省略時はgetValueと同じ） */
+  getExpValue?: (state: GameState) => number;
 }
 
 export interface InspectionDef {
@@ -41,6 +43,7 @@ export const inspections: InspectionDef[] = [
         key: 'level', label: '錬金Lv', unit: '',
         thresholds: { D: 1, C: 2, B: 2, A: 3, S: 3 },
         getValue: (s) => calcLevelFromExp(s.alchemyExp),
+        getExpValue: (s) => s.alchemyExp,
       },
       {
         key: 'quests', label: '依頼', unit: '件',
@@ -58,6 +61,7 @@ export const inspections: InspectionDef[] = [
         key: 'level', label: '錬金Lv', unit: '',
         thresholds: { D: 2, C: 2, B: 3, A: 3, S: 4 },
         getValue: (s) => calcLevelFromExp(s.alchemyExp),
+        getExpValue: (s) => s.alchemyExp,
       },
       {
         key: 'quests', label: '依頼', unit: '件',
@@ -75,6 +79,7 @@ export const inspections: InspectionDef[] = [
         key: 'level', label: '錬金Lv', unit: '',
         thresholds: { D: 2, C: 3, B: 3, A: 4, S: 5 },
         getValue: (s) => calcLevelFromExp(s.alchemyExp),
+        getExpValue: (s) => s.alchemyExp,
       },
       {
         key: 'quests', label: '依頼', unit: '件',
@@ -92,6 +97,7 @@ export const inspections: InspectionDef[] = [
         key: 'level', label: '錬金Lv', unit: '',
         thresholds: { D: 3, C: 4, B: 5, A: 6, S: 7 },
         getValue: (s) => calcLevelFromExp(s.alchemyExp),
+        getExpValue: (s) => s.alchemyExp,
       },
       {
         key: 'quests', label: '依頼', unit: '件',
@@ -107,6 +113,7 @@ export const inspections: InspectionDef[] = [
         key: 'reputation', label: '名声Lv', unit: '',
         thresholds: { D: 2, C: 3, B: 3, A: 4, S: 5 },
         getValue: (s) => calcLevelFromExp(s.reputationExp),
+        getExpValue: (s) => s.reputationExp,
       },
     ],
   },
@@ -119,6 +126,7 @@ export const inspections: InspectionDef[] = [
         key: 'level', label: '錬金Lv', unit: '',
         thresholds: { D: 4, C: 5, B: 6, A: 7, S: 8 },
         getValue: (s) => calcLevelFromExp(s.alchemyExp),
+        getExpValue: (s) => s.alchemyExp,
       },
       {
         key: 'quests', label: '依頼', unit: '件',
@@ -134,6 +142,7 @@ export const inspections: InspectionDef[] = [
         key: 'reputation', label: '名声Lv', unit: '',
         thresholds: { D: 3, C: 4, B: 5, A: 6, S: 7 },
         getValue: (s) => calcLevelFromExp(s.reputationExp),
+        getExpValue: (s) => s.reputationExp,
       },
     ],
   },
@@ -146,6 +155,7 @@ export const inspections: InspectionDef[] = [
         key: 'level', label: '錬金Lv', unit: '',
         thresholds: { D: 5, C: 6, B: 7, A: 8, S: 9 },
         getValue: (s) => calcLevelFromExp(s.alchemyExp),
+        getExpValue: (s) => s.alchemyExp,
       },
       {
         key: 'quests', label: '依頼', unit: '件',
@@ -161,6 +171,7 @@ export const inspections: InspectionDef[] = [
         key: 'reputation', label: '名声Lv', unit: '',
         thresholds: { D: 4, C: 5, B: 6, A: 7, S: 9 },
         getValue: (s) => calcLevelFromExp(s.reputationExp),
+        getExpValue: (s) => s.reputationExp,
       },
     ],
   },

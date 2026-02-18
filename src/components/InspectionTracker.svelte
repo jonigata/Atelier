@@ -1,12 +1,14 @@
 <script lang="ts">
   import { getGradeForValue } from '$lib/data/inspection';
   import type { InspectionDef, InspectionCriterion, InspectionGrade } from '$lib/data/inspection';
+  import { calcTotalExpForLevel } from '$lib/data/balance';
 
   import { onMount } from 'svelte';
 
   // props: 親から全データを受け取る
   export let inspection: InspectionDef;
   export let values: Record<string, number>; // { level: 5, quests: 10, ... }
+  export let expValues: Record<string, number> = {}; // 生XP値（ビジュアル進捗用）
   export let daysUntil: number;
   export let firstReveal: boolean = false;
 
@@ -33,19 +35,30 @@
 
   function getCriterionInfo(
     criterion: InspectionCriterion,
-    currentValues: Record<string, number>
+    currentValues: Record<string, number>,
+    currentExpValues: Record<string, number>
   ) {
     const value = currentValues[criterion.key] ?? 0;
     const grade = getGradeForValue(criterion.thresholds, value);
     const met = grade !== 'D';
     const maxVal = criterion.thresholds.S;
-    const progress = Math.min(1, value / maxVal);
+
+    // 生XPがある場合はXPベースで滑らかな進捗を計算
+    const rawExp = currentExpValues[criterion.key];
+    let progress: number;
+    if (rawExp !== undefined) {
+      const expMax = calcTotalExpForLevel(maxVal);
+      progress = expMax > 0 ? Math.min(1, rawExp / expMax) : 0;
+    } else {
+      progress = maxVal > 0 ? Math.min(1, value / maxVal) : 0;
+    }
+
     return { value, grade, met, progress, maxVal };
   }
 
-  $: allMet = inspection.criteria.every((c) => getCriterionInfo(c, values).met);
+  $: allMet = inspection.criteria.every((c) => getCriterionInfo(c, values, expValues).met);
 
-  $: metCount = inspection.criteria.filter((c) => getCriterionInfo(c, values).met).length;
+  $: metCount = inspection.criteria.filter((c) => getCriterionInfo(c, values, expValues).met).length;
 
   // ── ポーション瓶 (level) ──
   // 液面の高さを progress に応じて変化
@@ -117,16 +130,15 @@
   }
 
   // ── 人々 (reputation) ──
-  // 名声に応じて人アイコンが増える
-  function getPeopleCount(value: number, maxVal: number): number {
-    const ratio = value / maxVal;
-    if (ratio >= 0.9) return 7;
-    if (ratio >= 0.7) return 6;
-    if (ratio >= 0.55) return 5;
-    if (ratio >= 0.4) return 4;
-    if (ratio >= 0.25) return 3;
-    if (ratio >= 0.1) return 2;
-    if (ratio > 0) return 1;
+  // 名声の進捗（XPベース）に応じて人アイコンが増える
+  function getPeopleCount(progress: number): number {
+    if (progress >= 0.9) return 7;
+    if (progress >= 0.7) return 6;
+    if (progress >= 0.55) return 5;
+    if (progress >= 0.4) return 4;
+    if (progress >= 0.25) return 3;
+    if (progress >= 0.1) return 2;
+    if (progress > 0) return 1;
     return 0;
   }
 </script>
@@ -157,7 +169,7 @@
 
   <div class="criteria-grid">
     {#each inspection.criteria as criterion}
-        {@const info = getCriterionInfo(criterion, values)}
+        {@const info = getCriterionInfo(criterion, values, expValues)}
 
         {#if criterion.key === 'level'}
           <!-- ═══ 錬金Lv: ポーション瓶 ═══ -->
@@ -203,7 +215,7 @@
             </div>
             <div class="criterion-label">
               <span class="criterion-name">錬金Lv</span>
-              <span class="criterion-value" style="color: {gradeColors[info.grade]}">Lv.{info.value}</span>
+              <span class="criterion-value" style="color: {gradeColors[info.grade]}">Lv.{info.value} / {criterion.thresholds.S}</span>
               <span class="grade-badge" style="background: {gradeColors[info.grade]}">{info.grade}</span>
             </div>
             {#if expanded}
@@ -276,7 +288,7 @@
             </div>
             <div class="criterion-label">
               <span class="criterion-name">村発展</span>
-              <span class="criterion-value" style="color: {gradeColors[info.grade]}">{info.value}</span>
+              <span class="criterion-value" style="color: {gradeColors[info.grade]}">Lv.{info.value} / {criterion.thresholds.S}</span>
               <span class="grade-badge" style="background: {gradeColors[info.grade]}">{info.grade}</span>
             </div>
             {#if expanded}
@@ -292,7 +304,7 @@
 
         {:else if criterion.key === 'reputation'}
           <!-- ═══ 名声: 人々アイコン ═══ -->
-          {@const peopleCount = getPeopleCount(info.value, info.maxVal)}
+          {@const peopleCount = getPeopleCount(info.progress)}
           <div class="criterion-card people-card">
             <div class="people-container">
               {#each Array(7) as _, i}
@@ -312,7 +324,7 @@
             </div>
             <div class="criterion-label">
               <span class="criterion-name">名声</span>
-              <span class="criterion-value" style="color: {gradeColors[info.grade]}">{info.value}</span>
+              <span class="criterion-value" style="color: {gradeColors[info.grade]}">Lv.{info.value} / {criterion.thresholds.S}</span>
               <span class="grade-badge" style="background: {gradeColors[info.grade]}">{info.grade}</span>
             </div>
             {#if expanded}
@@ -320,7 +332,7 @@
                 {#each gradeList as g}
                   <span class:active={info.value >= criterion.thresholds[g]}
                     style="color: {info.value >= criterion.thresholds[g] ? gradeColors[g] : '#404050'}"
-                  >{g}:{criterion.thresholds[g]}</span>
+                  >{g}:Lv.{criterion.thresholds[g]}</span>
                 {/each}
               </div>
             {/if}

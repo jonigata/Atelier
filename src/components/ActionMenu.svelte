@@ -49,6 +49,9 @@
   $: inspectionValues = nextInspection
     ? Object.fromEntries(nextInspection.criteria.map(c => [c.key, c.getValue($gameState)]))
     : {};
+  $: inspectionExpValues = nextInspection
+    ? Object.fromEntries(nextInspection.criteria.filter(c => c.getExpValue).map(c => [c.key, c.getExpValue!($gameState)]))
+    : {};
 
   $: actionStates = actions.map(action => {
     const actionType = action.type;
@@ -73,7 +76,7 @@
 
 <div class="action-menu">
   {#if inspectionKnown && nextInspection && daysUntilInspection !== null}
-    <InspectionTracker inspection={nextInspection} values={inspectionValues} daysUntil={daysUntilInspection} firstReveal={inspectionFirstReveal} />
+    <InspectionTracker inspection={nextInspection} values={inspectionValues} expValues={inspectionExpValues} daysUntil={daysUntilInspection} firstReveal={inspectionFirstReveal} />
   {/if}
   <h3>行動を選択してください</h3>
 

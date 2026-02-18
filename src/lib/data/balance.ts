@@ -182,6 +182,17 @@ export function calcLevelFromExp(totalExp: number): number {
 }
 
 /**
+ * 指定レベルに到達するために必要な累計経験値を算出
+ */
+export function calcTotalExpForLevel(targetLevel: number): number {
+  let total = 0;
+  for (let lv = 1; lv < targetLevel; lv++) {
+    total += calcExpForLevel(lv);
+  }
+  return total;
+}
+
+/**
  * 累計経験値から現在レベル内の進捗（現在レベルで溜まったXP）を算出
  */
 export function calcExpProgress(totalExp: number): number {
