@@ -48,6 +48,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
         { itemId: 'water_01', quality: 50, quantity: 3 },
       ],
       originLabel: '持参品',
+      randomCommonEquipment: 1,
       unlocks: ['study'],
     },
     prerequisite: ['ach_game_start'],

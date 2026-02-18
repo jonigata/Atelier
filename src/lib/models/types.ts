@@ -361,6 +361,7 @@ export interface AchievementReward {
   recipes?: string[];
   unlocks?: ActionType[];  // アクションアンロック
   facilities?: string[];   // 設備アンロック
+  randomCommonEquipment?: number;  // ランダムコモン機材の付与数
   originLabel?: string;    // 報酬アイテムの入手元ラベル（省略時はアチーブメントtitle）
 }
 

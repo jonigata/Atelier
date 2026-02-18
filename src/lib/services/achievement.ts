@@ -21,6 +21,7 @@ import {
 import { items } from '$lib/data/items';
 import { recipes } from '$lib/data/recipes';
 import { getFacility } from '$lib/data/facilities';
+import { getEquipmentByRarity, getEquipment } from '$lib/data/equipment';
 import { showGoalActiveToast, actionLabels } from '$lib/stores/toast';
 import type {
   AchievementDef,
@@ -303,6 +304,23 @@ export function claimReward(achievementId: string): void {
     }
   }
 
+  // ランダムコモン機材
+  if (reward.randomCommonEquipment) {
+    const currentState = get(gameState);
+    const commonEquipment = getEquipmentByRarity('common');
+    const unowned = commonEquipment.filter((e) => !currentState.ownedEquipment.includes(e.id));
+    for (let i = 0; i < reward.randomCommonEquipment && unowned.length > 0; i++) {
+      const idx = Math.floor(Math.random() * unowned.length);
+      const picked = unowned.splice(idx, 1)[0];
+      gameState.update((s) => ({
+        ...s,
+        ownedEquipment: [...s.ownedEquipment, picked.id],
+        activeCauldron:
+          picked.category === 'cauldron' && !s.activeCauldron ? picked.id : s.activeCauldron,
+      }));
+    }
+  }
+
   clearPendingReward();
 }
 
@@ -417,6 +435,11 @@ function getDetailedRewards(achievement: AchievementDef): string[] {
     }
   }
 
+  if (reward.randomCommonEquipment) {
+    const count = reward.randomCommonEquipment;
+    details.push(`コモン機材 x${count}（ランダム）`);
+  }
+
   return details;
 }
 
@@ -519,6 +542,14 @@ function getStructuredRewards(achievement: AchievementDef): RewardDisplay[] {
     }
   }
 
+  if (reward.randomCommonEquipment) {
+    const count = reward.randomCommonEquipment;
+    structured.push({
+      text: `コモン機材 x${count}（ランダム）`,
+      type: 'unlock',
+    });
+  }
+
   return structured;
 }
 
@@ -557,6 +588,10 @@ export function getRewardDescription(achievementId: string): string[] {
 
   if (reward.recipes) {
     descriptions.push(`レシピ x${reward.recipes.length}`);
+  }
+
+  if (reward.randomCommonEquipment) {
+    descriptions.push(`コモン機材 x${reward.randomCommonEquipment}`);
   }
 
   return descriptions;
