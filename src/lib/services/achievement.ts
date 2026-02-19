@@ -21,7 +21,7 @@ import {
 import { items } from '$lib/data/items';
 import { recipes } from '$lib/data/recipes';
 import { getFacility } from '$lib/data/facilities';
-import { getEquipmentByRarity, getEquipment } from '$lib/data/equipment';
+import { getEquipmentByRarity, getEquipment, getEquipmentIcon } from '$lib/data/equipment';
 import { showGoalActiveToast, actionLabels } from '$lib/stores/toast';
 import type {
   AchievementDef,
@@ -563,6 +563,7 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
       structured.push({
         text: `機材「${eq.name}」`,
         subtitle: eq.effectDescription,
+        iconUrl: getEquipmentIcon(eq.id),
         type: 'unlock',
       });
     }
