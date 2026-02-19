@@ -173,6 +173,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     reward: {},
     priority: 42,
     prerequisite: ['ach_first_complete'],
+    triggerOnMorning: true,
   },
 
   ach_rival_intro: {

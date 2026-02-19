@@ -156,12 +156,13 @@ function isAchievementEligible(achievement: AchievementDef, state: GameState): b
 
 /**
  * 全アチーブメントをチェックし、達成したものを処理
+ * @param morningOnly trueなら triggerOnMorning のみ、falseなら triggerOnMorning を除外
  * @returns 達成したアチーブメントID（最初の1つのみ）
  *
  * 注意: トースト表示はこの関数では行わない
  * presentation.ts が async/await で順序制御を行う
  */
-export function checkAchievements(): string | null {
+export function checkAchievements(morningOnly: boolean = false): string | null {
   const state = get(gameState);
 
   // 既にpendingRewardがある場合は新しいアチーブメントをチェックしない
@@ -172,6 +173,10 @@ export function checkAchievements(): string | null {
   const achievements = getAllAchievements();
 
   for (const achievement of achievements) {
+    // morningOnly=false: triggerOnMorning を除外（通常のアクション時）
+    // morningOnly=true: triggerOnMorning のみ（朝フェーズ時）
+    if (morningOnly !== !!achievement.triggerOnMorning) continue;
+
     if (isAchievementEligible(achievement, state)) {
       completeAchievement(achievement.id);
       // トースト表示は presentation.ts で行う

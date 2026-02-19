@@ -160,6 +160,25 @@ export async function processActionComplete(): Promise<void> {
 }
 
 /**
+ * 朝フェーズのアチーブメント処理
+ * triggerOnMorning フラグ付きのアチーブメントをチェック
+ */
+export async function processMorningAchievements(): Promise<void> {
+  const state = get(gameState);
+
+  if (state.tutorialProgress.pendingDialogue) return;
+  if (state.achievementProgress.pendingReward) return;
+
+  const achievedId = checkAchievements(true);
+  if (achievedId) {
+    await processAchievementPresentation(achievedId);
+
+    // 連鎖チェック（通常アチーブメントも含む）
+    await processActionComplete();
+  }
+}
+
+/**
  * ゲーム開始時のautoCompleteアチーブメントを処理
  */
 export async function processAutoCompleteAchievements(): Promise<void> {
