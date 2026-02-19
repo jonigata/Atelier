@@ -26,12 +26,19 @@
   const gradeList: InspectionGrade[] = ['D', 'C', 'B', 'A', 'S'];
 
   const gradeColors: Record<InspectionGrade, string> = {
-    D: '#605060',
-    C: '#a0a0b0',
-    B: '#64b5f6',
-    A: '#81c784',
-    S: '#ffd700',
+    D: '#606068', // 鉄
+    C: '#b87333', // 銅
+    B: '#c0c0c0', // 銀
+    A: '#ffd700', // 金
+    S: '#74c0fc', // 虹（フォールバック）
   };
+
+  const rainbowGrad = 'linear-gradient(135deg, #ff6b6b, #ffd700, #69db7c, #74c0fc, #da77f2)';
+
+  function gradeBg(grade: InspectionGrade): string {
+    if (grade === 'S') return rainbowGrad;
+    return gradeColors[grade];
+  }
 
   function getCriterionInfo(
     criterion: InspectionCriterion,
@@ -69,22 +76,22 @@
 
   function potionColor(grade: InspectionGrade): string {
     const colors: Record<InspectionGrade, string> = {
-      D: '#6a5060',
-      C: '#8888aa',
-      B: '#5a9fd4',
-      A: '#66bb6a',
-      S: '#ffd700',
+      D: '#505058', // 鉄
+      C: '#a06828', // 銅
+      B: '#a0a0b0', // 銀
+      A: '#d4a800', // 金
+      S: '#5a9fd4', // 虹
     };
     return colors[grade];
   }
 
   function potionGlow(grade: InspectionGrade): string {
     const colors: Record<InspectionGrade, string> = {
-      D: 'rgba(106, 80, 96, 0.3)',
-      C: 'rgba(136, 136, 170, 0.4)',
-      B: 'rgba(90, 159, 212, 0.5)',
-      A: 'rgba(102, 187, 106, 0.5)',
-      S: 'rgba(255, 215, 0, 0.6)',
+      D: 'rgba(96, 96, 104, 0.3)',    // 鉄
+      C: 'rgba(184, 115, 51, 0.4)',   // 銅
+      B: 'rgba(192, 192, 192, 0.5)',  // 銀
+      A: 'rgba(255, 215, 0, 0.5)',    // 金
+      S: 'rgba(116, 192, 252, 0.6)',  // 虹
     };
     return colors[grade];
   }
@@ -94,18 +101,20 @@
   // 銅(~D) → 銀(~C) → 金(~B) → 虹(A~S)
   function getStarColor(starIndex: number, criterion: InspectionCriterion): string {
     const i = starIndex + 1; // 1-based
-    if (i <= criterion.thresholds.D) return '#b87333'; // 銅
-    if (i <= criterion.thresholds.C) return '#c0c0c0'; // 銀
-    if (i <= criterion.thresholds.B) return '#ffd700'; // 金
+    if (i <= criterion.thresholds.D) return '#606068'; // 鉄
+    if (i <= criterion.thresholds.C) return '#b87333'; // 銅
+    if (i <= criterion.thresholds.B) return '#c0c0c0'; // 銀
+    if (i <= criterion.thresholds.A) return '#ffd700'; // 金
     return 'url(#rainbow-grad)'; // 虹
   }
 
   function getStarStroke(starIndex: number, criterion: InspectionCriterion): string {
     const i = starIndex + 1;
-    if (i <= criterion.thresholds.D) return '#8b5a2b';
-    if (i <= criterion.thresholds.C) return '#909090';
-    if (i <= criterion.thresholds.B) return '#daa520';
-    return '#ff69b4';
+    if (i <= criterion.thresholds.D) return '#404048'; // 鉄
+    if (i <= criterion.thresholds.C) return '#8b5a2b'; // 銅
+    if (i <= criterion.thresholds.B) return '#909090'; // 銀
+    if (i <= criterion.thresholds.A) return '#daa520'; // 金
+    return '#ff69b4'; // 虹
   }
 
   function getStarOverlap(total: number): number {
@@ -141,6 +150,13 @@
     if (progress > 0) return 1;
     return 0;
   }
+
+  const rainbowPalette = ['#ff6b6b', '#ffa94d', '#ffd700', '#69db7c', '#74c0fc', '#b197fc', '#da77f2'];
+
+  function getPersonColor(index: number, grade: InspectionGrade): string {
+    if (grade === 'S') return rainbowPalette[index % rainbowPalette.length];
+    return gradeColors[grade];
+  }
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -167,6 +183,19 @@
     </div>
   </div>
 
+  <!-- 共有SVGグラデーション定義 -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="rainbow-grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ff6b6b" />
+        <stop offset="25%" stop-color="#ffd700" />
+        <stop offset="50%" stop-color="#69db7c" />
+        <stop offset="75%" stop-color="#74c0fc" />
+        <stop offset="100%" stop-color="#da77f2" />
+      </linearGradient>
+    </defs>
+  </svg>
+
   <div class="criteria-grid">
     {#each inspection.criteria as criterion}
         {@const info = getCriterionInfo(criterion, values, expValues)}
@@ -182,10 +211,20 @@
                     <!-- 瓶の内部形状 -->
                     <path d="M22 18 L22 28 Q10 35 10 48 L10 65 Q10 72 18 72 L42 72 Q50 72 50 65 L50 48 Q50 35 38 28 L38 18 Z"/>
                   </clipPath>
-                  <linearGradient id="liquid-grad-{info.grade}" x1="0" y1="1" x2="0" y2="0">
-                    <stop offset="0%" stop-color={potionColor(info.grade)} />
-                    <stop offset="100%" stop-color={potionColor(info.grade)} stop-opacity="0.6" />
-                  </linearGradient>
+                  {#if info.grade === 'S'}
+                    <linearGradient id="liquid-grad-S" x1="0" y1="1" x2="0.5" y2="0">
+                      <stop offset="0%" stop-color="#ff6b6b" />
+                      <stop offset="25%" stop-color="#ffd700" />
+                      <stop offset="50%" stop-color="#69db7c" />
+                      <stop offset="75%" stop-color="#74c0fc" />
+                      <stop offset="100%" stop-color="#da77f2" />
+                    </linearGradient>
+                  {:else}
+                    <linearGradient id="liquid-grad-{info.grade}" x1="0" y1="1" x2="0" y2="0">
+                      <stop offset="0%" stop-color={potionColor(info.grade)} />
+                      <stop offset="100%" stop-color={potionColor(info.grade)} stop-opacity="0.6" />
+                    </linearGradient>
+                  {/if}
                 </defs>
                 <!-- 瓶の輪郭 -->
                 <path d="M24 8 L24 18 L22 18 L22 28 Q10 35 10 48 L10 65 Q10 72 18 72 L42 72 Q50 72 50 65 L50 48 Q50 35 38 28 L38 18 L36 18 L36 8 Z"
@@ -218,7 +257,7 @@
             <div class="criterion-label">
               <span class="criterion-name">錬金Lv</span>
               <span class="criterion-value">現在Lv.{info.value}</span>
-              <span class="grade-badge" style="background: {gradeColors[info.grade]}">{info.grade}</span>
+              <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
               <span class="criterion-target">目標Lv.{criterion.thresholds.S}</span>
             </div>
             {#if expanded}
@@ -239,17 +278,6 @@
           <div class="criterion-card stars-card">
             <div class="criterion-visual">
             <div class="stars-container">
-              <svg viewBox="0 0 0 0" width="0" height="0" style="position:absolute">
-                <defs>
-                  <linearGradient id="rainbow-grad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#ff6b6b" />
-                    <stop offset="25%" stop-color="#ffd700" />
-                    <stop offset="50%" stop-color="#69db7c" />
-                    <stop offset="75%" stop-color="#74c0fc" />
-                    <stop offset="100%" stop-color="#da77f2" />
-                  </linearGradient>
-                </defs>
-              </svg>
               {#each Array(totalStars) as _, i}
                 {@const lit = i < info.value}
                 <svg viewBox="0 0 24 24" class="quest-star" class:lit
@@ -267,7 +295,7 @@
             <div class="criterion-label">
               <span class="criterion-name">依頼</span>
               <span class="criterion-value">達成済み{info.value}件</span>
-              <span class="grade-badge" style="background: {gradeColors[info.grade]}">{info.grade}</span>
+              <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
               <span class="criterion-target">目標{totalStars}件</span>
             </div>
             {#if expanded}
@@ -291,14 +319,14 @@
                   <img src={villageImage} alt="村の発展" class="village-img" />
                 </div>
                 <div class="village-bar">
-                  <div class="village-bar-fill" style="width: {info.progress * 100}%; background: linear-gradient(90deg, #4a6a3a, {gradeColors[info.grade]})"></div>
+                  <div class="village-bar-fill" style="width: {info.progress * 100}%; background: {info.grade === 'S' ? rainbowGrad : `linear-gradient(90deg, #4a6a3a, ${gradeColors[info.grade]})`}"></div>
                 </div>
               </div>
             </div>
             <div class="criterion-label">
               <span class="criterion-name">村発展</span>
               <span class="criterion-value">現在Lv.{info.value}</span>
-              <span class="grade-badge" style="background: {gradeColors[info.grade]}">{info.grade}</span>
+              <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
               <span class="criterion-target">目標Lv.{criterion.thresholds.S}</span>
             </div>
             {#if expanded}
@@ -323,11 +351,12 @@
                     <svg viewBox="0 0 20 28" class="person-svg">
                       <!-- 頭 -->
                       <circle cx="10" cy="7" r="5"
-                        fill={i < peopleCount ? '#ffd54f' : 'rgba(255,255,255,0.08)'}
+                        fill={i < peopleCount ? getPersonColor(i, info.grade) : 'rgba(255,255,255,0.08)'}
                       />
                       <!-- 体 -->
                       <path d="M4 28 L4 18 Q4 13 10 13 Q16 13 16 18 L16 28"
-                        fill={i < peopleCount ? '#c9a040' : 'rgba(255,255,255,0.05)'}
+                        fill={i < peopleCount ? getPersonColor(i, info.grade) : 'rgba(255,255,255,0.05)'}
+                        opacity={i < peopleCount ? 0.7 : 1}
                       />
                     </svg>
                   </div>
@@ -337,7 +366,7 @@
             <div class="criterion-label">
               <span class="criterion-name">名声</span>
               <span class="criterion-value">現在Lv.{info.value}</span>
-              <span class="grade-badge" style="background: {gradeColors[info.grade]}">{info.grade}</span>
+              <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
               <span class="criterion-target">目標Lv.{criterion.thresholds.S}</span>
             </div>
             {#if expanded}
