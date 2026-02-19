@@ -711,26 +711,6 @@ export function getEquipmentByRarity(rarity: EquipmentRarity): EquipmentDef[] {
   return Object.values(equipment).filter((e) => e.rarity === rarity);
 }
 
-// 機材画像: IDが一致するものはそのまま、それ以外はカテゴリ別フォールバック
-const EQUIPMENT_IMAGE_MAP: Record<string, string> = {
-  cauldron_spirit: 'spirit_cauldron',
-  hourglass: 'time_hourglass',
-  decomposition_grimoire: 'grimoire',
-};
-
-const CATEGORY_FALLBACK: Record<string, string> = {
-  cauldron: 'spirit_cauldron',
-  time: 'time_hourglass',
-  material: 'grimoire',
-  economy: 'time_hourglass',
-  special: 'grimoire',
-};
-
 export function getEquipmentIcon(id: string): string {
-  const mapped = EQUIPMENT_IMAGE_MAP[id];
-  if (mapped) return `/images/equipments/${mapped}.png`;
-
-  const def = equipment[id];
-  const fallback = def ? CATEGORY_FALLBACK[def.category] ?? 'grimoire' : 'grimoire';
-  return `/images/equipments/${fallback}.png`;
+  return `/images/equipments/${id}.png`;
 }
