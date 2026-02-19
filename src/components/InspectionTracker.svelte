@@ -215,8 +215,9 @@
             </div>
             <div class="criterion-label">
               <span class="criterion-name">錬金Lv</span>
-              <span class="criterion-value" style="color: {gradeColors[info.grade]}">Lv.{info.value} / {criterion.thresholds.S}</span>
+              <span class="criterion-value">現在Lv.{info.value}</span>
               <span class="grade-badge" style="background: {gradeColors[info.grade]}">{info.grade}</span>
+              <span class="criterion-target">目標Lv.{criterion.thresholds.S}</span>
             </div>
             {#if expanded}
               <div class="thresholds">
@@ -261,8 +262,9 @@
             </div>
             <div class="criterion-label">
               <span class="criterion-name">依頼</span>
-              <span class="criterion-value" style="color: {gradeColors[info.grade]}">{info.value}/{totalStars}件</span>
+              <span class="criterion-value">達成済み{info.value}件</span>
               <span class="grade-badge" style="background: {gradeColors[info.grade]}">{info.grade}</span>
+              <span class="criterion-target">目標{totalStars}件</span>
             </div>
             {#if expanded}
               <div class="thresholds">
@@ -288,8 +290,9 @@
             </div>
             <div class="criterion-label">
               <span class="criterion-name">村発展</span>
-              <span class="criterion-value" style="color: {gradeColors[info.grade]}">Lv.{info.value} / {criterion.thresholds.S}</span>
+              <span class="criterion-value">現在Lv.{info.value}</span>
               <span class="grade-badge" style="background: {gradeColors[info.grade]}">{info.grade}</span>
+              <span class="criterion-target">目標Lv.{criterion.thresholds.S}</span>
             </div>
             {#if expanded}
               <div class="thresholds">
@@ -324,8 +327,9 @@
             </div>
             <div class="criterion-label">
               <span class="criterion-name">名声</span>
-              <span class="criterion-value" style="color: {gradeColors[info.grade]}">Lv.{info.value} / {criterion.thresholds.S}</span>
+              <span class="criterion-value">現在Lv.{info.value}</span>
               <span class="grade-badge" style="background: {gradeColors[info.grade]}">{info.grade}</span>
+              <span class="criterion-target">目標Lv.{criterion.thresholds.S}</span>
             </div>
             {#if expanded}
               <div class="thresholds">
@@ -468,10 +472,19 @@
   }
 
   .criterion-label {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: 0.15rem 0.5rem;
+    width: 100%;
     margin-top: 0.25rem;
+  }
+
+  .criterion-target {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #a0a0b0;
+    justify-self: end;
   }
 
   .criterion-name {
@@ -481,16 +494,23 @@
   }
 
   .criterion-value {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: bold;
+    justify-self: end;
+    color: #e0dce8;
   }
 
   .grade-badge {
-    padding: 0.05rem 0.35rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.3em;
+    height: 1.3em;
     border-radius: 3px;
     font-size: 0.7rem;
     font-weight: bold;
     color: #1a1a2e;
+    line-height: 1;
   }
 
   .thresholds {
