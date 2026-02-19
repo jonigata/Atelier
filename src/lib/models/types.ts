@@ -177,6 +177,7 @@ export interface QuestDef {
   rewardMoney: number;
   rewardReputation: number;
   deadlineDays: number;
+  requiredReputationLevel?: number;
 }
 
 // アクティブな依頼

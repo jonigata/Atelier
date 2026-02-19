@@ -1,8 +1,9 @@
 import type { QuestDef } from '$lib/models/types';
 
 // 依頼テンプレート（ゲーム中にランダム生成の元になる）
+// requiredReputationLevel: この依頼が掲示板に出現するのに必要な名声レベル
 export const questTemplates: QuestDef[] = [
-  // 初級依頼
+  // 名声Lv1（制限なし）
   {
     id: 'quest_potion_basic',
     title: '回復薬を届けて！',
@@ -13,20 +14,8 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 200,
     rewardReputation: 5,
     deadlineDays: 10,
+    requiredReputationLevel: 1,
   },
-  {
-    id: 'quest_antidote_basic',
-    title: '解毒薬が必要です',
-    description: '山菜採りで毒草に当たった村人がいるんだ。',
-    type: 'deliver',
-    requiredItemId: 'antidote',
-    requiredQuantity: 2,
-    rewardMoney: 180,
-    rewardReputation: 5,
-    deadlineDays: 8,
-  },
-
-  // 品質指定依頼
   {
     id: 'quest_potion_quality',
     title: '良質な回復薬を',
@@ -38,6 +27,33 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 300,
     rewardReputation: 8,
     deadlineDays: 12,
+    requiredReputationLevel: 1,
+  },
+  {
+    id: 'quest_potion_bulk',
+    title: '回復薬の大量注文',
+    description: '隣村との共同作業があるんだ。備えておきたい。',
+    type: 'bulk',
+    requiredItemId: 'potion_01',
+    requiredQuantity: 10,
+    rewardMoney: 600,
+    rewardReputation: 12,
+    deadlineDays: 20,
+    requiredReputationLevel: 1,
+  },
+
+  // 名声Lv2
+  {
+    id: 'quest_antidote_basic',
+    title: '解毒薬が必要です',
+    description: '山菜採りで毒草に当たった村人がいるんだ。',
+    type: 'deliver',
+    requiredItemId: 'antidote',
+    requiredQuantity: 2,
+    rewardMoney: 180,
+    rewardReputation: 5,
+    deadlineDays: 8,
+    requiredReputationLevel: 2,
   },
   {
     id: 'quest_antidote_quality',
@@ -50,20 +66,10 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 500,
     rewardReputation: 10,
     deadlineDays: 15,
+    requiredReputationLevel: 2,
   },
 
-  // 大量依頼
-  {
-    id: 'quest_potion_bulk',
-    title: '回復薬の大量注文',
-    description: '隣村との共同作業があるんだ。備えておきたい。',
-    type: 'bulk',
-    requiredItemId: 'potion_01',
-    requiredQuantity: 10,
-    rewardMoney: 600,
-    rewardReputation: 12,
-    deadlineDays: 20,
-  },
+  // 名声Lv3
   {
     id: 'quest_bomb_bulk',
     title: '爆弾の納品依頼',
@@ -74,9 +80,8 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 700,
     rewardReputation: 15,
     deadlineDays: 25,
+    requiredReputationLevel: 3,
   },
-
-  // 中級依頼
   {
     id: 'quest_ingot_iron',
     title: '鉄インゴットの注文',
@@ -87,9 +92,10 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 400,
     rewardReputation: 10,
     deadlineDays: 15,
+    requiredReputationLevel: 3,
   },
 
-  // 上級依頼
+  // 名声Lv5
   {
     id: 'quest_potion_advanced',
     title: '上級回復薬の依頼',
@@ -100,6 +106,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 800,
     rewardReputation: 15,
     deadlineDays: 20,
+    requiredReputationLevel: 5,
   },
   {
     id: 'quest_ingot_silver',
@@ -111,9 +118,10 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 600,
     rewardReputation: 12,
     deadlineDays: 18,
+    requiredReputationLevel: 5,
   },
 
-  // 最上級依頼
+  // 名声Lv8
   {
     id: 'quest_elixir',
     title: '伝説のエリクサー',
@@ -125,24 +133,11 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 3000,
     rewardReputation: 30,
     deadlineDays: 30,
+    requiredReputationLevel: 8,
   },
 ];
 
-// 現在のレベルと名声に応じた依頼を取得
-export function getAvailableQuestTemplates(level: number, reputation: number): QuestDef[] {
-  return questTemplates.filter(q => {
-    // アイテムに応じたレベル制限
-    if (q.requiredItemId === 'elixir' && level < 15) return false;
-    if (q.requiredItemId === 'potion_02' && level < 5) return false;
-    if (q.requiredItemId === 'ingot_02' && level < 8) return false;
-    if (q.requiredItemId === 'ingot_01' && level < 4) return false;
-    if (q.requiredItemId === 'bomb_01' && level < 3) return false;
-    if (q.requiredItemId === 'antidote' && level < 2) return false;
-
-    // 名声による制限
-    if (q.rewardReputation >= 15 && reputation < 20) return false;
-    if (q.rewardReputation >= 30 && reputation < 50) return false;
-
-    return true;
-  });
+// 名声レベルに応じた依頼を取得
+export function getAvailableQuestTemplates(reputationLevel: number): QuestDef[] {
+  return questTemplates.filter(q => reputationLevel >= (q.requiredReputationLevel ?? 1));
 }

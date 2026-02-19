@@ -230,7 +230,7 @@ function generateNewQuests(): void {
 
   // 一定確率で新しい依頼を追加
   if (Math.random() < QUEST.NEW_QUEST_CHANCE || state.availableQuests.length === 0) {
-    const templates = getAvailableQuestTemplates(calcLevelFromExp(state.alchemyExp), calcLevelFromExp(state.reputationExp));
+    const templates = getAvailableQuestTemplates(calcLevelFromExp(state.reputationExp));
 
     if (templates.length > 0) {
       // ランダムに1-2個選択
@@ -281,7 +281,7 @@ export function skipOpening(): void {
 export function initializeGame(): void {
   // 初期依頼を設定
   const state = get(gameState);
-  const templates = getAvailableQuestTemplates(calcLevelFromExp(state.alchemyExp), calcLevelFromExp(state.reputationExp));
+  const templates = getAvailableQuestTemplates(calcLevelFromExp(state.reputationExp));
   const initialQuests = templates.slice(0, 2);
   setAvailableQuests(initialQuests);
 
