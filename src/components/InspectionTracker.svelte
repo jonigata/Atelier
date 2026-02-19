@@ -174,6 +174,7 @@
         {#if criterion.key === 'level'}
           <!-- ═══ 錬金Lv: ポーション瓶 ═══ -->
           <div class="criterion-card potion-card">
+            <div class="criterion-visual">
             <div class="potion-container">
               <svg viewBox="0 0 60 80" class="potion-svg">
                 <defs>
@@ -213,6 +214,7 @@
                 <div class="potion-glow" style="background: radial-gradient(ellipse, {potionGlow(info.grade)}, transparent 70%)"></div>
               {/if}
             </div>
+            </div>
             <div class="criterion-label">
               <span class="criterion-name">錬金Lv</span>
               <span class="criterion-value">現在Lv.{info.value}</span>
@@ -235,6 +237,7 @@
           {@const totalStars = criterion.thresholds.S}
           {@const overlap = getStarOverlap(totalStars)}
           <div class="criterion-card stars-card">
+            <div class="criterion-visual">
             <div class="stars-container">
               <svg viewBox="0 0 0 0" width="0" height="0" style="position:absolute">
                 <defs>
@@ -260,6 +263,7 @@
                 </svg>
               {/each}
             </div>
+            </div>
             <div class="criterion-label">
               <span class="criterion-name">依頼</span>
               <span class="criterion-value">達成済み{info.value}件</span>
@@ -281,12 +285,15 @@
           <!-- ═══ 村発展: 村の画像 + バー ═══ -->
           {@const villageImage = getVillageImage(info.value, info.maxVal)}
           <div class="criterion-card village-card">
-            <div class="village-scene">
-              <img src={villageImage} alt="村の発展" class="village-img" />
-            </div>
-            <!-- 発展度バー -->
-            <div class="village-bar">
-              <div class="village-bar-fill" style="width: {info.progress * 100}%; background: linear-gradient(90deg, #4a6a3a, {gradeColors[info.grade]})"></div>
+            <div class="criterion-visual">
+              <div class="village-visual-inner">
+                <div class="village-scene">
+                  <img src={villageImage} alt="村の発展" class="village-img" />
+                </div>
+                <div class="village-bar">
+                  <div class="village-bar-fill" style="width: {info.progress * 100}%; background: linear-gradient(90deg, #4a6a3a, {gradeColors[info.grade]})"></div>
+                </div>
+              </div>
             </div>
             <div class="criterion-label">
               <span class="criterion-name">村発展</span>
@@ -309,21 +316,23 @@
           <!-- ═══ 名声: 人々アイコン ═══ -->
           {@const peopleCount = getPeopleCount(info.progress)}
           <div class="criterion-card people-card">
-            <div class="people-container">
-              {#each Array(7) as _, i}
-                <div class="person" class:active={i < peopleCount}>
-                  <svg viewBox="0 0 20 28" class="person-svg">
-                    <!-- 頭 -->
-                    <circle cx="10" cy="7" r="5"
-                      fill={i < peopleCount ? '#ffd54f' : 'rgba(255,255,255,0.08)'}
-                    />
-                    <!-- 体 -->
-                    <path d="M4 28 L4 18 Q4 13 10 13 Q16 13 16 18 L16 28"
-                      fill={i < peopleCount ? '#c9a040' : 'rgba(255,255,255,0.05)'}
-                    />
-                  </svg>
-                </div>
-              {/each}
+            <div class="criterion-visual">
+              <div class="people-container">
+                {#each Array(7) as _, i}
+                  <div class="person" class:active={i < peopleCount}>
+                    <svg viewBox="0 0 20 28" class="person-svg">
+                      <!-- 頭 -->
+                      <circle cx="10" cy="7" r="5"
+                        fill={i < peopleCount ? '#ffd54f' : 'rgba(255,255,255,0.08)'}
+                      />
+                      <!-- 体 -->
+                      <path d="M4 28 L4 18 Q4 13 10 13 Q16 13 16 18 L16 28"
+                        fill={i < peopleCount ? '#c9a040' : 'rgba(255,255,255,0.05)'}
+                      />
+                    </svg>
+                  </div>
+                {/each}
+              </div>
             </div>
             <div class="criterion-label">
               <span class="criterion-name">名声</span>
@@ -455,8 +464,7 @@
 
   /* ── グリッドレイアウト ── */
   .criteria-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    display: flex;
     gap: 0.75rem;
   }
 
@@ -464,11 +472,21 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex: 1;
+    min-width: 0;
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 8px;
     padding: 0.75rem 0.5rem 0.5rem;
     gap: 0.4rem;
+  }
+
+  .criterion-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    width: 100%;
   }
 
   .criterion-label {
@@ -477,6 +495,7 @@
     align-items: baseline;
     gap: 0.15rem 0.5rem;
     width: 100%;
+    max-width: 150px;
     margin-top: 0.25rem;
   }
 
@@ -564,6 +583,13 @@
   }
 
   /* ── 村 (villageDev) ── */
+  .village-visual-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+  }
+
   .village-scene {
     width: 100%;
     max-width: 160px;
