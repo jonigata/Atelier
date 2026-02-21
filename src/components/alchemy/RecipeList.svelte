@@ -4,10 +4,19 @@
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
   import { formatCraftDays } from '$lib/services/equipmentEffects';
+  import { gameState } from '$lib/stores/game';
   import type { RecipeDef, Ingredient } from '$lib/models/types';
 
   export let recipes: RecipeDef[];
   export let onSelect: (recipe: RecipeDef) => void;
+
+  function getActiveQuestsForItem(itemId: string) {
+    return $gameState.activeQuests.filter(q => q.requiredItemId === itemId);
+  }
+
+  function getAvailableQuestsForItem(itemId: string) {
+    return $gameState.availableQuests.filter(q => q.requiredItemId === itemId);
+  }
 
   function getIngredientName(ing: Ingredient): string {
     if (ing.itemId) {
@@ -61,7 +70,15 @@
         <div class="recipe-header">
           <img class="recipe-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
           <div class="recipe-name-block">
-            <span class="recipe-name">{recipe.name}</span>
+            <div class="recipe-name-row">
+              <span class="recipe-name">{recipe.name}</span>
+              {#each getActiveQuestsForItem(recipe.resultItemId) as quest}
+                <span class="quest-badge active">{quest.title}({quest.requiredQuantity})</span>
+              {/each}
+              {#each getAvailableQuestsForItem(recipe.resultItemId) as quest}
+                <span class="quest-badge available">{quest.title}({quest.requiredQuantity})</span>
+              {/each}
+            </div>
             {#if getResultDescription(recipe)}
               <span class="recipe-description">{getResultDescription(recipe)}</span>
             {/if}
@@ -155,9 +172,36 @@
     min-width: 0;
   }
 
+  .recipe-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
   .recipe-name {
     font-size: 1.1rem;
     font-weight: bold;
+  }
+
+  .quest-badge {
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .quest-badge.active {
+    background: rgba(255, 152, 0, 0.25);
+    border: 1px solid #ff9800;
+    color: #ffb74d;
+  }
+
+  .quest-badge.available {
+    background: rgba(100, 181, 246, 0.2);
+    border: 1px solid #64b5f6;
+    color: #90caf9;
   }
 
   .recipe-description {
