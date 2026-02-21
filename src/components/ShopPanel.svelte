@@ -1,3 +1,8 @@
+<script lang="ts" context="module">
+  // モジュールレベル変数：コンポーネント再マウントでもリセットされない
+  let lastShopDealWeekSeen = 0;
+</script>
+
 <script lang="ts">
   import { gameState, addMessage, addMoney, addItem, addBook } from '$lib/stores/game';
   import { addSalesAmount } from '$lib/stores/stats';
@@ -9,7 +14,7 @@
   import { shopFlavors, pickRandom } from '$lib/data/flavorTexts';
   import { getSellPriceMult, getBuyPriceMult, recordSell } from '$lib/services/equipmentEffects';
   import { getBargainItems, getPremiumPurchaseItems } from '$lib/services/shopDeals';
-  import { getDaysLeftInWeek } from '$lib/services/calendar';
+  import { getWeek, getDaysLeftInWeek } from '$lib/services/calendar';
   import type { OwnedItem, ItemDef, EquipmentDef } from '$lib/models/types';
   import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
 
@@ -27,6 +32,35 @@
   $: bargainItemIds = getBargainItems($gameState.day, $villageLevel);
   $: premiumItemIds = getPremiumPurchaseItems($gameState.day);
   $: dealsRemaining = getDaysLeftInWeek($gameState.day);
+
+  // 週初回訪問でメルダのトークを表示
+  $: currentWeek = getWeek($gameState.day);
+  let showDealsTalk = false;
+  $: {
+    if (currentWeek !== lastShopDealWeekSeen) {
+      showDealsTalk = true;
+      lastShopDealWeekSeen = currentWeek;
+    }
+  }
+
+  function dismissDealsTalk() {
+    showDealsTalk = false;
+  }
+
+  // メルダのセリフを組み立て
+  $: dealsTalkText = (() => {
+    const parts: string[] = [];
+    if (bargainItemIds.length > 0) {
+      const names = bargainItemIds.map(id => getItem(id)?.name).filter(Boolean);
+      parts.push(`${names.join('・')}がお安くなってるわよ！`);
+    }
+    if (premiumItemIds.length > 0) {
+      const names = premiumItemIds.map(id => getItem(id)?.name).filter(Boolean);
+      parts.push(`${names.join('・')}は高く買い取るからね！`);
+    }
+    if (parts.length === 0) return '';
+    return `あらコレットちゃん！今週は${parts.join(' あと')}`;
+  })();
 
   // 村発展レベルに応じた購入可能レシピ本（未所持のみ）
   $: buyableBooks = getShopBooks($villageLevel)
@@ -253,6 +287,23 @@
       売却
     </button>
   </div>
+
+  {#if showDealsTalk && dealsTalkText}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="deals-talk" on:click={dismissDealsTalk}>
+      <img
+        class="deals-talk-face"
+        src="/images/characters/melda/melda-face-happy.png"
+        alt="メルダ"
+      />
+      <div class="deals-talk-bubble">
+        <span class="deals-talk-name">メルダ</span>
+        <span class="deals-talk-text">{dealsTalkText}</span>
+      </div>
+      <span class="deals-talk-dismiss">click</span>
+    </div>
+  {/if}
 
   {#if activeTab === 'buy'}
     {#if bargainItemIds.length > 0}
@@ -804,6 +855,91 @@
     font-weight: bold;
     margin-left: auto;
     white-space: nowrap;
+  }
+
+  /* メルダのトーク */
+  .deals-talk {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+    background: rgba(30, 30, 50, 0.85);
+    border: 1px solid rgba(201, 169, 89, 0.4);
+    border-radius: 8px;
+    cursor: pointer;
+    animation: deals-talk-in 0.3s ease-out;
+  }
+
+  @keyframes deals-talk-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .deals-talk-face {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid rgba(201, 169, 89, 0.4);
+  }
+
+  .deals-talk-bubble {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    background: rgba(40, 40, 65, 0.9);
+    border: 1px solid rgba(201, 169, 89, 0.3);
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    flex: 1;
+  }
+
+  .deals-talk-bubble::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-right: 8px solid rgba(201, 169, 89, 0.3);
+  }
+
+  .deals-talk-bubble::after {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 7px solid rgba(40, 40, 65, 0.9);
+  }
+
+  .deals-talk-name {
+    font-size: 0.7rem;
+    color: #c9a959;
+    font-weight: bold;
+  }
+
+  .deals-talk-text {
+    color: #e8dcc8;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .deals-talk-dismiss {
+    font-size: 0.65rem;
+    color: #808090;
+    align-self: flex-end;
+    flex-shrink: 0;
   }
 
   /* バーゲン＆高価買取 */

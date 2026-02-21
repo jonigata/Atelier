@@ -21,9 +21,9 @@ export const questClients: Record<string, QuestClientDef> = {
   gares: { id: 'gares', name: 'ガレス', title: '傭兵団の補給係' },
   sophia: { id: 'sophia', name: 'ソフィア', title: '修道院の薬草係' },
   valter: { id: 'valter', name: 'ヴァルター', title: '王都の仲買人' },
+  karin: { id: 'karin', name: 'カリン', title: '宿屋の女将' },
   // --- 顔ありキャラクター ---
-  melda: { id: 'melda', name: 'メルダ', title: 'パン屋', faceId: 'melda' },
-  karin: { id: 'karin', name: 'カリン', title: 'よろず屋' },
+  melda: { id: 'melda', name: 'メルダ', title: 'よろず屋', faceId: 'melda' },
   gord: { id: 'gord', name: 'ゴルド', title: '鍛冶屋', faceId: 'gord' },
   ren: { id: 'ren', name: 'レン', title: '冒険者・剣士', faceId: 'ren' },
   fee: { id: 'fee', name: 'フィー', title: '冒険者・斥候', faceId: 'fee' },
@@ -1089,7 +1089,7 @@ export const questTemplates: QuestDef[] = [
   // 顔ありキャラクター
   // ==========================================
 
-  // --- メルダ（パン屋） ---
+  // --- メルダ（よろず屋） ---
   {
     id: 'quest_melda_honey',
     title: 'パン用の蜂蜜シロップ',
@@ -1157,11 +1157,11 @@ export const questTemplates: QuestDef[] = [
     clientId: 'melda',
   },
 
-  // --- カリン（よろず屋） ---
+  // --- カリン（宿屋） ---
   {
     id: 'quest_karin_potion',
-    title: '店頭用の回復薬',
-    description: 'また売り切れちゃったの。追加お願いね',
+    title: '宿泊客用の回復薬',
+    description: '旅人のお客さんが増えてきてね。常備薬が足りないの',
     type: 'bulk',
     requiredItemId: 'potion_01',
     requiredQuantity: 6,
@@ -1173,8 +1173,8 @@ export const questTemplates: QuestDef[] = [
   },
   {
     id: 'quest_karin_antidote',
-    title: '解毒薬の在庫補充',
-    description: '山菜の季節になると需要が増えるのよ',
+    title: '旅人用の解毒薬',
+    description: '山越えのお客さんに持たせてあげたいのよ',
     type: 'deliver',
     requiredItemId: 'antidote',
     requiredQuantity: 3,
@@ -1186,8 +1186,8 @@ export const questTemplates: QuestDef[] = [
   },
   {
     id: 'quest_karin_rope',
-    title: 'ロープの仕入れ',
-    description: '日用品はいくらあっても足りないわ',
+    title: '宿の備品補充',
+    description: '荷物縛りに使うロープがだいぶ傷んできてね',
     type: 'bulk',
     requiredItemId: 'rope',
     requiredQuantity: 6,
@@ -1199,8 +1199,8 @@ export const questTemplates: QuestDef[] = [
   },
   {
     id: 'quest_karin_lamp',
-    title: '灯火油の在庫補充',
-    description: '冬が近づくとランプ油がよく売れるの',
+    title: '客室のランプ油',
+    description: '冬は日が短いから、ランプ油の減りが早くてねぇ',
     type: 'bulk',
     requiredItemId: 'lamp_oil',
     requiredQuantity: 4,
@@ -1212,8 +1212,8 @@ export const questTemplates: QuestDef[] = [
   },
   {
     id: 'quest_karin_adv_pot',
-    title: '上級回復薬の取り扱い',
-    description: 'あなたの名前で売れるようになったわ。品揃えを増やしたいの',
+    title: '上客向けの上級回復薬',
+    description: '最近いいお客さんが増えてきたの。良い薬を置きたくて',
     type: 'deliver',
     requiredItemId: 'potion_02',
     requiredQuantity: 3,
