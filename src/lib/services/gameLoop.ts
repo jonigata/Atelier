@@ -15,7 +15,7 @@ import { removeActiveQuest, incrementFailedQuests, setAvailableQuests, increment
 import { isActionUnlocked } from '$lib/stores/tutorial';
 import { getArea } from '$lib/data/areas';
 import { getItem } from '$lib/data/items';
-import { getAvailableQuestTemplates } from '$lib/data/quests';
+import { getAvailableQuestTemplates, questTemplates } from '$lib/data/quests';
 import { EXPEDITION, QUEST, calcLevelFromExp } from '$lib/data/balance';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import { checkAutoCompleteAchievements } from '$lib/services/tutorial';
@@ -220,13 +220,18 @@ function checkQuestDeadlines(): void {
 /**
  * 新しい依頼の生成
  */
-function generateNewQuests(): void {
+export function generateNewQuests(): void {
   // クエストがアンロックされていない場合はスキップ
   if (!isActionUnlocked('quest')) {
     return;
   }
 
   const state = get(gameState);
+
+  // 最初の依頼完了前はランダム生成しない
+  if (!state.achievementProgress.completed.includes('ach_first_complete')) {
+    return;
+  }
   const reputationLevel = calcLevelFromExp(state.reputationExp);
 
   // 既存の依頼IDセット
@@ -299,12 +304,11 @@ export function skipOpening(): void {
  * ゲーム開始時の初期化
  */
 export function initializeGame(): void {
-  // 初期依頼を設定
-  const state = get(gameState);
-  const templates = getAvailableQuestTemplates(calcLevelFromExp(state.reputationExp));
-  const shuffled = [...templates].sort(() => Math.random() - 0.5);
-  const initialQuests = shuffled.slice(0, 2);
-  setAvailableQuests(initialQuests);
+  // 初期依頼を設定（村長の固定クエスト）
+  const mayorFirstQuest = questTemplates.find((q) => q.id === 'quest_mayor_first');
+  if (mayorFirstQuest) {
+    setAvailableQuests([mayorFirstQuest]);
+  }
 
   // 1日目の演出をセット
   setDayTransition({ toDay: 1, daysAdvanced: 0 });

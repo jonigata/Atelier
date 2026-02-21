@@ -1,5 +1,6 @@
 import { get } from 'svelte/store';
 import { gameState, clearDayTransition } from '$lib/stores/game';
+import { generateNewQuests } from '$lib/services/gameLoop';
 import { setEventDialogue } from '$lib/stores/tutorial';
 import {
   showGoalCompleteToast,
@@ -124,7 +125,12 @@ export async function processAchievementPresentation(achievementId: string): Pro
   // 4. 報酬を付与（事前選択した機材を渡す）
   claimReward(achievementId, pickedEquipment);
 
-  // 4. アンロックアニメーション＆トースト
+  // 最初の依頼完了時、ランダム依頼生成を開始
+  if (achievementId === 'ach_first_complete') {
+    generateNewQuests();
+  }
+
+  // 5. アンロックアニメーション＆トースト
   await showUnlockToasts();
 
   // 5. 目標達成トースト（ストーリー/チュートリアル系はスキップ）

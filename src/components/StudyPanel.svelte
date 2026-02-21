@@ -71,6 +71,14 @@
       addMessage(`「${selectedBook.name}」を読みましたが、すでに全てのレシピを習得済みでした。`);
     }
 
+    if ($gameState.skipPresentation) {
+      const days = getStudyDays(selectedBook);
+      endTurn(days);
+      selectedBookId = null;
+      onBack();
+      return;
+    }
+
     studyCompletedBook = selectedBook;
     studyLearnedRecipeNames = learnedNames;
     showStudyDialog = true;

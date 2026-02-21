@@ -21,7 +21,7 @@
 
     if (!unlocked.includes('alchemy') && $gameState.stamina < 20) {
       list.push({
-        text: '疲れたな～。今日は休んで、明日からがんばろう',
+        text: '長旅疲れたな～。今日は休んで、明日からがんばろう',
         expression: 'worried',
         priority: 2,
       });

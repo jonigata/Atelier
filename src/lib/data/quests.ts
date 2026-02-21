@@ -1502,6 +1502,19 @@ export const questTemplates: QuestDef[] = [
 
   // --- 村長（フォンテ村長） ---
   {
+    id: 'quest_mayor_first',
+    title: '村長の頼みごと',
+    description: '新しい先生に頼みたいことがあるんだ。回復薬を作ってくれないか',
+    type: 'deliver',
+    requiredItemId: 'potion_01',
+    requiredQuantity: 1,
+    rewardMoney: 80,
+    rewardReputation: 3,
+    deadlineDays: 30,
+    requiredReputationLevel: 1,
+    clientId: 'mayor',
+  },
+  {
     id: 'quest_mayor_potion',
     title: '村の備蓄用回復薬',
     description: '冬に備えて村の薬箱を充実させたいんだ',
