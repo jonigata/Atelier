@@ -16,6 +16,7 @@
     setSelectedQuestId,
   } from '$lib/stores/quests';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
+  import { getQuestClient } from '$lib/data/quests';
   import { removeItemsFromInventory } from '$lib/services/inventory';
   import { checkMilestoneProgress } from '$lib/services/tutorial';
   import { setEventDialogue } from '$lib/stores/tutorial';
@@ -161,10 +162,12 @@
       },
     ];
 
+    const client = quest.clientId ? getQuestClient(quest.clientId) : undefined;
     const dialogue: EventDialogue = {
-      characterName: '依頼主',
-      characterTitle: '',
-      lines: ['ありがとう！助かったよ。'],
+      characterName: client?.name ?? '依頼主',
+      characterTitle: client?.title ?? '',
+      characterFaceId: client?.faceId,
+      lines: [quest.description],
       rewardsTitle: '依頼達成！',
       achievementTitle: quest.title,
       structuredRewards,
@@ -240,7 +243,11 @@
         {#each $gameState.availableQuests as quest}
           {@const itemDef = getItem(quest.requiredItemId)}
           {@const canAccept = $gameState.activeQuests.length < 3}
+          {@const client = quest.clientId ? getQuestClient(quest.clientId) : undefined}
           <div class="quest-item">
+            {#if client}
+              <div class="quest-client">{client.name}（{client.title}）</div>
+            {/if}
             <div class="quest-header">
               <span class="quest-title">{quest.title}</span>
               <span class="quest-type">
@@ -376,6 +383,12 @@
     border: 2px solid #4a4a6a;
     border-radius: 8px;
     min-height: 200px;
+  }
+
+  .quest-client {
+    font-size: 0.8rem;
+    color: #a0a0b0;
+    margin-bottom: 0.25rem;
   }
 
   .quest-header {

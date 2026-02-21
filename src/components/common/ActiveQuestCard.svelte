@@ -1,6 +1,7 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
+  import { getQuestClient } from '$lib/data/quests';
   import QuestTypeIcon from './QuestTypeIcon.svelte';
   import type { ActiveQuest, OwnedItem } from '$lib/models/types';
 
@@ -36,6 +37,7 @@
   $: matchingCount = getMatchingItemsForQuest(quest).length;
   $: canDeliverNow = canDeliver(quest);
   $: dangerLevel = Math.max(0, 1 - daysLeft / 7);
+  $: client = quest.clientId ? getQuestClient(quest.clientId) : undefined;
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -55,6 +57,9 @@
     </div>
     <div class="quest-content">
       <div class="quest-header">
+        {#if client}
+          <span class="quest-client">{client.name}</span>
+        {/if}
         <span class="quest-title">{quest.title}</span>
       </div>
 
@@ -145,6 +150,11 @@
 
   .quest-header {
     margin-bottom: 0.4rem;
+  }
+
+  .quest-client {
+    font-size: 0.75rem;
+    color: #a0a0b0;
   }
 
   .quest-title {

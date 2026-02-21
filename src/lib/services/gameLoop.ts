@@ -282,7 +282,8 @@ export function initializeGame(): void {
   // 初期依頼を設定
   const state = get(gameState);
   const templates = getAvailableQuestTemplates(calcLevelFromExp(state.reputationExp));
-  const initialQuests = templates.slice(0, 2);
+  const shuffled = [...templates].sort(() => Math.random() - 0.5);
+  const initialQuests = shuffled.slice(0, 2);
   setAvailableQuests(initialQuests);
 
   // 1日目の演出をセット

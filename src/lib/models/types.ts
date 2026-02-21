@@ -165,6 +165,14 @@ export interface RecipeBookDef {
 // 依頼タイプ
 export type QuestType = 'deliver' | 'quality' | 'bulk';
 
+// 依頼クライアント定義
+export interface QuestClientDef {
+  id: string;
+  name: string;
+  title: string;
+  faceId?: string; // 顔画像ディレクトリ名（顔ありキャラのみ）
+}
+
 // 依頼定義（マスタ）
 export interface QuestDef {
   id: string;
@@ -178,6 +186,7 @@ export interface QuestDef {
   rewardReputation: number;
   deadlineDays: number;
   requiredReputationLevel?: number;
+  clientId?: string; // 依頼主ID
 }
 
 // アクティブな依頼
