@@ -53,17 +53,17 @@
     );
 
     return allMaterials.filter((item) => {
-      // Lv1: 基本素材のみ（ハルマム草、清水）
+      // Lv1: 基本素材＋序盤レシピ素材（油草の実、麻繊維、魔木の枝）
       if (villageLv <= 1) {
-        return item.id === 'herb_01' || item.id === 'water_01';
+        return ['herb_01', 'water_01', 'oil_seed', 'hemp_fiber', 'magic_wood'].includes(item.id);
       }
       // Lv2-3: 中級素材追加（毒消し草、鉄鉱石）
       if (villageLv <= 3) {
-        return ['herb_01', 'herb_02', 'water_01', 'ore_01'].includes(item.id);
+        return ['herb_01', 'herb_02', 'water_01', 'ore_01', 'oil_seed', 'hemp_fiber', 'magic_wood'].includes(item.id);
       }
       // Lv4-6: さらに拡大（獣の皮）
       if (villageLv <= 6) {
-        return ['herb_01', 'herb_02', 'water_01', 'ore_01', 'misc_01'].includes(item.id);
+        return ['herb_01', 'herb_02', 'water_01', 'ore_01', 'misc_01', 'oil_seed', 'hemp_fiber', 'magic_wood'].includes(item.id);
       }
       // Lv7+: レア素材も購入可能
       return true;

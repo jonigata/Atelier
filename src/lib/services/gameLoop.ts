@@ -227,10 +227,21 @@ function generateNewQuests(): void {
   }
 
   const state = get(gameState);
+  const reputationLevel = calcLevelFromExp(state.reputationExp);
 
-  // 一定確率で新しい依頼を追加
-  if (Math.random() < QUEST.NEW_QUEST_CHANCE || state.availableQuests.length === 0) {
-    const templates = getAvailableQuestTemplates(calcLevelFromExp(state.reputationExp));
+  // 既存の依頼IDセット
+  const existingIds = new Set([
+    ...state.availableQuests.map((q) => q.id),
+    ...state.activeQuests.map((q) => q.id),
+  ]);
+
+  // 掲示板にショップ素材だけで作れるアイテムの依頼があるか確認
+  const basicItemIds = new Set(['potion_01', 'herbal_paste']);
+  const hasBasicQuest = state.availableQuests.some((q) => basicItemIds.has(q.requiredItemId));
+
+  // 一定確率 or 掲示板が少ない(2件以下) で新しい依頼を追加
+  if (Math.random() < QUEST.NEW_QUEST_CHANCE || state.availableQuests.length <= 2) {
+    const templates = getAvailableQuestTemplates(reputationLevel);
 
     if (templates.length > 0) {
       // ランダムに1-2個選択
@@ -238,20 +249,29 @@ function generateNewQuests(): void {
       const shuffled = [...templates].sort(() => Math.random() - 0.5);
       const selected = shuffled.slice(0, count);
 
-      // 既存の依頼と重複しないものだけ追加
-      const existingIds = new Set([
-        ...state.availableQuests.map((q) => q.id),
-        ...state.activeQuests.map((q) => q.id),
-      ]);
-
       const newQuests = selected.filter((q) => !existingIds.has(q.id));
 
       if (newQuests.length > 0) {
         setAvailableQuests([...state.availableQuests, ...newQuests]);
         incrementNewQuestCount(newQuests.length);
-        // メッセージログにのみ追加（朝画面は表示しない）
+        newQuests.forEach((q) => existingIds.add(q.id));
         addMessage(`新しい依頼が掲示板に追加されました！`);
       }
+    }
+  }
+
+  // ショップ素材で作れる依頼が掲示板にない場合、1件保証追加
+  if (!hasBasicQuest) {
+    const templates = getAvailableQuestTemplates(reputationLevel);
+    const basicTemplates = templates.filter(
+      (q) => basicItemIds.has(q.requiredItemId) && !existingIds.has(q.id)
+    );
+    if (basicTemplates.length > 0) {
+      const pick = basicTemplates[Math.floor(Math.random() * basicTemplates.length)];
+      const updatedQuests = [...get(gameState).availableQuests, pick];
+      setAvailableQuests(updatedQuests);
+      incrementNewQuestCount(1);
+      addMessage(`新しい依頼が掲示板に追加されました！`);
     }
   }
 }

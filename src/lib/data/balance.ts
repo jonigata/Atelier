@@ -75,7 +75,7 @@ export const EXPEDITION = {
 
 export const QUEST = {
   /** 新依頼が生成される確率 */
-  NEW_QUEST_CHANCE: 0.3,
+  NEW_QUEST_CHANCE: 0.6,
   /** 期限切れ時の名声ペナルティ */
   EXPIRED_REPUTATION_PENALTY: 5,
 } as const;
