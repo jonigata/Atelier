@@ -72,26 +72,37 @@
 
   // 購入処理（機材効果: 購入割引適用）
   function buyItem(item: ItemDef) {
+    buyItemMultiple(item, 1);
+  }
+
+  function buyItemMultiple(item: ItemDef, count: number) {
     const buyMult = getBuyPriceMult();
-    const price = Math.max(1, Math.floor(item.basePrice * buyMult));
-    if ($gameState.money < price) {
-      addMessage(`所持金が足りません（必要: ${price}G）`);
+    const unitPrice = Math.max(1, Math.floor(item.basePrice * buyMult));
+    const totalCost = unitPrice * count;
+    if ($gameState.money < totalCost) {
+      addMessage(`所持金が足りません（必要: ${totalCost}G）`);
       return;
     }
 
-    addMoney(-price);
-    // 品質はランダム（40-70）
-    const quality = Math.floor(Math.random() * 31) + 40;
-    addItem({
-      itemId: item.id,
-      quality,
-      origin: {
-        type: 'shop',
-        day: $gameState.day,
-        flavorText: pickRandom(shopFlavors),
-      },
-    });
-    addMessage(`${item.name}（品質${quality}）を${price}Gで購入しました`);
+    addMoney(-totalCost);
+    for (let i = 0; i < count; i++) {
+      const quality = Math.floor(Math.random() * 31) + 40;
+      addItem({
+        itemId: item.id,
+        quality,
+        origin: {
+          type: 'shop',
+          day: $gameState.day,
+          flavorText: pickRandom(shopFlavors),
+        },
+      });
+    }
+
+    if (count === 1) {
+      addMessage(`${item.name}を${totalCost}Gで購入しました`);
+    } else {
+      addMessage(`${item.name}×${count}を${totalCost}Gで購入しました`);
+    }
   }
 
   // 機材購入処理
@@ -161,6 +172,34 @@
     addMessage(`${def.name}（品質${item.quality}）を${price}Gで売却しました`);
   }
 
+  function sellItemMultiple(itemsToSell: OwnedItem[], count: number) {
+    const sorted = [...itemsToSell].sort((a, b) => a.quality - b.quality);
+    const targets = sorted.slice(0, count);
+    if (targets.length === 0) return;
+    const def = getItem(targets[0].itemId);
+    if (!def) return;
+
+    let totalPrice = 0;
+    for (const item of targets) {
+      const basePrice = Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
+      const price = Math.max(1, Math.floor(basePrice * getSellPriceMult(item)));
+      gameState.update((state) => ({
+        ...state,
+        inventory: removeItemFromInventory(state.inventory, item.itemId, item.quality),
+      }));
+      addMoney(price);
+      addSalesAmount(price);
+      recordSell();
+      totalPrice += price;
+    }
+
+    if (targets.length === 1) {
+      addMessage(`${def.name}（品質${targets[0].quality}）を${totalPrice}Gで売却しました`);
+    } else {
+      addMessage(`${def.name}×${targets.length}を${totalPrice}Gで売却しました`);
+    }
+  }
+
   // インベントリをアイテムIDでグループ化
   $: groupedInventory = $gameState.inventory.reduce(
     (acc, item) => {
@@ -211,6 +250,7 @@
         {@const buyMult = getBuyPriceMult()}
         {@const displayPrice = Math.max(1, Math.floor(item.basePrice * buyMult))}
         {@const canBuy = $gameState.money >= displayPrice}
+        {@const canBuy10 = $gameState.money >= displayPrice * 10}
         {@const ownedCount = $gameState.inventory.filter(i => i.itemId === item.id).length}
         <div class="shop-item" class:disabled={!canBuy}>
           <img class="item-icon" src={getItemIcon(item.id)} alt={item.name} on:error={handleIconError} />
@@ -226,6 +266,13 @@
               on:click={() => buyItem(item)}
             >
               購入
+            </button>
+            <button
+              class="buy-btn"
+              disabled={!canBuy10}
+              on:click={() => buyItemMultiple(item, 10)}
+            >
+              ×10
             </button>
           </div>
         </div>
@@ -306,6 +353,11 @@
               <div class="item-group-header">
                 <img class="item-icon-small" src={getItemIcon(itemId)} alt={def.name} on:error={handleIconError} />
                 <h4>{def.name} ({items.length}個)</h4>
+                {#if items.length > 1}
+                  <button class="sell-btn" on:click={() => sellItemMultiple(items, 10)}>
+                    ×10 売却
+                  </button>
+                {/if}
               </div>
               <div class="item-variants">
                 {#each items as item}
@@ -586,7 +638,11 @@
   }
 
   .buy-btn, .sell-btn {
-    padding: 0.4rem 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 2rem;
     background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
     border: none;
     border-radius: 4px;
@@ -627,6 +683,10 @@
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
+  }
+
+  .item-group-header .sell-btn {
+    margin-left: auto;
   }
 
   .item-group-header h4 {
