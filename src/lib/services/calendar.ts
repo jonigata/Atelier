@@ -21,6 +21,16 @@ export function getMerchantArrivalDay(month: number): number {
   return (month - 1) * 28 + MERCHANT.VISIT_START_DAY;
 }
 
+/** 週番号(1-48)を取得。7日/週 */
+export function getWeek(day: number): number {
+  return Math.ceil(day / 7);
+}
+
+/** 今週の残り日数を取得 */
+export function getDaysLeftInWeek(day: number): number {
+  return 7 - ((day - 1) % 7);
+}
+
 /** 日付表示用フォーマット */
 export function formatDate(day: number): string {
   const month = getMonth(day);

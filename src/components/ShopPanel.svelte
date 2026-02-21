@@ -5,9 +5,11 @@
   import { getAllEquipment, getEquipment, getEquipmentIcon } from '$lib/data/equipment';
   import { getShopBooks } from '$lib/data/books';
   import { removeItemFromInventory } from '$lib/services/inventory';
-  import { SHOP } from '$lib/data/balance';
+  import { SHOP, SHOP_DEALS } from '$lib/data/balance';
   import { shopFlavors, pickRandom } from '$lib/data/flavorTexts';
   import { getSellPriceMult, getBuyPriceMult, recordSell } from '$lib/services/equipmentEffects';
+  import { getBargainItems, getPremiumPurchaseItems } from '$lib/services/shopDeals';
+  import { getDaysLeftInWeek } from '$lib/services/calendar';
   import type { OwnedItem, ItemDef, EquipmentDef } from '$lib/models/types';
   import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
 
@@ -20,6 +22,11 @@
 
   // 村発展レベルに応じた購入可能アイテム
   $: buyableItems = getBuyableItems($villageLevel);
+
+  // 週替わり特売
+  $: bargainItemIds = getBargainItems($gameState.day, $villageLevel);
+  $: premiumItemIds = getPremiumPurchaseItems($gameState.day);
+  $: dealsRemaining = getDaysLeftInWeek($gameState.day);
 
   // 村発展レベルに応じた購入可能レシピ本（未所持のみ）
   $: buyableBooks = getShopBooks($villageLevel)
@@ -71,13 +78,13 @@
   }
 
   // 購入処理（機材効果: 購入割引適用）
-  function buyItem(item: ItemDef) {
-    buyItemMultiple(item, 1);
+  function buyItem(item: ItemDef, bargainRate: number = 1) {
+    buyItemMultiple(item, 1, bargainRate);
   }
 
-  function buyItemMultiple(item: ItemDef, count: number) {
+  function buyItemMultiple(item: ItemDef, count: number, bargainRate: number = 1) {
     const buyMult = getBuyPriceMult();
-    const unitPrice = Math.max(1, Math.floor(item.basePrice * buyMult));
+    const unitPrice = Math.max(1, Math.floor(item.basePrice * buyMult * bargainRate));
     const totalCost = unitPrice * count;
     if ($gameState.money < totalCost) {
       addMessage(`所持金が足りません（必要: ${totalCost}G）`);
@@ -151,14 +158,15 @@
     addMessage(`レシピ本「${name}」を${price}Gで購入しました！勉強で読むとレシピを習得できます。`);
   }
 
-  // 売却処理（機材効果: 売却価格補正適用）
+  // 売却処理（機材効果: 売却価格補正適用 + 高価買取）
   function sellItem(item: OwnedItem) {
     const def = getItem(item.itemId);
     if (!def) return;
 
-    // 売却価格 = 基本価格 × (品質 / 50) × 売却係数 × 機材効果
+    // 売却価格 = 基本価格 × (品質 / 50) × 売却係数 × 機材効果 × 高価買取
     const basePrice = Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
-    const price = Math.max(1, Math.floor(basePrice * getSellPriceMult(item)));
+    const premiumMult = premiumItemIds.includes(item.itemId) ? SHOP_DEALS.PREMIUM_MULTIPLIER : 1;
+    const price = Math.max(1, Math.floor(basePrice * getSellPriceMult(item) * premiumMult));
 
     // インベントリから削除
     gameState.update((state) => ({
@@ -180,9 +188,10 @@
     if (!def) return;
 
     let totalPrice = 0;
+    const premiumMult = premiumItemIds.includes(targets[0].itemId) ? SHOP_DEALS.PREMIUM_MULTIPLIER : 1;
     for (const item of targets) {
       const basePrice = Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
-      const price = Math.max(1, Math.floor(basePrice * getSellPriceMult(item)));
+      const price = Math.max(1, Math.floor(basePrice * getSellPriceMult(item) * premiumMult));
       gameState.update((state) => ({
         ...state,
         inventory: removeItemFromInventory(state.inventory, item.itemId, item.quality),
@@ -215,7 +224,8 @@
     const def = getItem(item.itemId);
     if (!def) return 0;
     const basePrice = Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
-    return Math.max(1, Math.floor(basePrice * getSellPriceMult(item)));
+    const premiumMult = premiumItemIds.includes(item.itemId) ? SHOP_DEALS.PREMIUM_MULTIPLIER : 1;
+    return Math.max(1, Math.floor(basePrice * getSellPriceMult(item) * premiumMult));
   }
 </script>
 
@@ -245,32 +255,51 @@
   </div>
 
   {#if activeTab === 'buy'}
+    {#if bargainItemIds.length > 0}
+      <div class="deals-banner bargain-banner">
+        <span class="deals-icon bargain-icon">SALE</span>
+        今週のバーゲン：対象素材が半額！
+        <span class="deals-remaining">残り{dealsRemaining}日</span>
+      </div>
+    {/if}
     <div class="item-list">
       {#each buyableItems as item}
+        {@const isBargain = bargainItemIds.includes(item.id)}
         {@const buyMult = getBuyPriceMult()}
-        {@const displayPrice = Math.max(1, Math.floor(item.basePrice * buyMult))}
+        {@const normalPrice = Math.max(1, Math.floor(item.basePrice * buyMult))}
+        {@const displayPrice = isBargain ? Math.max(1, Math.floor(normalPrice * SHOP_DEALS.BARGAIN_DISCOUNT)) : normalPrice}
         {@const canBuy = $gameState.money >= displayPrice}
         {@const canBuy10 = $gameState.money >= displayPrice * 10}
         {@const ownedCount = $gameState.inventory.filter(i => i.itemId === item.id).length}
-        <div class="shop-item" class:disabled={!canBuy}>
+        {@const bargainRate = isBargain ? SHOP_DEALS.BARGAIN_DISCOUNT : 1}
+        <div class="shop-item" class:disabled={!canBuy} class:bargain-item={isBargain}>
           <img class="item-icon" src={getItemIcon(item.id)} alt={item.name} on:error={handleIconError} />
           <div class="item-info">
-            <span class="item-name">{item.name}<span class="owned-count">所持 {ownedCount}</span></span>
+            <span class="item-name">
+              {item.name}
+              {#if isBargain}<span class="sale-badge">SALE</span>{/if}
+              <span class="owned-count">所持 {ownedCount}</span>
+            </span>
             <span class="item-desc">{item.description}</span>
           </div>
           <div class="item-action">
-            <span class="item-price">{displayPrice}G{buyMult < 1 ? ' (割引)' : ''}</span>
+            {#if isBargain}
+              <span class="item-price original-price">{normalPrice}G</span>
+              <span class="item-price sale-price">{displayPrice}G</span>
+            {:else}
+              <span class="item-price">{displayPrice}G{buyMult < 1 ? ' (割引)' : ''}</span>
+            {/if}
             <button
               class="buy-btn"
               disabled={!canBuy}
-              on:click={() => buyItem(item)}
+              on:click={() => buyItem(item, bargainRate)}
             >
               購入
             </button>
             <button
               class="buy-btn"
               disabled={!canBuy10}
-              on:click={() => buyItemMultiple(item, 10)}
+              on:click={() => buyItemMultiple(item, 10, bargainRate)}
             >
               ×10
             </button>
@@ -342,31 +371,56 @@
     </div>
 
   {:else}
+    {#if premiumItemIds.length > 0}
+      <div class="deals-banner premium-banner">
+        <span class="deals-icon premium-icon">高価買取</span>
+        <div class="deals-detail" style="flex:1">
+          <span>今週の高価買取（1.5倍）</span>
+          <div class="deals-items-row">
+            {#each premiumItemIds as pid}
+              {@const pdef = getItem(pid)}
+              {#if pdef}
+                <span class="deals-item-chip">
+                  <img class="deals-item-icon" src={getItemIcon(pid)} alt={pdef.name} on:error={handleIconError} />
+                  {pdef.name}
+                </span>
+              {/if}
+            {/each}
+          </div>
+        </div>
+        <span class="deals-remaining">残り{dealsRemaining}日</span>
+      </div>
+    {/if}
     <div class="item-list">
       {#if Object.keys(groupedInventory).length === 0}
         <p class="empty">売却できるアイテムがありません</p>
       {:else}
         {#each Object.entries(groupedInventory) as [itemId, items]}
           {@const def = getItem(itemId)}
+          {@const isPremium = premiumItemIds.includes(itemId)}
           {#if def}
-            <div class="item-group">
-              <div class="item-group-header">
-                <img class="item-icon-small" src={getItemIcon(itemId)} alt={def.name} on:error={handleIconError} />
-                <h4>{def.name} ({items.length}個)</h4>
+            <div class="sell-group" class:premium-group={isPremium}>
+              <div class="sell-group-header">
+                <img class="item-icon" src={getItemIcon(itemId)} alt={def.name} on:error={handleIconError} />
+                <div class="sell-group-info">
+                  <span class="item-name">
+                    {def.name}
+                    {#if isPremium}<span class="premium-badge">高価買取</span>{/if}
+                  </span>
+                  <span class="item-desc">{items.length}個所持</span>
+                </div>
                 {#if items.length > 1}
-                  <button class="sell-btn" on:click={() => sellItemMultiple(items, 10)}>
-                    ×10 売却
+                  <button class="sell-bulk-btn" on:click={() => sellItemMultiple(items, 10)}>
+                    ×10 まとめ売り
                   </button>
                 {/if}
               </div>
-              <div class="item-variants">
+              <div class="sell-cards">
                 {#each items as item}
-                  <div class="sell-item">
-                    <span class="quality">品質 {item.quality}</span>
-                    <span class="sell-price">{getSellPrice(item)}G</span>
-                    <button class="sell-btn" on:click={() => sellItem(item)}>
-                      売却
-                    </button>
+                  <div class="sell-card">
+                    <span class="sell-card-quality" class:high={item.quality >= 70} class:low={item.quality < 30}>品質 {item.quality}</span>
+                    <span class="sell-card-price">{getSellPrice(item)}G</span>
+                    <button class="sell-btn" on:click={() => sellItem(item)}>売却</button>
                   </div>
                 {/each}
               </div>
@@ -672,48 +726,199 @@
     padding: 2rem;
   }
 
-  .item-group {
+  /* 売却グループ */
+  .sell-group {
     padding: 0.75rem;
     background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
     border-radius: 6px;
   }
 
-  .item-group-header {
+  .sell-group-header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
     margin-bottom: 0.5rem;
   }
 
-  .item-group-header .sell-btn {
-    margin-left: auto;
-  }
-
-  .item-group-header h4 {
-    margin-bottom: 0;
-  }
-
-  .item-variants {
+  .sell-group-info {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.15rem;
+    flex: 1;
+    min-width: 0;
   }
 
-  .sell-item {
+  .sell-bulk-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.75rem;
+    white-space: nowrap;
+    background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
+    border: none;
+    border-radius: 4px;
+    color: #1a1a2e;
+    font-weight: bold;
+    font-size: 0.8rem;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .sell-bulk-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .sell-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.4rem;
+  }
+
+  .sell-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 0.5rem 0.75rem;
-    background: rgba(0, 0, 0, 0.2);
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid #3a3a5a;
     border-radius: 4px;
   }
 
-  .quality {
+  .sell-card-quality {
     color: #a0a0b0;
+    font-size: 0.85rem;
+    white-space: nowrap;
   }
 
-  .sell-price {
+  .sell-card-quality.high {
     color: #81c784;
+  }
+
+  .sell-card-quality.low {
+    color: #ff6b6b;
+  }
+
+  .sell-card-price {
+    color: #81c784;
+    font-weight: bold;
     margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* バーゲン＆高価買取 */
+  .deals-banner {
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .bargain-banner {
+    background: rgba(255, 50, 50, 0.12);
+    border: 1px solid rgba(255, 100, 100, 0.3);
+    color: #ff8a8a;
+  }
+
+  .premium-banner {
+    background: rgba(50, 200, 50, 0.12);
+    border: 1px solid rgba(100, 200, 100, 0.3);
+    color: #81c784;
+  }
+
+  .deals-icon {
+    font-weight: bold;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .deals-remaining {
+    margin-left: auto;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .bargain-icon {
+    background: #d32f2f;
+    color: white;
+  }
+
+  .premium-icon {
+    background: #388e3c;
+    color: white;
+  }
+
+  .deals-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .deals-items-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .deals-item-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.15rem 0.5rem 0.15rem 0.25rem;
+    border-radius: 4px;
+  }
+
+  .deals-item-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+
+  .sale-badge {
+    font-size: 0.65rem;
+    font-weight: bold;
+    background: #d32f2f;
+    color: white;
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+    margin-left: 0.25rem;
+  }
+
+  .premium-badge {
+    font-size: 0.65rem;
+    font-weight: bold;
+    background: #388e3c;
+    color: white;
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+    margin-left: 0.5rem;
+  }
+
+  .original-price {
+    text-decoration: line-through;
+    color: #808090;
+    font-size: 0.8rem;
+    font-weight: normal;
+  }
+
+  .sale-price {
+    color: #ff6666 !important;
+  }
+
+  .bargain-item {
+    border-color: rgba(255, 100, 100, 0.3);
+  }
+
+  .premium-group {
+    border: 1px solid rgba(100, 200, 100, 0.3);
   }
 </style>
