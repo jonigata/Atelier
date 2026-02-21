@@ -12,6 +12,7 @@
   import EventDialog from '../components/EventDialog.svelte';
   import DayTransition from '../components/DayTransition.svelte';
   import DebugPanel from '../components/DebugPanel.svelte';
+  import SaveLoadSidebar from '../components/SaveLoadSidebar.svelte';
   import ToastContainer from '../components/ToastContainer.svelte';
   import TalkBanner from '../components/TalkBanner.svelte';
   import type { ActionType } from '$lib/models/types';
@@ -96,6 +97,9 @@
   <!-- デバッグパネル -->
   <DebugPanel />
 </div>
+
+<!-- セーブ・ロードサイドバー（左側） -->
+<SaveLoadSidebar />
 
 <!-- トースト通知（メイン画面に合わせて配置） -->
 <ToastContainer />

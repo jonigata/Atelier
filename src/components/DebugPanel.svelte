@@ -47,7 +47,7 @@
 
   function doSave(index: number) {
     const existing = slotMeta[index];
-    saveToSlot(index, existing?.label ?? '');
+    saveToSlot(index, existing?.label ?? '', existing?.memo ?? '');
     refreshSlots();
     confirmAction = null;
   }

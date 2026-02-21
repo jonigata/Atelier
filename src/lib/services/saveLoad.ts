@@ -14,6 +14,7 @@ export interface SaveSlotMeta {
   money: number;
   playerName: string;
   label: string;         // ユーザーが付けるラベル（空文字可）
+  memo: string;          // ユーザーメモ（複数行可）
 }
 
 interface SaveData {
@@ -45,7 +46,7 @@ export function getAllSlotMeta(): (SaveSlotMeta | null)[] {
 }
 
 /** 指定スロットにセーブ */
-export function saveToSlot(index: number, label: string = ''): SaveSlotMeta {
+export function saveToSlot(index: number, label: string = '', memo: string = ''): SaveSlotMeta {
   if (index < 0 || index >= MAX_SLOTS) throw new Error(`Invalid slot index: ${index}`);
 
   const state = get(gameState);
@@ -57,6 +58,7 @@ export function saveToSlot(index: number, label: string = ''): SaveSlotMeta {
     money: state.money,
     playerName: state.playerName,
     label,
+    memo,
   };
 
   const data: SaveData = { meta, state };
@@ -94,6 +96,20 @@ export function updateSlotLabel(index: number, label: string): void {
   try {
     const data: SaveData = JSON.parse(raw);
     data.meta.label = label;
+    localStorage.setItem(slotKey(index), JSON.stringify(data));
+  } catch {
+    // ignore
+  }
+}
+
+/** スロットのメモを更新 */
+export function updateSlotMemo(index: number, memo: string): void {
+  const raw = localStorage.getItem(slotKey(index));
+  if (!raw) return;
+
+  try {
+    const data: SaveData = JSON.parse(raw);
+    data.meta.memo = memo;
     localStorage.setItem(slotKey(index), JSON.stringify(data));
   } catch {
     // ignore
