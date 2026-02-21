@@ -13,6 +13,7 @@
   import DayTransition from '../components/DayTransition.svelte';
   import DebugPanel from '../components/DebugPanel.svelte';
   import ToastContainer from '../components/ToastContainer.svelte';
+  import TalkBanner from '../components/TalkBanner.svelte';
   import type { ActionType } from '$lib/models/types';
 
   let selectedAction: ActionType | null = null;
@@ -78,6 +79,10 @@
         {/if}
       {/if}
     </main>
+
+    {#if $gameState.phase === 'action' && selectedAction === null}
+      <TalkBanner />
+    {/if}
 
     <MessageLog />
   {/if}

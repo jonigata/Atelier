@@ -152,6 +152,12 @@
     </div>
   {/if}
 
+  {#if !selectedBookId}
+    <p class="study-hint">📖 読む本を選んでください</p>
+  {:else if $gameState.stamina < STAMINA.STUDY_COST}
+    <p class="study-hint warning">⚠ 体力が足りません（必要: {STAMINA.STUDY_COST} / 現在: {$gameState.stamina}）</p>
+  {/if}
+
   <button
     class="action-btn"
     on:click={handleStudy}
@@ -159,8 +165,6 @@
   >
     {#if !selectedBookId}
       本を選んでください
-    {:else if $gameState.stamina < STAMINA.STUDY_COST}
-      体力不足（必要: {STAMINA.STUDY_COST} / 現在: {$gameState.stamina}）
     {:else}
       「{selectedBook?.name}」を読む（体力 -{STAMINA.STUDY_COST}）
     {/if}
@@ -342,5 +346,21 @@
 
   .no-recipes p {
     margin: 0.25rem 0;
+  }
+
+  .study-hint {
+    color: #c0c0d0;
+    font-size: 0.95rem;
+    margin-top: 1rem;
+    padding: 0.6rem 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid #6a6a8a;
+    border-radius: 2px;
+  }
+
+  .study-hint.warning {
+    color: #ffb74d;
+    border-left-color: #ffb74d;
+    background: rgba(255, 183, 77, 0.1);
   }
 </style>
