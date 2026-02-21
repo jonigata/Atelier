@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { gameState, addMessage, addMoney, addItem } from '$lib/stores/game';
+  import { gameState, addMessage, addMoney, addItem, addBook } from '$lib/stores/game';
   import { addSalesAmount } from '$lib/stores/stats';
   import { items, getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getAllEquipment, getEquipment, getEquipmentIcon } from '$lib/data/equipment';
+  import { getShopBooks } from '$lib/data/books';
   import { removeItemFromInventory } from '$lib/services/inventory';
   import { SHOP } from '$lib/data/balance';
   import { shopFlavors, pickRandom } from '$lib/data/flavorTexts';
@@ -19,6 +20,10 @@
 
   // 村発展レベルに応じた購入可能アイテム
   $: buyableItems = getBuyableItems($villageLevel);
+
+  // 村発展レベルに応じた購入可能レシピ本（未所持のみ）
+  $: buyableBooks = getShopBooks($villageLevel)
+    .filter(book => !$gameState.ownedBooks.includes(book.id));
 
   // ショップ機材ラインナップの初期化
   $: if ($gameState.shopEquipment.length === 0) {
@@ -120,6 +125,21 @@
     addMessage(`機材「${equipDef.name}」を購入した！`);
   }
 
+  // レシピ本購入処理
+  function buyBook(bookId: string, name: string, price: number) {
+    if ($gameState.money < price) {
+      addMessage(`所持金が足りません（必要: ${price}G）`);
+      return;
+    }
+    if ($gameState.ownedBooks.includes(bookId)) {
+      addMessage(`「${name}」は既に所持しています`);
+      return;
+    }
+    addMoney(-price);
+    addBook(bookId);
+    addMessage(`レシピ本「${name}」を${price}Gで購入しました！勉強で読むとレシピを習得できます。`);
+  }
+
   // 売却処理（機材効果: 売却価格補正適用）
   function sellItem(item: OwnedItem) {
     const def = getItem(item.itemId);
@@ -210,6 +230,31 @@
           </div>
         </div>
       {/each}
+
+      {#if buyableBooks.length > 0}
+        <h3 class="section-header">レシピ本</h3>
+        {#each buyableBooks as book}
+          {@const canBuy = $gameState.money >= book.basePrice}
+          <div class="shop-item" class:disabled={!canBuy}>
+            <span class="book-icon-lg">📖</span>
+            <div class="item-info">
+              <span class="item-name">{book.name}</span>
+              <span class="item-desc">{book.description}</span>
+              <span class="item-desc recipe-count">{book.recipeIds.length}種のレシピ収録</span>
+            </div>
+            <div class="item-action">
+              <span class="item-price">{book.basePrice}G</span>
+              <button
+                class="buy-btn"
+                disabled={!canBuy}
+                on:click={() => buyBook(book.id, book.name, book.basePrice)}
+              >
+                購入
+              </button>
+            </div>
+          </div>
+        {/each}
+      {/if}
 
       {#if shopEquipmentList.length > 0}
         <h3 class="section-header">機材</h3>
@@ -452,6 +497,18 @@
     gap: 0.5rem;
     padding: 0 0.65rem 0.65rem;
     margin-top: auto;
+  }
+
+  .book-icon-lg {
+    font-size: 2rem;
+    flex-shrink: 0;
+    width: 48px;
+    text-align: center;
+  }
+
+  .recipe-count {
+    color: #c9a959;
+    font-size: 0.8rem;
   }
 
   .item-icon {

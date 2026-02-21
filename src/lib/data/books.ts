@@ -2,7 +2,7 @@ import type { RecipeBookDef } from '$lib/models/types';
 
 export const books: Record<string, RecipeBookDef> = {
   // ========================================
-  // Tier 1: 入門書（Lv1-2）
+  // Tier 1: 入門書（Lv1-2）— 村Lv1から購入可
   // ========================================
   book_basics: {
     id: 'book_basics',
@@ -11,34 +11,38 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['potion_01', 'herbal_paste', 'plant_oil', 'charcoal', 'rope'],
     basePrice: 100,
     studyDays: 1,
+    requiredVillageLevel: 1,
   },
   book_pharmacy: {
     id: 'book_pharmacy',
     name: '薬学の基礎',
     description: '解毒薬や精製水など、水と薬草を使った調合の基礎を解説した本。',
     recipeIds: ['antidote', 'purified_water', 'dried_herbs', 'basic_catalyst', 'honey_syrup'],
-    basePrice: 200,
+    basePrice: 800,
     studyDays: 1,
+    requiredVillageLevel: 1,
   },
   book_materials: {
     id: 'book_materials',
     name: '素材加工読本',
     description: '布や膠、ゴムなど日用素材の加工法をまとめた実用書。',
     recipeIds: ['simple_cloth', 'resin_glue', 'rubber_sheet', 'moss_extract', 'salt_crystal'],
-    basePrice: 200,
+    basePrice: 800,
     studyDays: 1,
+    requiredVillageLevel: 1,
   },
   book_minerals_explosives: {
     id: 'book_minerals_explosives',
     name: '鉱物と火薬',
     description: '石や粘土の粉砕から火薬の調合まで。鉱物加工の入門書。',
     recipeIds: ['stone_powder', 'clay_powder', 'sulfur_powder', 'polishing_powder', 'filter_cloth', 'bomb_01'],
-    basePrice: 300,
+    basePrice: 800,
     studyDays: 1,
+    requiredVillageLevel: 1,
   },
 
   // ========================================
-  // Tier 2: 初級書（Lv3-4）
+  // Tier 2: 初級書（Lv3-4）— 村Lv2から購入可
   // ========================================
   book_advanced_potions: {
     id: 'book_advanced_potions',
@@ -47,6 +51,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['potion_02', 'healing_salve', 'fine_oil', 'lamp_oil', 'cooling_agent'],
     basePrice: 500,
     studyDays: 1,
+    requiredVillageLevel: 2,
   },
   book_crafting_materials: {
     id: 'book_crafting_materials',
@@ -55,6 +60,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['quality_charcoal', 'black_powder', 'whetstone', 'ceramic_base', 'strong_rope'],
     basePrice: 500,
     studyDays: 1,
+    requiredVillageLevel: 2,
   },
   book_glass_crystal: {
     id: 'book_glass_crystal',
@@ -63,6 +69,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['glass_powder', 'basic_glass', 'phosphor_powder', 'water_crystal', 'basic_lens'],
     basePrice: 600,
     studyDays: 1,
+    requiredVillageLevel: 2,
   },
   book_applied_processing: {
     id: 'book_applied_processing',
@@ -71,6 +78,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['ink_base', 'glowing_ink', 'reinforced_cloth', 'insulation_mat', 'sticky_clay'],
     basePrice: 600,
     studyDays: 1,
+    requiredVillageLevel: 2,
   },
   book_metallurgy: {
     id: 'book_metallurgy',
@@ -79,10 +87,11 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['ingot_01', 'iron_powder', 'pure_crystal', 'heat_stone'],
     basePrice: 800,
     studyDays: 1,
+    requiredVillageLevel: 2,
   },
 
   // ========================================
-  // Tier 3: 中級書（Lv5-6）
+  // Tier 3: 中級書（Lv5-6）— 村Lv4から購入可
   // ========================================
   book_precision_crafts: {
     id: 'book_precision_crafts',
@@ -91,6 +100,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['ingot_02', 'silver_powder', 'precision_tools', 'quality_ceramic', 'reinforced_glass'],
     basePrice: 1000,
     studyDays: 1,
+    requiredVillageLevel: 4,
   },
   book_magical_materials: {
     id: 'book_magical_materials',
@@ -99,6 +109,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['magic_ink', 'magic_powder', 'spirit_essence', 'quality_lens', 'waterproof_coating', 'fonte_prototype_01'],
     basePrice: 1200,
     studyDays: 1,
+    requiredVillageLevel: 4,
   },
   book_elemental_conversion: {
     id: 'book_elemental_conversion',
@@ -107,6 +118,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['fire_powder', 'cold_crystal', 'heat_crystal', 'flexible_tube', 'filter_stone'],
     basePrice: 1200,
     studyDays: 1,
+    requiredVillageLevel: 4,
   },
   book_crystal_research: {
     id: 'book_crystal_research',
@@ -115,6 +127,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['crystal_core', 'frost_core', 'thunder_crystal', 'eternal_flame', 'mirror_glass'],
     basePrice: 1500,
     studyDays: 1,
+    requiredVillageLevel: 4,
   },
   book_mana_engineering: {
     id: 'book_mana_engineering',
@@ -123,10 +136,11 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['conductive_wire', 'purification_core', 'enchanted_clay', 'life_essence', 'heat_regulator', 'conductor_core'],
     basePrice: 1500,
     studyDays: 1,
+    requiredVillageLevel: 4,
   },
 
   // ========================================
-  // Tier 4: 上級書（Lv7-8）
+  // Tier 4: 上級書（Lv7-8）— 村Lv6から購入可
   // ========================================
   book_mana_circuits: {
     id: 'book_mana_circuits',
@@ -135,6 +149,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['magic_circuit', 'cooling_unit', 'heating_unit', 'purifier_unit', 'power_converter'],
     basePrice: 2000,
     studyDays: 1,
+    requiredVillageLevel: 6,
   },
   book_light_sound: {
     id: 'book_light_sound',
@@ -143,6 +158,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['light_core', 'magic_mirror', 'magic_lens', 'communication_crystal', 'sound_crystal'],
     basePrice: 2000,
     studyDays: 1,
+    requiredVillageLevel: 6,
   },
   book_advanced_metallurgy: {
     id: 'book_advanced_metallurgy',
@@ -151,6 +167,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['silver_frame', 'gold_ingot', 'mithril_ingot', 'bell_alloy', 'dragon_alloy'],
     basePrice: 2500,
     studyDays: 1,
+    requiredVillageLevel: 6,
   },
   book_life_earth: {
     id: 'book_life_earth',
@@ -159,10 +176,11 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['heat_core', 'golem_clay', 'terrain_clay', 'life_core', 'moon_crystal'],
     basePrice: 2500,
     studyDays: 1,
+    requiredVillageLevel: 6,
   },
 
   // ========================================
-  // Tier 5-6: 最上級書（Lv9-10）
+  // Tier 5-6: 最上級書（Lv9-10）— 村Lv8から購入可
   // ========================================
   book_legendary_elixirs: {
     id: 'book_legendary_elixirs',
@@ -171,6 +189,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['elixir', 'healing_incense', 'healing_censer', 'life_support'],
     basePrice: 3000,
     studyDays: 1,
+    requiredVillageLevel: 8,
   },
   book_perpetual_machines: {
     id: 'book_perpetual_machines',
@@ -179,6 +198,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['eternal_lamp', 'eternal_light', 'eternal_cooler', 'water_pump', 'great_purifier', 'purifying_stone'],
     basePrice: 3500,
     studyDays: 1,
+    requiredVillageLevel: 8,
   },
   book_power_climate: {
     id: 'book_power_climate',
@@ -187,6 +207,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['magic_reactor', 'magic_generator', 'power_core', 'climate_core', 'climate_orb'],
     basePrice: 4000,
     studyDays: 1,
+    requiredVillageLevel: 8,
   },
   book_construction: {
     id: 'book_construction',
@@ -195,6 +216,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['golem_core', 'advanced_golem_core', 'road_clay', 'road_stone', 'harvest_golem'],
     basePrice: 4000,
     studyDays: 1,
+    requiredVillageLevel: 8,
   },
   book_clockwork_comm: {
     id: 'book_clockwork_comm',
@@ -203,6 +225,7 @@ export const books: Record<string, RecipeBookDef> = {
     recipeIds: ['clock_mechanism', 'bell_mechanism', 'bell_tower', 'communication_pair', 'far_mirror', 'dragon_frame'],
     basePrice: 4500,
     studyDays: 1,
+    requiredVillageLevel: 8,
   },
 };
 
@@ -212,4 +235,8 @@ export function getBook(id: string): RecipeBookDef | undefined {
 
 export function getBooksContainingRecipe(recipeId: string): RecipeBookDef[] {
   return Object.values(books).filter(book => book.recipeIds.includes(recipeId));
+}
+
+export function getShopBooks(villageLevel: number): RecipeBookDef[] {
+  return Object.values(books).filter(book => villageLevel >= book.requiredVillageLevel);
 }

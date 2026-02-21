@@ -160,6 +160,7 @@ export interface RecipeBookDef {
   recipeIds: string[];  // この本に含まれるレシピID
   basePrice: number;    // ショップでの購入価格
   studyDays: number;    // 勉強に必要な日数
+  requiredVillageLevel: number; // ショップに並ぶ最低村レベル
 }
 
 // 依頼タイプ
