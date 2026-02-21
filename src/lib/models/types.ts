@@ -188,6 +188,7 @@ export interface QuestDef {
   deadlineDays: number;
   requiredReputationLevel?: number;
   clientId?: string; // 依頼主ID
+  completionMessage?: string; // 達成時のセリフ（未設定時はdescriptionにフォールバック）
 }
 
 // アクティブな依頼

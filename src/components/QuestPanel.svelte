@@ -167,7 +167,7 @@
       characterName: client?.name ?? '依頼主',
       characterTitle: client?.title ?? '',
       characterFaceId: client?.faceId,
-      lines: [quest.description],
+      lines: [quest.completionMessage ?? quest.description],
       rewardsTitle: '依頼達成！',
       achievementTitle: quest.title,
       structuredRewards,
