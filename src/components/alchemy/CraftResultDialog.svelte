@@ -33,6 +33,7 @@
   let mounted = false;
 
   import { onMount } from 'svelte';
+  import { gameState } from '$lib/stores/game';
 
   function onVideoEnded() {
     phase = 'reveal';
@@ -48,6 +49,12 @@
   }
 
   onMount(() => {
+    // 演出スキップ時は動画をスキップして即座に結果表示
+    if ($gameState.skipPresentation) {
+      onVideoEnded();
+      return;
+    }
+
     // マウント後に少し遅延してからクリック受付開始
     const mountGuard = setTimeout(() => {
       // brewingフェーズ中はスキップ可能にするためmountedを立てる

@@ -51,6 +51,10 @@
       addMessage('体力が足りません。休息して体力を回復しましょう。');
       return;
     }
+    if ($gameState.skipPresentation) {
+      onVideoEnd();
+      return;
+    }
     showVideo = true;
   }
 

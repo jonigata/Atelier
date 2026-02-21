@@ -13,6 +13,10 @@
   let showVideo = false;
 
   function handleRest() {
+    if ($gameState.skipPresentation) {
+      onVideoEnd();
+      return;
+    }
     showVideo = true;
   }
 
