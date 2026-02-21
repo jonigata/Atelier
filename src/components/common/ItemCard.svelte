@@ -8,6 +8,7 @@
   export let emoji: string | null = null; // アイコンの代わりにemoji表示
   export let iconUrl: string | null = null; // カスタムアイコンURL
   export let clickable: boolean = false;
+  export let showDescription: boolean = false;
 
   $: def = itemId ? getItem(itemId) : null;
   $: name = label || def?.name || itemId || '';
@@ -22,6 +23,9 @@
     <img class="item-icon" src={getItemIcon(itemId)} alt={name} on:error={handleIconError} />
   {/if}
   <span class="item-name">{name}</span>
+  {#if showDescription && def?.description}
+    <span class="item-description">{def.description}</span>
+  {/if}
   {#if quality !== null}
     <span class="item-quality" class:high={quality >= 70} class:low={quality < 30}>品質 {quality}</span>
   {/if}
@@ -72,6 +76,13 @@
     font-weight: bold;
     color: #e0e0f0;
     text-align: center;
+  }
+
+  .item-description {
+    font-size: 0.7rem;
+    color: #8a8a9a;
+    text-align: center;
+    line-height: 1.3;
   }
 
   .item-quality {

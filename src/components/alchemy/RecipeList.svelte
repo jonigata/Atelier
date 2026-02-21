@@ -28,6 +28,11 @@
     return true;
   }
 
+  function getResultDescription(recipe: RecipeDef): string {
+    const item = getItem(recipe.resultItemId);
+    return item?.description || '';
+  }
+
   function getDisabledReason(recipe: RecipeDef): string | null {
     if (!hasRequiredFacilities(recipe)) {
       const missing = getMissingFacilities(recipe);
@@ -55,7 +60,12 @@
       >
         <div class="recipe-header">
           <img class="recipe-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
-          <span class="recipe-name">{recipe.name}</span>
+          <div class="recipe-name-block">
+            <span class="recipe-name">{recipe.name}</span>
+            {#if getResultDescription(recipe)}
+              <span class="recipe-description">{getResultDescription(recipe)}</span>
+            {/if}
+          </div>
           <span class="recipe-days">{formatCraftDays(recipe.daysRequired)}</span>
         </div>
         <div class="recipe-ingredients">
@@ -138,10 +148,25 @@
     flex-shrink: 0;
   }
 
+  .recipe-name-block {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+  }
+
   .recipe-name {
     font-size: 1.1rem;
     font-weight: bold;
-    flex: 1;
+  }
+
+  .recipe-description {
+    font-size: 0.8rem;
+    color: #8a8a9a;
+    margin-top: 0.15rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .recipe-days {
