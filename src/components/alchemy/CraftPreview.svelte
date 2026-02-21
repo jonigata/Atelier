@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { RecipeDef } from '$lib/models/types';
   import { getFacilityBonuses } from '$lib/services/facility';
-
   export let successRate: number;
   export let expectedQuality: { min: number; max: number } | null;
   export let craftQuantity: number;
@@ -16,6 +15,9 @@
 
   $: bonuses = getFacilityBonuses(recipe);
   $: hasBonuses = bonuses.successRateBonus > 0 || bonuses.qualityBonus > 0;
+
+  // 調合後の体力
+  $: afterStamina = Math.max(0, currentStamina - totalStaminaCost);
 </script>
 
 <div class="craft-action">
@@ -44,7 +46,7 @@
       <span class="stamina-value" class:over-budget={totalStaminaCost > currentStamina}>
         {staminaCost}{#if craftQuantity > 1} × {craftQuantity} = {totalStaminaCost}{/if}
       </span>
-      <span class="stamina-current">（残り: {currentStamina}）</span>
+      <span class="stamina-current">（{currentStamina} → {afterStamina}）</span>
     </div>
     {#if fatigueLabel}
       <div class="fatigue-warning">
@@ -199,4 +201,5 @@
     color: #ff6b6b;
     font-size: 0.8rem;
   }
+
 </style>
