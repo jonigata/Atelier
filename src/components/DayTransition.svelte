@@ -39,6 +39,12 @@
     visible = true;
     showText = false;
 
+    // 演出スキップがオンの場合
+    if ($gameState.skipPresentation) {
+      timers.push(setTimeout(() => { visible = false; fading = null; transitioning = false; resolveDayTransition(); }, 50));
+      return;
+    }
+
     if (initialLoad) {
       // 初回: すでに黒画面なのでフェードイン不要
       initialLoad = false;

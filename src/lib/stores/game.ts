@@ -72,6 +72,8 @@ function createInitialState(): GameState {
       totalSalesAmount: 0,
       inventoryOpened: false,
     },
+
+    skipPresentation: false,
   };
 }
 
@@ -354,5 +356,16 @@ export function unlockFacility(facilityId: string): void {
 
 export function resetGame(): void {
   gameState.set(createInitialState());
+}
+
+// =====================================
+// 演出スキップ
+// =====================================
+
+export function toggleSkipPresentation(): void {
+  gameState.update((state) => ({
+    ...state,
+    skipPresentation: !state.skipPresentation,
+  }));
 }
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameState, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel } from '$lib/stores/game';
+  import { gameState, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel, toggleSkipPresentation } from '$lib/stores/game';
   import { calcExpForLevel, calcExpProgress } from '$lib/data/balance';
   import MoneyIndicator from './MoneyIndicator.svelte';
 
@@ -9,6 +9,17 @@
 
 <div class="hud">
   <div class="hud-row main-row">
+    <div class="hud-section skip-section">
+      <label class="skip-checkbox">
+        <input
+          type="checkbox"
+          checked={$gameState.skipPresentation}
+          on:change={toggleSkipPresentation}
+        />
+        <span>演出スキップ</span>
+      </label>
+    </div>
+
     <div class="hud-section time-section">
       <div class="section-icon">📅</div>
       <div class="section-content">
@@ -87,6 +98,35 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
+
+  .skip-section {
+    margin-left: auto;
+    order: 999;
+  }
+
+  .skip-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #c9a959;
+    user-select: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  .skip-checkbox:hover {
+    background-color: rgba(201, 169, 89, 0.1);
+  }
+
+  .skip-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #c9a959;
   }
 
   .section-icon {

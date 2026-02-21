@@ -320,6 +320,8 @@ export interface GameState {
   tutorialProgress: TutorialProgress;
   achievementProgress: AchievementProgress;
   stats: GameStats;
+
+  skipPresentation: boolean;  // 演出スキップモード
 }
 
 // 行動タイプ

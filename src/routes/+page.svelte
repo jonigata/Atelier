@@ -20,6 +20,15 @@
   onMount(() => {
     initializeGame();
 
+    // URLパラメータで演出スキップを制御
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('skipPresentation') === 'true') {
+      gameState.update((state) => ({
+        ...state,
+        skipPresentation: true,
+      }));
+    }
+
     // ブラウザの戻る/進むナビゲーションを全て防止
     // (マウスサイドボタン、ブラウザボタン、Alt+←等すべて対応)
     history.pushState(null, '', location.href);
