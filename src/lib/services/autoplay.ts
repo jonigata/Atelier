@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { gameState, learnRecipesFromBook, addBook, consumeStamina, addMessage } from '$lib/stores/game';
+import { gameState, learnRecipesFromBook, addBook, consumeStamina, addMessage, markInventoryOpened } from '$lib/stores/game';
 import { incrementExpeditionCount } from '$lib/stores/stats';
 import { endTurn, startActionPhase } from './gameLoop';
 import { checkMilestoneProgress } from './tutorial';
@@ -158,6 +158,14 @@ async function processCurrentPhase(): Promise<void> {
  */
 async function executeAction(state: GameState): Promise<void> {
   const unlocked = state.tutorialProgress.unlockedActions;
+
+  // 0. チュートリアル進行: 所持品を開いてstudyを解放する
+  if (unlocked.includes('inventory') && !state.stats.inventoryOpened) {
+    markInventoryOpened();
+    log('tutorial', 'success', '所持品を確認');
+    checkMilestoneProgress();
+    return;
+  }
 
   // 1. 納品可能な依頼を全て処理
   if (unlocked.includes('quest') && state.activeQuests.length > 0) {
