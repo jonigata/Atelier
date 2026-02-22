@@ -165,7 +165,7 @@ export function getStaminaCostMult(): number {
 
 /** 調合日数を計算（0.1日単位の内部値を返す） */
 export function getEffectiveCraftDays(recipe: RecipeDef): number {
-  let days = recipe.daysRequired;
+  let days = recipe.craftDaysTenths;
 
   // 半減
   const halves = getEffectsOfType('craft_days_halve');
@@ -176,7 +176,7 @@ export function getEffectiveCraftDays(recipe: RecipeDef): number {
   // 固定短縮
   const reduces = getEffectsOfType('craft_days_reduce');
   for (const r of reduces) {
-    if (r.minOriginalDays && recipe.daysRequired < r.minOriginalDays) continue;
+    if (r.minOriginalDays && recipe.craftDaysTenths < r.minOriginalDays) continue;
     days -= r.value;
   }
 

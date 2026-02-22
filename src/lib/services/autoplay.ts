@@ -415,7 +415,7 @@ function tryAcceptSmartQuest(state: GameState): boolean {
     if (needsToCraft) {
       const recipeForItem = Object.values(recipes).find(r => r.resultItemId === aq.requiredItemId);
       if (recipeForItem) {
-        pendingCraftDays += recipeForItem.daysRequired;
+        pendingCraftDays += recipeForItem.craftDaysTenths;
       }
     }
   }
@@ -444,7 +444,7 @@ function tryAcceptSmartQuest(state: GameState): boolean {
         const needToCraft = remaining - ownedCount;
         const maxPerBatch = getMaxCraftQuantity(recipeForItem, state);
         const batchesNeeded = maxPerBatch > 0 ? Math.ceil(needToCraft / maxPerBatch) : needToCraft;
-        const totalCraftDays = recipeForItem.daysRequired * batchesNeeded;
+        const totalCraftDays = recipeForItem.craftDaysTenths * batchesNeeded;
         const effectiveCraftDays = totalCraftDays + pendingCraftDays;
 
         if (totalCraftDays > quest.deadlineDays) {
@@ -469,9 +469,9 @@ function tryAcceptSmartQuest(state: GameState): boolean {
           // 成長機会コスト: このレシピのExp効率 vs 最高効率レシピ
           // 長時間・低効率のレシピは成長を大きく阻害する
           const bestEfficiency = getOptimalCraftEfficiency(state);
-          const questEfficiency = recipeForItem.expReward / Math.max(1, recipeForItem.daysRequired);
+          const questEfficiency = recipeForItem.expReward / Math.max(1, recipeForItem.craftDaysTenths);
           const lostExpPerDay = Math.max(0, bestEfficiency - questEfficiency);
-          score -= lostExpPerDay * recipeForItem.daysRequired * 5;
+          score -= lostExpPerDay * recipeForItem.craftDaysTenths * 5;
         }
       } else if (recipeForItem && !state.knownRecipes.includes(recipeForItem.id)) {
         // レシピ未習得 → 勉強時間も含めると期限がさらに厳しい → 低スコア
@@ -650,7 +650,7 @@ function tryCraftBest(state: GameState): boolean {
   const questUrgency = state.activeQuests.map(q => {
     const remainingDays = (q.acceptedDay + q.deadlineDays) - state.day;
     const recipe = Object.values(recipes).find(r => r.resultItemId === q.requiredItemId);
-    const craftDays = recipe ? recipe.daysRequired : 0;
+    const craftDays = recipe ? recipe.craftDaysTenths : 0;
     const ownedCount = state.inventory.filter(i => {
       if (i.itemId !== q.requiredItemId) return false;
       if (q.requiredQuality && i.quality < q.requiredQuality) return false;
@@ -676,7 +676,7 @@ function tryCraftBest(state: GameState): boolean {
     const slack = qu.remainingDays - qu.craftDays;
 
     // クエストレシピの効率
-    const questEfficiency = qu.recipe.expReward / Math.max(1, qu.recipe.daysRequired);
+    const questEfficiency = qu.recipe.expReward / Math.max(1, qu.recipe.craftDaysTenths);
 
     // 効率が最適より低いクエストは、ギリギリまで遅延させる
     // slackが大きく、かつ効率が悪い場合は「まだ急がない」
@@ -705,7 +705,7 @@ function tryCraftBest(state: GameState): boolean {
 
     for (const candidate of urgentQuestRecipes) {
       // この調合にかかる日数
-      const craftDays = candidate.recipe.daysRequired;
+      const craftDays = candidate.recipe.craftDaysTenths;
 
       // 他の依頼がこの調合期間中に失効しないかチェック
       const wouldExpireOther = questUrgency.some(other => {
@@ -755,10 +755,10 @@ function tryCraftBest(state: GameState): boolean {
       999
     );
     // アクティブ依頼の最短残り日数より長い調合は避ける
-    if (bestRecipe.daysRequired > minQuestRemaining) {
+    if (bestRecipe.craftDaysTenths > minQuestRemaining) {
       const shorterRecipes = craftableRecipes
-        .filter(r => r.daysRequired <= minQuestRemaining)
-        .sort((a, b) => (b.expReward / Math.max(1, b.daysRequired)) - (a.expReward / Math.max(1, a.daysRequired)));
+        .filter(r => r.craftDaysTenths <= minQuestRemaining)
+        .sort((a, b) => (b.expReward / Math.max(1, b.craftDaysTenths)) - (a.expReward / Math.max(1, a.craftDaysTenths)));
       if (shorterRecipes.length > 0) {
         bestRecipe = shorterRecipes[0];
       }
@@ -772,13 +772,13 @@ function tryCraftBest(state: GameState): boolean {
   const name = itemDef?.name ?? bestRecipe.name;
 
   if (result.successCount > 0) {
-    log('craft', 'success', `${name} x${result.successCount}${result.duplicatedCount > 0 ? `(+複製${result.duplicatedCount})` : ''} +${result.totalExpGained}Exp (${bestRecipe.daysRequired}日)`);
+    log('craft', 'success', `${name} x${result.successCount}${result.duplicatedCount > 0 ? `(+複製${result.duplicatedCount})` : ''} +${result.totalExpGained}Exp (${bestRecipe.craftDaysTenths}日)`);
   } else {
     log('craft', 'error', `${name}の調合に失敗 +${result.totalExpGained}Exp`);
   }
 
   checkMilestoneProgress();
-  endTurn(bestRecipe.daysRequired);
+  endTurn(bestRecipe.craftDaysTenths);
   return true;
 }
 
@@ -788,11 +788,11 @@ function tryCraftBest(state: GameState): boolean {
 function selectNonQuestRecipe(craftableRecipes: RecipeDef[], state: GameState): RecipeDef {
   // 短い日数で高い経験値効率のレシピを優先
   const sorted = [...craftableRecipes].sort((a, b) => {
-    const aEfficiency = a.expReward / Math.max(1, a.daysRequired);
-    const bEfficiency = b.expReward / Math.max(1, b.daysRequired);
+    const aEfficiency = a.expReward / Math.max(1, a.craftDaysTenths);
+    const bEfficiency = b.expReward / Math.max(1, b.craftDaysTenths);
     if (Math.abs(aEfficiency - bEfficiency) > 0.5) return bEfficiency - aEfficiency;
     // 効率が同程度なら日数が短い方を優先
-    return a.daysRequired - b.daysRequired;
+    return a.craftDaysTenths - b.craftDaysTenths;
   });
   return sorted[0];
 }
@@ -806,7 +806,7 @@ function getOptimalCraftEfficiency(state: GameState): number {
   for (const recipeId of state.knownRecipes) {
     const recipe = recipes[recipeId];
     if (!recipe || recipe.requiredLevel > alchemyLv) continue;
-    const eff = recipe.expReward / Math.max(1, recipe.daysRequired);
+    const eff = recipe.expReward / Math.max(1, recipe.craftDaysTenths);
     if (eff > best) best = eff;
   }
   return best;

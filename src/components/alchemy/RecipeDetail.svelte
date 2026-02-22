@@ -44,7 +44,7 @@
   <div class="detail-info">
     <div class="info-row">
       <span class="info-label">所要日数</span>
-      <span class="info-value">{formatCraftDays(recipe.daysRequired)}</span>
+      <span class="info-value">{formatCraftDays(recipe.craftDaysTenths)}</span>
     </div>
     <div class="info-row">
       <span class="info-label">難易度</span>

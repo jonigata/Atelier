@@ -83,7 +83,7 @@
               <span class="recipe-description">{getResultDescription(recipe)}</span>
             {/if}
           </div>
-          <span class="recipe-days">{formatCraftDays(recipe.daysRequired)}</span>
+          <span class="recipe-days">{formatCraftDays(recipe.craftDaysTenths)}</span>
         </div>
         <div class="recipe-ingredients">
           {#each recipe.ingredients as ing}

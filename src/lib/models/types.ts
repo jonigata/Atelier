@@ -125,7 +125,8 @@ export interface RecipeDef {
   resultItemId: string;
   ingredients: Ingredient[];
   requiredLevel: number;
-  daysRequired: number;
+  /** 調合日数（0.1日単位）。10=1日, 5=0.5日。craftDaysToActual()で実日数に変換 */
+  craftDaysTenths: number;
   difficulty: number; // 1-10
   expReward: number;
   requiredFacilities?: string[]; // 必要な設備ID（すべて必要）
