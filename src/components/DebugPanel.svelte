@@ -23,7 +23,7 @@
   let isRunning = false;
   let logs: AutoplayLog[] = [];
   let speed = 100;
-  let maxDays = 30;
+  let maxDays = 27;
   let updateInterval: ReturnType<typeof setInterval>;
 
   // セーブ・ロード

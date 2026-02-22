@@ -67,7 +67,7 @@ export async function startAutoplay(options?: { speed?: number; maxDays?: number
   autoplayState.isRunning = true;
   stopRequested = false;
   const speed = options?.speed ?? 100;
-  const maxDays = options?.maxDays ?? 30;
+  const maxDays = options?.maxDays ?? 27;
 
   log('start', 'info', `Greedy Growth開始 (speed=${speed}ms, maxDays=${maxDays})`);
 
@@ -87,7 +87,8 @@ export async function startAutoplay(options?: { speed?: number; maxDays?: number
         break;
       }
 
-      await processCurrentPhase();
+      const remainingDays = maxDays - (state.day - startDay);
+      await processCurrentPhase(remainingDays);
       await sleep(speed);
     }
   } catch (error) {
@@ -113,7 +114,7 @@ export function stopAutoplay(): void {
 /**
  * 現在のフェーズを処理
  */
-async function processCurrentPhase(): Promise<void> {
+async function processCurrentPhase(remainingDays: number): Promise<void> {
   const state = get(gameState);
 
   // ダイアログがあれば閉じる
@@ -130,7 +131,7 @@ async function processCurrentPhase(): Promise<void> {
       break;
 
     case 'action':
-      await executeAction(state);
+      await executeAction(state, remainingDays);
       break;
 
     case 'ending':
@@ -156,7 +157,7 @@ async function processCurrentPhase(): Promise<void> {
  * 8. 体力が低ければ休息（1日消費）
  * 9. フォールバック: 休息
  */
-async function executeAction(state: GameState): Promise<void> {
+async function executeAction(state: GameState, remainingDays: number): Promise<void> {
   const unlocked = state.tutorialProgress.unlockedActions;
 
   // 0. チュートリアル進行: 所持品を開いてstudyを解放する
@@ -179,7 +180,7 @@ async function executeAction(state: GameState): Promise<void> {
 
   // 3. レシピ本を購入・勉強（未習得レシピがある本を優先）
   if (unlocked.includes('study')) {
-    if (tryBuyAndStudy(state)) return;
+    if (tryBuyAndStudy(state, remainingDays)) return;
   }
 
   // 4. 依頼受注（達成可能な依頼を優先）
@@ -194,12 +195,18 @@ async function executeAction(state: GameState): Promise<void> {
 
   // 6. 最高効率のレシピを調合
   if (unlocked.includes('alchemy') && state.knownRecipes.length > 0) {
-    if (tryCraftBest(state)) return;
+    if (tryCraftBest(state, remainingDays)) return;
   }
 
   // 7. 採取隊を派遣
   if (unlocked.includes('expedition') && !state.expedition) {
     if (tryDispatchBestExpedition(state)) return;
+  }
+
+  // 残り日数が足りなければ日数消費アクションをスキップ
+  if (remainingDays < 1) {
+    log('end', 'info', '残り日数なし、停止待ち');
+    return;
   }
 
   // 8. 体力が低ければ休息
@@ -341,7 +348,7 @@ function isNeededAsIngredient(itemId: string, state: GameState): boolean {
 // レシピ本購入 & 勉強
 // =====================================================================
 
-function tryBuyAndStudy(state: GameState): boolean {
+function tryBuyAndStudy(state: GameState, remainingDays: number): boolean {
   const villageLv = calcLevelFromExp(state.villageExp);
   const alchemyLv = calcLevelFromExp(state.alchemyExp);
   const availableBooks = getShopBooks(villageLv);
@@ -368,6 +375,11 @@ function tryBuyAndStudy(state: GameState): boolean {
     // 体力チェック
     if (state.stamina < STAMINA.STUDY_COST) continue;
 
+    // 勉強日数（機材効果適用）を先に計算してオーバーランチェック
+    const maxLevel = Math.max(...book.recipeIds.map(id => recipes[id]?.requiredLevel ?? 1));
+    const studyDays = getEffectiveStudyDays(book, maxLevel);
+    if (studyDays > remainingDays) continue;
+
     // 本を購入（未所持の場合）
     if (!alreadyOwned) {
       gameState.update(s => ({
@@ -388,10 +400,6 @@ function tryBuyAndStudy(state: GameState): boolean {
     } else {
       log('study', 'info', `「${book.name}」は全て習得済み`);
     }
-
-    // 勉強日数（機材効果適用）
-    const maxLevel = Math.max(...book.recipeIds.map(id => recipes[id]?.requiredLevel ?? 1));
-    const studyDays = getEffectiveStudyDays(book, maxLevel);
 
     checkMilestoneProgress();
     endTurn(studyDays);
@@ -643,14 +651,14 @@ function getCraftCandidates(state: GameState): { recipe: RecipeDef; missingItems
 // 調合（最高効率レシピ選択）
 // =====================================================================
 
-function tryCraftBest(state: GameState): boolean {
+function tryCraftBest(state: GameState, remainingDays: number): boolean {
   const alchemyLv = calcLevelFromExp(state.alchemyExp);
 
-  // 調合可能なレシピを全て取得
+  // 調合可能なレシピを全て取得（残り日数内に収まるもののみ）
   const craftableRecipes = state.knownRecipes
     .filter(id => canCraftRecipe(id))
     .map(id => recipes[id])
-    .filter((r): r is RecipeDef => !!r);
+    .filter((r): r is RecipeDef => !!r && r.craftDaysTenths <= remainingDays);
 
   if (craftableRecipes.length === 0) return false;
 

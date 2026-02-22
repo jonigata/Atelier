@@ -204,12 +204,12 @@ export function isInspectionPassed(inspection: InspectionDef, state: GameState):
   return getOverallGrade(inspection, state) !== 'D';
 }
 
-/** 次の査察を取得（12月末含む） */
+/** 次の査察を取得（当日含む、12月末含む） */
 export function getNextInspection(day: number): InspectionDef | null {
-  return inspections.find((i) => i.day > day) ?? null;
+  return inspections.find((i) => i.day >= day) ?? null;
 }
 
-/** 次の査察日を取得（12月末含む） */
+/** 次の査察日を取得（当日含む、12月末含む） */
 export function getNextInspectionDay(day: number): number | null {
-  return INSPECTION_DAYS.find((d) => d > day) ?? null;
+  return INSPECTION_DAYS.find((d) => d >= day) ?? null;
 }
