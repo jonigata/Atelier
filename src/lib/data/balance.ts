@@ -10,11 +10,11 @@
 /** 3軸共通のレベル設定 */
 export const LEVEL = {
   /** レベルアップ基本経験値 */
-  EXP_BASE: 70,
+  EXP_BASE: 14,
   /** レベルごとの経験値成長率 */
-  EXP_GROWTH: 1.5,
+  EXP_GROWTH: 1.15,
   /** 最大レベル */
-  MAX_LEVEL: 10,
+  MAX_LEVEL: 30,
 } as const;
 
 /** 錬金術固有の設定 */
@@ -38,7 +38,7 @@ export const CRAFT_SUCCESS = {
   /** 難易度1上昇ごとの成功率減少 */
   DIFFICULTY_PENALTY: 0.05,
   /** レベル超過1ごとの成功率ボーナス */
-  LEVEL_BONUS: 0.05,
+  LEVEL_BONUS: 0.02,
   /** 最大成功率 */
   MAX_RATE: 1.0,
 } as const;
@@ -49,7 +49,7 @@ export const CRAFT_SUCCESS = {
 
 export const QUALITY = {
   /** 品質計算時のレベルボーナス（レベル超過1ごと） */
-  LEVEL_BONUS: 2,
+  LEVEL_BONUS: 1,
   /** 品質ランダム幅の下限 */
   RANDOM_MIN: -10,
   /** 品質ランダム幅の上限 */

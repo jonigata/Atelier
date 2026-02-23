@@ -347,12 +347,12 @@ export const equipment: Record<string, EquipmentDef> = {
   basic_manual: {
     id: 'basic_manual',
     name: '入門教本',
-    description: 'Lv3以下のレシピ習得が即日完了する。Lv4以上には効果なし',
+    description: 'Lv9以下のレシピ習得が即日完了する。Lv10以上には効果なし',
     category: 'time',
     rarity: 'common',
     price: 400,
-    effectDescription: 'Lv3以下のレシピ即日習得',
-    effects: [{ type: 'study_instant', maxLevel: 3 }],
+    effectDescription: 'Lv9以下のレシピ即日習得',
+    effects: [{ type: 'study_instant', maxLevel: 9 }],
   },
   reading_glass: {
     id: 'reading_glass',

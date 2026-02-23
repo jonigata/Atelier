@@ -41,7 +41,7 @@ export const inspections: InspectionDef[] = [
     criteria: [
       {
         key: 'level', label: '錬金Lv', unit: '',
-        thresholds: { D: 1, C: 2, B: 2, A: 3, S: 3 },
+        thresholds: { D: 1, C: 6, B: 6, A: 9, S: 9 },
         getValue: (s) => calcLevelFromExp(s.alchemyExp),
         getExpValue: (s) => s.alchemyExp,
       },
@@ -59,7 +59,7 @@ export const inspections: InspectionDef[] = [
     criteria: [
       {
         key: 'level', label: '錬金Lv', unit: '',
-        thresholds: { D: 2, C: 2, B: 3, A: 3, S: 4 },
+        thresholds: { D: 6, C: 6, B: 9, A: 9, S: 12 },
         getValue: (s) => calcLevelFromExp(s.alchemyExp),
         getExpValue: (s) => s.alchemyExp,
       },
@@ -77,7 +77,7 @@ export const inspections: InspectionDef[] = [
     criteria: [
       {
         key: 'level', label: '錬金Lv', unit: '',
-        thresholds: { D: 2, C: 3, B: 3, A: 4, S: 5 },
+        thresholds: { D: 6, C: 9, B: 9, A: 12, S: 15 },
         getValue: (s) => calcLevelFromExp(s.alchemyExp),
         getExpValue: (s) => s.alchemyExp,
       },
@@ -95,7 +95,7 @@ export const inspections: InspectionDef[] = [
     criteria: [
       {
         key: 'level', label: '錬金Lv', unit: '',
-        thresholds: { D: 3, C: 4, B: 5, A: 6, S: 7 },
+        thresholds: { D: 9, C: 12, B: 15, A: 18, S: 21 },
         getValue: (s) => calcLevelFromExp(s.alchemyExp),
         getExpValue: (s) => s.alchemyExp,
       },
@@ -106,12 +106,12 @@ export const inspections: InspectionDef[] = [
       },
       {
         key: 'villageDev', label: '村発展Lv', unit: '',
-        thresholds: { D: 2, C: 3, B: 3, A: 4, S: 5 },
+        thresholds: { D: 6, C: 9, B: 9, A: 12, S: 15 },
         getValue: (s) => calcLevelFromExp(s.villageExp),
       },
       {
         key: 'reputation', label: '名声Lv', unit: '',
-        thresholds: { D: 2, C: 3, B: 3, A: 4, S: 5 },
+        thresholds: { D: 6, C: 9, B: 9, A: 12, S: 15 },
         getValue: (s) => calcLevelFromExp(s.reputationExp),
         getExpValue: (s) => s.reputationExp,
       },
@@ -124,7 +124,7 @@ export const inspections: InspectionDef[] = [
     criteria: [
       {
         key: 'level', label: '錬金Lv', unit: '',
-        thresholds: { D: 4, C: 5, B: 6, A: 7, S: 8 },
+        thresholds: { D: 12, C: 15, B: 18, A: 21, S: 24 },
         getValue: (s) => calcLevelFromExp(s.alchemyExp),
         getExpValue: (s) => s.alchemyExp,
       },
@@ -135,12 +135,12 @@ export const inspections: InspectionDef[] = [
       },
       {
         key: 'villageDev', label: '村発展Lv', unit: '',
-        thresholds: { D: 3, C: 4, B: 5, A: 6, S: 7 },
+        thresholds: { D: 9, C: 12, B: 15, A: 18, S: 21 },
         getValue: (s) => calcLevelFromExp(s.villageExp),
       },
       {
         key: 'reputation', label: '名声Lv', unit: '',
-        thresholds: { D: 3, C: 4, B: 5, A: 6, S: 7 },
+        thresholds: { D: 9, C: 12, B: 15, A: 18, S: 21 },
         getValue: (s) => calcLevelFromExp(s.reputationExp),
         getExpValue: (s) => s.reputationExp,
       },
@@ -153,7 +153,7 @@ export const inspections: InspectionDef[] = [
     criteria: [
       {
         key: 'level', label: '錬金Lv', unit: '',
-        thresholds: { D: 5, C: 6, B: 7, A: 8, S: 9 },
+        thresholds: { D: 15, C: 18, B: 21, A: 24, S: 27 },
         getValue: (s) => calcLevelFromExp(s.alchemyExp),
         getExpValue: (s) => s.alchemyExp,
       },
@@ -164,12 +164,12 @@ export const inspections: InspectionDef[] = [
       },
       {
         key: 'villageDev', label: '村発展Lv', unit: '',
-        thresholds: { D: 4, C: 5, B: 6, A: 7, S: 9 },
+        thresholds: { D: 12, C: 15, B: 18, A: 21, S: 27 },
         getValue: (s) => calcLevelFromExp(s.villageExp),
       },
       {
         key: 'reputation', label: '名声Lv', unit: '',
-        thresholds: { D: 4, C: 5, B: 6, A: 7, S: 9 },
+        thresholds: { D: 12, C: 15, B: 18, A: 21, S: 27 },
         getValue: (s) => calcLevelFromExp(s.reputationExp),
         getExpValue: (s) => s.reputationExp,
       },

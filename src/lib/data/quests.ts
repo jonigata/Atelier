@@ -88,7 +88,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 180,
     rewardReputation: 5,
     deadlineDays: 10,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'toma',
   },
   {
@@ -102,7 +102,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'toma',
   },
   {
@@ -116,7 +116,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 300,
     rewardReputation: 7,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'toma',
   },
 
@@ -161,7 +161,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 180,
     rewardReputation: 5,
     deadlineDays: 10,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'brigitte',
   },
   {
@@ -176,7 +176,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 8,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'brigitte',
   },
   {
@@ -190,7 +190,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 7,
     deadlineDays: 15,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'brigitte',
   },
 
@@ -220,7 +220,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 5,
     deadlineDays: 15,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'org',
   },
   {
@@ -234,7 +234,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 250,
     rewardReputation: 5,
     deadlineDays: 10,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'org',
   },
   {
@@ -248,7 +248,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 600,
     rewardReputation: 10,
     deadlineDays: 20,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'org',
   },
   {
@@ -263,7 +263,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 300,
     rewardReputation: 8,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'org',
   },
 
@@ -293,7 +293,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 150,
     rewardReputation: 4,
     deadlineDays: 10,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'nora',
   },
   {
@@ -308,7 +308,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 250,
     rewardReputation: 6,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'nora',
   },
   {
@@ -322,7 +322,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 220,
     rewardReputation: 5,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'nora',
   },
   {
@@ -337,7 +337,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'nora',
   },
 
@@ -367,7 +367,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 250,
     rewardReputation: 5,
     deadlineDays: 12,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'dario',
   },
   {
@@ -396,7 +396,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 250,
     rewardReputation: 6,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'dario',
   },
   {
@@ -410,7 +410,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 280,
     rewardReputation: 7,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'dario',
   },
 
@@ -455,7 +455,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 180,
     rewardReputation: 5,
     deadlineDays: 8,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'hanna',
   },
   {
@@ -469,7 +469,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 200,
     rewardReputation: 5,
     deadlineDays: 5,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'hanna',
   },
   {
@@ -484,7 +484,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 8,
     deadlineDays: 10,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'hanna',
   },
 
@@ -528,7 +528,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 80,
     rewardReputation: 3,
     deadlineDays: 10,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'misha',
   },
   {
@@ -542,7 +542,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 100,
     rewardReputation: 4,
     deadlineDays: 10,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'misha',
   },
   {
@@ -557,7 +557,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 300,
     rewardReputation: 7,
     deadlineDays: 15,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'misha',
   },
 
@@ -573,7 +573,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 7,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'cedric',
   },
   {
@@ -588,7 +588,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 400,
     rewardReputation: 8,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'cedric',
   },
   {
@@ -602,7 +602,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 400,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'cedric',
   },
   {
@@ -617,7 +617,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 300,
     rewardReputation: 7,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'cedric',
   },
   {
@@ -632,7 +632,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 600,
     rewardReputation: 10,
     deadlineDays: 18,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'cedric',
   },
 
@@ -648,7 +648,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 7,
     deadlineDays: 15,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'pierre',
   },
   {
@@ -662,7 +662,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 400,
     rewardReputation: 8,
     deadlineDays: 18,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'pierre',
   },
   {
@@ -677,7 +677,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 400,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'pierre',
   },
   {
@@ -691,7 +691,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 450,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'pierre',
   },
   {
@@ -706,7 +706,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'pierre',
   },
 
@@ -722,7 +722,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 500,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'emil',
   },
   {
@@ -736,7 +736,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 450,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'emil',
   },
   {
@@ -750,7 +750,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 500,
     rewardReputation: 10,
     deadlineDays: 18,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'emil',
   },
   {
@@ -764,7 +764,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1400,
     rewardReputation: 15,
     deadlineDays: 20,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'emil',
   },
   {
@@ -779,7 +779,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1000,
     rewardReputation: 12,
     deadlineDays: 18,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'emil',
   },
 
@@ -796,7 +796,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1000,
     rewardReputation: 12,
     deadlineDays: 18,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'bernard',
   },
   {
@@ -811,7 +811,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 600,
     rewardReputation: 10,
     deadlineDays: 12,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'bernard',
   },
   {
@@ -826,7 +826,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 700,
     rewardReputation: 10,
     deadlineDays: 15,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'bernard',
   },
   {
@@ -841,7 +841,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 600,
     rewardReputation: 10,
     deadlineDays: 18,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'bernard',
   },
   {
@@ -855,7 +855,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 500,
     rewardReputation: 10,
     deadlineDays: 15,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'bernard',
   },
 
@@ -872,7 +872,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 500,
     rewardReputation: 10,
     deadlineDays: 15,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'adele',
   },
   {
@@ -887,7 +887,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 400,
     rewardReputation: 8,
     deadlineDays: 12,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'adele',
   },
   {
@@ -902,7 +902,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 600,
     rewardReputation: 12,
     deadlineDays: 18,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'adele',
   },
   {
@@ -917,7 +917,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 600,
     rewardReputation: 12,
     deadlineDays: 18,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'adele',
   },
   {
@@ -932,7 +932,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 800,
     rewardReputation: 15,
     deadlineDays: 20,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'adele',
   },
 
@@ -948,7 +948,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1700,
     rewardReputation: 15,
     deadlineDays: 20,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'gares',
   },
   {
@@ -962,7 +962,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 600,
     rewardReputation: 10,
     deadlineDays: 15,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'gares',
   },
   {
@@ -976,7 +976,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1000,
     rewardReputation: 12,
     deadlineDays: 20,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'gares',
   },
   {
@@ -990,7 +990,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 700,
     rewardReputation: 10,
     deadlineDays: 18,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'gares',
   },
   {
@@ -1004,7 +1004,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 800,
     rewardReputation: 12,
     deadlineDays: 20,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'gares',
   },
 
@@ -1021,7 +1021,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 250,
     rewardReputation: 6,
     deadlineDays: 12,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'sophia',
   },
   {
@@ -1035,7 +1035,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 250,
     rewardReputation: 6,
     deadlineDays: 15,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'sophia',
   },
   {
@@ -1050,7 +1050,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'sophia',
   },
   {
@@ -1065,7 +1065,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 800,
     rewardReputation: 15,
     deadlineDays: 25,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'sophia',
   },
   {
@@ -1079,7 +1079,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 500,
     rewardReputation: 10,
     deadlineDays: 18,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'sophia',
   },
 
@@ -1096,7 +1096,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1200,
     rewardReputation: 15,
     deadlineDays: 20,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'valter',
   },
   {
@@ -1111,7 +1111,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1000,
     rewardReputation: 15,
     deadlineDays: 20,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'valter',
   },
   {
@@ -1126,7 +1126,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 800,
     rewardReputation: 12,
     deadlineDays: 20,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'valter',
   },
   {
@@ -1141,7 +1141,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1000,
     rewardReputation: 15,
     deadlineDays: 20,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'valter',
   },
   {
@@ -1156,7 +1156,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 5000,
     rewardReputation: 30,
     deadlineDays: 30,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'valter',
   },
 
@@ -1190,7 +1190,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 180,
     rewardReputation: 5,
     deadlineDays: 10,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'melda',
   },
   {
@@ -1204,7 +1204,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 220,
     rewardReputation: 5,
     deadlineDays: 12,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'melda',
   },
   {
@@ -1219,7 +1219,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 300,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'melda',
   },
   {
@@ -1233,7 +1233,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 500,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'melda',
   },
 
@@ -1249,7 +1249,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 400,
     rewardReputation: 6,
     deadlineDays: 15,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'karin',
   },
   {
@@ -1263,7 +1263,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 300,
     rewardReputation: 6,
     deadlineDays: 12,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'karin',
   },
   {
@@ -1277,7 +1277,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 260,
     rewardReputation: 5,
     deadlineDays: 12,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'karin',
   },
   {
@@ -1291,7 +1291,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 500,
     rewardReputation: 8,
     deadlineDays: 18,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'karin',
   },
   {
@@ -1305,7 +1305,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 900,
     rewardReputation: 12,
     deadlineDays: 18,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'karin',
   },
 
@@ -1322,7 +1322,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 7,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'gord',
   },
   {
@@ -1336,7 +1336,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 550,
     rewardReputation: 8,
     deadlineDays: 18,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'gord',
   },
   {
@@ -1350,7 +1350,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 280,
     rewardReputation: 6,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'gord',
   },
   {
@@ -1365,7 +1365,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 800,
     rewardReputation: 12,
     deadlineDays: 20,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'gord',
   },
   {
@@ -1379,7 +1379,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 560,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'gord',
   },
 
@@ -1395,7 +1395,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 400,
     rewardReputation: 8,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'ren',
   },
   {
@@ -1409,7 +1409,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 300,
     rewardReputation: 7,
     deadlineDays: 10,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'ren',
   },
   {
@@ -1423,7 +1423,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 450,
     rewardReputation: 8,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'ren',
   },
   {
@@ -1438,7 +1438,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 800,
     rewardReputation: 12,
     deadlineDays: 18,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'ren',
   },
   {
@@ -1453,7 +1453,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 7,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'ren',
   },
 
@@ -1498,7 +1498,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 280,
     rewardReputation: 6,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'fee',
   },
   {
@@ -1512,7 +1512,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 7,
     deadlineDays: 15,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'fee',
   },
   {
@@ -1526,7 +1526,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 340,
     rewardReputation: 6,
     deadlineDays: 15,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'fee',
   },
 
@@ -1571,7 +1571,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 200,
     rewardReputation: 5,
     deadlineDays: 10,
-    requiredReputationLevel: 2,
+    requiredReputationLevel: 6,
     clientId: 'liene',
   },
   {
@@ -1586,7 +1586,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 400,
     rewardReputation: 8,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'liene',
   },
   {
@@ -1601,7 +1601,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 600,
     rewardReputation: 10,
     deadlineDays: 15,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'liene',
   },
 
@@ -1631,7 +1631,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 500,
     rewardReputation: 8,
     deadlineDays: 15,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'mayor',
   },
   {
@@ -1646,7 +1646,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 7,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'mayor',
   },
   {
@@ -1660,7 +1660,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 500,
     rewardReputation: 8,
     deadlineDays: 18,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'mayor',
   },
   {
@@ -1675,7 +1675,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 600,
     rewardReputation: 10,
     deadlineDays: 20,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'mayor',
   },
   {
@@ -1690,7 +1690,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 900,
     rewardReputation: 12,
     deadlineDays: 18,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'mayor',
   },
 
@@ -1706,7 +1706,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 600,
     rewardReputation: 10,
     deadlineDays: 7,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'marco',
   },
   {
@@ -1720,7 +1720,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 800,
     rewardReputation: 12,
     deadlineDays: 7,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'marco',
   },
   {
@@ -1734,7 +1734,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 550,
     rewardReputation: 8,
     deadlineDays: 7,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'marco',
   },
   {
@@ -1748,7 +1748,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1200,
     rewardReputation: 15,
     deadlineDays: 7,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'marco',
   },
   {
@@ -1763,7 +1763,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1200,
     rewardReputation: 15,
     deadlineDays: 7,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'marco',
   },
 
@@ -1780,7 +1780,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 800,
     rewardReputation: 15,
     deadlineDays: 20,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'inspector',
   },
   {
@@ -1795,7 +1795,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1000,
     rewardReputation: 15,
     deadlineDays: 20,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'inspector',
   },
   {
@@ -1810,7 +1810,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 800,
     rewardReputation: 12,
     deadlineDays: 20,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'inspector',
   },
   {
@@ -1825,7 +1825,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1200,
     rewardReputation: 20,
     deadlineDays: 25,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'inspector',
   },
   {
@@ -1840,7 +1840,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 3000,
     rewardReputation: 25,
     deadlineDays: 30,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'inspector',
   },
 
@@ -1857,7 +1857,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 400,
     rewardReputation: 8,
     deadlineDays: 10,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'vict',
   },
   {
@@ -1872,7 +1872,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 450,
     rewardReputation: 8,
     deadlineDays: 12,
-    requiredReputationLevel: 3,
+    requiredReputationLevel: 9,
     clientId: 'vict',
   },
   {
@@ -1887,7 +1887,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 800,
     rewardReputation: 12,
     deadlineDays: 18,
-    requiredReputationLevel: 5,
+    requiredReputationLevel: 15,
     clientId: 'vict',
   },
   {
@@ -1902,7 +1902,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1200,
     rewardReputation: 15,
     deadlineDays: 20,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'vict',
   },
   {
@@ -1917,7 +1917,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 2500,
     rewardReputation: 20,
     deadlineDays: 25,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'vict',
   },
 
@@ -1934,7 +1934,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1000,
     rewardReputation: 15,
     deadlineDays: 25,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'irina',
   },
   {
@@ -1949,7 +1949,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1200,
     rewardReputation: 15,
     deadlineDays: 20,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'irina',
   },
   {
@@ -1964,7 +1964,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1000,
     rewardReputation: 12,
     deadlineDays: 20,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'irina',
   },
   {
@@ -1979,7 +1979,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 1500,
     rewardReputation: 20,
     deadlineDays: 25,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'irina',
   },
   {
@@ -1994,7 +1994,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 5000,
     rewardReputation: 30,
     deadlineDays: 30,
-    requiredReputationLevel: 8,
+    requiredReputationLevel: 24,
     clientId: 'irina',
   },
 ];

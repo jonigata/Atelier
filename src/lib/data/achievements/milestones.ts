@@ -289,47 +289,45 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
   },
 
   // --- 熟練系 ---
-  ach_level_5: {
-    id: 'ach_level_5',
+  ach_level_15: {
+    id: 'ach_level_15',
     title: '成長の実感',
-    description: '錬金術レベル5に到達した',
-    hint: '錬金術<strong>レベル5</strong>に到達しよう',
+    description: '錬金術レベル15に到達した',
+    hint: '錬金術<strong>レベル15</strong>に到達しよう',
     category: 'mastery',
     narrative: 'master_gift',
     narrativeLines: ['師匠から成長を祝う仕送りが届いた。「そろそろ蒸留器の使い方も覚える頃だ」'],
-    conditions: [{ type: 'level', target: 5 }],
+    conditions: [{ type: 'level', target: 15 }],
     reward: { money: 300, recipes: ['bomb_01'], facilities: ['distiller'] },
     priority: 510,
     important: true,
     prerequisite: ['ach_rival_intro'],
   },
 
-  ach_level_10: {
-    id: 'ach_level_10',
+  ach_level_30: {
+    id: 'ach_level_30',
     title: '一人前',
-    description: '錬金術レベル10に到達した',
-    hint: '錬金術<strong>レベル10</strong>に到達しよう',
+    description: '錬金術レベル30に到達した',
+    hint: '錬金術<strong>レベル30</strong>に到達しよう',
     category: 'mastery',
     narrative: 'master_teaching',
     narrativeLines: ['師匠からの手紙「一人前と認めよう。工房の炉も使いこなせるだろう」'],
-    conditions: [{ type: 'level', target: 10 }],
+    conditions: [{ type: 'level', target: 30 }],
     reward: { money: 800, reputationExp: 10, recipes: ['ingot_01'], facilities: ['furnace'] },
     priority: 520,
-    prerequisite: ['ach_level_5'],
+    prerequisite: ['ach_level_15'],
     important: true,
   },
 
-  // ach_level_15, ach_level_20 は削除（最大レベル10のため）
-
-  ach_reputation_5: {
-    id: 'ach_reputation_5',
+  ach_reputation_15: {
+    id: 'ach_reputation_15',
     title: '名声を馳せる',
-    description: '名声レベル5に到達した',
-    hint: '名声<strong>レベル5</strong>に到達しよう',
+    description: '名声レベル15に到達した',
+    hint: '名声<strong>レベル15</strong>に到達しよう',
     category: 'mastery',
     narrative: 'village_festival',
     narrativeLines: ['村の祭りで名誉村民に選出された'],
-    conditions: [{ type: 'reputation', target: 5 }],
+    conditions: [{ type: 'reputation', target: 15 }],
     reward: {
       money: 1000,
       items: [{ itemId: 'water_02', quality: 80, quantity: 2 }],
@@ -338,17 +336,17 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     priority: 550,
   },
 
-  ach_reputation_8: {
-    id: 'ach_reputation_8',
+  ach_reputation_24: {
+    id: 'ach_reputation_24',
     title: '伝説の錬金術士',
-    description: '名声レベル8に到達した',
-    hint: '名声<strong>レベル8</strong>に到達しよう',
+    description: '名声レベル24に到達した',
+    hint: '名声<strong>レベル24</strong>に到達しよう',
     category: 'mastery',
     narrative: 'village_festival',
     narrativeLines: ['年末の祭りで最優秀貢献者として表彰された'],
-    conditions: [{ type: 'reputation', target: 8 }],
+    conditions: [{ type: 'reputation', target: 24 }],
     reward: { money: 2000, reputationExp: 5 },
     priority: 560,
-    prerequisite: ['ach_reputation_5'],
+    prerequisite: ['ach_reputation_15'],
   },
 };

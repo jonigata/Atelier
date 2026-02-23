@@ -229,7 +229,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
       '森の奥まで行ける。金は貰うが、悪い取引にはならないさ',
       'フィー「よろしくねー！ 珍しいもの見つけたら教えるから！」',
     ],
-    conditions: [{ type: 'village_development', target: 2 }],
+    conditions: [{ type: 'village_development', target: 6 }],
     reward: {
       unlocks: ['expedition'],
     },

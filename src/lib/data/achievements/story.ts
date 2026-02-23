@@ -247,7 +247,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     id: 'ach_story_neighbor_pressure',
     title: '焦りの種',
     description: '隣村の発展ぶりを聞いた',
-    hint: '村発展<strong>レベル3</strong>を目指そう',
+    hint: '村発展<strong>レベル9</strong>を目指そう',
     category: 'quest',
     narrative: 'client_gratitude',
     narrativeCharacter: { name: 'メルダ', title: 'よろず屋のおばちゃん' },
@@ -259,7 +259,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     conditions: [
       { type: 'day', target: 160, comparison: '>=' },
-      { type: 'village_development', target: 3 },
+      { type: 'village_development', target: 9 },
     ],
     reward: {
       reputationExp: 3,
@@ -272,7 +272,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     id: 'ach_story_q2_checkpoint',
     title: '中間査察',
     description: '師匠組合の中間査察を受けた',
-    hint: '<strong>依頼10件</strong>・<strong>レベル5</strong>を達成しよう',
+    hint: '<strong>依頼10件</strong>・<strong>レベル15</strong>を達成しよう',
     category: 'quest',
     narrative: 'patron_support',
     narrativeCharacter: { name: '査察官', title: '師匠組合' },
@@ -286,7 +286,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     conditions: [
       { type: 'day', target: 168, comparison: '>=' },
       { type: 'quest_count', target: 10 },
-      { type: 'level', target: 5 },
+      { type: 'level', target: 15 },
     ],
     reward: {
       money: 500,
@@ -303,7 +303,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     id: 'ach_story_specialty_start',
     title: '挑戦の始まり',
     description: '特産品の開発を開始した',
-    hint: '<strong>レベル8</strong>・<strong>調合40回</strong>を達成しよう',
+    hint: '<strong>レベル24</strong>・<strong>調合40回</strong>を達成しよう',
     category: 'alchemy',
     narrative: 'village_girl',
     narrativeCharacter: { name: 'リーネ', title: '村娘' },
@@ -315,7 +315,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     conditions: [
       { type: 'day', target: 178, comparison: '>=' },
-      { type: 'level', target: 8 },
+      { type: 'level', target: 24 },
       { type: 'craft_count', target: 40 },
     ],
     reward: {
@@ -405,7 +405,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     id: 'ach_story_village_crisis',
     title: '村を守る力',
     description: '村の危機に錬金術で立ち向かった',
-    hint: '<strong>レベル10</strong>・<strong>品質60</strong>を達成しよう',
+    hint: '<strong>レベル30</strong>・<strong>品質60</strong>を達成しよう',
     category: 'quest',
     narrative: 'village_growth',
     narrativeCharacter: { name: '村長', title: 'フォンテ村長' },
@@ -417,7 +417,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     conditions: [
       { type: 'day', target: 245, comparison: '>=' },
-      { type: 'level', target: 10 },
+      { type: 'level', target: 30 },
       { type: 'craft_quality', target: 60 },
     ],
     reward: {
@@ -459,7 +459,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     id: 'ach_story_q3_checkpoint',
     title: '審判の予告',
     description: '査察官が予告訪問に来た',
-    hint: '<strong>レベル8</strong>・<strong>依頼20件</strong>を達成しよう',
+    hint: '<strong>レベル24</strong>・<strong>依頼20件</strong>を達成しよう',
     category: 'quest',
     narrative: 'patron_support',
     narrativeCharacter: { name: '査察官', title: '師匠組合' },
@@ -472,7 +472,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     conditions: [
       { type: 'day', target: 252, comparison: '>=' },
-      { type: 'level', target: 8 },
+      { type: 'level', target: 24 },
       { type: 'quest_count', target: 20 },
     ],
     reward: {
@@ -489,7 +489,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     id: 'ach_story_specialty_complete',
     title: 'フォンテの恵み',
     description: 'フォンテ村の特産品を完成させた',
-    hint: '<strong>レベル10</strong>・<strong>品質80</strong>・<strong>調合80回</strong>を達成しよう',
+    hint: '<strong>レベル30</strong>・<strong>品質80</strong>・<strong>調合80回</strong>を達成しよう',
     category: 'alchemy',
     narrative: 'workshop_discovery',
     narrativeLines: [
@@ -500,7 +500,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     conditions: [
       { type: 'day', target: 280, comparison: '>=' },
-      { type: 'level', target: 10 },
+      { type: 'level', target: 30 },
       { type: 'craft_quality', target: 80 },
       { type: 'craft_count', target: 80 },
     ],
@@ -518,7 +518,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     id: 'ach_story_girl_friendship',
     title: '親友',
     description: 'リーネと真の友情を結んだ',
-    hint: '名声<strong>レベル6</strong>に到達しよう',
+    hint: '名声<strong>レベル18</strong>に到達しよう',
     category: 'quest',
     narrative: 'village_girl',
     narrativeCharacter: { name: 'リーネ', title: '村娘' },
@@ -531,7 +531,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     ],
     conditions: [
       { type: 'day', target: 320, comparison: '>=' },
-      { type: 'reputation', target: 6 },
+      { type: 'reputation', target: 18 },
     ],
     reward: {
       reputationExp: 10,
