@@ -367,6 +367,9 @@ export function resetGame(): void {
 
 export const skipPresentation = writable(false);
 
+// 依頼から調合パネルへのジャンプ用
+export const pendingAlchemyRecipeId = writable<string | null>(null);
+
 export function toggleSkipPresentation(): void {
   skipPresentation.update((v) => !v);
 }

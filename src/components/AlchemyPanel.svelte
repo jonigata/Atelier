@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { get } from 'svelte/store';
-  import { gameState, pendingLevelUp } from '$lib/stores/game';
+  import { gameState, pendingLevelUp, pendingAlchemyRecipeId } from '$lib/stores/game';
   import type { LevelUpInfo } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
@@ -25,6 +26,15 @@
 
   let showFacilities = false;
   let selectedRecipe: RecipeDef | null = null;
+
+  // 依頼からのジャンプ: レシピを自動選択
+  onMount(() => {
+    const recipeId = get(pendingAlchemyRecipeId);
+    if (recipeId && recipes[recipeId]) {
+      selectedRecipe = recipes[recipeId];
+      pendingAlchemyRecipeId.set(null);
+    }
+  });
   let craftQuantity: number = 1;
   let selectedItems: OwnedItem[] = [];
   let craftResultData: CraftMultipleResult | null = null;

@@ -1,18 +1,52 @@
 <script lang="ts">
-  import { gameState } from '$lib/stores/game';
+  import { gameState, pendingAlchemyRecipeId } from '$lib/stores/game';
   import { setSelectedQuestId } from '$lib/stores/quests';
   import { showingUnlockActions, pendingUnlockActions } from '$lib/stores/toast';
   import { isMerchantVisiting } from '$lib/services/calendar';
   import { getNextInspection, INSPECTION_DAYS } from '$lib/data/inspection';
+  import { recipes } from '$lib/data/recipes';
+  import { calcLevelFromExp } from '$lib/data/balance';
   import InspectionTracker from './InspectionTracker.svelte';
   import ObjectivesSection from './ObjectivesSection.svelte';
   import type { ActionType, ActiveQuest } from '$lib/models/types';
 
   export let onSelect: (action: ActionType) => void;
 
+  function canDeliverQuest(quest: ActiveQuest): boolean {
+    const remaining = quest.requiredQuantity - quest.deliveredCount;
+    const matchingItems = $gameState.inventory.filter((item) => {
+      if (item.itemId !== quest.requiredItemId) return false;
+      if (quest.requiredQuality && item.quality < quest.requiredQuality) return false;
+      return true;
+    });
+    return matchingItems.length >= remaining;
+  }
+
+  function findRecipeForItem(itemId: string): string | null {
+    const level = calcLevelFromExp($gameState.alchemyExp);
+    const recipe = Object.values(recipes).find(
+      (r) => r.resultItemId === itemId && $gameState.knownRecipes.includes(r.id) && r.requiredLevel <= level
+    );
+    return recipe?.id ?? null;
+  }
+
   function handleQuestClick(quest: ActiveQuest) {
-    setSelectedQuestId(quest.id);
-    onSelect('quest');
+    if (canDeliverQuest(quest)) {
+      // 納品可能 → 依頼パネルへ
+      setSelectedQuestId(quest.id);
+      onSelect('quest');
+    } else {
+      // 納品不可 → 調合パネルへジャンプ（レシピがあれば）
+      const recipeId = findRecipeForItem(quest.requiredItemId);
+      if (recipeId && $gameState.tutorialProgress.unlockedActions.includes('alchemy')) {
+        pendingAlchemyRecipeId.set(recipeId);
+        onSelect('alchemy');
+      } else {
+        // レシピ未習得 or 調合未解放 → 従来通り依頼パネルへ
+        setSelectedQuestId(quest.id);
+        onSelect('quest');
+      }
+    }
   }
 
   const actions: { type: ActionType; label: string; description: string }[] = [
