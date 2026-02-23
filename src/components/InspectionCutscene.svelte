@@ -262,7 +262,7 @@
     <!-- コンテンツ -->
     <div class="content">
       <!-- タイトル -->
-      {#if phase === 'title' || phase === 'criteria' || phase === 'grade'}
+      {#if phase === 'title' || phase === 'criteria' || phase === 'grade' || phase === 'fade-out'}
         <div class="header" class:visible={true}>
           <div class="header-sub">師匠組合 定期査察</div>
           <div class="header-main">{data.month}月末 — {data.title}</div>
@@ -270,7 +270,7 @@
       {/if}
 
       <!-- 評価項目 -->
-      {#if phase === 'criteria' || phase === 'grade'}
+      {#if phase === 'criteria' || phase === 'grade' || phase === 'fade-out'}
         <div class="criteria-list">
           {#each data.criteria as c, i}
             {#if i < revealedCriteria}
@@ -287,10 +287,24 @@
 
       <!-- 総合等級スタンプ -->
       {#if showGrade}
-        <div class="grade-stamp" class:stamped={gradeStamped} class:fail={!data.passed}>
-          <div class="grade-label">総合評価</div>
-          <div class="grade-value" style="color: {gradeColor(data.overallGrade)}">{data.overallGrade}</div>
-          <div class="grade-result">{data.passed ? '合格' : '不合格'}</div>
+        <div class="grade-stamp-wrap">
+          {#if gradeStamped && data.passed}
+            <div class="burst-rays" style="--ray-color: {gradeColor(data.overallGrade)}">
+              {#each Array(8) as _, i}
+                <div class="ray" style="
+                  --angle: {i * 45 + (Math.random() - 0.5) * 20}deg;
+                  --len: {200 + Math.random() * 200}px;
+                  --w: {8 + Math.random() * 60}px;
+                  --opacity: {0.25 + Math.random() * 0.35};
+                " />
+              {/each}
+            </div>
+          {/if}
+          <div class="grade-stamp" class:stamped={gradeStamped} class:fail={!data.passed}>
+            <div class="grade-label">総合評価</div>
+            <div class="grade-value" style="color: {gradeColor(data.overallGrade)}">{data.overallGrade}</div>
+            <div class="grade-result">{data.passed ? '合格' : '不合格'}</div>
+          </div>
         </div>
       {/if}
     </div>
@@ -549,6 +563,48 @@
     font-size: 1.1rem;
     font-weight: bold;
     letter-spacing: 0.05em;
+  }
+
+  /* 放射線 */
+  .grade-stamp-wrap {
+    position: relative;
+  }
+
+  .burst-rays {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    z-index: -1;
+    animation: raysRotate 8s linear infinite, raysFadeIn 0.6s ease-out both;
+  }
+
+  .ray {
+    position: absolute;
+    top: calc(var(--w, 10px) / -2);
+    left: 0;
+    width: var(--len, 300px);
+    height: var(--w, 10px);
+    transform-origin: 0 50%;
+    transform: rotate(var(--angle, 0deg));
+    background: linear-gradient(
+      90deg,
+      var(--ray-color, #ffd700) 0%,
+      transparent 100%
+    );
+    opacity: var(--opacity, 0.4);
+    clip-path: polygon(0 50%, 100% 0, 100% 100%);
+  }
+
+  @keyframes raysRotate {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  @keyframes raysFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   /* 総合等級スタンプ */
