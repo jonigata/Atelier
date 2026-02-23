@@ -11,6 +11,7 @@
   import EndingScreen from '../components/EndingScreen.svelte';
   import EventDialog from '../components/EventDialog.svelte';
   import DayTransition from '../components/DayTransition.svelte';
+  import InspectionCutscene from '../components/InspectionCutscene.svelte';
   import DebugPanel from '../components/DebugPanel.svelte';
   import SaveLoadSidebar from '../components/SaveLoadSidebar.svelte';
   import ToastContainer from '../components/ToastContainer.svelte';
@@ -90,6 +91,9 @@
 
   <!-- 日数経過フィードバック -->
   <DayTransition />
+
+  <!-- 査察カットシーン -->
+  <InspectionCutscene />
 
   <!-- イベントダイアログ（最前面） -->
   <EventDialog />

@@ -328,6 +328,16 @@ export interface GameState {
   // 査察システム
   completedInspections: number[];  // 処理済み査察日の配列
   gameOverReason: string | null;   // ゲームオーバー理由（null=通常）
+  pendingInspectionCutscene: InspectionCutsceneData | null;  // 査察カットシーン用
+}
+
+// 査察カットシーン用データ
+export interface InspectionCutsceneData {
+  month: number;
+  title: string;
+  criteria: { label: string; value: string; grade: string }[];
+  overallGrade: string;
+  passed: boolean;
 }
 
 // 行動タイプ

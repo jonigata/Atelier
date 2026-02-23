@@ -18,7 +18,7 @@ import {
 } from './achievement';
 import { getAchievementById } from '$lib/data/achievements';
 import { INSPECTION_DAYS, inspections, getOverallGrade, getGradeForValue } from '$lib/data/inspection';
-import type { EquipmentDef } from '$lib/models/types';
+import type { EquipmentDef, NarrativeLine, InspectionCutsceneData } from '$lib/models/types';
 import type { EventDialogue } from '$lib/models/types';
 
 // 日数表示の完了を待つための resolver
@@ -26,6 +26,9 @@ let dayTransitionResolver: (() => void) | null = null;
 
 // ダイアログ完了を待つための resolver
 let dialogueResolver: (() => void) | null = null;
+
+// 査察カットシーン完了を待つための resolver
+let inspectionCutsceneResolver: (() => void) | null = null;
 
 /**
  * 日数表示の完了を待つ
@@ -62,6 +65,29 @@ async function waitForDayTransition(): Promise<void> {
 
   return new Promise((resolve) => {
     dayTransitionResolver = resolve;
+  });
+}
+
+/**
+ * 査察カットシーンの完了を待つ
+ * InspectionCutscene.svelte から呼ばれる
+ */
+export function resolveInspectionCutscene(): void {
+  gameState.update((s) => ({ ...s, pendingInspectionCutscene: null }));
+  if (inspectionCutsceneResolver) {
+    inspectionCutsceneResolver();
+    inspectionCutsceneResolver = null;
+  }
+}
+
+/**
+ * 査察カットシーンを表示して完了まで待つ
+ */
+async function showInspectionCutsceneAndWait(data: InspectionCutsceneData): Promise<void> {
+  gameState.update((s) => ({ ...s, pendingInspectionCutscene: data }));
+
+  return new Promise((resolve) => {
+    inspectionCutsceneResolver = resolve;
   });
 }
 
@@ -191,11 +217,11 @@ export async function processInspectionMorning(): Promise<boolean> {
 
     const overallGrade = getOverallGrade(inspection, state);
 
-    // 各項目の結果テキスト
-    const criteriaLines = inspection.criteria.map((c) => {
+    // 各項目の結果データ
+    const criteriaResults = inspection.criteria.map((c) => {
       const value = c.getValue(state);
       const grade = getGradeForValue(c.thresholds, value);
-      return `${c.label}: ${value}${c.unit} → ${grade}等級`;
+      return { label: c.label, value: `${value}${c.unit}`, grade };
     });
 
     const passed = overallGrade !== 'D';
@@ -203,25 +229,43 @@ export async function processInspectionMorning(): Promise<boolean> {
     // 日数表示を待つ
     await waitForDayTransition();
 
-    // 査察ダイアログ表示
-    const lines: string[] = [
-      `${inspection.month}月末の定期査察を執り行います`,
-      criteriaLines.join(' / '),
-      passed
-        ? `総合評価: ${overallGrade}等級。合格です`
-        : `総合評価: ${overallGrade}等級……不合格です`,
-    ];
+    // 1. 導入ダイアログ（クリック送り）
+    await showDialogueAndWait({
+      characterName: '査察官',
+      characterTitle: '師匠組合',
+      characterFaceId: 'inspector',
+      eventImage: '/images/events/inspection_evaluation.png',
+      lines: [
+        { text: `${inspection.month}月末の定期査察を執り行います`, expression: 'neutral' },
+        { text: 'それでは項目ごとに確認します', expression: 'determined' },
+      ],
+    });
 
+    // 2. 査察カットシーン（タイムライン演出 — 将来ムービーに差し替え予定）
+    await showInspectionCutsceneAndWait({
+      month: inspection.month,
+      title: inspection.title,
+      criteria: criteriaResults,
+      overallGrade,
+      passed,
+    });
+
+    // 3. 結果コメント（クリック送り）
+    const verdictLines: NarrativeLine[] = [];
     if (passed) {
-      lines.push('引き続き精進を期待します');
+      verdictLines.push({ text: `以上を踏まえまして、総合${overallGrade}等級。合格です`, expression: 'neutral' });
+      verdictLines.push({ text: '引き続き精進を期待します', expression: 'happy' });
     } else {
-      lines.push('残念ですが、これ以上の活動継続は認められません。召還命令を発行します');
+      verdictLines.push({ text: '以上を踏まえまして……総合D等級。不合格です', expression: 'angry' });
+      verdictLines.push({ text: '残念ですが、これ以上の活動継続は認められません', expression: 'sad' });
+      verdictLines.push({ text: '召還命令を発行します', expression: 'determined' });
     }
 
     await showDialogueAndWait({
       characterName: '査察官',
       characterTitle: '師匠組合',
-      lines,
+      characterFaceId: 'inspector',
+      lines: verdictLines,
     });
 
     // メッセージログに記録
