@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { gameState, clearDayTransition, setPhase, addMessage } from '$lib/stores/game';
+import { gameState, clearDayTransition, setPhase, addMessage, addItem, addMoney, addReputationExp } from '$lib/stores/game';
 import { generateNewQuests } from '$lib/services/gameLoop';
 import { setEventDialogue } from '$lib/stores/tutorial';
 import {
@@ -17,7 +17,9 @@ import {
   preSelectRandomEquipment,
 } from './achievement';
 import { getAchievementById } from '$lib/data/achievements';
-import { INSPECTION_DAYS, inspections, getOverallGrade, getGradeForValue } from '$lib/data/inspection';
+import { INSPECTION_DAYS, inspections, getOverallGrade, getGradeForValue, getInspectionReward } from '$lib/data/inspection';
+import type { InspectionGrade } from '$lib/data/inspection';
+import { getItem } from '$lib/data/items';
 import type { EquipmentDef, NarrativeLine, InspectionCutsceneData } from '$lib/models/types';
 import type { EventDialogue } from '$lib/models/types';
 
@@ -285,6 +287,53 @@ export async function processInspectionSequence(): Promise<boolean> {
 
     // メッセージログに記録
     addMessage(`【査察結果】${inspection.month}月末 ${inspection.title}: 総合${overallGrade}等級${passed ? '（合格）' : '（不合格）'}`);
+
+    // 報酬付与（B等級以上）
+    const reward = passed ? getInspectionReward(inspDay, overallGrade as InspectionGrade) : null;
+    if (reward) {
+      // 報酬ダイアログの台詞を組み立て
+      const rewardLines: NarrativeLine[] = [];
+      rewardLines.push({ text: '組合より支援物資をお届けします', expression: 'neutral' });
+
+      const rewardDescParts: string[] = [];
+      if (reward.money > 0) {
+        rewardDescParts.push(`${reward.money}G`);
+      }
+      for (const ri of reward.items) {
+        const itemDef = getItem(ri.itemId);
+        const name = itemDef?.name ?? ri.itemId;
+        rewardDescParts.push(`${name}(品質${ri.quality})×${ri.quantity}`);
+      }
+      rewardLines.push({ text: rewardDescParts.join('、'), expression: 'neutral' });
+
+      await showDialogueAndWait({
+        characterName: '査察官',
+        characterTitle: '師匠組合',
+        characterFaceId: 'inspector',
+        lines: rewardLines,
+      });
+
+      // 実際に報酬を付与
+      if (reward.money > 0) {
+        addMoney(reward.money);
+      }
+      const currentState = get(gameState);
+      for (const ri of reward.items) {
+        for (let i = 0; i < ri.quantity; i++) {
+          addItem({
+            itemId: ri.itemId,
+            quality: ri.quality,
+            origin: { type: 'reward', day: currentState.day, flavorText: `${inspection.month}月末査察報酬` },
+          });
+        }
+      }
+      if (reward.reputationExp > 0) {
+        addReputationExp(reward.reputationExp);
+      }
+
+      // メッセージログに報酬内容を記録
+      addMessage(`【査察報酬】${rewardDescParts.join('、')}`);
+    }
 
     // completedInspections に追加
     gameState.update((s) => ({
