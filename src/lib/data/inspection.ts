@@ -40,10 +40,9 @@ export const inspections: InspectionDef[] = [
     title: '初回報告',
     criteria: [
       {
-        key: 'level', label: '錬金Lv', unit: '',
-        thresholds: { D: 1, C: 6, B: 6, A: 9, S: 9 },
-        getValue: (s) => calcLevelFromExp(s.alchemyExp),
-        getExpValue: (s) => s.alchemyExp,
+        key: 'album', label: 'アルバム', unit: '種',
+        thresholds: { D: 3, C: 5, B: 8, A: 10, S: 14 },
+        getValue: (s) => s.discoveredItems.length,
       },
       {
         key: 'quests', label: '依頼', unit: '件',
@@ -76,15 +75,19 @@ export const inspections: InspectionDef[] = [
     title: '基礎確認',
     criteria: [
       {
-        key: 'level', label: '錬金Lv', unit: '',
-        thresholds: { D: 6, C: 9, B: 9, A: 12, S: 15 },
-        getValue: (s) => calcLevelFromExp(s.alchemyExp),
-        getExpValue: (s) => s.alchemyExp,
+        key: 'album', label: 'アルバム', unit: '種',
+        thresholds: { D: 14, C: 20, B: 28, A: 35, S: 42 },
+        getValue: (s) => s.discoveredItems.length,
       },
       {
         key: 'quests', label: '依頼', unit: '件',
         thresholds: { D: 6, C: 8, B: 10, A: 12, S: 15 },
         getValue: (s) => s.completedQuestCount,
+      },
+      {
+        key: 'villageDev', label: '村発展Lv', unit: '',
+        thresholds: { D: 3, C: 6, B: 6, A: 9, S: 12 },
+        getValue: (s) => calcLevelFromExp(s.villageExp),
       },
     ],
   },
@@ -105,11 +108,6 @@ export const inspections: InspectionDef[] = [
         getValue: (s) => s.completedQuestCount,
       },
       {
-        key: 'villageDev', label: '村発展Lv', unit: '',
-        thresholds: { D: 6, C: 9, B: 9, A: 12, S: 15 },
-        getValue: (s) => calcLevelFromExp(s.villageExp),
-      },
-      {
         key: 'reputation', label: '名声Lv', unit: '',
         thresholds: { D: 6, C: 9, B: 9, A: 12, S: 15 },
         getValue: (s) => calcLevelFromExp(s.reputationExp),
@@ -123,10 +121,9 @@ export const inspections: InspectionDef[] = [
     title: '中間評価',
     criteria: [
       {
-        key: 'level', label: '錬金Lv', unit: '',
-        thresholds: { D: 12, C: 15, B: 18, A: 21, S: 24 },
-        getValue: (s) => calcLevelFromExp(s.alchemyExp),
-        getExpValue: (s) => s.alchemyExp,
+        key: 'album', label: 'アルバム', unit: '種',
+        thresholds: { D: 38, C: 50, B: 65, A: 80, S: 95 },
+        getValue: (s) => s.discoveredItems.length,
       },
       {
         key: 'quests', label: '依頼', unit: '件',

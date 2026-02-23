@@ -26,6 +26,8 @@ export const ALCHEMY = {
   HIGH_QUALITY_THRESHOLD: 70,
   /** 高品質時の経験値ボーナス係数 */
   HIGH_QUALITY_EXP_BONUS: 1.2,
+  /** 初回アルバム登録時の追加経験値倍率（レシピ基本経験値の400%） */
+  ALBUM_FIRST_CRAFT_EXP_BONUS: 4.0,
 } as const;
 
 // =====================================

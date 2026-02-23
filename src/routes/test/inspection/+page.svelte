@@ -10,6 +10,7 @@
   let quests = $state(0);
   let villageDev = $state(0);    // 村発展Lv (discrete)
   let reputationExp = $state(0); // 名声 生XP
+  let album = $state(2);         // アルバム登録数
   let daysUntil = $state(78);
 
   // XPからレベルを自動計算
@@ -65,6 +66,10 @@
       <input type="range" min="0" max="8000" step="10" bind:value={reputationExp} />
     </label>
     <label>
+      <span>アルバム: {album}種</span>
+      <input type="range" min="0" max="161" bind:value={album} />
+    </label>
+    <label>
       <span>残り日数: {daysUntil}</span>
       <input type="range" min="1" max="90" bind:value={daysUntil} />
     </label>
@@ -81,7 +86,7 @@
       {#key revealKey}
         <InspectionTracker
           {inspection}
-          values={{ level, quests, villageDev, reputation }}
+          values={{ level, quests, villageDev, reputation, album }}
           expValues={{ level: levelExp, reputation: reputationExp }}
           {daysUntil}
           {firstReveal}

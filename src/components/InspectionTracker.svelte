@@ -151,6 +151,16 @@
     return 0;
   }
 
+  // ── アルバム (album) ──
+  // タイルグリッドで収集率を表現。S基準を24分割し、埋まったタイルを等級色で表示
+  const ALBUM_TILES = 24;
+
+  function getAlbumTileColor(tileIndex: number, litCount: number, grade: InspectionGrade): string {
+    if (tileIndex >= litCount) return 'rgba(255,255,255,0.04)';
+    if (grade === 'S') return rainbowPalette[tileIndex % rainbowPalette.length];
+    return gradeColors[grade];
+  }
+
   const rainbowPalette = ['#ff6b6b', '#ffa94d', '#ffd700', '#69db7c', '#74c0fc', '#b197fc', '#da77f2'];
 
   function getPersonColor(index: number, grade: InspectionGrade): string {
@@ -375,6 +385,75 @@
                   <span class:active={info.value >= criterion.thresholds[g]}
                     style="color: {info.value >= criterion.thresholds[g] ? gradeColors[g] : '#404050'}"
                   >{g}:Lv.{criterion.thresholds[g]}</span>
+                {/each}
+              </div>
+            {/if}
+          </div>
+
+        {:else if criterion.key === 'album'}
+          <!-- ═══ アルバム: タイルグリッド ═══ -->
+          {@const litCount = Math.round(info.progress * ALBUM_TILES)}
+          <div class="criterion-card album-card">
+            <div class="criterion-visual">
+              <div class="album-grid">
+                {#each Array(ALBUM_TILES) as _, i}
+                  <div
+                    class="album-tile"
+                    class:lit={i < litCount}
+                    style="background: {getAlbumTileColor(i, litCount, info.grade)};
+                           {i < litCount && info.grade !== 'S' ? `box-shadow: inset 0 0 4px ${gradeColors[info.grade]}44` : ''}
+                           {i < litCount && info.grade === 'S' ? `box-shadow: 0 0 4px ${rainbowPalette[i % rainbowPalette.length]}66` : ''}"
+                  >
+                    {#if i < litCount}
+                      <svg viewBox="0 0 12 12" class="tile-icon">
+                        <circle cx="6" cy="4" r="2.5" fill="rgba(0,0,0,0.3)"/>
+                        <rect x="2" y="7" width="8" height="4" rx="1" fill="rgba(0,0,0,0.2)"/>
+                      </svg>
+                    {/if}
+                  </div>
+                {/each}
+              </div>
+            </div>
+            <div class="criterion-label">
+              <span class="criterion-name">アルバム</span>
+              <span class="criterion-value">{info.value}種</span>
+              <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
+              <span class="criterion-target">目標{criterion.thresholds.S}種</span>
+            </div>
+            {#if expanded}
+              <div class="thresholds">
+                {#each gradeList as g}
+                  <span class:active={info.value >= criterion.thresholds[g]}
+                    style="color: {info.value >= criterion.thresholds[g] ? gradeColors[g] : '#404050'}"
+                  >{g}:{criterion.thresholds[g]}種</span>
+                {/each}
+              </div>
+            {/if}
+          </div>
+
+        {:else}
+          <!-- ═══ 汎用: プログレスバー ═══ -->
+          <div class="criterion-card generic-card">
+            <div class="criterion-visual">
+              <div class="generic-visual">
+                <div class="generic-value-big" style="color: {gradeColors[info.grade]}">{info.value}</div>
+                <div class="generic-bar">
+                  <div class="generic-bar-fill" style="width: {info.progress * 100}%; background: {info.grade === 'S' ? rainbowGrad : `linear-gradient(90deg, ${gradeColors[info.grade]}88, ${gradeColors[info.grade]})`}"></div>
+                </div>
+              </div>
+            </div>
+            <div class="criterion-label">
+              <span class="criterion-name">{criterion.label}</span>
+              <span class="criterion-value">{info.value}{criterion.unit}</span>
+              <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
+              <span class="criterion-target">目標{criterion.thresholds.S}{criterion.unit}</span>
+            </div>
+            {#if expanded}
+              <div class="thresholds">
+                {#each gradeList as g}
+                  <span class:active={info.value >= criterion.thresholds[g]}
+                    style="color: {info.value >= criterion.thresholds[g] ? gradeColors[g] : '#404050'}"
+                  >{g}:{criterion.thresholds[g]}{criterion.unit}</span>
                 {/each}
               </div>
             {/if}
@@ -665,6 +744,65 @@
   .person-svg {
     width: 18px;
     height: 28px;
+  }
+
+  /* ── アルバム (album) ── */
+  .album-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3px;
+    width: 100%;
+    max-width: 130px;
+  }
+
+  .album-tile {
+    aspect-ratio: 1;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+  }
+
+  .album-tile.lit {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .tile-icon {
+    width: 70%;
+    height: 70%;
+    opacity: 0.5;
+  }
+
+  /* ── 汎用 (generic) ── */
+  .generic-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 140px;
+  }
+
+  .generic-value-big {
+    font-size: 1.8rem;
+    font-weight: bold;
+    line-height: 1;
+  }
+
+  .generic-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .generic-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
   }
 
   .expand-hint {
