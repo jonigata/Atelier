@@ -7,8 +7,10 @@
     startAutoplay,
     stopAutoplay,
     getAutoplayState,
+    getAutoplayStats,
     clearLogs,
     type AutoplayLog,
+    type AutoplayStats,
   } from '$lib/services/autoplay';
   import {
     getAllSlotMeta,
@@ -22,6 +24,7 @@
   let isOpen = false;
   let isRunning = false;
   let logs: AutoplayLog[] = [];
+  let stats: AutoplayStats[] = [];
   let speed = 100;
   let maxDays = 27;
   let updateInterval: ReturnType<typeof setInterval>;
@@ -116,6 +119,7 @@
       const state = getAutoplayState();
       isRunning = state.isRunning;
       logs = state.logs;
+      stats = getAutoplayStats();
     }, 100);
   }
 
@@ -276,6 +280,19 @@
         <span>依頼完了:</span><span>{$gameState.completedQuestCount}</span>
       </div>
     </div>
+
+    {#if stats.length > 0}
+      <div class="section">
+        <h4>行動スタッツ ({stats.reduce((s, e) => s + e.days, 0)}日消費)</h4>
+        <div class="stats-grid">
+          {#each stats as stat}
+            <span class="stats-label">{stat.label}</span>
+            <span class="stats-value">{stat.days}日</span>
+            <span class="stats-count">({stat.count}回)</span>
+          {/each}
+        </div>
+      </div>
+    {/if}
 
     <div class="section logs">
       <h4>ログ ({logs.length})</h4>
@@ -494,6 +511,30 @@
 
   .status-grid span:nth-child(odd) {
     color: #888;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 0.15rem 0.5rem;
+    font-size: 0.8rem;
+    font-family: monospace;
+    background: #111;
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+
+  .stats-label {
+    color: #90caf9;
+  }
+
+  .stats-value {
+    color: #c9a959;
+    text-align: right;
+  }
+
+  .stats-count {
+    color: #666;
   }
 
   .logs {

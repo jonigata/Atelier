@@ -19,6 +19,7 @@ export interface AutoplayLog {
   action: string;
   result: 'success' | 'error' | 'info';
   message: string;
+  daysCost?: number;
 }
 
 export interface AutoplayState {
@@ -45,9 +46,47 @@ export function clearLogs(): void {
   autoplayState.logs = [];
 }
 
-function log(action: string, result: 'success' | 'error' | 'info', message: string): void {
+export interface AutoplayStats {
+  action: string;
+  label: string;
+  days: number;
+  count: number;
+}
+
+const ACTION_LABELS: Record<string, string> = {
+  craft: '調合',
+  study: '勉強',
+  rest: '休息',
+  quest: '納品',
+};
+
+export function getAutoplayStats(): AutoplayStats[] {
+  const map = new Map<string, { days: number; count: number }>();
+  for (const log of autoplayState.logs) {
+    if (log.daysCost === undefined) continue;
+    const entry = map.get(log.action) ?? { days: 0, count: 0 };
+    entry.days += log.daysCost;
+    entry.count += 1;
+    map.set(log.action, entry);
+  }
+  // ACTION_LABELSの順序で返す（未知のアクションも末尾に追加）
+  const result: AutoplayStats[] = [];
+  for (const [action, label] of Object.entries(ACTION_LABELS)) {
+    const entry = map.get(action);
+    if (entry) {
+      result.push({ action, label, ...entry });
+      map.delete(action);
+    }
+  }
+  for (const [action, entry] of map) {
+    result.push({ action, label: action, ...entry });
+  }
+  return result;
+}
+
+function log(action: string, result: 'success' | 'error' | 'info', message: string, daysCost?: number): void {
   const state = get(gameState);
-  autoplayState.logs.push({ day: state.day, action, result, message });
+  autoplayState.logs.push({ day: state.day, action, result, message, daysCost });
   console.log(`[Autoplay Day ${state.day}] ${action}: ${message}`);
 }
 
@@ -261,7 +300,7 @@ function tryDeliverQuest(state: GameState): boolean {
       });
 
       const itemDef = items[quest.requiredItemId];
-      log('quest', 'success', `納品「${quest.title}」(${itemDef?.name ?? quest.requiredItemId} x${remaining}) +${quest.rewardMoney}G +${quest.rewardReputation}名声`);
+      log('quest', 'success', `納品「${quest.title}」(${itemDef?.name ?? quest.requiredItemId} x${remaining}) +${quest.rewardMoney}G +${quest.rewardReputation}名声`, 0);
       checkMilestoneProgress();
       endTurn(0);
       return true;
@@ -396,9 +435,9 @@ function tryBuyAndStudy(state: GameState, remainingDays: number): boolean {
 
     if (learned.length > 0) {
       const learnedNames = learned.map(id => recipes[id]?.name ?? id).join(', ');
-      log('study', 'success', `「${book.name}」を勉強 → ${learnedNames}`);
+      log('study', 'success', `「${book.name}」を勉強 → ${learnedNames}`, studyDays);
     } else {
-      log('study', 'info', `「${book.name}」は全て習得済み`);
+      log('study', 'info', `「${book.name}」は全て習得済み`, studyDays);
     }
 
     checkMilestoneProgress();
@@ -788,9 +827,9 @@ function tryCraftBest(state: GameState, remainingDays: number): boolean {
   const name = itemDef?.name ?? bestRecipe.name;
 
   if (result.successCount > 0) {
-    log('craft', 'success', `${name} x${result.successCount}${result.duplicatedCount > 0 ? `(+複製${result.duplicatedCount})` : ''} +${result.totalExpGained}Exp (${bestRecipe.craftDaysTenths}日)`);
+    log('craft', 'success', `${name} x${result.successCount}${result.duplicatedCount > 0 ? `(+複製${result.duplicatedCount})` : ''} +${result.totalExpGained}Exp (${bestRecipe.craftDaysTenths}日)`, bestRecipe.craftDaysTenths);
   } else {
-    log('craft', 'error', `${name}の調合に失敗 +${result.totalExpGained}Exp`);
+    log('craft', 'error', `${name}の調合に失敗 +${result.totalExpGained}Exp`, bestRecipe.craftDaysTenths);
   }
 
   checkMilestoneProgress();
@@ -936,6 +975,6 @@ function doRest(): void {
     stamina: s.maxStamina,
   }));
 
-  log('rest', 'success', '休息');
+  log('rest', 'success', '休息', 1);
   endTurn(1);
 }
