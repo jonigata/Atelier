@@ -59,7 +59,7 @@
     </label>
     <label>
       <span>村発展Lv: {villageDev}</span>
-      <input type="range" min="0" max="10" bind:value={villageDev} />
+      <input type="range" min="0" max="30" bind:value={villageDev} />
     </label>
     <label>
       <span>名声Exp: {reputationExp} (Lv.{reputation})</span>

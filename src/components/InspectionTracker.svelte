@@ -23,7 +23,7 @@
     }
   });
 
-  const gradeList: InspectionGrade[] = ['D', 'C', 'B', 'A', 'S'];
+  const gradeList = ['C', 'B', 'A', 'S'] as const;
 
   const gradeColors: Record<InspectionGrade, string> = {
     D: '#606068', // 鉄
@@ -101,8 +101,7 @@
   // 銅(~D) → 銀(~C) → 金(~B) → 虹(A~S)
   function getStarColor(starIndex: number, criterion: InspectionCriterion): string {
     const i = starIndex + 1; // 1-based
-    if (i <= criterion.thresholds.D) return '#606068'; // 鉄
-    if (i <= criterion.thresholds.C) return '#b87333'; // 銅
+    if (i <= criterion.thresholds.C) return '#b87333'; // 銅（合格ライン）
     if (i <= criterion.thresholds.B) return '#c0c0c0'; // 銀
     if (i <= criterion.thresholds.A) return '#ffd700'; // 金
     return 'url(#rainbow-grad)'; // 虹
@@ -110,7 +109,6 @@
 
   function getStarStroke(starIndex: number, criterion: InspectionCriterion): string {
     const i = starIndex + 1;
-    if (i <= criterion.thresholds.D) return '#404048'; // 鉄
     if (i <= criterion.thresholds.C) return '#8b5a2b'; // 銅
     if (i <= criterion.thresholds.B) return '#909090'; // 銀
     if (i <= criterion.thresholds.A) return '#daa520'; // 金
