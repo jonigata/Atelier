@@ -125,10 +125,10 @@
         id: particleId++,
         x: 5 + Math.random() * 90,  // コンテナ内5%~95%
         y: type === 'firework' ? 20 + Math.random() * 30 : -10 + Math.random() * 25,
-        size: type === 'firework' ? 16 + Math.random() * 16 : type === 'spark' ? 20 + Math.random() * 20 : 56 + Math.random() * 28,
+        size: type === 'firework' ? 16 + Math.random() * 16 : type === 'spark' ? 4 + Math.random() * 6 : 56 + Math.random() * 28,
         color: colors[Math.floor(Math.random() * colors.length)],
         delay: type === 'firework' ? Math.random() * 0.8 : Math.random() * 2.5,
-        duration: type === 'firework' ? 0.6 + Math.random() * 0.4 : type === 'confetti' ? 2.5 + Math.random() * 1.0 : 1.8 + Math.random() * 1.2,
+        duration: type === 'firework' ? 0.6 + Math.random() * 0.4 : type === 'confetti' ? 2.5 + Math.random() * 1.0 : 3.0 + Math.random() * 1.5,
         type,
         rotation: Math.random() * 360,
         rotateX: 360 + Math.random() * 720,
@@ -163,10 +163,10 @@
 
   function gradeParticleTypes(grade: string): Particle['type'][] {
     switch (grade) {
-      case 'S': return ['confetti'];
-      case 'A': return ['confetti'];
-      case 'B': return ['confetti'];
-      case 'C': return ['confetti'];
+      case 'S': return ['confetti', 'confetti', 'confetti', 'spark'];
+      case 'A': return ['confetti', 'confetti', 'spark'];
+      case 'B': return ['confetti', 'confetti', 'spark'];
+      case 'C': return ['confetti', 'spark'];
       default: return ['spark'];
     }
   }
@@ -430,11 +430,16 @@
 
   @keyframes sparkFall {
     0% {
-      opacity: 1;
+      opacity: 0;
       transform: translateY(0) translateX(0) scale(1);
     }
-    30% {
+    8% {
       opacity: 1;
+      transform: translateY(3vh) translateX(calc(var(--drift-px, 0px) * 0.1)) scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: translateY(40vh) translateX(calc(var(--drift-px, 0px) * 0.5)) scale(0.6);
     }
     100% {
       opacity: 0;
