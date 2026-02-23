@@ -220,7 +220,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 350,
     rewardReputation: 5,
     deadlineDays: 15,
-    requiredReputationLevel: 1,
+    requiredReputationLevel: 2,
     clientId: 'org',
   },
   {
@@ -1204,7 +1204,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 220,
     rewardReputation: 5,
     deadlineDays: 12,
-    requiredReputationLevel: 1,
+    requiredReputationLevel: 2,
     clientId: 'melda',
   },
   {
@@ -1249,7 +1249,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 400,
     rewardReputation: 6,
     deadlineDays: 15,
-    requiredReputationLevel: 1,
+    requiredReputationLevel: 2,
     clientId: 'karin',
   },
   {
@@ -1277,7 +1277,7 @@ export const questTemplates: QuestDef[] = [
     rewardMoney: 260,
     rewardReputation: 5,
     deadlineDays: 12,
-    requiredReputationLevel: 1,
+    requiredReputationLevel: 2,
     clientId: 'karin',
   },
   {
