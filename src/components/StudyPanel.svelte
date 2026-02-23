@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameState, addMessage, learnRecipesFromBook, consumeStamina } from '$lib/stores/game';
+  import { gameState, addMessage, learnRecipesFromBook, consumeStamina, skipPresentation } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
   import { books } from '$lib/data/books';
@@ -51,7 +51,7 @@
       addMessage('体力が足りません。休息して体力を回復しましょう。');
       return;
     }
-    if ($gameState.skipPresentation) {
+    if ($skipPresentation) {
       onVideoEnd();
       return;
     }
@@ -71,7 +71,7 @@
       addMessage(`「${selectedBook.name}」を読みましたが、すでに全てのレシピを習得済みでした。`);
     }
 
-    if ($gameState.skipPresentation) {
+    if ($skipPresentation) {
       const days = getStudyDays(selectedBook);
       endTurn(days);
       selectedBookId = null;

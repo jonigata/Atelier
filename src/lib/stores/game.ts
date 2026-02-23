@@ -73,8 +73,6 @@ function createInitialState(): GameState {
       inventoryOpened: false,
     },
 
-    skipPresentation: false,
-
     completedInspections: [],
     gameOverReason: null,
     pendingInspectionCutscene: null,
@@ -364,13 +362,12 @@ export function resetGame(): void {
 }
 
 // =====================================
-// 演出スキップ
+// 演出スキップ（セーブデータに含めない）
 // =====================================
 
+export const skipPresentation = writable(false);
+
 export function toggleSkipPresentation(): void {
-  gameState.update((state) => ({
-    ...state,
-    skipPresentation: !state.skipPresentation,
-  }));
+  skipPresentation.update((v) => !v);
 }
 

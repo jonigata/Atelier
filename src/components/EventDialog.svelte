@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { gameState, addMessage } from '$lib/stores/game';
+  import { gameState, addMessage, skipPresentation } from '$lib/stores/game';
   import { resolveDialogue } from '$lib/services/presentation';
   import { skipOpening } from '$lib/services/gameLoop';
   import { getItemIcon, handleIconError } from '$lib/data/items';
@@ -124,7 +124,7 @@
   }
 
   // スキップモードが変わったときの処理
-  $: if (dialogue && $gameState.skipPresentation && !closing) {
+  $: if (dialogue && $skipPresentation && !closing) {
     closing = true;
     stopTimer();
     timer = setTimeout(() => {
@@ -214,7 +214,7 @@
     showcaseIndex = 0;
 
     // 報酬情報をメッセージログに出力（スキップモード時の情報保持）
-    if ($gameState.skipPresentation && dialogue?.structuredRewards && dialogue.structuredRewards.length > 0) {
+    if ($skipPresentation && dialogue?.structuredRewards && dialogue.structuredRewards.length > 0) {
       const rewardsText = dialogue.structuredRewards
         .map(r => r.text)
         .join(' / ');

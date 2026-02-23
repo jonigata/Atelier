@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { gameState, markInventoryOpened } from '$lib/stores/game';
+  import { gameState, markInventoryOpened, skipPresentation } from '$lib/stores/game';
   import { initializeGame } from '$lib/services/gameLoop';
   import { checkMilestoneProgress } from '$lib/services/tutorial';
   import HUD from '../components/HUD.svelte';
@@ -26,10 +26,7 @@
     // URLパラメータで演出スキップを制御
     const params = new URLSearchParams(window.location.search);
     if (params.get('skipPresentation') === 'true') {
-      gameState.update((state) => ({
-        ...state,
-        skipPresentation: true,
-      }));
+      skipPresentation.set(true);
     }
 
     // ブラウザの戻る/進むナビゲーションを全て防止

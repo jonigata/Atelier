@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameState } from '$lib/stores/game';
+  import { gameState, skipPresentation } from '$lib/stores/game';
   import { resolveInspectionCutscene } from '$lib/services/presentation';
   import type { InspectionCutsceneData } from '$lib/models/types';
 
@@ -58,7 +58,7 @@
     particles = [];
 
     // 演出スキップ
-    if ($gameState.skipPresentation) {
+    if ($skipPresentation) {
       after(50, finish);
       return;
     }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameState, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel, toggleSkipPresentation } from '$lib/stores/game';
+  import { gameState, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel, skipPresentation, toggleSkipPresentation } from '$lib/stores/game';
   import { calcExpForLevel, calcExpProgress } from '$lib/data/balance';
   import MoneyIndicator from './MoneyIndicator.svelte';
 
@@ -13,7 +13,7 @@
       <label class="skip-checkbox">
         <input
           type="checkbox"
-          checked={$gameState.skipPresentation}
+          checked={$skipPresentation}
           on:change={toggleSkipPresentation}
         />
         <span>演出スキップ</span>

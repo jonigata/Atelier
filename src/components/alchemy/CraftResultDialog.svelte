@@ -33,7 +33,7 @@
   let mounted = false;
 
   import { onMount } from 'svelte';
-  import { gameState } from '$lib/stores/game';
+  import { skipPresentation } from '$lib/stores/game';
 
   function onVideoEnded() {
     phase = 'reveal';
@@ -50,7 +50,7 @@
 
   onMount(() => {
     // 演出スキップ時は動画をスキップして即座に結果表示
-    if ($gameState.skipPresentation) {
+    if ($skipPresentation) {
       onVideoEnded();
       return;
     }

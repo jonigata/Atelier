@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameState, addMessage, restoreStamina } from '$lib/stores/game';
+  import { gameState, addMessage, restoreStamina, skipPresentation } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { getFatigueLabel } from '$lib/services/alchemy';
   import VideoOverlay from './common/VideoOverlay.svelte';
@@ -13,7 +13,7 @@
   let showVideo = false;
 
   function handleRest() {
-    if ($gameState.skipPresentation) {
+    if ($skipPresentation) {
       onVideoEnd();
       return;
     }

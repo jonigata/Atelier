@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameState } from '$lib/stores/game';
+  import { gameState, skipPresentation } from '$lib/stores/game';
   import { resolveDayTransition } from '$lib/services/presentation';
   import { INSPECTION_DAYS } from '$lib/data/inspection';
 
@@ -40,7 +40,7 @@
     showText = false;
 
     // 演出スキップがオンの場合
-    if ($gameState.skipPresentation) {
+    if ($skipPresentation) {
       timers.push(setTimeout(() => { visible = false; fading = null; transitioning = false; resolveDayTransition(); }, 50));
       return;
     }
