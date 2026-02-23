@@ -209,7 +209,7 @@ async function executeAction(state: GameState, remainingDays: number): Promise<v
 
   // 1. 納品可能な依頼を全て処理
   if (unlocked.includes('quest') && state.activeQuests.length > 0) {
-    if (tryDeliverQuest(state)) return;
+    if (await tryDeliverQuest(state)) return;
   }
 
   // 2. 余剰品を売却して資金確保
@@ -219,7 +219,7 @@ async function executeAction(state: GameState, remainingDays: number): Promise<v
 
   // 3. レシピ本を購入・勉強（未習得レシピがある本を優先）
   if (unlocked.includes('study')) {
-    if (tryBuyAndStudy(state, remainingDays)) return;
+    if (await tryBuyAndStudy(state, remainingDays)) return;
   }
 
   // 4. 依頼受注（達成可能な依頼を優先）
@@ -234,7 +234,7 @@ async function executeAction(state: GameState, remainingDays: number): Promise<v
 
   // 6. 最高効率のレシピを調合
   if (unlocked.includes('alchemy') && state.knownRecipes.length > 0) {
-    if (tryCraftBest(state, remainingDays)) return;
+    if (await tryCraftBest(state, remainingDays)) return;
   }
 
   // 7. 採取隊を派遣
@@ -250,19 +250,19 @@ async function executeAction(state: GameState, remainingDays: number): Promise<v
 
   // 8. 体力が低ければ休息
   if (unlocked.includes('rest') && state.stamina < 30) {
-    doRest();
+    await doRest();
     return;
   }
 
   // 9. フォールバック: 休息して日を進める
-  doRest();
+  await doRest();
 }
 
 // =====================================================================
 // 依頼納品
 // =====================================================================
 
-function tryDeliverQuest(state: GameState): boolean {
+async function tryDeliverQuest(state: GameState): Promise<boolean> {
   for (const quest of state.activeQuests) {
     const matchingItems = state.inventory.filter(item => {
       if (item.itemId !== quest.requiredItemId) return false;
@@ -302,7 +302,7 @@ function tryDeliverQuest(state: GameState): boolean {
       const itemDef = items[quest.requiredItemId];
       log('quest', 'success', `納品「${quest.title}」(${itemDef?.name ?? quest.requiredItemId} x${remaining}) +${quest.rewardMoney}G +${quest.rewardReputation}名声`, 0);
       checkMilestoneProgress();
-      endTurn(0);
+      await endTurn(0);
       return true;
     }
   }
@@ -387,7 +387,7 @@ function isNeededAsIngredient(itemId: string, state: GameState): boolean {
 // レシピ本購入 & 勉強
 // =====================================================================
 
-function tryBuyAndStudy(state: GameState, remainingDays: number): boolean {
+async function tryBuyAndStudy(state: GameState, remainingDays: number): Promise<boolean> {
   const villageLv = calcLevelFromExp(state.villageExp);
   const alchemyLv = calcLevelFromExp(state.alchemyExp);
   const availableBooks = getShopBooks(villageLv);
@@ -441,7 +441,7 @@ function tryBuyAndStudy(state: GameState, remainingDays: number): boolean {
     }
 
     checkMilestoneProgress();
-    endTurn(studyDays);
+    await endTurn(studyDays);
     return true;
   }
 
@@ -690,7 +690,7 @@ function getCraftCandidates(state: GameState): { recipe: RecipeDef; missingItems
 // 調合（最高効率レシピ選択）
 // =====================================================================
 
-function tryCraftBest(state: GameState, remainingDays: number): boolean {
+async function tryCraftBest(state: GameState, remainingDays: number): Promise<boolean> {
   const alchemyLv = calcLevelFromExp(state.alchemyExp);
 
   // 調合可能なレシピを全て取得（残り日数内に収まるもののみ）
@@ -833,7 +833,7 @@ function tryCraftBest(state: GameState, remainingDays: number): boolean {
   }
 
   checkMilestoneProgress();
-  endTurn(bestRecipe.craftDaysTenths);
+  await endTurn(bestRecipe.craftDaysTenths);
   return true;
 }
 
@@ -969,12 +969,12 @@ function getNeededMaterials(state: GameState): Set<string> {
 // 休息
 // =====================================================================
 
-function doRest(): void {
+async function doRest(): Promise<void> {
   gameState.update(s => ({
     ...s,
     stamina: s.maxStamina,
   }));
 
   log('rest', 'success', '休息', 1);
-  endTurn(1);
+  await endTurn(1);
 }
