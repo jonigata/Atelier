@@ -4,7 +4,7 @@
   "money": 500,
   "reputationExp": 0,
   "villageExp": 0,
-  "alchemyExp": 10,
+  "alchemyExp": 12,
   "stamina": 72,
   "maxStamina": 100,
   "inventory": [
@@ -18,39 +18,31 @@
     { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 3, "flavorText": "師匠イリーナからの仕送り" } },
     { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 3, "flavorText": "師匠イリーナからの仕送り" } },
     { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 3, "flavorText": "師匠イリーナからの仕送り" } },
-    { "itemId": "potion_01", "quality": 55, "origin": { "type": "crafted", "day": 3, "flavorText": "慎重に仕上げた一品" } },
+    { "itemId": "potion_01", "quality": 71, "origin": { "type": "crafted", "day": 3, "flavorText": "慎重に仕上げた一品" } },
     { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
     { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
     { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
     { "itemId": "ore_01", "quality": 40, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
-    { "itemId": "ore_01", "quality": 40, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } }
+    { "itemId": "ore_01", "quality": 40, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
+    { "itemId": "water_02", "quality": 80, "origin": { "type": "reward", "day": 4, "flavorText": "工房の棚の奥から見つけた" } }
   ],
   "ownedBooks": ["book_basics"],
-  "knownRecipes": ["potion_01", "antidote"],
+  "knownRecipes": ["potion_01", "plant_oil", "charcoal", "rope"],
   "activeQuests": [],
   "availableQuests": [
     {
-      "id": "quest_potion_basic",
-      "title": "回復薬を届けて！",
-      "description": "村の診療所で回復薬が足りないんだ。",
+      "id": "quest_mayor_first",
+      "title": "村長の頼みごと",
+      "description": "新しい先生に頼みたいことがあるんだ。回復薬を作ってくれないか",
+      "completionMessage": "ありがとう。やっぱり錬金術師が村にいると心強いな",
       "type": "deliver",
       "requiredItemId": "potion_01",
-      "requiredQuantity": 3,
-      "rewardMoney": 200,
-      "rewardReputation": 5,
-      "deadlineDays": 10
-    },
-    {
-      "id": "quest_potion_quality",
-      "title": "良質な回復薬を",
-      "description": "村長への贈り物にしたいんだ。品質の良いものを頼む。",
-      "type": "quality",
-      "requiredItemId": "potion_01",
       "requiredQuantity": 1,
-      "requiredQuality": 50,
-      "rewardMoney": 300,
-      "rewardReputation": 8,
-      "deadlineDays": 12
+      "rewardMoney": 80,
+      "rewardReputation": 3,
+      "deadlineDays": 30,
+      "requiredReputationLevel": 1,
+      "clientId": "mayor"
     }
   ],
   "completedQuestCount": 0,
@@ -59,9 +51,9 @@
   "selectedQuestId": null,
   "expedition": null,
   "craftedItems": ["potion_01"],
-  "discoveredItems": ["herb_01", "water_01", "potion_01", "ore_01"],
+  "discoveredItems": ["herb_01", "water_01", "potion_01", "ore_01", "water_02"],
   "facilities": [],
-  "ownedEquipment": [],
+  "ownedEquipment": ["measuring_cup"],
   "activeCauldron": null,
   "shopEquipment": [],
   "merchantLineup": null,
@@ -71,7 +63,11 @@
   "messageLog": [
     "ゲームを開始しました。",
     "フォンテ村での1年間が始まります。",
-    "--- チュートリアルをスキップしました ---"
+    "休息しました。体力が全回復しました。",
+    "--- 2日目の朝 ---",
+    "「錬金術入門」を読破！ 回復薬、植物油、木炭、麻縄のレシピを習得しました！",
+    "--- 3日目の朝 ---",
+    "--- 4日目の朝 ---"
   ],
   "pendingDayTransition": null,
   "tutorialProgress": {
@@ -84,7 +80,8 @@
       "ach_check_inventory",
       "ach_story_village_girl_cold",
       "ach_first_recipe",
-      "ach_first_craft"
+      "ach_first_craft",
+      "ach_quality_70"
     ],
     "pendingReward": null
   },
@@ -92,8 +89,12 @@
     "totalCraftCount": 1,
     "totalExpeditionCount": 0,
     "consecutiveQuestSuccess": 0,
-    "highestQualityCrafted": 55,
+    "highestQualityCrafted": 71,
     "totalSalesAmount": 0,
     "inventoryOpened": true
-  }
+  },
+  "completedInspections": [],
+  "gameOverReason": null,
+  "pendingInspectionCutscene": null,
+  "inspectionBackdrop": false
 }
