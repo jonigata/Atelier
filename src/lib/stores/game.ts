@@ -78,6 +78,7 @@ function createInitialState(): GameState {
     completedInspections: [],
     gameOverReason: null,
     pendingInspectionCutscene: null,
+    inspectionBackdrop: false,
   };
 }
 

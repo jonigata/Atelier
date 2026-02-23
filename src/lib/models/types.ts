@@ -329,6 +329,7 @@ export interface GameState {
   completedInspections: number[];  // 処理済み査察日の配列
   gameOverReason: string | null;   // ゲームオーバー理由（null=通常）
   pendingInspectionCutscene: InspectionCutsceneData | null;  // 査察カットシーン用
+  inspectionBackdrop: boolean;  // 査察シーケンス中の黒オーバーレイ
 }
 
 // 査察カットシーン用データ

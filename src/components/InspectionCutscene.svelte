@@ -64,7 +64,8 @@
     }
 
     if (data?.mode === 'movie') {
-      phase = 'movie';
+      phase = 'fade-in';
+      after(500, () => { phase = 'movie'; });
     } else {
       startEvaluationTimeline();
     }
@@ -213,6 +214,10 @@
   }
 </script>
 
+{#if $gameState.inspectionBackdrop}
+  <div class="inspection-backdrop" />
+{/if}
+
 {#if visible && data}
   <div
     class="cutscene-overlay"
@@ -353,6 +358,14 @@
 {/if}
 
 <style>
+  .inspection-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: #000;
+    pointer-events: all;
+  }
+
   .cutscene-overlay {
     position: fixed;
     top: 0;

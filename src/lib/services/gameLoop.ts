@@ -19,7 +19,7 @@ import { getAvailableQuestTemplates, questTemplates } from '$lib/data/quests';
 import { EXPEDITION, QUEST, calcLevelFromExp } from '$lib/data/balance';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import { checkAutoCompleteAchievements } from '$lib/services/tutorial';
-import { processMorningAchievements, processInspectionMorning } from '$lib/services/presentation';
+import { processMorningAchievements, processInspectionSequence } from '$lib/services/presentation';
 import { checkMerchantEvents } from '$lib/services/merchant';
 import { expeditionFlavors, pickRandom } from '$lib/data/flavorTexts';
 import { getExpeditionDropsMult, getExpeditionRareBonus } from '$lib/services/equipmentEffects';
@@ -31,7 +31,7 @@ import skipDataJson from '$lib/data/skipData.json';
  * ゲームループのメイン処理
  * 行動後に呼び出され、時間を進めて朝のフェーズに移行する
  */
-export function endTurn(daysSpent: number): void {
+export async function endTurn(daysSpent: number): Promise<void> {
   if (daysSpent > 0) {
     advanceDay(daysSpent);
   }
@@ -44,6 +44,10 @@ export function endTurn(daysSpent: number): void {
     addMessage('1年が経過しました。最終評価を行います...');
     return;
   }
+
+  // 査察シーケンス（DayTransition完了後、朝画面の前に全て実行）
+  const gameOver = await processInspectionSequence();
+  if (gameOver) return;
 
   // 朝のフェーズに移行
   processMorningPhase();
@@ -287,8 +291,6 @@ export function generateNewQuests(): void {
 export function startActionPhase(): void {
   clearMorningEvents();
   setPhase('action');
-  // 査察チェック（朝イベント確認後にダイアログ表示）
-  processInspectionMorning();
 }
 
 /**

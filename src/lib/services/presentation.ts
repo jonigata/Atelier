@@ -193,10 +193,11 @@ export async function processActionComplete(): Promise<void> {
 }
 
 /**
- * 査察の朝処理
- * 査察日の翌朝に査察結果を告げる。D等級ならゲームオーバー。
+ * 査察シーケンス全体（日送り直後、朝画面の前に実行）
+ * ムービー → 導入ダイアログ → 評価カットシーン → 結果ダイアログ を一連で再生。
+ * ホーム画面が見えないまま全て完了する。
  */
-export async function processInspectionMorning(): Promise<boolean> {
+export async function processInspectionSequence(): Promise<boolean> {
   const state = get(gameState);
 
   // 査察制度が未説明（ach_inspection_intro 未完了）ならスキップ
@@ -210,6 +211,12 @@ export async function processInspectionMorning(): Promise<boolean> {
   );
 
   if (pendingDays.length === 0) return false;
+
+  // 黒オーバーレイON（DayTransitionの裏でホーム画面を隠す）
+  gameState.update((s) => ({ ...s, inspectionBackdrop: true }));
+
+  // 日数表示を待つ
+  await waitForDayTransition();
 
   for (const inspDay of pendingDays) {
     const inspection = inspections.find((i) => i.day === inspDay);
@@ -225,9 +232,6 @@ export async function processInspectionMorning(): Promise<boolean> {
     });
 
     const passed = overallGrade !== 'D';
-
-    // 日数表示を待つ
-    await waitForDayTransition();
 
     // 1. 査察官が歩いてくるムービー
     await showInspectionCutsceneAndWait({
@@ -292,6 +296,7 @@ export async function processInspectionMorning(): Promise<boolean> {
     if (!passed) {
       gameState.update((s) => ({
         ...s,
+        inspectionBackdrop: false,
         gameOverReason: `${inspection.month}月末の査察で不合格（D等級）となり、召還されました。`,
       }));
       setPhase('ending');
@@ -299,6 +304,8 @@ export async function processInspectionMorning(): Promise<boolean> {
     }
   }
 
+  // 黒オーバーレイOFF
+  gameState.update((s) => ({ ...s, inspectionBackdrop: false }));
   return false;
 }
 
