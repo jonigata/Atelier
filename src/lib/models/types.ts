@@ -332,12 +332,15 @@ export interface GameState {
 
 // 査察カットシーン用データ
 export interface InspectionCutsceneData {
-  mode: 'movie' | 'evaluation';
+  mode: 'movie' | 'evaluation' | 'reward';
   month: number;
   title: string;
   criteria: { label: string; value: string; grade: string }[];
   overallGrade: string;
   passed: boolean;
+  /** reward モード用 */
+  rewardItems?: { itemId: string; name: string; quality: number; quantity: number }[];
+  rewardMoney?: number;
 }
 
 // 行動タイプ

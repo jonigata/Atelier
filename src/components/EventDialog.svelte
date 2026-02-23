@@ -3,10 +3,11 @@
   import { gameState, addMessage, skipPresentation } from '$lib/stores/game';
   import { resolveDialogue } from '$lib/services/presentation';
   import { skipOpening } from '$lib/services/gameLoop';
-  import { getItemIcon, handleIconError } from '$lib/data/items';
+  import { handleIconError } from '$lib/data/items';
   import ItemCard from './common/ItemCard.svelte';
   import AnimatedGauge from './common/AnimatedGauge.svelte';
   import AchievementCategoryIcon from './common/AchievementCategoryIcon.svelte';
+  import StampRush from './common/StampRush.svelte';
   import type { NarrativeLine } from '$lib/models/types';
 
   function getLineText(line: NarrativeLine): string {
@@ -42,56 +43,13 @@
   let showcasePhase: 'in' | 'show' | 'out' = 'in';
 
   // スタンプ演出（アイテム取得時、個数分ペタペタ表示）
-  interface Stamp {
-    id: number;
-    x: number; // px（中央からのオフセット）
-    y: number; // px
-    delay: number;
-    rotation: number;
-  }
-  let stamps: Stamp[] = [];
-  let stampIdCounter = 0;
+  let stampRushRef: StampRush;
+  let stampRushItems: { itemId: string; quantity: number }[] = [];
+  let stampRushActive = false;
 
   function getRewardQuantity(text: string): number {
     const m = text.match(/[×x](\d+)/);
     return m ? parseInt(m[1], 10) : 1;
-  }
-
-  function spawnStamps(count: number) {
-    const sX = 300, sY = 200;
-    const newStamps: Stamp[] = [];
-
-    if (count === 1) {
-      newStamps.push({ id: stampIdCounter++, x: 0, y: 0, delay: 0, rotation: 0 });
-    } else {
-      const cols = Math.max(1, Math.round(Math.sqrt(count * (sX / sY))));
-      const rows = Math.max(1, Math.ceil(count / cols));
-      const cellW = sX / cols;
-      const cellH = sY / rows;
-
-      let placed = 0;
-      for (let row = 0; row < rows && placed < count; row++) {
-        for (let col = 0; col < cols && placed < count; col++) {
-          const cx = -sX / 2 + (col + 0.5) * cellW;
-          const cy = -sY / 2 + (row + 0.5) * cellH;
-          newStamps.push({
-            id: stampIdCounter++,
-            x: cx + (Math.random() - 0.5) * cellW * 0.8,
-            y: cy + (Math.random() - 0.5) * cellH * 0.8,
-            delay: placed * 0.1,
-            rotation: (Math.random() - 0.5) * 30,
-          });
-          placed++;
-        }
-      }
-    }
-    for (let i = newStamps.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      const tmp = newStamps[i].delay;
-      newStamps[i].delay = newStamps[j].delay;
-      newStamps[j].delay = tmp;
-    }
-    stamps = newStamps;
   }
 
   $: dialogue = $gameState.tutorialProgress.pendingDialogue;
@@ -119,7 +77,8 @@
     closing = false;
     showcaseIndex = 0;
     showcasePhase = 'in';
-    stamps = [];
+    stampRushActive = false;
+    stampRushItems = [];
     stopTimer();
   }
 
@@ -148,14 +107,17 @@
 
   function showReward() {
     showcasePhase = 'in';
-    stamps = [];
+    stampRushActive = false;
+    stampRushItems = [];
+    if (stampRushRef) stampRushRef.reset();
     timer = setTimeout(() => {
       showcasePhase = 'show';
       // アイテム報酬ならスタンプ演出
       const reward = allRewards[showcaseIndex];
       if (reward && reward.itemId) {
         const qty = getRewardQuantity(reward.text);
-        spawnStamps(qty);
+        stampRushItems = [{ itemId: reward.itemId, quantity: qty }];
+        stampRushActive = true;
       }
       // クリック待ち（自動進行しない）
     }, 100);
@@ -164,7 +126,9 @@
   function hideReward() {
     stopTimer();
     showcasePhase = 'out';
-    stamps = [];
+    stampRushActive = false;
+    stampRushItems = [];
+    if (stampRushRef) stampRushRef.reset();
     timer = setTimeout(() => {
       showcaseIndex++;
       if (showcaseIndex >= allRewards.length) {
@@ -334,19 +298,11 @@
                 <div class="showcase-subtitle">{reward.subtitle}</div>
               {/if}
             {:else}
-              <div class="stamps-zone">
-                {#if stamps.length > 0 && reward.itemId}
-                  {#each stamps as s (s.id)}
-                    <img
-                      class="stamp"
-                      src={getItemIcon(reward.itemId)}
-                      alt=""
-                      style="left: calc(50% + {s.x}px); top: calc(50% + {s.y}px); --delay: {s.delay}s; --rot: {s.rotation}deg;"
-                      on:error={handleIconError}
-                    />
-                  {/each}
-                {/if}
-              </div>
+              <StampRush
+                bind:this={stampRushRef}
+                items={stampRushItems}
+                active={stampRushActive}
+              />
               <div class="showcase-text">{reward.text}</div>
               {#if reward.subtitle}
                 <div class="showcase-subtitle">{reward.subtitle}</div>
@@ -768,42 +724,4 @@
     margin-top: 0.5rem;
   }
 
-  /* ========== スタンプ演出（アイテム取得） ========== */
-  .stamps-zone {
-    position: relative;
-    width: 100%;
-    height: 250px;
-    pointer-events: none;
-  }
-
-  .stamp {
-    position: absolute;
-    width: 170px;
-    height: 170px;
-    object-fit: contain;
-    transform: translate(-50%, -50%) rotate(var(--rot)) scale(0);
-    animation: stampIn 0.15s ease-out forwards;
-    animation-delay: var(--delay);
-    pointer-events: none;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
-    opacity: 0;
-  }
-
-  @keyframes stampIn {
-    0% {
-      transform: translate(-50%, -50%) rotate(var(--rot)) scale(0);
-      opacity: 0;
-    }
-    40% {
-      opacity: 0.85;
-    }
-    60% {
-      transform: translate(-50%, -50%) rotate(var(--rot)) scale(1.15);
-      opacity: 0.85;
-    }
-    100% {
-      transform: translate(-50%, -50%) rotate(var(--rot)) scale(1);
-      opacity: 0.8;
-    }
-  }
 </style>

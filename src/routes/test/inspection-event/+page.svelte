@@ -4,6 +4,8 @@
   import { gameState } from '$lib/stores/game';
   import { setEventDialogue } from '$lib/stores/tutorial';
   import { resolveInspectionCutscene } from '$lib/services/presentation';
+  import { getInspectionReward } from '$lib/data/inspection';
+  import { getItem } from '$lib/data/items';
   import InspectionCutscene from '../../../components/InspectionCutscene.svelte';
   import EventDialog from '../../../components/EventDialog.svelte';
   import type { InspectionCutsceneData, NarrativeLine } from '$lib/models/types';
@@ -137,6 +139,38 @@
       lines: verdictLines,
     });
   }
+
+  // 報酬カットシーンのみ再生
+  function showReward() {
+    const month = selectedMonth;
+    const grade = selectedGrade;
+    const m = months.find((m) => m.month === month)!;
+    const day = [28, 56, 84, 140, 196, 252][months.indexOf(m)];
+    const reward = getInspectionReward(day, grade);
+    if (!reward) {
+      alert('この等級には報酬がありません（C/D等級）');
+      return;
+    }
+
+    const rewardItemsData = reward.items.map((ri) => {
+      const itemDef = getItem(ri.itemId);
+      return { itemId: ri.itemId, name: itemDef?.name ?? ri.itemId, quality: ri.quality, quantity: ri.quantity };
+    });
+
+    gameState.update((s) => ({
+      ...s,
+      pendingInspectionCutscene: {
+        mode: 'reward' as const,
+        month,
+        title: m.title,
+        criteria: [],
+        overallGrade: grade,
+        passed: true,
+        rewardItems: rewardItemsData,
+        rewardMoney: reward.money,
+      },
+    }));
+  }
 </script>
 
 <div class="test-page">
@@ -176,6 +210,9 @@
     </button>
     <button class="show-btn" onclick={showMovie}>
       ムービーのみ
+    </button>
+    <button class="show-btn" onclick={showReward}>
+      報酬のみ
     </button>
     <span class="hint">
       {selectedGrade === 'D' ? '不合格パターン' : `${selectedGrade}等級 合格パターン`}

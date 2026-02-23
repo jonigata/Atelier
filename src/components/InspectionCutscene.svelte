@@ -1,6 +1,8 @@
 <script lang="ts">
   import { gameState, skipPresentation } from '$lib/stores/game';
   import { resolveInspectionCutscene } from '$lib/services/presentation';
+  import PopIn from './common/PopIn.svelte';
+  import StampRush from './common/StampRush.svelte';
   import type { InspectionCutsceneData } from '$lib/models/types';
 
   let visible = false;
@@ -8,7 +10,10 @@
   let timers: ReturnType<typeof setTimeout>[] = [];
 
   // 演出フェーズ
-  let phase: 'movie' | 'fade-in' | 'image' | 'title' | 'criteria' | 'grade' | 'fade-out' | 'idle' = 'idle';
+  type Phase = 'movie' | 'fade-in' | 'image' | 'title' | 'criteria' | 'grade'
+    | 'reward-title' | 'reward-money' | 'reward-items' | 'reward-hold'
+    | 'fade-out' | 'idle';
+  let phase: Phase = 'idle';
   let data: InspectionCutsceneData | null = null;
   let revealedCriteria = 0;
   let showGrade = false;
@@ -34,6 +39,12 @@
   let particles: Particle[] = [];
   let particleId = 0;
 
+  // 報酬演出用
+  let rewardMoneyStamped = false;
+  let stampRushActive = false;
+  let stampRushDone = false;
+  let stampRushRef: StampRush;
+
   $: if ($gameState.pendingInspectionCutscene && !transitioning) {
     data = $gameState.pendingInspectionCutscene;
     startCutscene();
@@ -55,6 +66,10 @@
     revealedCriteria = 0;
     showGrade = false;
     gradeStamped = false;
+    rewardMoneyStamped = false;
+    stampRushActive = false;
+    stampRushDone = false;
+    if (stampRushRef) stampRushRef.reset();
     particles = [];
 
     // 演出スキップ
@@ -66,6 +81,8 @@
     if (data?.mode === 'movie') {
       phase = 'fade-in';
       after(500, () => { phase = 'movie'; });
+    } else if (data?.mode === 'reward') {
+      startRewardTimeline();
     } else {
       startEvaluationTimeline();
     }
@@ -128,6 +145,52 @@
 
     // ホールド（エフェクト分長めに）
     t += 4000;
+
+    // フェードアウト
+    after(t, () => { phase = 'fade-out'; });
+    t += 600;
+    after(t, finish);
+  }
+
+  function startRewardTimeline() {
+    phase = 'fade-in';
+
+    // 連打にかかる時間を計算
+    const totalItems = (data?.rewardItems ?? []).reduce((sum, i) => sum + i.quantity, 0);
+    const stampInterval = 60;
+    const stampDuration = totalItems * stampInterval;
+
+    let t = 0;
+
+    // フェードイン → 背景表示
+    t += 500;
+    after(t, () => { phase = 'image'; });
+
+    // タイトル「組合支援物資」
+    t += 600;
+    after(t, () => { phase = 'reward-title'; });
+
+    // 金額スタンプ
+    if (data?.rewardMoney && data.rewardMoney > 0) {
+      t += 800;
+      after(t, () => { phase = 'reward-money'; });
+      t += 150;
+      after(t, () => { rewardMoneyStamped = true; });
+    }
+
+    // StampRush 開始
+    t += 500;
+    after(t, () => { stampRushActive = true; });
+    t += stampDuration;
+
+    // パーティクル（StampRush の onComplete でも stampRushDone を立てる）
+    t += 300;
+    after(t, () => {
+      if (data) spawnCelebration(data.overallGrade);
+    });
+
+    // ホールド
+    t += 3500;
 
     // フェードアウト
     after(t, () => { phase = 'fade-out'; });
@@ -346,12 +409,50 @@
               {/each}
             </div>
           {/if}
-          <div class="grade-stamp" class:stamped={gradeStamped} class:fail={!data.passed}>
-            <div class="grade-label">総合評価</div>
-            <div class="grade-value" style="color: {gradeColor(data.overallGrade)}">{data.overallGrade}</div>
-            <div class="grade-result">{data.passed ? '合格' : '不合格'}</div>
-          </div>
+          <PopIn stamped={gradeStamped}>
+            <div class="grade-stamp" class:fail={!data.passed}>
+              <div class="grade-label">総合評価</div>
+              <div class="grade-value" style="color: {gradeColor(data.overallGrade)}">{data.overallGrade}</div>
+              <div class="grade-result">{data.passed ? '合格' : '不合格'}</div>
+            </div>
+          </PopIn>
         </div>
+      {/if}
+
+      <!-- 報酬表示 -->
+      {#if data.mode === 'reward'}
+        {#if phase === 'reward-title' || phase === 'reward-money' || phase === 'reward-items' || phase === 'reward-hold' || phase === 'fade-out'}
+          <div class="reward-header">
+            <div class="reward-header-sub">師匠組合</div>
+            <div class="reward-header-main">支援物資</div>
+          </div>
+        {/if}
+
+        {#if (phase === 'reward-money' || phase === 'reward-items' || phase === 'reward-hold' || phase === 'fade-out') && data.rewardMoney && data.rewardMoney > 0}
+          <div class="reward-money-wrap">
+            <PopIn stamped={rewardMoneyStamped}>
+              <span class="reward-money-value">{data.rewardMoney}G</span>
+            </PopIn>
+          </div>
+        {/if}
+
+        {#if stampRushActive}
+          <StampRush
+            bind:this={stampRushRef}
+            items={data.rewardItems ?? []}
+            active={stampRushActive}
+            onComplete={() => { stampRushDone = true; }}
+          />
+        {/if}
+
+        <!-- スタンプ完了後にアイテム名と数量のサマリー -->
+        {#if stampRushDone || phase === 'fade-out'}
+          <div class="reward-summary">
+            {#each data.rewardItems ?? [] as item}
+              <span class="reward-summary-item">{item.name}(品質{item.quality}) x{item.quantity}</span>
+            {/each}
+          </div>
+        {/if}
       {/if}
     </div>
   </div>
@@ -692,14 +793,6 @@
   .grade-stamp {
     text-align: center;
     margin-top: 0.5rem;
-    transform: scale(2.5);
-    opacity: 0;
-    transition: transform 0.15s cubic-bezier(0.2, 0, 0.3, 1), opacity 0.1s;
-  }
-
-  .grade-stamp.stamped {
-    transform: scale(1);
-    opacity: 1;
   }
 
   .grade-label {
@@ -726,5 +819,52 @@
 
   .grade-stamp.fail .grade-result {
     color: #e05050;
+  }
+
+  /* 報酬演出 */
+  .reward-header {
+    text-align: center;
+    animation: slideUp 0.5s ease-out both;
+  }
+
+  .reward-header-sub {
+    font-size: 0.85rem;
+    color: #a0a0b0;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.3rem;
+  }
+
+  .reward-header-main {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    letter-spacing: 0.2em;
+  }
+
+  .reward-money-wrap {
+    margin: 0.3rem 0;
+  }
+
+  .reward-money-value {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #ffe066;
+    text-shadow: 0 0 20px rgba(255, 224, 102, 0.5);
+  }
+
+  /* サマリー */
+  .reward-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.8rem;
+    justify-content: center;
+    animation: slideUp 0.4s ease-out both;
+  }
+
+  .reward-summary-item {
+    font-size: 0.8rem;
+    color: #c0b880;
+    white-space: nowrap;
   }
 </style>

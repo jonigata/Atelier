@@ -291,26 +291,22 @@ export async function processInspectionSequence(): Promise<boolean> {
     // 報酬付与（B等級以上）
     const reward = passed ? getInspectionReward(inspDay, overallGrade as InspectionGrade) : null;
     if (reward) {
-      // 報酬ダイアログの台詞を組み立て
-      const rewardLines: NarrativeLine[] = [];
-      rewardLines.push({ text: '組合より支援物資をお届けします', expression: 'neutral' });
-
-      const rewardDescParts: string[] = [];
-      if (reward.money > 0) {
-        rewardDescParts.push(`${reward.money}G`);
-      }
-      for (const ri of reward.items) {
+      // 報酬カットシーンのデータを組み立て
+      const rewardItemsData = reward.items.map((ri) => {
         const itemDef = getItem(ri.itemId);
-        const name = itemDef?.name ?? ri.itemId;
-        rewardDescParts.push(`${name}(品質${ri.quality})×${ri.quantity}`);
-      }
-      rewardLines.push({ text: rewardDescParts.join('、'), expression: 'neutral' });
+        return { itemId: ri.itemId, name: itemDef?.name ?? ri.itemId, quality: ri.quality, quantity: ri.quantity };
+      });
 
-      await showDialogueAndWait({
-        characterName: '査察官',
-        characterTitle: '師匠組合',
-        characterFaceId: 'inspector',
-        lines: rewardLines,
+      // 報酬カットシーン表示
+      await showInspectionCutsceneAndWait({
+        mode: 'reward',
+        month: inspection.month,
+        title: inspection.title,
+        criteria: criteriaResults,
+        overallGrade,
+        passed,
+        rewardItems: rewardItemsData,
+        rewardMoney: reward.money,
       });
 
       // 実際に報酬を付与
@@ -332,6 +328,11 @@ export async function processInspectionSequence(): Promise<boolean> {
       }
 
       // メッセージログに報酬内容を記録
+      const rewardDescParts: string[] = [];
+      if (reward.money > 0) rewardDescParts.push(`${reward.money}G`);
+      for (const ri of rewardItemsData) {
+        rewardDescParts.push(`${ri.name}(品質${ri.quality})×${ri.quantity}`);
+      }
       addMessage(`【査察報酬】${rewardDescParts.join('、')}`);
     }
 
