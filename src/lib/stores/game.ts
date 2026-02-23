@@ -74,6 +74,9 @@ function createInitialState(): GameState {
     },
 
     skipPresentation: false,
+
+    completedInspections: [],
+    gameOverReason: null,
   };
 }
 

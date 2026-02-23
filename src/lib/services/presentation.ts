@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { gameState, clearDayTransition } from '$lib/stores/game';
+import { gameState, clearDayTransition, setPhase, addMessage } from '$lib/stores/game';
 import { generateNewQuests } from '$lib/services/gameLoop';
 import { setEventDialogue } from '$lib/stores/tutorial';
 import {
@@ -17,6 +17,7 @@ import {
   preSelectRandomEquipment,
 } from './achievement';
 import { getAchievementById } from '$lib/data/achievements';
+import { INSPECTION_DAYS, inspections, getOverallGrade, getGradeForValue } from '$lib/data/inspection';
 import type { EquipmentDef } from '$lib/models/types';
 import type { EventDialogue } from '$lib/models/types';
 
@@ -163,6 +164,87 @@ export async function processActionComplete(): Promise<void> {
     // 連鎖的に次のアチーブメントをチェック
     await processActionComplete();
   }
+}
+
+/**
+ * 査察の朝処理
+ * 査察日の翌朝に査察結果を告げる。D等級ならゲームオーバー。
+ */
+export async function processInspectionMorning(): Promise<boolean> {
+  const state = get(gameState);
+
+  // 査察制度が未説明（ach_inspection_intro 未完了）ならスキップ
+  if (!state.achievementProgress.completed.includes('ach_inspection_intro')) {
+    return false;
+  }
+
+  // 処理すべき査察を検出（d < state.day かつ未処理、12月末=336は除外）
+  const pendingDays = INSPECTION_DAYS.filter(
+    (d) => d < state.day && d !== 336 && !state.completedInspections.includes(d)
+  );
+
+  if (pendingDays.length === 0) return false;
+
+  for (const inspDay of pendingDays) {
+    const inspection = inspections.find((i) => i.day === inspDay);
+    if (!inspection) continue;
+
+    const overallGrade = getOverallGrade(inspection, state);
+
+    // 各項目の結果テキスト
+    const criteriaLines = inspection.criteria.map((c) => {
+      const value = c.getValue(state);
+      const grade = getGradeForValue(c.thresholds, value);
+      return `${c.label}: ${value}${c.unit} → ${grade}等級`;
+    });
+
+    const passed = overallGrade !== 'D';
+
+    // 日数表示を待つ
+    await waitForDayTransition();
+
+    // 査察ダイアログ表示
+    const lines: string[] = [
+      `${inspection.month}月末の定期査察を執り行います`,
+      criteriaLines.join(' / '),
+      passed
+        ? `総合評価: ${overallGrade}等級。合格です`
+        : `総合評価: ${overallGrade}等級……不合格です`,
+    ];
+
+    if (passed) {
+      lines.push('引き続き精進を期待します');
+    } else {
+      lines.push('残念ですが、これ以上の活動継続は認められません。召還命令を発行します');
+    }
+
+    await showDialogueAndWait({
+      characterName: '査察官',
+      characterTitle: '師匠組合',
+      lines,
+    });
+
+    // メッセージログに記録
+    addMessage(`【査察結果】${inspection.month}月末 ${inspection.title}: 総合${overallGrade}等級${passed ? '（合格）' : '（不合格）'}`);
+
+    // completedInspections に追加
+    gameState.update((s) => ({
+      ...s,
+      completedInspections: [...s.completedInspections, inspDay],
+    }));
+
+    // 不合格ならゲームオーバー
+    if (!passed) {
+      gameState.update((s) => ({
+        ...s,
+        gameOverReason: `${inspection.month}月末の査察で不合格（D等級）となり、召還されました。`,
+      }));
+      setPhase('ending');
+      return true; // 中断
+    }
+  }
+
+  return false;
 }
 
 /**

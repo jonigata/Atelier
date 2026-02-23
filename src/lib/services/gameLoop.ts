@@ -19,7 +19,7 @@ import { getAvailableQuestTemplates, questTemplates } from '$lib/data/quests';
 import { EXPEDITION, QUEST, calcLevelFromExp } from '$lib/data/balance';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import { checkAutoCompleteAchievements } from '$lib/services/tutorial';
-import { processMorningAchievements } from '$lib/services/presentation';
+import { processMorningAchievements, processInspectionMorning } from '$lib/services/presentation';
 import { checkMerchantEvents } from '$lib/services/merchant';
 import { expeditionFlavors, pickRandom } from '$lib/data/flavorTexts';
 import { getExpeditionDropsMult, getExpeditionRareBonus } from '$lib/services/equipmentEffects';
@@ -78,7 +78,7 @@ function processMorningPhase(): void {
   if (updatedState.morningEvents.length > 0) {
     setPhase('morning');
   } else {
-    setPhase('action');
+    startActionPhase();
   }
 }
 
@@ -287,6 +287,8 @@ export function generateNewQuests(): void {
 export function startActionPhase(): void {
   clearMorningEvents();
   setPhase('action');
+  // 査察チェック（朝イベント確認後にダイアログ表示）
+  processInspectionMorning();
 }
 
 /**

@@ -324,6 +324,10 @@ export interface GameState {
   stats: GameStats;
 
   skipPresentation: boolean;  // 演出スキップモード
+
+  // 査察システム
+  completedInspections: number[];  // 処理済み査察日の配列
+  gameOverReason: string | null;   // ゲームオーバー理由（null=通常）
 }
 
 // 行動タイプ

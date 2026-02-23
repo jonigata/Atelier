@@ -3,6 +3,8 @@
 
   type EndingType = 'true' | 'good' | 'normal' | 'mediocre' | 'fail';
 
+  $: isGameOver = $gameState.gameOverReason != null;
+
   function getEnding(): { type: EndingType; title: string; description: string } {
     const state = $gameState;
     const devLv = $villageLevel;
@@ -68,6 +70,44 @@
   }
 </script>
 
+{#if isGameOver}
+<div class="ending-screen gameover">
+  <div class="content">
+    <h1>召還されました</h1>
+
+    <div class="ending-card">
+      <h2>GAME OVER</h2>
+      <p class="description">{$gameState.gameOverReason}</p>
+    </div>
+
+    <div class="stats">
+      <h3>{$gameState.day}日目の成績</h3>
+      <div class="stat-grid">
+        <div class="stat highlight">
+          <span class="label">村発展度</span>
+          <span class="value">Lv.{$villageLevel}</span>
+        </div>
+        <div class="stat">
+          <span class="label">錬金術レベル</span>
+          <span class="value">Lv.{$alchemyLevel}</span>
+        </div>
+        <div class="stat">
+          <span class="label">名声</span>
+          <span class="value">Lv.{$reputationLevel}</span>
+        </div>
+        <div class="stat">
+          <span class="label">達成依頼</span>
+          <span class="value">{$gameState.completedQuestCount}件</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="restart-btn" on:click={handleRestart}>
+      やり直す
+    </button>
+  </div>
+</div>
+{:else}
 <div class="ending-screen" class:true={ending.type === 'true'}
      class:good={ending.type === 'good'}
      class:normal={ending.type === 'normal'}
@@ -116,6 +156,7 @@
     </button>
   </div>
 </div>
+{/if}
 
 <style>
   .ending-screen {
@@ -135,8 +176,22 @@
     background: linear-gradient(135deg, #1a2e1a 0%, #2a4a2a 100%);
   }
 
-  .ending-screen.fail {
+  .ending-screen.fail,
+  .ending-screen.gameover {
     background: linear-gradient(135deg, #2e1a1a 0%, #3a2020 100%);
+  }
+
+  .gameover h1 {
+    color: #e74c3c;
+  }
+
+  .gameover .ending-card {
+    border-color: #e74c3c;
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.2);
+  }
+
+  .gameover h2 {
+    color: #e74c3c;
   }
 
   .content {
