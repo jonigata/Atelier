@@ -91,7 +91,7 @@ export const items: Record<string, ItemDef> = {
     id: 'magic_wood',
     name: '魔木の枝',
     category: 'wood',
-    basePrice: 20,
+    basePrice: 12,
     description: '魔力を帯びた木材',
   },
   glow_mushroom: {
@@ -149,7 +149,7 @@ export const items: Record<string, ItemDef> = {
     id: 'whetstone_ore',
     name: '砥石鉱',
     category: 'ore',
-    basePrice: 25,
+    basePrice: 18,
     description: '研磨に使われる石',
   },
   coal: {
