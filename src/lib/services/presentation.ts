@@ -335,6 +335,23 @@ export async function processInspectionSequence(): Promise<boolean> {
       addMessage(`【査察報酬】${rewardDescParts.join('、')}`);
     }
 
+    // 次の査察日を告知
+    if (passed) {
+      const nextInsp = inspections.find((i) => i.day > inspDay);
+      const nextDeadlineLines: NarrativeLine[] = [];
+      if (nextInsp) {
+        nextDeadlineLines.push({ text: `次の査察は${nextInsp.month}月末です。それまでに備えておくように`, expression: 'neutral' });
+      } else {
+        nextDeadlineLines.push({ text: '次回は12月末の最終評価となります。悔いのないよう励みなさい', expression: 'neutral' });
+      }
+      await showDialogueAndWait({
+        characterName: '査察官',
+        characterTitle: '師匠組合',
+        characterFaceId: 'inspector',
+        lines: nextDeadlineLines,
+      });
+    }
+
     // completedInspections に追加
     gameState.update((s) => ({
       ...s,
