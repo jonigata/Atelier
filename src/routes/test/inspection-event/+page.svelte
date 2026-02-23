@@ -41,6 +41,7 @@
         ];
 
     return {
+      mode: 'evaluation' as const,
       month,
       title: m.title,
       criteria,
@@ -49,10 +50,16 @@
     };
   }
 
-  // カットシーンのみ再生
+  // カットシーンのみ再生（評価）
   function showCutscene() {
     const data = buildCutsceneData(selectedMonth, selectedGrade);
     gameState.update((s) => ({ ...s, pendingInspectionCutscene: data }));
+  }
+
+  // ムービーのみ再生
+  function showMovie() {
+    const data = buildCutsceneData(selectedMonth, selectedGrade);
+    gameState.update((s) => ({ ...s, pendingInspectionCutscene: { ...data, mode: 'movie' as const } }));
   }
 
   // フルシーケンス再生（導入会話 → カットシーン → 結果会話）
@@ -62,7 +69,21 @@
     const m = months.find((m) => m.month === month)!;
     const passed = grade !== 'D';
 
-    // 1. 導入ダイアログ
+    // 1. ムービー
+    const movieData = { ...buildCutsceneData(month, grade), mode: 'movie' as const };
+    gameState.update((s) => ({ ...s, pendingInspectionCutscene: movieData }));
+
+    // ムービー完了を待つ
+    await new Promise<void>((resolve) => {
+      const unsub = gameState.subscribe((s) => {
+        if (!s.pendingInspectionCutscene) {
+          unsub();
+          resolve();
+        }
+      });
+    });
+
+    // 2. 導入ダイアログ
     setEventDialogue({
       characterName: '査察官',
       characterTitle: '師匠組合',
@@ -70,7 +91,7 @@
       eventImage: '/images/events/inspection_evaluation.png',
       lines: [
         { text: `${month}月末の定期査察を執り行います`, expression: 'neutral' },
-        { text: 'それでは項目ごとに確認します', expression: 'determined' },
+        { text: 'それでは項目ごとに確認します', expression: 'neutral' },
       ],
     });
 
@@ -84,7 +105,7 @@
       });
     });
 
-    // 2. カットシーン
+    // 3. 評価カットシーン
     const data = buildCutsceneData(month, grade);
     gameState.update((s) => ({ ...s, pendingInspectionCutscene: data }));
 
@@ -102,11 +123,11 @@
     const verdictLines: NarrativeLine[] = [];
     if (passed) {
       verdictLines.push({ text: `以上を踏まえまして、総合${grade}等級。合格です`, expression: 'neutral' });
-      verdictLines.push({ text: '引き続き精進を期待します', expression: 'happy' });
+      verdictLines.push({ text: '引き続き精進を期待します', expression: 'neutral' });
     } else {
-      verdictLines.push({ text: '以上を踏まえまして……総合D等級。不合格です', expression: 'angry' });
-      verdictLines.push({ text: '残念ですが、これ以上の活動継続は認められません', expression: 'sad' });
-      verdictLines.push({ text: '召還命令を発行します', expression: 'determined' });
+      verdictLines.push({ text: '以上を踏まえまして……総合D等級。不合格です', expression: 'neutral' });
+      verdictLines.push({ text: '残念ですが、これ以上の活動継続は認められません', expression: 'neutral' });
+      verdictLines.push({ text: '召還命令を発行します', expression: 'neutral' });
     }
 
     setEventDialogue({
@@ -151,7 +172,10 @@
       フルシーケンス再生
     </button>
     <button class="show-btn" onclick={showCutscene}>
-      カットシーンのみ
+      評価のみ
+    </button>
+    <button class="show-btn" onclick={showMovie}>
+      ムービーのみ
     </button>
     <span class="hint">
       {selectedGrade === 'D' ? '不合格パターン' : `${selectedGrade}等級 合格パターン`}

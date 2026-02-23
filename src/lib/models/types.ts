@@ -333,6 +333,7 @@ export interface GameState {
 
 // 査察カットシーン用データ
 export interface InspectionCutsceneData {
+  mode: 'movie' | 'evaluation';
   month: number;
   title: string;
   criteria: { label: string; value: string; grade: string }[];

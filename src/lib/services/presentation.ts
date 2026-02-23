@@ -229,7 +229,17 @@ export async function processInspectionMorning(): Promise<boolean> {
     // 日数表示を待つ
     await waitForDayTransition();
 
-    // 1. 導入ダイアログ（クリック送り）
+    // 1. 査察官が歩いてくるムービー
+    await showInspectionCutsceneAndWait({
+      mode: 'movie',
+      month: inspection.month,
+      title: inspection.title,
+      criteria: criteriaResults,
+      overallGrade,
+      passed,
+    });
+
+    // 2. 導入ダイアログ（クリック送り）
     await showDialogueAndWait({
       characterName: '査察官',
       characterTitle: '師匠組合',
@@ -237,12 +247,13 @@ export async function processInspectionMorning(): Promise<boolean> {
       eventImage: '/images/events/inspection_evaluation.png',
       lines: [
         { text: `${inspection.month}月末の定期査察を執り行います`, expression: 'neutral' },
-        { text: 'それでは項目ごとに確認します', expression: 'determined' },
+        { text: 'それでは項目ごとに確認します', expression: 'neutral' },
       ],
     });
 
-    // 2. 査察カットシーン（タイムライン演出 — 将来ムービーに差し替え予定）
+    // 3. 査察カットシーン（評価タイムライン）
     await showInspectionCutsceneAndWait({
+      mode: 'evaluation',
       month: inspection.month,
       title: inspection.title,
       criteria: criteriaResults,
@@ -254,11 +265,11 @@ export async function processInspectionMorning(): Promise<boolean> {
     const verdictLines: NarrativeLine[] = [];
     if (passed) {
       verdictLines.push({ text: `以上を踏まえまして、総合${overallGrade}等級。合格です`, expression: 'neutral' });
-      verdictLines.push({ text: '引き続き精進を期待します', expression: 'happy' });
+      verdictLines.push({ text: '引き続き精進を期待します', expression: 'neutral' });
     } else {
-      verdictLines.push({ text: '以上を踏まえまして……総合D等級。不合格です', expression: 'angry' });
-      verdictLines.push({ text: '残念ですが、これ以上の活動継続は認められません', expression: 'sad' });
-      verdictLines.push({ text: '召還命令を発行します', expression: 'determined' });
+      verdictLines.push({ text: '以上を踏まえまして……総合D等級。不合格です', expression: 'neutral' });
+      verdictLines.push({ text: '残念ですが、これ以上の活動継続は認められません', expression: 'neutral' });
+      verdictLines.push({ text: '召還命令を発行します', expression: 'neutral' });
     }
 
     await showDialogueAndWait({

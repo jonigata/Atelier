@@ -8,11 +8,12 @@
   let timers: ReturnType<typeof setTimeout>[] = [];
 
   // 演出フェーズ
-  let phase: 'fade-in' | 'image' | 'title' | 'criteria' | 'grade' | 'fade-out' | 'idle' = 'idle';
+  let phase: 'movie' | 'fade-in' | 'image' | 'title' | 'criteria' | 'grade' | 'fade-out' | 'idle' = 'idle';
   let data: InspectionCutsceneData | null = null;
   let revealedCriteria = 0;
   let showGrade = false;
   let gradeStamped = false;
+  let videoEl: HTMLVideoElement | null = null;
 
   // パーティクル（座標はコンテナ内の%）
   interface Particle {
@@ -51,7 +52,6 @@
     clearTimers();
     transitioning = true;
     visible = true;
-    phase = 'fade-in';
     revealedCriteria = 0;
     showGrade = false;
     gradeStamped = false;
@@ -62,6 +62,28 @@
       after(50, finish);
       return;
     }
+
+    if (data?.mode === 'movie') {
+      phase = 'movie';
+    } else {
+      startEvaluationTimeline();
+    }
+  }
+
+  // ムービー終了後
+  function onMovieEnded() {
+    finish();
+  }
+
+  function skipMovie() {
+    if (videoEl) {
+      videoEl.pause();
+    }
+    finish();
+  }
+
+  function startEvaluationTimeline() {
+    phase = 'fade-in';
 
     // タイムライン
     let t = 0;
@@ -197,8 +219,27 @@
     class:entering={phase === 'fade-in'}
     class:leaving={phase === 'fade-out'}
   >
+    <!-- ムービー -->
+    {#if phase === 'movie'}
+      <!-- svelte-ignore a11y_media_has_caption -->
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <div class="movie-wrap" on:click={skipMovie} role="button" tabindex="-1">
+        <video
+          class="inspection-movie"
+          autoplay
+          muted
+          playsinline
+          bind:this={videoEl}
+          on:ended={onMovieEnded}
+        >
+          <source src="/movies/inspection.mp4" type="video/mp4" />
+        </video>
+        <p class="skip-hint">クリックでスキップ</p>
+      </div>
+    {/if}
+
     <!-- 背景: イベントCG -->
-    <div class="bg-image" class:visible={phase !== 'fade-in'}>
+    <div class="bg-image" class:visible={phase !== 'fade-in' && phase !== 'movie'}>
       <img src="/images/events/inspection_evaluation.png" alt="" />
       <div class="bg-dim" />
     </div>
@@ -347,6 +388,33 @@
   @keyframes fadeOut {
     from { opacity: 1; }
     to { opacity: 0; }
+  }
+
+  /* ムービー */
+  .movie-wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    cursor: pointer;
+  }
+
+  .inspection-movie {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .skip-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    pointer-events: none;
   }
 
   /* 背景CG */
