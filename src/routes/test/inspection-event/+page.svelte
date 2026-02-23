@@ -164,12 +164,13 @@
 
 <style>
   .test-page {
-    max-width: 500px;
-    margin: 2rem auto;
+    max-width: 960px;
+    margin: 0 auto;
     padding: 1.5rem;
     color: #e0e0f0;
-    background: #1a1a2e;
+    background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
     min-height: 100vh;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
   }
 
   h2 {

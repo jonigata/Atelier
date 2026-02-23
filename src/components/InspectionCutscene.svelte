@@ -14,6 +14,25 @@
   let showGrade = false;
   let gradeStamped = false;
 
+  // パーティクル（座標はコンテナ内の%）
+  interface Particle {
+    id: number;
+    x: number;   // % (コンテナ幅内)
+    y: number;    // % (開始位置、負=上から)
+    size: number; // px
+    color: string;
+    delay: number; // s
+    duration: number; // s
+    type: 'confetti' | 'spark' | 'firework';
+    rotation: number;
+    rotateX: number;  // 3D回転速度
+    rotateY: number;  // 3D回転速度
+    driftPx: number; // 横移動量 px
+    wobblePx: number; // 左右揺れ振幅 px
+  }
+  let particles: Particle[] = [];
+  let particleId = 0;
+
   $: if ($gameState.pendingInspectionCutscene && !transitioning) {
     data = $gameState.pendingInspectionCutscene;
     startCutscene();
@@ -36,6 +55,7 @@
     revealedCriteria = 0;
     showGrade = false;
     gradeStamped = false;
+    particles = [];
 
     // 演出スキップ
     if ($gameState.skipPresentation) {
@@ -75,10 +95,16 @@
       showGrade = true;
     });
     t += 150;
-    after(t, () => { gradeStamped = true; });
+    after(t, () => {
+      gradeStamped = true;
+      // 等級に応じた祝福エフェクト
+      if (data && data.passed) {
+        spawnCelebration(data.overallGrade);
+      }
+    });
 
-    // ホールド
-    t += 2000;
+    // ホールド（エフェクト分長めに）
+    t += 4000;
 
     // フェードアウト
     after(t, () => { phase = 'fade-out'; });
@@ -86,9 +112,69 @@
     after(t, finish);
   }
 
+  // 等級に応じたパーティクル生成
+  function spawnCelebration(grade: string) {
+    const newParticles: Particle[] = [];
+    const colors = gradeParticleColors(grade);
+    const count = gradeParticleCount(grade);
+    const types = gradeParticleTypes(grade);
+
+    for (let i = 0; i < count; i++) {
+      const type = types[Math.floor(Math.random() * types.length)];
+      newParticles.push({
+        id: particleId++,
+        x: 5 + Math.random() * 90,  // コンテナ内5%~95%
+        y: type === 'firework' ? 20 + Math.random() * 30 : -10 + Math.random() * 25,
+        size: type === 'firework' ? 16 + Math.random() * 16 : type === 'spark' ? 20 + Math.random() * 20 : 56 + Math.random() * 28,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        delay: type === 'firework' ? Math.random() * 0.8 : Math.random() * 2.5,
+        duration: type === 'firework' ? 0.6 + Math.random() * 0.4 : type === 'confetti' ? 2.5 + Math.random() * 1.0 : 1.8 + Math.random() * 1.2,
+        type,
+        rotation: Math.random() * 360,
+        rotateX: 360 + Math.random() * 720,
+        rotateY: 360 + Math.random() * 720,
+        driftPx: (Math.random() - 0.5) * 120,  // px
+        wobblePx: 15 + Math.random() * 50,  // 揺れ振幅 px
+      });
+    }
+
+    particles = newParticles;
+  }
+
+  function gradeParticleColors(grade: string): string[] {
+    switch (grade) {
+      case 'S': return ['#c9a0ff', '#ffd700', '#ff90d0', '#90d0ff', '#ffffff', '#ffe066'];
+      case 'A': return ['#ffd700', '#ffb000', '#ffe066', '#ffffff'];
+      case 'B': return ['#60c060', '#90e090', '#c0f0c0'];
+      case 'C': return ['#80b0d0', '#a0c8e0'];
+      default: return [];
+    }
+  }
+
+  function gradeParticleCount(grade: string): number {
+    switch (grade) {
+      case 'S': return 160;
+      case 'A': return 100;
+      case 'B': return 70;
+      case 'C': return 24;
+      default: return 0;
+    }
+  }
+
+  function gradeParticleTypes(grade: string): Particle['type'][] {
+    switch (grade) {
+      case 'S': return ['confetti'];
+      case 'A': return ['confetti'];
+      case 'B': return ['confetti'];
+      case 'C': return ['confetti'];
+      default: return ['spark'];
+    }
+  }
+
   function finish() {
     visible = false;
     phase = 'idle';
+    particles = [];
     transitioning = false;
     resolveInspectionCutscene();
   }
@@ -116,6 +202,62 @@
       <img src="/images/events/inspection_evaluation.png" alt="" />
       <div class="bg-dim" />
     </div>
+
+    <!-- パーティクル層 -->
+    {#if particles.length > 0}
+      <div class="particles">
+        {#each particles as p (p.id)}
+          {#if p.type === 'confetti'}
+            <div
+              class="particle confetti"
+              style="
+                left: {p.x}%;
+                top: {p.y}%;
+                width: {p.size}px;
+                height: {p.size * 0.6}px;
+                background: {p.color};
+                animation-delay: {p.delay}s;
+                animation-duration: {p.duration}s;
+                --drift-px: {p.driftPx}px;
+                --wobble-px: {p.wobblePx}px;
+                --rotation: {p.rotation}deg;
+                --rx: {p.rotateX}deg;
+                --ry: {p.rotateY}deg;
+              "
+            />
+          {:else if p.type === 'spark'}
+            <div
+              class="particle spark"
+              style="
+                left: {p.x}%;
+                top: {p.y}%;
+                width: {p.size}px;
+                height: {p.size}px;
+                background: {p.color};
+                box-shadow: 0 0 {p.size * 2}px {p.color};
+                animation-delay: {p.delay}s;
+                animation-duration: {p.duration}s;
+                --drift-px: {p.driftPx}px;
+              "
+            />
+          {:else if p.type === 'firework'}
+            <div
+              class="particle firework"
+              style="
+                left: {p.x}%;
+                top: {p.y}%;
+                width: {p.size}px;
+                height: {p.size}px;
+                background: {p.color};
+                box-shadow: 0 0 {p.size * 3}px {p.color}, 0 0 {p.size * 6}px {p.color};
+                animation-delay: {p.delay}s;
+                animation-duration: {p.duration}s;
+              "
+            />
+          {/if}
+        {/each}
+      </div>
+    {/if}
 
     <!-- コンテンツ -->
     <div class="content">
@@ -158,7 +300,13 @@
 <style>
   .cutscene-overlay {
     position: fixed;
-    inset: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
     z-index: 1050;
     display: flex;
     align-items: center;
@@ -166,6 +314,7 @@
     background: #000;
     pointer-events: all;
     opacity: 1;
+    overflow: hidden;
   }
 
   .cutscene-overlay.entering {
@@ -215,10 +364,107 @@
     );
   }
 
+  /* パーティクル */
+  .particles {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    perspective: 800px;
+  }
+
+  .particle {
+    position: absolute;
+    border-radius: 2px;
+  }
+
+  .particle.confetti {
+    animation: confettiFall linear both;
+    transform-style: preserve-3d;
+  }
+
+  .particle.spark {
+    border-radius: 50%;
+    animation: sparkFall linear both;
+  }
+
+  .particle.firework {
+    border-radius: 50%;
+    animation: fireworkBurst ease-out both;
+  }
+
+  @keyframes confettiFall {
+    0% {
+      opacity: 0;
+      transform: translateY(0) translateX(0) rotateX(0deg) rotateY(0deg) rotate(var(--rotation, 0deg)) scale(1);
+    }
+    8% {
+      opacity: 1;
+      transform: translateY(3vh) translateX(calc(var(--wobble-px) * 0.3)) rotateX(calc(var(--rx) * 0.08)) rotateY(calc(var(--ry) * 0.08)) rotate(calc(var(--rotation) + 30deg)) scale(1);
+    }
+    20% {
+      opacity: 1;
+      transform: translateY(8vh) translateX(calc(var(--wobble-px) * -0.4)) rotateX(calc(var(--rx) * 0.2)) rotateY(calc(var(--ry) * 0.2)) rotate(calc(var(--rotation) + 75deg)) scale(0.98);
+    }
+    40% {
+      opacity: 0.95;
+      transform: translateY(24vh) translateX(calc(var(--wobble-px) * 0.3)) rotateX(calc(var(--rx) * 0.4)) rotateY(calc(var(--ry) * 0.4)) rotate(calc(var(--rotation) + 170deg)) scale(0.95);
+    }
+    55% {
+      opacity: 0.85;
+      transform: translateY(42vh) translateX(calc(var(--wobble-px) * -0.2 + var(--drift-px) * 0.3)) rotateX(calc(var(--rx) * 0.55)) rotateY(calc(var(--ry) * 0.55)) rotate(calc(var(--rotation) + 230deg)) scale(0.92);
+    }
+    70% {
+      opacity: 0.6;
+      transform: translateY(62vh) translateX(calc(var(--wobble-px) * 0.1 + var(--drift-px) * 0.6)) rotateX(calc(var(--rx) * 0.7)) rotateY(calc(var(--ry) * 0.7)) rotate(calc(var(--rotation) + 290deg)) scale(0.9);
+    }
+    85% {
+      opacity: 0.3;
+      transform: translateY(82vh) translateX(calc(var(--drift-px) * 0.85)) rotateX(calc(var(--rx) * 0.85)) rotateY(calc(var(--ry) * 0.85)) rotate(calc(var(--rotation) + 330deg)) scale(0.87);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(100vh) translateX(var(--drift-px)) rotateX(var(--rx)) rotateY(var(--ry)) rotate(calc(var(--rotation) + 360deg)) scale(0.85);
+    }
+  }
+
+  @keyframes sparkFall {
+    0% {
+      opacity: 1;
+      transform: translateY(0) translateX(0) scale(1);
+    }
+    30% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(80vh) translateX(var(--drift-px, 0px)) scale(0);
+    }
+  }
+
+  @keyframes fireworkBurst {
+    0% {
+      opacity: 0;
+      transform: scale(0);
+    }
+    15% {
+      opacity: 1;
+      transform: scale(4);
+    }
+    40% {
+      opacity: 0.8;
+      transform: scale(2);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0);
+    }
+  }
+
   /* コンテンツ */
   .content {
     position: relative;
-    z-index: 1;
+    z-index: 3;
     display: flex;
     flex-direction: column;
     align-items: center;
