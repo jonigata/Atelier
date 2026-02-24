@@ -132,6 +132,75 @@ export interface RecipeDef {
   requiredFacilities?: string[]; // 必要な設備ID（すべて必要）
 }
 
+// =====================================
+// 村施設システム（ドロー報酬）
+// =====================================
+
+export type VillageFacilityEffectType =
+  | 'daily_item'         // 毎朝アイテム入手
+  | 'periodic_item'      // N日おきにアイテム入手
+  | 'craft_success'      // 調合成功率+
+  | 'craft_quality'      // 調合品質+
+  | 'craft_days_reduce'  // 調合日数短縮（カテゴリ限定可）
+  | 'study_days_reduce'  // 勉強日数-
+  | 'rest_bonus'         // 休息回復量+
+  | 'expedition_bonus'   // 採取ドロップ増
+  | 'sell_price'         // 売値+%
+  | 'buy_price';         // 買値-%
+
+export interface VillageFacilityEffect {
+  type: VillageFacilityEffectType;
+  value: number;
+  itemId?: string;           // daily_item/periodic_item用
+  itemCategory?: ItemCategory; // カテゴリ限定
+  interval?: number;         // periodic_item用（日数間隔）
+}
+
+export interface VillageFacilityDef {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  effects: VillageFacilityEffect[];
+  effectDescription: string;
+}
+
+// =====================================
+// 助手システム（ドロー報酬）
+// =====================================
+
+export interface HelperLevelEffect {
+  description: string;
+}
+
+export interface HelperDef {
+  id: string;
+  name: string;
+  species: string;
+  icon: string;
+  description: string;
+  maxLevel: number;
+  levelEffects: HelperLevelEffect[];
+  craftSuccessBonus: number[];
+  craftQualityBonus: number[];
+  expeditionDropBonus: number[];
+  expeditionRareBonus: number[];
+  buyPriceMult: number[];
+  sellPriceMult: number[];
+  morningStamina: number[];
+  staminaCostReduction: number[];
+  rareEventBonus: number[];
+}
+
+export interface OwnedHelper {
+  helperId: string;
+  level: number;
+}
+
+// =====================================
+// 設備システム（アチーブメント報酬）
+// =====================================
+
 // 設備効果の種類
 type FacilityEffectScope = 'all' | 'category';
 
@@ -322,6 +391,10 @@ export interface GameState {
   tutorialProgress: TutorialProgress;
   achievementProgress: AchievementProgress;
   stats: GameStats;
+
+  // 村施設・助手システム
+  villageFacilities: string[];      // 所有する村施設ID
+  ownedHelpers: OwnedHelper[];     // 所有する助手
 
   // 査察システム
   completedInspections: number[];  // 処理済み査察日の配列

@@ -2,6 +2,7 @@
   import { gameState, addMessage, restoreStamina, skipPresentation } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { getFatigueLabel } from '$lib/services/alchemy';
+  import { getVillageRestBonus } from '$lib/services/villageFacilityEffects';
   import VideoOverlay from './common/VideoOverlay.svelte';
 
   export let onBack: () => void;
@@ -21,8 +22,9 @@
   }
 
   function onVideoEnd() {
-    restoreStamina(100);
-    addMessage('休息しました。体力が全回復しました。');
+    const bonus = getVillageRestBonus();
+    restoreStamina(100 + bonus);
+    addMessage(`休息しました。体力が全回復しました。${bonus > 0 ? `（施設ボーナス+${bonus}）` : ''}`);
     endTurn(1);
     // DayTransitionの暗転(0.3s)が完了してからオーバーレイを消す
     setTimeout(() => {

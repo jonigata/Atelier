@@ -20,9 +20,13 @@ import { EXPEDITION, QUEST, calcLevelFromExp } from '$lib/data/balance';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import { checkAutoCompleteAchievements } from '$lib/services/tutorial';
 import { processMorningAchievements, processInspectionSequence } from '$lib/services/presentation';
+import { processFacilityMorningItems } from '$lib/services/villageFacilityEffects';
+import { processHelperMorningStamina } from '$lib/services/helperEffects';
 import { checkMerchantEvents } from '$lib/services/merchant';
 import { expeditionFlavors, pickRandom } from '$lib/data/flavorTexts';
 import { getExpeditionDropsMult, getExpeditionRareBonus } from '$lib/services/equipmentEffects';
+import { getVillageExpeditionBonus } from '$lib/services/villageFacilityEffects';
+import { getHelperExpeditionDropBonus, getHelperExpeditionRareBonus } from '$lib/services/helperEffects';
 import { getItem as getItemDef } from '$lib/data/items';
 import type { OwnedItem, MorningEvent, GameState } from '$lib/models/types';
 import skipDataJson from '$lib/data/skipData.json';
@@ -74,7 +78,13 @@ function processMorningPhase(): void {
   // 4. マルコの来訪・出発チェック
   checkMerchantEvents();
 
-  // 5. 朝発動アチーブメント（triggerOnMorning）
+  // 5. 施設からのアイテム生成
+  processFacilityMorningItems();
+
+  // 6. 助手の毎朝スタミナ回復
+  processHelperMorningStamina();
+
+  // 7. 朝発動アチーブメント（triggerOnMorning）
   processMorningAchievements();
 
   // イベントがあればmorning画面を表示、なければ直接actionへ
@@ -147,10 +157,13 @@ function calculateExpeditionDrops(areaId: string, duration: number): OwnedItem[]
 
   // 機材効果: 汎用ドロップ乗数（カテゴリ指定なし）
   const generalMult = getExpeditionDropsMult();
-  const effectiveDropCount = Math.round(baseDropCount * generalMult);
+  // 施設・助手効果: ドロップボーナス
+  const villageDropBonus = getVillageExpeditionBonus();
+  const helperDropBonus = getHelperExpeditionDropBonus();
+  const effectiveDropCount = Math.round(baseDropCount * (generalMult + villageDropBonus + helperDropBonus));
 
   // 機材効果: レア素材確率ボーナス
-  const rareBonus = getExpeditionRareBonus();
+  const rareBonus = getExpeditionRareBonus() + getHelperExpeditionRareBonus();
 
   for (let i = 0; i < effectiveDropCount; i++) {
     // レアドロップ判定（機材効果で確率上昇）

@@ -73,6 +73,10 @@ function createInitialState(): GameState {
       inventoryOpened: false,
     },
 
+    // 村施設・助手
+    villageFacilities: [],
+    ownedHelpers: [],
+
     completedInspections: [],
     gameOverReason: null,
     pendingInspectionCutscene: null,
@@ -174,7 +178,7 @@ export function addReputationExp(amount: number): void {
     const oldLevel = calcLevelFromExp(state.reputationExp);
     const newExp = Math.max(0, state.reputationExp + amount);
     const newLevel = calcLevelFromExp(newExp);
-    if (newLevel > oldLevel) {
+    if (newLevel > oldLevel && hasDrawLevel(oldLevel, newLevel)) {
       pendingReputationLevelUp.set({ oldLevel, newLevel });
     }
     return { ...state, reputationExp: newExp };
@@ -193,7 +197,7 @@ export function addVillageExp(amount: number): void {
     const oldLevel = calcLevelFromExp(state.villageExp);
     const newExp = Math.max(0, state.villageExp + amount);
     const newLevel = calcLevelFromExp(newExp);
-    if (newLevel > oldLevel) {
+    if (newLevel > oldLevel && hasDrawLevel(oldLevel, newLevel)) {
       pendingVillageLevelUp.set({ oldLevel, newLevel });
     }
     return { ...state, villageExp: newExp };
@@ -205,9 +209,38 @@ export interface LevelUpInfo {
   newLevel: number;
 }
 
+/** oldLevel～newLevelの間に3の倍数レベルがあるか（ドロー発火判定） */
+function hasDrawLevel(oldLevel: number, newLevel: number): boolean {
+  const nextDraw = Math.ceil((oldLevel + 1) / 3) * 3;
+  return nextDraw <= newLevel;
+}
+
 export const pendingLevelUp = writable<LevelUpInfo | null>(null);
 export const pendingVillageLevelUp = writable<LevelUpInfo | null>(null);
 export const pendingReputationLevelUp = writable<LevelUpInfo | null>(null);
+
+export function addVillageFacility(facilityId: string): void {
+  gameState.update((state) => ({
+    ...state,
+    villageFacilities: [...state.villageFacilities, facilityId],
+  }));
+}
+
+export function addHelper(helperId: string): void {
+  gameState.update((state) => ({
+    ...state,
+    ownedHelpers: [...state.ownedHelpers, { helperId, level: 1 }],
+  }));
+}
+
+export function upgradeHelper(helperId: string): void {
+  gameState.update((state) => ({
+    ...state,
+    ownedHelpers: state.ownedHelpers.map((h) =>
+      h.helperId === helperId ? { ...h, level: Math.min(h.level + 1, 3) } : h
+    ),
+  }));
+}
 
 export function addExp(amount: number): void {
   gameState.update((state) => {

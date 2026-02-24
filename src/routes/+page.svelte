@@ -12,6 +12,7 @@
   import EventDialog from '../components/EventDialog.svelte';
   import DayTransition from '../components/DayTransition.svelte';
   import InspectionCutscene from '../components/InspectionCutscene.svelte';
+  import DrawDialog from '../components/DrawDialog.svelte';
   import DebugPanel from '../components/DebugPanel.svelte';
   import SaveLoadSidebar from '../components/SaveLoadSidebar.svelte';
   import ToastContainer from '../components/ToastContainer.svelte';
@@ -91,6 +92,9 @@
 
   <!-- 査察カットシーン -->
   <InspectionCutscene />
+
+  <!-- ドローダイアログ -->
+  <DrawDialog />
 
   <!-- イベントダイアログ（最前面） -->
   <EventDialog />

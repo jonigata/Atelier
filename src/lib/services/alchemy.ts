@@ -33,6 +33,8 @@ import {
   resetCombo,
   getEffectiveIngredientCount,
 } from '$lib/services/equipmentEffects';
+import { getVillageCraftSuccessBonus, getVillageCraftQualityBonus } from '$lib/services/villageFacilityEffects';
+import { getHelperCraftSuccessBonus, getHelperCraftQualityBonus } from '$lib/services/helperEffects';
 import type { OwnedItem, RecipeDef, Ingredient } from '$lib/models/types';
 
 export interface CraftMultipleResult {
@@ -391,9 +393,13 @@ export function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number, st
   const accumBonus = getFailAccumulationBonus(recipe.id);
   const probBonus = getAllProbabilityBonus();
 
+  // 施設・助手効果
+  const villageBonus = getVillageCraftSuccessBonus();
+  const helperBonus = getHelperCraftSuccessBonus();
+
   return Math.max(0.01, Math.min(
     CRAFT_SUCCESS.MAX_RATE,
-    baserate + levelBonus + successRateBonus + equipBonus + accumBonus + probBonus - fatiguePenalty
+    baserate + levelBonus + successRateBonus + equipBonus + accumBonus + probBonus + villageBonus + helperBonus - fatiguePenalty
   ));
 }
 
@@ -421,7 +427,11 @@ export function calculateExpectedQuality(
   const qualityCap = getQualityCap();
   const varianceMult = getQualityVarianceMult();
 
-  const base = Math.floor(avgQuality + levelBonus + qualityBonus + equipQualityBonus + comboBonus);
+  // 施設・助手効果
+  const villageQualityBonus = getVillageCraftQualityBonus();
+  const helperQualityBonus = getHelperCraftQualityBonus();
+
+  const base = Math.floor(avgQuality + levelBonus + qualityBonus + equipQualityBonus + comboBonus + villageQualityBonus + helperQualityBonus);
   const randomMin = Math.round(QUALITY.RANDOM_MIN * varianceMult);
   const randomMax = Math.round(QUALITY.RANDOM_MAX * varianceMult);
   const min = Math.max(QUALITY.MIN, base + randomMin);
@@ -457,6 +467,10 @@ function calculateQuality(
   const randomRange = randomMax - randomMin + 1;
   const randomFactor = Math.floor(Math.random() * randomRange) + randomMin;
 
-  const quality = Math.floor(avgQuality + levelBonus + qualityBonus + equipQualityBonus + comboBonus + randomFactor);
+  // 施設・助手効果
+  const villageQualityBonus = getVillageCraftQualityBonus();
+  const helperQualityBonus = getHelperCraftQualityBonus();
+
+  const quality = Math.floor(avgQuality + levelBonus + qualityBonus + equipQualityBonus + comboBonus + villageQualityBonus + helperQualityBonus + randomFactor);
   return Math.max(1, Math.min(qualityCap, quality));
 }
