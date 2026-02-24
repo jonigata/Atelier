@@ -20,12 +20,12 @@ import { EXPEDITION, QUEST, calcLevelFromExp } from '$lib/data/balance';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import { checkAutoCompleteAchievements } from '$lib/services/tutorial';
 import { processMorningAchievements, processInspectionSequence } from '$lib/services/presentation';
-import { processFacilityMorningItems } from '$lib/services/villageFacilityEffects';
+import { processBuildingMorningItems } from '$lib/services/buildingEffects';
 import { processHelperMorningStamina } from '$lib/services/helperEffects';
 import { checkMerchantEvents } from '$lib/services/merchant';
 import { expeditionFlavors, pickRandom } from '$lib/data/flavorTexts';
 import { getExpeditionDropsMult, getExpeditionRareBonus } from '$lib/services/equipmentEffects';
-import { getVillageExpeditionBonus } from '$lib/services/villageFacilityEffects';
+import { getBuildingExpeditionBonus } from '$lib/services/buildingEffects';
 import { getHelperExpeditionDropBonus, getHelperExpeditionRareBonus } from '$lib/services/helperEffects';
 import { getItem as getItemDef } from '$lib/data/items';
 import type { OwnedItem, MorningEvent, GameState } from '$lib/models/types';
@@ -79,7 +79,7 @@ function processMorningPhase(): void {
   checkMerchantEvents();
 
   // 5. 施設からのアイテム生成
-  processFacilityMorningItems();
+  processBuildingMorningItems();
 
   // 6. 助手の毎朝スタミナ回復
   processHelperMorningStamina();
@@ -158,7 +158,7 @@ function calculateExpeditionDrops(areaId: string, duration: number): OwnedItem[]
   // 機材効果: 汎用ドロップ乗数（カテゴリ指定なし）
   const generalMult = getExpeditionDropsMult();
   // 施設・助手効果: ドロップボーナス
-  const villageDropBonus = getVillageExpeditionBonus();
+  const villageDropBonus = getBuildingExpeditionBonus();
   const helperDropBonus = getHelperExpeditionDropBonus();
   const effectiveDropCount = Math.round(baseDropCount * (generalMult + villageDropBonus + helperDropBonus));
 

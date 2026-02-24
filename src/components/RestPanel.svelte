@@ -2,7 +2,7 @@
   import { gameState, addMessage, restoreStamina, skipPresentation } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { getFatigueLabel } from '$lib/services/alchemy';
-  import { getVillageRestBonus } from '$lib/services/villageFacilityEffects';
+  import { getBuildingRestBonus } from '$lib/services/buildingEffects';
   import VideoOverlay from './common/VideoOverlay.svelte';
 
   export let onBack: () => void;
@@ -22,7 +22,7 @@
   }
 
   function onVideoEnd() {
-    const bonus = getVillageRestBonus();
+    const bonus = getBuildingRestBonus();
     restoreStamina(100 + bonus);
     addMessage(`休息しました。体力が全回復しました。${bonus > 0 ? `（施設ボーナス+${bonus}）` : ''}`);
     endTurn(1);

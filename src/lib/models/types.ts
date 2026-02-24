@@ -136,7 +136,7 @@ export interface RecipeDef {
 // 村施設システム（ドロー報酬）
 // =====================================
 
-export type VillageFacilityEffectType =
+export type BuildingEffectType =
   | 'daily_item'         // 毎朝アイテム入手
   | 'periodic_item'      // N日おきにアイテム入手
   | 'craft_success'      // 調合成功率+
@@ -148,20 +148,20 @@ export type VillageFacilityEffectType =
   | 'sell_price'         // 売値+%
   | 'buy_price';         // 買値-%
 
-export interface VillageFacilityEffect {
-  type: VillageFacilityEffectType;
+export interface BuildingEffect {
+  type: BuildingEffectType;
   value: number;
   itemId?: string;           // daily_item/periodic_item用
   itemCategory?: ItemCategory; // カテゴリ限定
   interval?: number;         // periodic_item用（日数間隔）
 }
 
-export interface VillageFacilityDef {
+export interface BuildingDef {
   id: string;
   name: string;
   description: string;
   icon: string;
-  effects: VillageFacilityEffect[];
+  effects: BuildingEffect[];
   effectDescription: string;
 }
 
@@ -393,7 +393,7 @@ export interface GameState {
   stats: GameStats;
 
   // 村施設・助手システム
-  villageFacilities: string[];      // 所有する村施設ID
+  buildings: string[];              // 所有する村施設ID
   ownedHelpers: OwnedHelper[];     // 所有する助手
 
   // 査察システム

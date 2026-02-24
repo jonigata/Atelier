@@ -1,12 +1,12 @@
-import { getAllVillageFacilities } from '$lib/data/villageFacilities';
+import { getAllBuildings } from '$lib/data/buildings';
 import { getAllHelpers } from '$lib/data/helpers';
-import type { VillageFacilityDef, HelperDef, OwnedHelper } from '$lib/models/types';
+import type { BuildingDef, HelperDef, OwnedHelper } from '$lib/models/types';
 
 /**
  * 施設ドローの選択肢を生成（未所有から最大3つ）
  */
-export function generateFacilityChoices(ownedIds: string[]): VillageFacilityDef[] {
-  const all = getAllVillageFacilities();
+export function generateBuildingChoices(ownedIds: string[]): BuildingDef[] {
+  const all = getAllBuildings();
   const available = all.filter((f) => !ownedIds.includes(f.id));
   if (available.length === 0) return [];
   return shuffleArray(available).slice(0, Math.min(3, available.length));

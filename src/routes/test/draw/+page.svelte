@@ -10,7 +10,7 @@
 
   // 所持施設をクリアして全施設が出るようにする
   function clearFacilities() {
-    gameState.update((s) => ({ ...s, villageFacilities: [] }));
+    gameState.update((s) => ({ ...s, buildings: [] }));
   }
 
   // 所持助手をクリアして全助手NEWが出るようにする
@@ -38,7 +38,7 @@
     pendingReputationLevelUp.set({ oldLevel: 1, newLevel: 2 });
   }
 
-  $: facilities = $gameState.villageFacilities;
+  $: facilities = $gameState.buildings;
   $: helpers = $gameState.ownedHelpers;
 </script>
 

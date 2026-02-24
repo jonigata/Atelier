@@ -33,7 +33,7 @@ import {
   resetCombo,
   getEffectiveIngredientCount,
 } from '$lib/services/equipmentEffects';
-import { getVillageCraftSuccessBonus, getVillageCraftQualityBonus } from '$lib/services/villageFacilityEffects';
+import { getBuildingCraftSuccessBonus, getBuildingCraftQualityBonus } from '$lib/services/buildingEffects';
 import { getHelperCraftSuccessBonus, getHelperCraftQualityBonus } from '$lib/services/helperEffects';
 import type { OwnedItem, RecipeDef, Ingredient } from '$lib/models/types';
 
@@ -394,7 +394,7 @@ export function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number, st
   const probBonus = getAllProbabilityBonus();
 
   // 施設・助手効果
-  const villageBonus = getVillageCraftSuccessBonus();
+  const villageBonus = getBuildingCraftSuccessBonus();
   const helperBonus = getHelperCraftSuccessBonus();
 
   return Math.max(0.01, Math.min(
@@ -428,7 +428,7 @@ export function calculateExpectedQuality(
   const varianceMult = getQualityVarianceMult();
 
   // 施設・助手効果
-  const villageQualityBonus = getVillageCraftQualityBonus();
+  const villageQualityBonus = getBuildingCraftQualityBonus();
   const helperQualityBonus = getHelperCraftQualityBonus();
 
   const base = Math.floor(avgQuality + levelBonus + qualityBonus + equipQualityBonus + comboBonus + villageQualityBonus + helperQualityBonus);
@@ -468,7 +468,7 @@ function calculateQuality(
   const randomFactor = Math.floor(Math.random() * randomRange) + randomMin;
 
   // 施設・助手効果
-  const villageQualityBonus = getVillageCraftQualityBonus();
+  const villageQualityBonus = getBuildingCraftQualityBonus();
   const helperQualityBonus = getHelperCraftQualityBonus();
 
   const quality = Math.floor(avgQuality + levelBonus + qualityBonus + equipQualityBonus + comboBonus + villageQualityBonus + helperQualityBonus + randomFactor);

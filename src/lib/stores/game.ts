@@ -74,7 +74,7 @@ function createInitialState(): GameState {
     },
 
     // 村施設・助手
-    villageFacilities: [],
+    buildings: [],
     ownedHelpers: [],
 
     completedInspections: [],
@@ -219,10 +219,10 @@ export const pendingLevelUp = writable<LevelUpInfo | null>(null);
 export const pendingVillageLevelUp = writable<LevelUpInfo | null>(null);
 export const pendingReputationLevelUp = writable<LevelUpInfo | null>(null);
 
-export function addVillageFacility(facilityId: string): void {
+export function addBuilding(facilityId: string): void {
   gameState.update((state) => ({
     ...state,
-    villageFacilities: [...state.villageFacilities, facilityId],
+    buildings: [...state.buildings, facilityId],
   }));
 }
 

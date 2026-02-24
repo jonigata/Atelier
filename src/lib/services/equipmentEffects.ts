@@ -13,7 +13,7 @@ import type {
   RecipeBookDef,
   ItemCategory,
 } from '$lib/models/types';
-import { getVillageStudyDaysReduce } from '$lib/services/villageFacilityEffects';
+import { getBuildingStudyDaysReduce } from '$lib/services/buildingEffects';
 
 // =====================================================================
 // 一時的な状態（セーブ不要）
@@ -319,7 +319,7 @@ export function getEffectiveStudyDays(book: RecipeBookDef, maxRecipeLevel?: numb
     days -= r.value;
   }
   // 施設効果
-  days -= getVillageStudyDaysReduce();
+  days -= getBuildingStudyDaysReduce();
   return Math.max(1, days);
 }
 

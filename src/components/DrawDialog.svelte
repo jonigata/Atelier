@@ -4,21 +4,21 @@
     gameState,
     pendingVillageLevelUp,
     pendingReputationLevelUp,
-    addVillageFacility,
+    addBuilding,
     addHelper,
     upgradeHelper,
     addMessage,
     skipPresentation,
   } from '$lib/stores/game';
-  import { generateFacilityChoices, generateHelperChoices } from '$lib/services/draw';
-  import type { VillageFacilityDef, HelperDef } from '$lib/models/types';
+  import { generateBuildingChoices, generateHelperChoices } from '$lib/services/draw';
+  import type { BuildingDef, HelperDef } from '$lib/models/types';
 
   type DrawMode = 'none' | 'facility' | 'helper';
   type DrawPhase = 'entering' | 'cards-in' | 'flipping' | 'choosing' | 'selected' | 'result' | 'closing';
 
   let drawMode: DrawMode = 'none';
   let phase: DrawPhase = 'entering';
-  let facilityChoices: VillageFacilityDef[] = [];
+  let facilityChoices: BuildingDef[] = [];
   let helperChoices: { def: HelperDef; currentLevel: number }[] = [];
   let selectedIndex: number = -1;
   let canInteract = false;
@@ -38,7 +38,7 @@
   const unsubVillage = pendingVillageLevelUp.subscribe((info) => {
     if (!info || drawMode !== 'none') return;
     const state = $gameState;
-    const choices = generateFacilityChoices(state.villageFacilities);
+    const choices = generateBuildingChoices(state.buildings);
     if (choices.length > 0) {
       facilityChoices = choices;
       drawMode = 'facility';
@@ -88,8 +88,8 @@
     addTimer(() => { phase = 'choosing'; canInteract = true; }, 1100);
   }
 
-  function applyFacilitySelection(facility: VillageFacilityDef) {
-    addVillageFacility(facility.id);
+  function applyFacilitySelection(facility: BuildingDef) {
+    addBuilding(facility.id);
     addMessage(`施設「${facility.name}」を建設した！ ${facility.effectDescription}`);
     facilityChoices = [];
     drawMode = 'none';
@@ -218,11 +218,16 @@
                   <span class="card-back-mark">?</span>
                 </div>
                 <!-- 表面 -->
-                <div class="card-face card-front card facility-card">
-                  <span class="card-icon">{facility.icon}</span>
-                  <span class="card-name">{facility.name}</span>
-                  <span class="card-desc">{facility.description}</span>
-                  <span class="card-effect">{facility.effectDescription}</span>
+                <div class="card-face card-front facility-card">
+                  <img
+                    class="card-building-img"
+                    src="/images/buildings/{facility.id}.png"
+                    alt={facility.name}
+                  />
+                  <div class="building-card-info">
+                    <span class="card-name">{facility.name}</span>
+                    <span class="card-effect-overlay">{facility.effectDescription}</span>
+                  </div>
                 </div>
               </button>
               {#if selectedIndex === i && (phase === 'result' || phase === 'closing')}
@@ -420,7 +425,7 @@
   /* ========== 3D Flip container ========== */
   .card-flip-container {
     width: 100%;
-    aspect-ratio: 2 / 3.5;
+    aspect-ratio: 2 / 2.8;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -495,16 +500,31 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   }
 
-  /* ========== Card (front face content) ========== */
-  .card {
-    background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
-    padding: 1rem 0.75rem;
+  /* ========== Facility card (image-based) ========== */
+  .facility-card {
+    overflow: hidden;
+    padding: 0;
+    background: #1a1a2e;
+  }
+
+  .card-building-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center top;
+  }
+
+  .building-card-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.75rem 0.5rem 0.5rem;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.9) 40%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.35rem;
-    text-align: center;
-    overflow: hidden;
+    gap: 0.2rem;
   }
 
   .card-flip-container.maxed .card-front {
@@ -515,10 +535,6 @@
   .card-chosen .card-front {
     border-color: #c9a959;
     box-shadow: 0 0 20px rgba(201, 169, 89, 0.5);
-  }
-
-  .card-icon {
-    font-size: 2rem;
   }
 
   .helper-card {
@@ -561,37 +577,6 @@
     font-weight: bold;
     color: #f4e4bc;
     white-space: nowrap;
-  }
-
-.card-desc {
-    font-size: 0.75rem;
-    color: #a0a0b0;
-    line-height: 1.3;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .card-effect {
-    font-size: 0.75rem;
-    color: #4caf50;
-    font-weight: bold;
-    padding: 0.2rem 0.4rem;
-    background: rgba(76, 175, 80, 0.1);
-    border: 1px solid rgba(76, 175, 80, 0.3);
-    border-radius: 4px;
-    margin-top: auto;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .card-effect.dimmed {
-    color: #808090;
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
   }
 
   .card-level {
