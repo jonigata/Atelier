@@ -4,6 +4,7 @@ import {
   addMessage,
   addItem,
   addExp,
+  addReputationExp,
   markItemCrafted,
 } from '$lib/stores/game';
 import { incrementCraftCount } from '$lib/stores/stats';
@@ -40,6 +41,7 @@ export interface CraftMultipleResult {
   items: OwnedItem[];
   duplicatedCount: number;
   totalExpGained: number;
+  totalReputationExpGained: number;
   message: string;
 }
 
@@ -51,15 +53,18 @@ function calculateCraftExpGained(
   quality: number,
   quantity: number,
   isNewDiscovery: boolean,
-): number {
+): { alchemyExp: number; reputationExp: number } {
   let exp = recipe.expReward * quantity;
   if (quality >= ALCHEMY.HIGH_QUALITY_THRESHOLD) {
     exp = Math.floor(exp * ALCHEMY.HIGH_QUALITY_EXP_BONUS);
   }
+  let reputationExp = 0;
   if (isNewDiscovery) {
-    exp += Math.floor(recipe.expReward * ALCHEMY.ALBUM_FIRST_CRAFT_EXP_BONUS);
+    const bonus = Math.floor(recipe.expReward * ALCHEMY.ALBUM_FIRST_CRAFT_EXP_BONUS);
+    exp += bonus;
+    reputationExp = bonus;
   }
-  return exp;
+  return { alchemyExp: exp, reputationExp };
 }
 
 /**
@@ -71,21 +76,23 @@ function generateBatchMessage(
   failCount: number,
   items: OwnedItem[],
   totalExpGained: number,
+  totalReputationExpGained: number,
   duplicatedCount: number
 ): string {
   if (successCount === 0 && failCount === 0) {
     return '素材が足りませんでした';
   }
   const dupMsg = duplicatedCount > 0 ? `（＋複製${duplicatedCount}個）` : '';
+  const repMsg = totalReputationExpGained > 0 ? ` / 名声Exp +${totalReputationExpGained}` : '';
   if (failCount === 0) {
     const avgQuality = Math.round(items.reduce((sum, item) => sum + item.quality, 0) / items.length);
-    return `${itemName}を${successCount}個${dupMsg}作成しました！（平均品質: ${avgQuality}） +${totalExpGained} Exp`;
+    return `${itemName}を${successCount}個${dupMsg}作成しました！（平均品質: ${avgQuality}） +${totalExpGained} Exp${repMsg}`;
   }
   if (successCount === 0) {
     return `${failCount}回すべて失敗しました... +${totalExpGained} Exp`;
   }
   const avgQuality = Math.round(items.reduce((sum, item) => sum + item.quality, 0) / items.length);
-  return `${itemName}を${successCount}個${dupMsg}作成、${failCount}個失敗（平均品質: ${avgQuality}） +${totalExpGained} Exp`;
+  return `${itemName}を${successCount}個${dupMsg}作成、${failCount}個失敗（平均品質: ${avgQuality}） +${totalExpGained} Exp${repMsg}`;
 }
 
 /**
@@ -163,6 +170,7 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
 
   const resultItems: OwnedItem[] = [];
   let totalExpGained = 0;
+  let totalReputationExpGained = 0;
   let duplicatedCount = 0;
 
   if (isSuccess) {
@@ -193,9 +201,11 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
       }
     }
 
-    const expGained = calculateCraftExpGained(recipe, quality, actualQuantity, isNewDiscovery);
+    const { alchemyExp: expGained, reputationExp: repExpGained } = calculateCraftExpGained(recipe, quality, actualQuantity, isNewDiscovery);
     addExp(expGained);
+    if (repExpGained > 0) addReputationExp(repExpGained);
     totalExpGained = expGained;
+    totalReputationExpGained = repExpGained;
     recordSuccess(recipe.id);
   } else {
     // 全失敗
@@ -230,6 +240,7 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
     isSuccess ? 0 : actualQuantity,
     resultItems,
     totalExpGained,
+    totalReputationExpGained,
     duplicatedCount,
   );
 
@@ -239,6 +250,7 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
     items: resultItems,
     duplicatedCount,
     totalExpGained,
+    totalReputationExpGained,
     message,
   };
 }
@@ -247,16 +259,16 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
 function validateBatchPreconditions(recipeId: string): { recipe: RecipeDef } | { error: CraftMultipleResult } {
   const recipe = getRecipe(recipeId);
   if (!recipe) {
-    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, message: 'レシピが見つかりません' } };
+    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, message: 'レシピが見つかりません' } };
   }
   const state = get(gameState);
   if (recipe.requiredLevel > calcLevelFromExp(state.alchemyExp)) {
-    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, message: `錬金術レベルが足りません（必要: Lv${recipe.requiredLevel}）` } };
+    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, message: `錬金術レベルが足りません（必要: Lv${recipe.requiredLevel}）` } };
   }
   return { recipe };
 }
 
-const EMPTY_BATCH_RESULT: CraftMultipleResult = { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, message: '素材が足りませんでした' };
+const EMPTY_BATCH_RESULT: CraftMultipleResult = { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, message: '素材が足りませんでした' };
 
 /**
  * 複数個の調合を実行（自動で素材を選択）

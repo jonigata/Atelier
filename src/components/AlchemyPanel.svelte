@@ -39,6 +39,7 @@
   let selectedItems: OwnedItem[] = [];
   let craftResultData: CraftMultipleResult | null = null;
   let expGaugeData: { before: number; after: number; max: number; label: string } | null = null;
+  let reputationExpGaugeData: { before: number; after: number; max: number; label: string } | null = null;
   let staminaGaugeData: { before: number; after: number; max: number; label: string } | null = null;
   let levelUpData: LevelUpInfo | null = null;
 
@@ -205,6 +206,9 @@
     const levelBefore = calcLevelFromExp(stateBefore.alchemyExp);
     const expBefore = calcExpProgress(stateBefore.alchemyExp);
     const expMax = calcExpForLevel(levelBefore);
+    const repLevelBefore = calcLevelFromExp(stateBefore.reputationExp);
+    const repExpBefore = calcExpProgress(stateBefore.reputationExp);
+    const repExpMax = calcExpForLevel(repLevelBefore);
     const staminaBefore = stateBefore.stamina;
 
     const result = craftBatch(selectedRecipe.id, selectedItems, craftQuantity);
@@ -220,6 +224,20 @@
       max: expMax,
       label: `Lv.${levelBefore}`,
     };
+
+    // 名声経験値ゲージデータを構築
+    if (result.totalReputationExpGained > 0) {
+      const repLevelAfter = calcLevelFromExp(stateAfter.reputationExp);
+      const repLeveledUp = repLevelAfter > repLevelBefore;
+      reputationExpGaugeData = {
+        before: repExpBefore,
+        after: repLeveledUp ? repExpMax : calcExpProgress(stateAfter.reputationExp),
+        max: repExpMax,
+        label: `名声 Lv.${repLevelBefore}`,
+      };
+    } else {
+      reputationExpGaugeData = null;
+    }
 
     // 体力ゲージデータを構築
     staminaGaugeData = {
@@ -337,6 +355,7 @@
     result={craftResultData}
     recipeName={selectedRecipe.name}
     {expGaugeData}
+    {reputationExpGaugeData}
     {staminaGaugeData}
     onClose={closeCraftResult}
   />
