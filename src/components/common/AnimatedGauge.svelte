@@ -168,9 +168,12 @@
   }
 
   .gauge-subtext :global(.draw-icon) {
-    height: 1.8em;
+    height: 1.3em;
     width: auto;
+    margin-left: 1px;
     margin-right: 1px;
+    position: relative;
+    top: 2px;
   }
 
   /* ゴールド（名声） */

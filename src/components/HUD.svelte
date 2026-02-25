@@ -209,14 +209,14 @@
   .draw-target {
     display: flex;
     align-items: center;
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     font-weight: bold;
     position: relative;
     top: 3px;
   }
 
   .draw-icon {
-    height: 1.7em;
+    height: 1.3em;
     width: auto;
     margin-right: 1px;
     position: relative;
