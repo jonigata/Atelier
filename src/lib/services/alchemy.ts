@@ -56,13 +56,14 @@ function calculateCraftExpGained(
   quantity: number,
   isNewDiscovery: boolean,
 ): { alchemyExp: number; reputationExp: number } {
-  let exp = recipe.expReward * quantity;
+  const baseExp = recipe.expReward * (recipe.craftDaysTenths / 10);
+  let exp = baseExp * quantity;
   if (quality >= ALCHEMY.HIGH_QUALITY_THRESHOLD) {
     exp = Math.floor(exp * ALCHEMY.HIGH_QUALITY_EXP_BONUS);
   }
   let reputationExp = 0;
   if (isNewDiscovery) {
-    const bonus = Math.floor(recipe.expReward * ALCHEMY.ALBUM_FIRST_CRAFT_EXP_BONUS);
+    const bonus = Math.floor(baseExp * ALCHEMY.ALBUM_FIRST_CRAFT_EXP_BONUS);
     exp += bonus;
     reputationExp = bonus;
   }
@@ -211,7 +212,7 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
     recordSuccess(recipe.id);
   } else {
     // 全失敗
-    const expGained = Math.floor(recipe.expReward * ALCHEMY.FAIL_EXP_RATE) * actualQuantity;
+    const expGained = Math.floor(recipe.expReward * (recipe.craftDaysTenths / 10) * ALCHEMY.FAIL_EXP_RATE) * actualQuantity;
     addExp(expGained);
     totalExpGained = expGained;
     resetCombo();
