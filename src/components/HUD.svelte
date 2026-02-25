@@ -42,7 +42,7 @@
         <div class="stat-value-row">
           <span class="stat-value village">Lv.{$villageLevel}</span>
           {#if calcNextDrawLevel($villageLevel)}
-            <span class="draw-target village"><img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="⚡" />{calcNextDrawLevel($villageLevel)}</span>
+            <span class="draw-target village"><img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="⚡" />Lv.{calcNextDrawLevel($villageLevel)}</span>
           {/if}
         </div>
         <div class="exp-bar">
@@ -54,7 +54,7 @@
         <div class="stat-value-row">
           <span class="stat-value reputation">Lv.{$reputationLevel}</span>
           {#if calcNextDrawLevel($reputationLevel)}
-            <span class="draw-target reputation"><img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="⚡" />{calcNextDrawLevel($reputationLevel)}</span>
+            <span class="draw-target reputation"><img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="⚡" />Lv.{calcNextDrawLevel($reputationLevel)}</span>
           {/if}
         </div>
         <div class="exp-bar">
@@ -184,6 +184,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.1rem;
+    min-width: 4rem;
   }
 
   .stat-label {
@@ -232,7 +233,7 @@
 
   .exp-bar,
   .stamina-bar {
-    width: 50px;
+    width: 65px;
     height: 4px;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 2px;
