@@ -9,7 +9,7 @@ import {
   learnRecipe,
   unlockFacility,
 } from '$lib/stores/game';
-import { calcExpForLevel, calcLevelFromExp, calcExpProgress, buildExpGaugeSegments } from '$lib/data/balance';
+import { calcExpForLevel, calcLevelFromExp, calcExpProgress, buildExpGaugeSegments, calcNextDrawLevel } from '$lib/data/balance';
 import { completeAchievement, clearPendingReward, isAchievementCompleted } from '$lib/stores/achievements';
 import { unlockAction } from '$lib/stores/tutorial';
 import {
@@ -501,6 +501,7 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
     const levelAfter = calcLevelFromExp(totalAfter);
     const progressAfter = calcExpProgress(totalAfter);
     const leveledUp = levelAfter > levelBefore;
+    const repNextDraw = calcNextDrawLevel(levelAfter);
     structured.push({
       text: `名声Exp +${reward.reputationExp}`,
       type: 'reputation',
@@ -512,6 +513,7 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
         segments: leveledUp
           ? buildExpGaugeSegments(levelBefore, before, levelAfter, progressAfter)
           : undefined,
+        subtext: repNextDraw ? `NEXT⚡️Lv.${repNextDraw}` : undefined,
       },
     });
   }
@@ -547,6 +549,7 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
     const levelAfter = calcLevelFromExp(totalAfter);
     const progressAfter = calcExpProgress(totalAfter);
     const leveledUp = levelAfter > levelBefore;
+    const vilNextDraw = calcNextDrawLevel(levelAfter);
     structured.push({
       text: `村発展Exp +${reward.villageExp}`,
       type: 'villageDevelopment',
@@ -558,6 +561,7 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
         segments: leveledUp
           ? buildExpGaugeSegments(levelBefore, before, levelAfter, progressAfter)
           : undefined,
+        subtext: vilNextDraw ? `NEXT⚡️Lv.${vilNextDraw}` : undefined,
       },
     });
   }

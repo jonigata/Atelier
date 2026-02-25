@@ -9,6 +9,7 @@
   export let text: string = '';
   export let color: 'gold' | 'blue' | 'green' | 'orange' = 'blue';
   export let segments: GaugeSegment[] | undefined = undefined;
+  export let subtext: string = '';
 
   // アニメーション状態
   let displayLabel = label;
@@ -70,7 +71,12 @@
 </script>
 
 <div class="gauge-row gauge-{color}">
-  <div class="gauge-label">{displayLabel}</div>
+  <div class="gauge-label-col">
+    <div class="gauge-label">{displayLabel}</div>
+    {#if subtext}
+      <div class="gauge-subtext">{subtext}</div>
+    {/if}
+  </div>
   <div class="gauge-track">
     {#key animKey}
       <div
@@ -92,13 +98,16 @@
     gap: 0.75rem;
   }
 
+  .gauge-label-col {
+    min-width: 4.5em;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
   .gauge-label {
     font-size: 0.8rem;
     font-weight: bold;
     color: #a0a0b0;
-    min-width: 4.5em;
-    text-align: right;
-    flex-shrink: 0;
     transition: color 0.15s;
   }
 
@@ -149,12 +158,19 @@
     flex-shrink: 0;
   }
 
+  .gauge-subtext {
+    font-size: 0.7rem;
+    color: #e0e0f0;
+    margin-top: 1px;
+  }
+
   /* ゴールド（名声） */
   .gauge-gold .gauge-fill {
     background: linear-gradient(90deg, #c9a959, #ffd700);
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
   }
   .gauge-gold .gauge-label { color: #ffd700; }
+  .gauge-gold .gauge-subtext { color: #ffe766; }
 
   /* ブルー（経験値） */
   .gauge-blue .gauge-fill {
@@ -162,6 +178,7 @@
     box-shadow: 0 0 10px rgba(100, 181, 246, 0.6);
   }
   .gauge-blue .gauge-label { color: #64b5f6; }
+  .gauge-blue .gauge-subtext { color: #a0d4ff; }
 
   /* グリーン（村発展度） */
   .gauge-green .gauge-fill {
@@ -169,6 +186,7 @@
     box-shadow: 0 0 10px rgba(129, 199, 132, 0.6);
   }
   .gauge-green .gauge-label { color: #81c784; }
+  .gauge-green .gauge-subtext { color: #b0e8b3; }
 
   /* オレンジ（体力） */
   .gauge-orange .gauge-fill {

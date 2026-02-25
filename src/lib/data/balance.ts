@@ -225,6 +225,15 @@ export function calcExpProgress(totalExp: number): number {
 }
 
 /**
+ * 現在レベルから次のカードドロー（3の倍数レベル）を算出
+ * ドロー対象レベルがMAX_LEVELを超える場合は0を返す
+ */
+export function calcNextDrawLevel(currentLevel: number): number {
+  const next = Math.ceil((currentLevel + 1) / 3) * 3;
+  return next <= LEVEL.MAX_LEVEL ? next : 0;
+}
+
+/**
  * レベルアップを跨ぐゲージアニメーション用セグメントを構築
  * レベルが上がるたびにバーが左から右へ繰り返されるデータを生成
  */

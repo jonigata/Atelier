@@ -7,7 +7,7 @@
   import { recipes } from '$lib/data/recipes';
   import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient, calculateStaminaCost, calculateFatiguePenalty, getFatigueLabel } from '$lib/services/alchemy';
   import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
-  import { calcExpForLevel, calcLevelFromExp, calcExpProgress, buildExpGaugeSegments } from '$lib/data/balance';
+  import { calcExpForLevel, calcLevelFromExp, calcExpProgress, buildExpGaugeSegments, calcNextDrawLevel } from '$lib/data/balance';
   import { getEffectiveCraftDays, getEffectiveIngredientCount, craftDaysToActual, formatCraftDays } from '$lib/services/equipmentEffects';
   import type { RecipeDef, OwnedItem, Ingredient, GaugeData } from '$lib/models/types';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
@@ -234,6 +234,7 @@
       const repLevelAfter = calcLevelFromExp(stateAfter.reputationExp);
       const repProgressAfter = calcExpProgress(stateAfter.reputationExp);
       const repLeveledUp = repLevelAfter > repLevelBefore;
+      const repNextDraw = calcNextDrawLevel(repLevelAfter);
       reputationExpGaugeData = {
         before: repExpBefore,
         after: repLeveledUp ? repExpMax : repProgressAfter,
@@ -242,6 +243,7 @@
         segments: repLeveledUp
           ? buildExpGaugeSegments(repLevelBefore, repExpBefore, repLevelAfter, repProgressAfter, '名声 Lv.')
           : undefined,
+        subtext: repNextDraw ? `NEXT⚡️Lv.${repNextDraw}` : undefined,
       };
     } else {
       reputationExpGaugeData = null;

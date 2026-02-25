@@ -229,7 +229,6 @@
               </div>
               {#if isExpanded}
                 <div class="objective-detail">
-                  <div class="detail-description">{goal.description}</div>
                   <div class="detail-conditions">
                     {#each condDetails as cond}
                       <div class="condition-row" class:met={cond.met}>

@@ -322,6 +322,7 @@ export interface GaugeData {
   max: number;
   label: string;
   segments?: GaugeSegment[]; // レベルアップ時の複数セグメントアニメーション
+  subtext?: string;          // ゲージ下の補足テキスト（次のドロー目標など）
 }
 
 // 構造化された報酬アイテム（アイコン表示用）

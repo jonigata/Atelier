@@ -257,6 +257,7 @@
             text="+{result.totalReputationExpGained} 名声Exp"
             color="green"
             segments={reputationExpGaugeData.segments}
+            subtext={reputationExpGaugeData.subtext ?? ''}
           />
         {:else if result.totalReputationExpGained > 0}
           <div class="exp-row">

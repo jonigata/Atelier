@@ -261,6 +261,7 @@
                     text={reward.text}
                     color={getGaugeColor(reward.type)}
                     segments={reward.gaugeData.segments}
+                    subtext={reward.gaugeData.subtext ?? ''}
                   />
                 {/if}
               {/each}
@@ -285,6 +286,7 @@
                   text={reward.text}
                   color={getGaugeColor(reward.type)}
                   segments={reward.gaugeData.segments}
+                  subtext={reward.gaugeData.subtext ?? ''}
                 />
               </div>
             {:else if !reward.itemId}
