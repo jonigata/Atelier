@@ -243,7 +243,7 @@
         segments: repLeveledUp
           ? buildExpGaugeSegments(repLevelBefore, repExpBefore, repLevelAfter, repProgressAfter, '名声 Lv.')
           : undefined,
-        subtext: repNextDraw ? `NEXT⚡️Lv.${repNextDraw}` : undefined,
+        subtext: repNextDraw ? `NEXT<img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="">Lv.${repNextDraw}` : undefined,
       };
     } else {
       reputationExpGaugeData = null;

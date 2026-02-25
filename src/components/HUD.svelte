@@ -1,6 +1,6 @@
 <script lang="ts">
   import { gameState, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel, skipPresentation, toggleSkipPresentation } from '$lib/stores/game';
-  import { calcExpForLevel, calcExpProgress } from '$lib/data/balance';
+  import { calcExpForLevel, calcExpProgress, calcNextDrawLevel } from '$lib/data/balance';
   import MoneyIndicator from './MoneyIndicator.svelte';
 
   $: staminaRatio = $gameState.stamina / $gameState.maxStamina;
@@ -39,21 +39,33 @@
     <div class="hud-section stats-section">
       <div class="stat-item">
         <span class="stat-label">村発展</span>
-        <span class="stat-value village">Lv.{$villageLevel}</span>
+        <div class="stat-value-row">
+          <span class="stat-value village">Lv.{$villageLevel}</span>
+          {#if calcNextDrawLevel($villageLevel)}
+            <span class="draw-target village"><img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="⚡" />{calcNextDrawLevel($villageLevel)}</span>
+          {/if}
+        </div>
         <div class="exp-bar">
           <div class="exp-fill village-fill" style="width: {Math.min(100, (calcExpProgress($gameState.villageExp) / calcExpForLevel($villageLevel)) * 100)}%"></div>
         </div>
       </div>
       <div class="stat-item">
         <span class="stat-label">名声</span>
-        <span class="stat-value reputation">Lv.{$reputationLevel}</span>
+        <div class="stat-value-row">
+          <span class="stat-value reputation">Lv.{$reputationLevel}</span>
+          {#if calcNextDrawLevel($reputationLevel)}
+            <span class="draw-target reputation"><img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="⚡" />{calcNextDrawLevel($reputationLevel)}</span>
+          {/if}
+        </div>
         <div class="exp-bar">
           <div class="exp-fill reputation-fill" style="width: {Math.min(100, (calcExpProgress($gameState.reputationExp) / calcExpForLevel($reputationLevel)) * 100)}%"></div>
         </div>
       </div>
       <div class="stat-item">
         <span class="stat-label">錬金術</span>
-        <span class="stat-value">Lv.{$alchemyLevel}</span>
+        <div class="stat-value-row">
+          <span class="stat-value">Lv.{$alchemyLevel}</span>
+        </div>
         <div class="exp-bar">
           <div class="exp-fill" style="width: {Math.min(100, (calcExpProgress($gameState.alchemyExp) / $expForNextLevel) * 100)}%"></div>
         </div>
@@ -186,6 +198,35 @@
 
   .stat-value.village {
     color: #81c784;
+  }
+
+  .stat-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+  }
+
+  .draw-target {
+    display: flex;
+    align-items: center;
+    font-size: 0.6rem;
+    font-weight: bold;
+  }
+
+  .draw-icon {
+    height: 1.3em;
+    width: auto;
+    margin-right: 1px;
+    position: relative;
+    top: 1px;
+  }
+
+  .draw-target.village {
+    color: #81c784;
+  }
+
+  .draw-target.reputation {
+    color: #e0c080;
   }
 
   .exp-bar,

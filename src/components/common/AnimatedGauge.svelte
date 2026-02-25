@@ -74,7 +74,7 @@
   <div class="gauge-label-col">
     <div class="gauge-label">{displayLabel}</div>
     {#if subtext}
-      <div class="gauge-subtext">{subtext}</div>
+      <div class="gauge-subtext">{@html subtext}</div>
     {/if}
   </div>
   <div class="gauge-track">
@@ -162,6 +162,15 @@
     font-size: 0.7rem;
     color: #e0e0f0;
     margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .gauge-subtext :global(.draw-icon) {
+    height: 1.8em;
+    width: auto;
+    margin-right: 1px;
   }
 
   /* ゴールド（名声） */

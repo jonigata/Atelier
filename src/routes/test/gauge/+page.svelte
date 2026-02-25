@@ -3,6 +3,7 @@
   import type { GaugeSegment } from '$lib/models/types';
 
   let testKey = 0;
+  const drawIcon = '<img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="">';
 
   function replay() {
     testKey++;
@@ -134,7 +135,7 @@
           text="+12 名声Exp"
           color="green"
           segments={reputationLevelUp}
-          subtext="NEXT⚡️Lv.3"
+          subtext={`NEXT${drawIcon}Lv.3`}
         />
       </div>
     </section>
@@ -180,7 +181,7 @@
           label="Lv.4"
           text="+7 村発展Exp"
           color="green"
-          subtext="NEXT⚡️Lv.6"
+          subtext={`NEXT${drawIcon}Lv.6`}
         />
       </div>
     </section>
@@ -200,7 +201,7 @@
             { from: 10, to: 22, max: 22, label: '名声 Lv.5' },
             { from: 0, to: 5, max: 25, label: '名声 Lv.6' },
           ]}
-          subtext="NEXT⚡️Lv.9"
+          subtext={`NEXT${drawIcon}Lv.9`}
         />
       </div>
     </section>

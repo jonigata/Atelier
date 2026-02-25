@@ -21,7 +21,7 @@
   import { checkMilestoneProgress } from '$lib/services/tutorial';
   import { setEventDialogue } from '$lib/stores/tutorial';
   import { getQuestMoneyMult, getQuestReputationBonus, getQuestQualityBonus } from '$lib/services/equipmentEffects';
-  import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments } from '$lib/data/balance';
+  import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments, calcNextDrawLevel } from '$lib/data/balance';
   import { get } from 'svelte/store';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
   import QuestTypeIcon from './common/QuestTypeIcon.svelte';
@@ -156,6 +156,7 @@
           segments: repLeveledUp
             ? buildExpGaugeSegments(repLevelBefore, repExpBefore, repLevelAfter, repProgressAfter)
             : undefined,
+          subtext: (() => { const n = calcNextDrawLevel(repLevelAfter); return n ? `NEXT<img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="">Lv.${n}` : undefined; })(),
         },
       },
       {
@@ -169,6 +170,7 @@
           segments: vilLeveledUp
             ? buildExpGaugeSegments(vilLevelBefore, vilExpBefore, vilLevelAfter, vilProgressAfter)
             : undefined,
+          subtext: (() => { const n = calcNextDrawLevel(vilLevelAfter); return n ? `NEXT<img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="">Lv.${n}` : undefined; })(),
         },
       },
     ];
