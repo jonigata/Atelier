@@ -223,3 +223,54 @@ export function calcExpProgress(totalExp: number): number {
   }
   return remaining;
 }
+
+/**
+ * レベルアップを跨ぐゲージアニメーション用セグメントを構築
+ * レベルが上がるたびにバーが左から右へ繰り返されるデータを生成
+ */
+export function buildExpGaugeSegments(
+  levelBefore: number,
+  progressBefore: number,
+  levelAfter: number,
+  progressAfter: number,
+  labelPrefix: string = 'Lv.'
+): import('$lib/models/types').GaugeSegment[] {
+  if (levelAfter <= levelBefore) {
+    return [{
+      from: progressBefore,
+      to: progressAfter,
+      max: calcExpForLevel(levelBefore),
+      label: `${labelPrefix}${levelBefore}`
+    }];
+  }
+
+  const segments: import('$lib/models/types').GaugeSegment[] = [];
+
+  // 最初のセグメント: 現在レベルを100%まで埋める
+  segments.push({
+    from: progressBefore,
+    to: calcExpForLevel(levelBefore),
+    max: calcExpForLevel(levelBefore),
+    label: `${labelPrefix}${levelBefore}`
+  });
+
+  // 中間レベル: 0%→100%のフル表示
+  for (let lv = levelBefore + 1; lv < levelAfter; lv++) {
+    segments.push({
+      from: 0,
+      to: calcExpForLevel(lv),
+      max: calcExpForLevel(lv),
+      label: `${labelPrefix}${lv}`
+    });
+  }
+
+  // 最後のセグメント: 0%→新レベルでの進捗
+  segments.push({
+    from: 0,
+    to: progressAfter,
+    max: calcExpForLevel(levelAfter),
+    label: `${labelPrefix}${levelAfter}`
+  });
+
+  return segments;
+}

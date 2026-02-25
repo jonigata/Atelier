@@ -21,7 +21,7 @@
   import { checkMilestoneProgress } from '$lib/services/tutorial';
   import { setEventDialogue } from '$lib/stores/tutorial';
   import { getQuestMoneyMult, getQuestReputationBonus, getQuestQualityBonus } from '$lib/services/equipmentEffects';
-  import { calcLevelFromExp, calcExpProgress, calcExpForLevel } from '$lib/data/balance';
+  import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments } from '$lib/data/balance';
   import { get } from 'svelte/store';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
   import QuestTypeIcon from './common/QuestTypeIcon.svelte';
@@ -138,6 +138,11 @@
     const vilLevelAfter = calcLevelFromExp(stateAfter.villageExp);
 
     // 完了ダイアログを表示
+    const repProgressAfter = calcExpProgress(stateAfter.reputationExp);
+    const vilProgressAfter = calcExpProgress(stateAfter.villageExp);
+    const repLeveledUp = repLevelAfter > repLevelBefore;
+    const vilLeveledUp = vilLevelAfter > vilLevelBefore;
+
     const structuredRewards: RewardDisplay[] = [
       { text: `${finalMoney.toLocaleString()} G`, type: 'money' },
       {
@@ -145,9 +150,12 @@
         type: 'reputation',
         gaugeData: {
           before: repExpBefore,
-          after: repLevelAfter > repLevelBefore ? repExpMax : calcExpProgress(stateAfter.reputationExp),
+          after: repLeveledUp ? repExpMax : repProgressAfter,
           max: repExpMax,
           label: `Lv.${repLevelBefore}`,
+          segments: repLeveledUp
+            ? buildExpGaugeSegments(repLevelBefore, repExpBefore, repLevelAfter, repProgressAfter)
+            : undefined,
         },
       },
       {
@@ -155,9 +163,12 @@
         type: 'villageDevelopment',
         gaugeData: {
           before: vilExpBefore,
-          after: vilLevelAfter > vilLevelBefore ? vilExpMax : calcExpProgress(stateAfter.villageExp),
+          after: vilLeveledUp ? vilExpMax : vilProgressAfter,
           max: vilExpMax,
           label: `Lv.${vilLevelBefore}`,
+          segments: vilLeveledUp
+            ? buildExpGaugeSegments(vilLevelBefore, vilExpBefore, vilLevelAfter, vilProgressAfter)
+            : undefined,
         },
       },
     ];

@@ -2,12 +2,13 @@
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import AnimatedGauge from '../common/AnimatedGauge.svelte';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
+  import type { GaugeData } from '$lib/models/types';
 
   export let result: CraftMultipleResult;
   export let recipeName: string;
-  export let expGaugeData: { before: number; after: number; max: number; label: string } | null = null;
-  export let reputationExpGaugeData: { before: number; after: number; max: number; label: string } | null = null;
-  export let staminaGaugeData: { before: number; after: number; max: number; label: string } | null = null;
+  export let expGaugeData: GaugeData | null = null;
+  export let reputationExpGaugeData: GaugeData | null = null;
+  export let staminaGaugeData: GaugeData | null = null;
   export let onClose: () => void;
 
   $: allSuccess = result.failCount === 0 && result.successCount > 0;
@@ -239,6 +240,7 @@
             label={expGaugeData.label}
             text="+{result.totalExpGained} Exp"
             color="blue"
+            segments={expGaugeData.segments}
           />
         {:else}
           <div class="exp-row">
@@ -254,6 +256,7 @@
             label={reputationExpGaugeData.label}
             text="+{result.totalReputationExpGained} 名声Exp"
             color="green"
+            segments={reputationExpGaugeData.segments}
           />
         {:else if result.totalReputationExpGained > 0}
           <div class="exp-row">

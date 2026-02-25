@@ -1,19 +1,86 @@
 <script lang="ts">
-  export let before: number;
-  export let after: number;
-  export let max: number;
-  export let label: string;
-  export let text: string;
-  export let color: 'gold' | 'blue' | 'green' | 'orange' = 'blue';
+  import { onMount } from 'svelte';
+  import type { GaugeSegment } from '$lib/models/types';
 
-  $: beforePct = (before / max) * 100;
-  $: afterPct = (after / max) * 100;
+  export let before: number = 0;
+  export let after: number = 0;
+  export let max: number = 100;
+  export let label: string = '';
+  export let text: string = '';
+  export let color: 'gold' | 'blue' | 'green' | 'orange' = 'blue';
+  export let segments: GaugeSegment[] | undefined = undefined;
+
+  // アニメーション状態
+  let displayLabel = label;
+  let fromPct = 0;
+  let toPct = 0;
+  let animKey = 0;
+  let duration = 1000;
+  let delay = 500;
+  let flashVisible = false;
+
+  function sleep(ms: number) {
+    return new Promise<void>(r => setTimeout(r, ms));
+  }
+
+  onMount(() => {
+    if (segments && segments.length > 1) {
+      playMultiSegment(segments);
+    } else if (segments && segments.length === 1) {
+      const seg = segments[0];
+      displayLabel = seg.label;
+      fromPct = (seg.from / seg.max) * 100;
+      toPct = (seg.to / seg.max) * 100;
+      duration = 1000;
+      delay = 500;
+    } else {
+      // 従来動作: before/after/maxで単一アニメーション
+      fromPct = (before / max) * 100;
+      toPct = (after / max) * 100;
+      duration = 1000;
+      delay = 500;
+    }
+  });
+
+  async function playMultiSegment(segs: GaugeSegment[]) {
+    for (let i = 0; i < segs.length; i++) {
+      const seg = segs[i];
+      const fillPct = ((seg.to - seg.from) / seg.max) * 100;
+
+      displayLabel = seg.label;
+      fromPct = (seg.from / seg.max) * 100;
+      toPct = (seg.to / seg.max) * 100;
+      delay = i === 0 ? 500 : 0;
+      // 充填量に比例した時間（最低250ms、100%で800ms）
+      duration = Math.max(250, Math.round(fillPct * 8));
+      animKey++;
+
+      // delay + アニメーション完了を待つ
+      await sleep(delay + duration);
+
+      if (i < segs.length - 1) {
+        // セグメント間のフラッシュ（レベルアップ演出）
+        flashVisible = true;
+        await sleep(200);
+        flashVisible = false;
+        await sleep(50);
+      }
+    }
+  }
 </script>
 
 <div class="gauge-row gauge-{color}">
-  <div class="gauge-label">{label}</div>
+  <div class="gauge-label">{displayLabel}</div>
   <div class="gauge-track">
-    <div class="gauge-fill" style="--from: {beforePct}%; --to: {afterPct}%"></div>
+    {#key animKey}
+      <div
+        class="gauge-fill"
+        style="--from: {fromPct}%; --to: {toPct}%; --duration: {duration}ms; --delay: {delay}ms"
+      ></div>
+    {/key}
+    {#if flashVisible}
+      <div class="gauge-flash"></div>
+    {/if}
   </div>
   <div class="gauge-text">{text}</div>
 </div>
@@ -32,6 +99,7 @@
     min-width: 4.5em;
     text-align: right;
     flex-shrink: 0;
+    transition: color 0.15s;
   }
 
   .gauge-track {
@@ -51,12 +119,25 @@
     height: 100%;
     border-radius: 6px;
     width: var(--to);
-    animation: gaugeFill 1s ease-out 0.5s both;
+    animation: gaugeFill var(--duration) ease-out var(--delay) both;
   }
 
   @keyframes gaugeFill {
     from { width: var(--from); }
     to { width: var(--to); }
+  }
+
+  .gauge-flash {
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.6);
+    animation: gaugeFlash 0.2s ease-out both;
+  }
+
+  @keyframes gaugeFlash {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
   }
 
   .gauge-text {

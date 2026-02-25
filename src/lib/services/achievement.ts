@@ -9,7 +9,7 @@ import {
   learnRecipe,
   unlockFacility,
 } from '$lib/stores/game';
-import { calcExpForLevel, calcLevelFromExp, calcExpProgress } from '$lib/data/balance';
+import { calcExpForLevel, calcLevelFromExp, calcExpProgress, buildExpGaugeSegments } from '$lib/data/balance';
 import { completeAchievement, clearPendingReward, isAchievementCompleted } from '$lib/stores/achievements';
 import { unlockAction } from '$lib/stores/tutorial';
 import {
@@ -494,38 +494,71 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
   }
 
   if (reward.reputationExp) {
-    const level = calcLevelFromExp(state.reputationExp);
+    const levelBefore = calcLevelFromExp(state.reputationExp);
     const before = calcExpProgress(state.reputationExp);
-    const max = calcExpForLevel(level);
-    const after = Math.min(max, before + reward.reputationExp);
+    const max = calcExpForLevel(levelBefore);
+    const totalAfter = state.reputationExp + reward.reputationExp;
+    const levelAfter = calcLevelFromExp(totalAfter);
+    const progressAfter = calcExpProgress(totalAfter);
+    const leveledUp = levelAfter > levelBefore;
     structured.push({
       text: `名声Exp +${reward.reputationExp}`,
       type: 'reputation',
-      gaugeData: { before, after, max, label: `Lv.${level}` },
+      gaugeData: {
+        before,
+        after: leveledUp ? max : progressAfter,
+        max,
+        label: `Lv.${levelBefore}`,
+        segments: leveledUp
+          ? buildExpGaugeSegments(levelBefore, before, levelAfter, progressAfter)
+          : undefined,
+      },
     });
   }
 
   if (reward.exp) {
-    const level = calcLevelFromExp(state.alchemyExp);
+    const levelBefore = calcLevelFromExp(state.alchemyExp);
     const before = calcExpProgress(state.alchemyExp);
-    const max = calcExpForLevel(level);
-    const after = Math.min(max, before + reward.exp);
+    const max = calcExpForLevel(levelBefore);
+    const totalAfter = state.alchemyExp + reward.exp;
+    const levelAfter = calcLevelFromExp(totalAfter);
+    const progressAfter = calcExpProgress(totalAfter);
+    const leveledUp = levelAfter > levelBefore;
     structured.push({
       text: `経験値 +${reward.exp}`,
       type: 'exp',
-      gaugeData: { before, after, max, label: `Lv.${level}` },
+      gaugeData: {
+        before,
+        after: leveledUp ? max : progressAfter,
+        max,
+        label: `Lv.${levelBefore}`,
+        segments: leveledUp
+          ? buildExpGaugeSegments(levelBefore, before, levelAfter, progressAfter)
+          : undefined,
+      },
     });
   }
 
   if (reward.villageExp) {
-    const level = calcLevelFromExp(state.villageExp);
+    const levelBefore = calcLevelFromExp(state.villageExp);
     const before = calcExpProgress(state.villageExp);
-    const max = calcExpForLevel(level);
-    const after = Math.min(max, before + reward.villageExp);
+    const max = calcExpForLevel(levelBefore);
+    const totalAfter = state.villageExp + reward.villageExp;
+    const levelAfter = calcLevelFromExp(totalAfter);
+    const progressAfter = calcExpProgress(totalAfter);
+    const leveledUp = levelAfter > levelBefore;
     structured.push({
       text: `村発展Exp +${reward.villageExp}`,
       type: 'villageDevelopment',
-      gaugeData: { before, after, max, label: `Lv.${level}` },
+      gaugeData: {
+        before,
+        after: leveledUp ? max : progressAfter,
+        max,
+        label: `Lv.${levelBefore}`,
+        segments: leveledUp
+          ? buildExpGaugeSegments(levelBefore, before, levelAfter, progressAfter)
+          : undefined,
+      },
     });
   }
 

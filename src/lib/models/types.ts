@@ -307,6 +307,23 @@ export type MorningEvent =
   | { type: 'merchant_departure'; message: string };
 
 // チュートリアル会話
+// ゲージアニメーションのセグメント（レベルアップ時の繰り返し表示用）
+export interface GaugeSegment {
+  from: number;
+  to: number;
+  max: number;
+  label: string;
+}
+
+// ゲージ演出データ
+export interface GaugeData {
+  before: number;
+  after: number;
+  max: number;
+  label: string;
+  segments?: GaugeSegment[]; // レベルアップ時の複数セグメントアニメーション
+}
+
 // 構造化された報酬アイテム（アイコン表示用）
 export interface RewardDisplay {
   text: string;
@@ -314,12 +331,7 @@ export interface RewardDisplay {
   itemId?: string;  // アイコン表示用（アイテム報酬の場合）
   iconUrl?: string; // カスタムアイコンURL（アクションアンロック等）
   type: 'money' | 'item' | 'reputation' | 'recipe' | 'unlock' | 'exp' | 'villageDevelopment';
-  gaugeData?: {     // ゲージ演出用
-    before: number;
-    after: number;
-    max: number;
-    label: string;  // ゲージラベル（例: "Lv.3"）
-  };
+  gaugeData?: GaugeData;
 }
 
 // ダイアログ1行分（文字列 or 表情付き）
