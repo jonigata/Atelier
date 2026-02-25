@@ -513,7 +513,7 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
         segments: leveledUp
           ? buildExpGaugeSegments(levelBefore, before, levelAfter, progressAfter)
           : undefined,
-        subtext: repNextDraw ? `NEXT<img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="">Lv.${repNextDraw}` : undefined,
+        subtext: repNextDraw ? `NEXT<img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="">Lv.${repNextDraw}` : undefined,
       },
     });
   }
@@ -561,7 +561,7 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
         segments: leveledUp
           ? buildExpGaugeSegments(levelBefore, before, levelAfter, progressAfter)
           : undefined,
-        subtext: vilNextDraw ? `NEXT<img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="">Lv.${vilNextDraw}` : undefined,
+        subtext: vilNextDraw ? `NEXT<img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="">Lv.${vilNextDraw}` : undefined,
       },
     });
   }

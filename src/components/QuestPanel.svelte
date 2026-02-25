@@ -156,7 +156,7 @@
           segments: repLeveledUp
             ? buildExpGaugeSegments(repLevelBefore, repExpBefore, repLevelAfter, repProgressAfter)
             : undefined,
-          subtext: (() => { const n = calcNextDrawLevel(repLevelAfter); return n ? `NEXT<img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="">Lv.${n}` : undefined; })(),
+          subtext: (() => { const n = calcNextDrawLevel(repLevelAfter); return n ? `NEXT<img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="">Lv.${n}` : undefined; })(),
         },
       },
       {
@@ -170,7 +170,7 @@
           segments: vilLeveledUp
             ? buildExpGaugeSegments(vilLevelBefore, vilExpBefore, vilLevelAfter, vilProgressAfter)
             : undefined,
-          subtext: (() => { const n = calcNextDrawLevel(vilLevelAfter); return n ? `NEXT<img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="">Lv.${n}` : undefined; })(),
+          subtext: (() => { const n = calcNextDrawLevel(vilLevelAfter); return n ? `NEXT<img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="">Lv.${n}` : undefined; })(),
         },
       },
     ];

@@ -42,7 +42,7 @@
         <div class="stat-value-row">
           <span class="stat-value village">Lv.{$villageLevel}</span>
           {#if calcNextDrawLevel($villageLevel)}
-            <span class="draw-target village"><img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="⚡" />{calcNextDrawLevel($villageLevel)}</span>
+            <span class="draw-target village"><img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="⚡" />{calcNextDrawLevel($villageLevel)}</span>
           {/if}
         </div>
         <div class="exp-bar">
@@ -54,7 +54,7 @@
         <div class="stat-value-row">
           <span class="stat-value reputation">Lv.{$reputationLevel}</span>
           {#if calcNextDrawLevel($reputationLevel)}
-            <span class="draw-target reputation"><img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="⚡" />{calcNextDrawLevel($reputationLevel)}</span>
+            <span class="draw-target reputation"><img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="⚡" />{calcNextDrawLevel($reputationLevel)}</span>
           {/if}
         </div>
         <div class="exp-bar">
@@ -211,14 +211,15 @@
     align-items: center;
     font-size: 0.6rem;
     font-weight: bold;
+    position: relative;
+    top: 3px;
   }
 
   .draw-icon {
-    height: 1.3em;
+    height: 1.7em;
     width: auto;
     margin-right: 1px;
     position: relative;
-    top: 1px;
   }
 
   .draw-target.village {

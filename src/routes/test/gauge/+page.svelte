@@ -3,7 +3,7 @@
   import type { GaugeSegment } from '$lib/models/types';
 
   let testKey = 0;
-  const drawIcon = '<img class="draw-icon" src="/icons/actions/draw_lightning.png" alt="">';
+  const drawIcon = '<img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="">';
 
   function replay() {
     testKey++;
