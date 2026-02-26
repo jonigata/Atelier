@@ -187,6 +187,13 @@
   function getAlbumGradeBoundary(criterion: InspectionCriterion, grade: 'C' | 'B' | 'A' | 'S', tileCount: number): number {
     return Math.round(getThresholdRatio(criterion, grade) * tileCount);
   }
+
+  // カードの背景・ボーダースタイル（pass時にグレード色で染める）
+  function cardStyle(grade: InspectionGrade, met: boolean): string {
+    if (!met) return '';
+    const c = gradeColors[grade];
+    return `background: linear-gradient(135deg, ${c}12, ${c}20); border: 2px solid ${c}cc; box-shadow: 0 0 10px ${c}55, 0 0 3px ${c}44;`;
+  }
 </script>
 
 <div
@@ -227,7 +234,7 @@
 
         {#if criterion.key === 'level'}
           <!-- ═══ 錬金Lv: ポーション瓶 + 等級ライン ═══ -->
-          <div class="criterion-card potion-card">
+          <div class="criterion-card potion-card" style="{cardStyle(info.grade, info.met)}">
             <div class="criterion-visual">
             <div class="potion-container">
               <svg viewBox="0 0 60 80" class="potion-svg">
@@ -293,7 +300,7 @@
           <!-- ═══ 依頼: 星 + 等級境界マーカー ═══ -->
           {@const totalStars = criterion.thresholds.S}
           {@const overlap = getStarOverlap(totalStars)}
-          <div class="criterion-card stars-card">
+          <div class="criterion-card stars-card" style="{cardStyle(info.grade, info.met)}">
             <div class="criterion-visual">
             <div class="stars-container">
               {#each Array(totalStars) as _, i}
@@ -328,7 +335,7 @@
         {:else if criterion.key === 'villageDev'}
           <!-- ═══ 村発展: 村の画像 + 等級マーカー付きバー ═══ -->
           {@const villageImage = getVillageImage(info.value, info.maxVal)}
-          <div class="criterion-card village-card">
+          <div class="criterion-card village-card" style="{cardStyle(info.grade, info.met)}">
             <div class="criterion-visual">
               <div class="village-visual-inner">
                 <div class="village-scene">
@@ -360,7 +367,7 @@
         {:else if criterion.key === 'reputation'}
           <!-- ═══ 名声: 人々アイコン + 等級マーカー付きバー ═══ -->
           {@const peopleCount = getPeopleCount(info.progress)}
-          <div class="criterion-card people-card">
+          <div class="criterion-card people-card" style="{cardStyle(info.grade, info.met)}">
             <div class="criterion-visual">
               <div class="reputation-visual-inner">
                 <div class="people-container">
@@ -406,7 +413,7 @@
           {@const tileCount = Math.min(criterion.thresholds.S, ALBUM_TILES)}
           {@const litCount = Math.round(info.progress * tileCount)}
           {@const cols = tileCount <= 6 ? tileCount : 6}
-          <div class="criterion-card album-card">
+          <div class="criterion-card album-card" style="{cardStyle(info.grade, info.met)}">
             <div class="criterion-visual">
               <div class="album-grid" style="grid-template-columns: repeat({cols}, 1fr)">
                 {#each Array(tileCount) as _, i}
@@ -444,7 +451,7 @@
 
         {:else}
           <!-- ═══ 汎用: プログレスバー + 等級マーカー ═══ -->
-          <div class="criterion-card generic-card">
+          <div class="criterion-card generic-card" style="{cardStyle(info.grade, info.met)}">
             <div class="criterion-visual">
               <div class="generic-visual">
                 <div class="generic-value-big" style="color: {gradeColors[info.grade]}">{info.value}</div>
