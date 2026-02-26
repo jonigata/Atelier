@@ -10,6 +10,8 @@ import { recipes } from '$lib/data/recipes';
 import { books, getShopBooks } from '$lib/data/books';
 import { removeItemsFromInventory } from '$lib/services/inventory';
 import { calcLevelFromExp, STAMINA, SHOP } from '$lib/data/balance';
+import { getBuildingReputationExpBonus, getBuildingVillageExpBonus } from '$lib/services/buildingEffects';
+import { getHelperReputationExpBonus, getHelperVillageExpBonus } from '$lib/services/helperEffects';
 import { craftMultiple, canCraftRecipe } from '$lib/services/alchemy';
 import { getEffectiveStudyDays } from '$lib/services/equipmentEffects';
 import type { GameState, OwnedItem, Expedition, RecipeDef } from '$lib/models/types';
@@ -299,12 +301,15 @@ async function tryDeliverQuest(state: GameState): Promise<boolean> {
           developmentGain += baseExp;
         }
 
+        const finalReputation = Math.floor(reputationGain * (1 + getBuildingReputationExpBonus() + getHelperReputationExpBonus()));
+        const finalDevelopment = Math.floor(developmentGain * (1 + getBuildingVillageExpBonus() + getHelperVillageExpBonus()));
+
         return {
           ...s,
           inventory: newInventory,
           money: s.money + quest.rewardMoney,
-          reputationExp: s.reputationExp + reputationGain,
-          villageExp: s.villageExp + developmentGain,
+          reputationExp: s.reputationExp + finalReputation,
+          villageExp: s.villageExp + finalDevelopment,
           completedQuestCount: s.completedQuestCount + 1,
           activeQuests: s.activeQuests.filter(q => q.id !== quest.id),
           stats: {

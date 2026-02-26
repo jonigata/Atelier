@@ -59,17 +59,6 @@ export const buildings: Record<string, BuildingDef> = {
     effects: [{ type: 'expedition_bonus', value: 0.2 }],
     effectDescription: '採取ドロップ+20%',
   },
-  inn: {
-    id: 'inn',
-    name: '宿屋',
-    description: '旅人が立ち寄る宿。時折珍しい素材を持った旅人が訪れる',
-    icon: '🏨',
-    effects: [
-      { type: 'sell_price', value: 0.05 },
-      { type: 'buy_price', value: 0.03 },
-    ],
-    effectDescription: '売値+5%、買値-3%',
-  },
 
   // =====================================
   // 時間効率系
@@ -87,27 +76,11 @@ export const buildings: Record<string, BuildingDef> = {
     name: '水車小屋',
     description: '水力で素材の粉砕・混合を補助する。調合の品質が安定する',
     icon: '🎡',
-    effects: [{ type: 'craft_quality', value: 3 }],
-    effectDescription: '全調合品質+3',
-  },
-  drying_rack: {
-    id: 'drying_rack',
-    name: '物干し台',
-    description: '素材を効率よく乾燥させる台。調合の成功率が少し上がる',
-    icon: '🧺',
-    effects: [{ type: 'craft_success', value: 0.03 }],
-    effectDescription: '全調合成功率+3%',
-  },
-  annex: {
-    id: 'annex',
-    name: '工房の別棟',
-    description: '工房を増築した別棟。作業効率が大きく向上する',
-    icon: '🏗️',
     effects: [
       { type: 'craft_quality', value: 5 },
-      { type: 'craft_success', value: 0.05 },
+      { type: 'craft_success', value: 0.03 },
     ],
-    effectDescription: '全調合品質+5、成功率+5%',
+    effectDescription: '全調合品質+5、成功率+3%',
   },
 
   // =====================================
@@ -121,21 +94,13 @@ export const buildings: Record<string, BuildingDef> = {
     effects: [{ type: 'study_days_reduce', value: 1 }],
     effectDescription: '勉強日数-1（最低1日）',
   },
-  bulletin_board: {
-    id: 'bulletin_board',
-    name: '掲示板',
-    description: '村の情報掲示板。依頼の情報が集まりやすくなる',
-    icon: '📋',
-    effects: [{ type: 'craft_success', value: 0.02 }],
-    effectDescription: '全調合成功率+2%',
-  },
   clock_tower: {
     id: 'clock_tower',
     name: '時計塔',
     description: '村のシンボルとなる時計塔。名声が自然に高まる',
     icon: '🕐',
-    effects: [{ type: 'craft_quality', value: 2 }],
-    effectDescription: '全調合品質+2',
+    effects: [{ type: 'reputation_exp_bonus', value: 0.20 }],
+    effectDescription: '名声Exp +20%',
   },
 
   // =====================================
@@ -146,19 +111,16 @@ export const buildings: Record<string, BuildingDef> = {
     name: '診療所',
     description: '村の医療施設。休息時の体力回復量が増加する',
     icon: '🏥',
-    effects: [{ type: 'rest_bonus', value: 20 }],
-    effectDescription: '休息の体力回復量+20',
+    effects: [{ type: 'rest_bonus', value: 25 }],
+    effectDescription: '休息の体力回復量+25',
   },
   meeting_hall: {
     id: 'meeting_hall',
     name: '集会所',
     description: '村人が集まる交流の場。村全体の活気が高まる',
     icon: '🏛️',
-    effects: [
-      { type: 'rest_bonus', value: 10 },
-      { type: 'craft_success', value: 0.02 },
-    ],
-    effectDescription: '休息回復+10、調合成功率+2%',
+    effects: [{ type: 'village_exp_bonus', value: 0.20 }],
+    effectDescription: '村発展Exp +20%',
   },
 };
 

@@ -21,6 +21,8 @@
   import { checkMilestoneProgress } from '$lib/services/tutorial';
   import { setEventDialogue } from '$lib/stores/tutorial';
   import { getQuestMoneyMult, getQuestReputationBonus, getQuestQualityBonus } from '$lib/services/equipmentEffects';
+  import { getBuildingReputationExpBonus, getBuildingVillageExpBonus } from '$lib/services/buildingEffects';
+  import { getHelperReputationExpBonus, getHelperVillageExpBonus } from '$lib/services/helperEffects';
   import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments, calcNextDrawLevel } from '$lib/data/balance';
   import { get } from 'svelte/store';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
@@ -129,7 +131,10 @@
     const qualityBonus = getQuestQualityBonus(avgQuality);
 
     const finalMoney = Math.floor(quest.rewardMoney * moneyMult) + qualityBonus.money;
-    const finalReputation = reputationGain + repBonus + qualityBonus.reputation;
+    const finalReputation = Math.floor((reputationGain + repBonus + qualityBonus.reputation) * (1 + getBuildingReputationExpBonus() + getHelperReputationExpBonus()));
+
+    // 村発展expにボーナス適用
+    const finalDevelopment = Math.floor(developmentGain * (1 + getBuildingVillageExpBonus() + getHelperVillageExpBonus()));
 
     // ゲージ用: 変更前の状態を保存
     const stateBefore = get(gameState);
@@ -143,7 +148,7 @@
     // 報酬付与（機材効果適用済み）
     addMoney(finalMoney);
     addReputationExp(finalReputation);
-    addVillageExp(developmentGain);
+    addVillageExp(finalDevelopment);
     incrementCompletedQuests();
     removeActiveQuest(quest.id);
 
@@ -175,7 +180,7 @@
         },
       },
       {
-        text: `村発展Exp +${developmentGain}`,
+        text: `村発展Exp +${finalDevelopment}`,
         type: 'villageDevelopment',
         gaugeData: {
           before: vilExpBefore,
@@ -203,7 +208,7 @@
     setEventDialogue(dialogue);
 
     addMessage(
-      `依頼「${quest.title}」を達成しました！ 報酬: ${finalMoney}G, 名声+${finalReputation}, 村発展+${developmentGain}`
+      `依頼「${quest.title}」を達成しました！ 報酬: ${finalMoney}G, 名声+${finalReputation}, 村発展+${finalDevelopment}`
     );
   }
 
