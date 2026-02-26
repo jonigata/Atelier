@@ -2,18 +2,21 @@ import { get } from 'svelte/store';
 import { gameState } from './game';
 
 /**
- * アチーブメントを完了としてマーク
+ * アチーブメント達成を開始（pendingRewardをセット）
+ * completed への追加は報酬受取時（clearPendingReward）に行う
  */
 export function completeAchievement(achievementId: string): void {
   gameState.update((state) => {
     if (state.achievementProgress.completed.includes(achievementId)) {
       return state;
     }
+    if (state.achievementProgress.pendingReward) {
+      return state;
+    }
     return {
       ...state,
       achievementProgress: {
         ...state.achievementProgress,
-        completed: [...state.achievementProgress.completed, achievementId],
         pendingReward: achievementId,
       },
     };
@@ -21,16 +24,22 @@ export function completeAchievement(achievementId: string): void {
 }
 
 /**
- * 報酬受取待ちをクリア
+ * 報酬受取を完了し、アチーブメントを completed に追加
  */
 export function clearPendingReward(): void {
-  gameState.update((state) => ({
-    ...state,
-    achievementProgress: {
-      ...state.achievementProgress,
-      pendingReward: null,
-    },
-  }));
+  gameState.update((state) => {
+    const pendingId = state.achievementProgress.pendingReward;
+    return {
+      ...state,
+      achievementProgress: {
+        ...state.achievementProgress,
+        completed: pendingId && !state.achievementProgress.completed.includes(pendingId)
+          ? [...state.achievementProgress.completed, pendingId]
+          : state.achievementProgress.completed,
+        pendingReward: null,
+      },
+    };
+  });
 }
 
 /**

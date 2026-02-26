@@ -1,7 +1,7 @@
 <script lang="ts">
   import { gameState, pendingAlchemyRecipeId } from '$lib/stores/game';
   import { setSelectedQuestId } from '$lib/stores/quests';
-  import { showingUnlockActions, pendingUnlockActions } from '$lib/stores/toast';
+  import { showingUnlockActions } from '$lib/stores/toast';
   import { isMerchantVisiting } from '$lib/services/calendar';
   import { getNextInspection, INSPECTION_DAYS } from '$lib/data/inspection';
   import { recipes } from '$lib/data/recipes';
@@ -64,13 +64,10 @@
     return `/images/actions/${type}.png`;
   }
 
-  $: isDayTransition = $gameState.pendingDayTransition !== null;
   $: merchantInTown = isMerchantVisiting($gameState.day);
 
   // 査察トラッカー用データ
-  $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_q1_goal_reminder')
-    && !$gameState.achievementProgress.pendingReward
-    && !$gameState.tutorialProgress.pendingDialogue;
+  $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_q1_goal_reminder');
   let inspectionRevealDone = false;
   let inspectionFirstReveal = false;
   $: if (inspectionKnown && !inspectionRevealDone) {
@@ -88,21 +85,9 @@
     : {};
 
   $: actionStates = actions.map(action => {
-    const actionType = action.type;
     const unlockedActions = $gameState.tutorialProgress.unlockedActions;
-    const dayTransition = $gameState.pendingDayTransition;
-    const pendingDialogue = $gameState.tutorialProgress.pendingDialogue;
-    const pending = $pendingUnlockActions;
-
-    let isLocked = false;
-    if ((dayTransition !== null || pendingDialogue !== null) && pending.includes(actionType)) {
-      isLocked = true;
-    } else if (!unlockedActions.includes(actionType)) {
-      isLocked = true;
-    }
-
-    const isNewlyUnlocked = $showingUnlockActions.has(actionType);
-
+    const isLocked = !unlockedActions.includes(action.type);
+    const isNewlyUnlocked = $showingUnlockActions.has(action.type);
     return { ...action, isLocked, isNewlyUnlocked };
   });
 

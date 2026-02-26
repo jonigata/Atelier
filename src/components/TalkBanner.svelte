@@ -1,38 +1,50 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
 
-  interface Monologue {
+  interface MonologueDef {
     text: string;
     expression: string;
     priority: number;
+    /** このアクションが解放済みなら表示（報酬受取後の判定に使う） */
+    afterAction?: string;
+    /** このアクションが未解放の間だけ表示 */
+    untilAction?: string;
+    /** 追加条件（stateを受け取りboolを返す） */
+    condition?: (state: typeof $gameState) => boolean;
   }
 
-  $: monologues = (() => {
-    const list: Monologue[] = [];
+  const monologueDefs: MonologueDef[] = [
+    {
+      text: '荷解きしなくっちゃ',
+      expression: 'neutral',
+      priority: 1,
+      afterAction: 'inventory',
+      untilAction: 'study',
+    },
+    {
+      text: '長旅疲れたな～。今日は休んで、明日からがんばろう',
+      expression: 'worried',
+      priority: 2,
+      afterAction: 'inventory',
+      untilAction: 'alchemy',
+      condition: (s) => s.stamina < 20,
+    },
+  ];
+
+  $: activeMonologue = (() => {
     const unlocked = $gameState.tutorialProgress.unlockedActions;
 
-    if (!unlocked.includes('study')) {
-      list.push({
-        text: '荷解きしなくっちゃ',
-        expression: 'neutral',
-        priority: 1,
-      });
-    }
+    const eligible = monologueDefs.filter((m) => {
+      if (m.afterAction && !unlocked.includes(m.afterAction)) return false;
+      if (m.untilAction && unlocked.includes(m.untilAction)) return false;
+      if (m.condition && !m.condition($gameState)) return false;
+      return true;
+    });
 
-    if (!unlocked.includes('alchemy') && $gameState.stamina < 20) {
-      list.push({
-        text: '長旅疲れたな～。今日は休んで、明日からがんばろう',
-        expression: 'worried',
-        priority: 2,
-      });
-    }
-
-    return list;
+    return eligible.length > 0
+      ? eligible.reduce((best, m) => m.priority < best.priority ? m : best)
+      : null;
   })();
-
-  $: activeMonologue = monologues.length > 0
-    ? monologues.reduce((best, m) => m.priority < best.priority ? m : best)
-    : null;
 </script>
 
 {#if activeMonologue}
