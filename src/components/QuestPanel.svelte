@@ -3,26 +3,18 @@
   import {
     gameState,
     addMessage,
-    addMoney,
-    addReputationExp,
-    addVillageExp,
   } from '$lib/stores/game';
   import {
     addActiveQuest,
-    removeActiveQuest,
-    incrementCompletedQuests,
     setAvailableQuests,
     clearNewQuestCount,
     setSelectedQuestId,
   } from '$lib/stores/quests';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getQuestClient } from '$lib/data/quests';
-  import { removeItemsFromInventory } from '$lib/services/inventory';
   import { checkMilestoneProgress } from '$lib/services/tutorial';
+  import { executeQuestDelivery } from '$lib/services/quest';
   import { setEventDialogue } from '$lib/stores/tutorial';
-  import { getQuestMoneyMult, getQuestReputationBonus, getQuestQualityBonus } from '$lib/services/equipmentEffects';
-  import { getBuildingReputationExpBonus, getBuildingVillageExpBonus } from '$lib/services/buildingEffects';
-  import { getHelperReputationExpBonus, getHelperVillageExpBonus } from '$lib/services/helperEffects';
   import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments, calcNextDrawLevel } from '$lib/data/balance';
   import { get } from 'svelte/store';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
@@ -93,48 +85,7 @@
       return;
     }
 
-    // アイテムを消費
     const itemsToConsume = matchingItems.slice(0, remaining);
-    gameState.update((state) => ({
-      ...state,
-      inventory: removeItemsFromInventory(state.inventory, itemsToConsume),
-    }));
-
-    // 品質クエスト→名声特化、大量クエスト→村発展特化、通常→両方少量
-    const baseExp = quest.rewardReputation;
-    const avgQuality = itemsToConsume.reduce((sum, i) => sum + i.quality, 0) / itemsToConsume.length;
-    const qualityBonusExp = avgQuality >= 70 ? Math.max(1, Math.floor(baseExp * 0.2)) : 0;
-
-    let reputationGain: number;
-    let developmentGain: number;
-    if (quest.type === 'quality') {
-      reputationGain = baseExp + qualityBonusExp;
-      developmentGain = 0;
-    } else if (quest.type === 'bulk') {
-      reputationGain = 0;
-      developmentGain = baseExp + qualityBonusExp;
-    } else {
-      // deliver: 両方に半分ずつ
-      const half = Math.floor(baseExp / 2);
-      reputationGain = half + qualityBonusExp;
-      developmentGain = half + qualityBonusExp;
-    }
-    // エリクサーは特別: 両方に加算
-    if (quest.requiredItemId === 'elixir') {
-      reputationGain += baseExp;
-      developmentGain += baseExp;
-    }
-
-    // 機材効果: 報酬補正
-    const moneyMult = getQuestMoneyMult();
-    const repBonus = getQuestReputationBonus();
-    const qualityBonus = getQuestQualityBonus(avgQuality);
-
-    const finalMoney = Math.floor(quest.rewardMoney * moneyMult) + qualityBonus.money;
-    const finalReputation = Math.floor((reputationGain + repBonus + qualityBonus.reputation) * (1 + getBuildingReputationExpBonus() + getHelperReputationExpBonus()));
-
-    // 村発展expにボーナス適用
-    const finalDevelopment = Math.floor(developmentGain * (1 + getBuildingVillageExpBonus() + getHelperVillageExpBonus()));
 
     // ゲージ用: 変更前の状態を保存
     const stateBefore = get(gameState);
@@ -145,12 +96,8 @@
     const vilExpBefore = calcExpProgress(stateBefore.villageExp);
     const vilExpMax = calcExpForLevel(vilLevelBefore);
 
-    // 報酬付与（機材効果適用済み）
-    addMoney(finalMoney);
-    addReputationExp(finalReputation);
-    addVillageExp(finalDevelopment);
-    incrementCompletedQuests();
-    removeActiveQuest(quest.id);
+    // 共通納品ロジック
+    const { finalMoney, finalReputation, finalDevelopment } = executeQuestDelivery(quest, itemsToConsume);
 
     // ゲージ用: 変更後の状態を取得
     const stateAfter = get(gameState);

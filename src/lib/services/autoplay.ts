@@ -4,14 +4,13 @@ import { incrementExpeditionCount } from '$lib/stores/stats';
 import { endTurn, startActionPhase } from './gameLoop';
 import { checkMilestoneProgress } from './tutorial';
 import { resolveDialogue } from './presentation';
+import { executeQuestDelivery } from './quest';
 import { areas } from '$lib/data/areas';
 import { items } from '$lib/data/items';
 import { recipes } from '$lib/data/recipes';
 import { books, getShopBooks } from '$lib/data/books';
 import { removeItemsFromInventory } from '$lib/services/inventory';
 import { calcLevelFromExp, STAMINA, SHOP } from '$lib/data/balance';
-import { getBuildingReputationExpBonus, getBuildingVillageExpBonus } from '$lib/services/buildingEffects';
-import { getHelperReputationExpBonus, getHelperVillageExpBonus } from '$lib/services/helperEffects';
 import { craftMultiple, canCraftRecipe } from '$lib/services/alchemy';
 import { getEffectiveStudyDays } from '$lib/services/equipmentEffects';
 import type { GameState, OwnedItem, Expedition, RecipeDef } from '$lib/models/types';
@@ -275,52 +274,10 @@ async function tryDeliverQuest(state: GameState): Promise<boolean> {
     const remaining = quest.requiredQuantity - quest.deliveredCount;
     if (matchingItems.length >= remaining) {
       const itemsToConsume = matchingItems.slice(0, remaining);
-
-      gameState.update(s => {
-        const newInventory = removeItemsFromInventory(s.inventory, itemsToConsume);
-
-        const baseExp = quest.rewardReputation;
-        const avgQuality = itemsToConsume.reduce((sum, i) => sum + i.quality, 0) / itemsToConsume.length;
-        const qualityBonusExp = avgQuality >= 70 ? Math.max(1, Math.floor(baseExp * 0.2)) : 0;
-
-        let reputationGain: number;
-        let developmentGain: number;
-        if (quest.type === 'quality') {
-          reputationGain = baseExp + qualityBonusExp;
-          developmentGain = 0;
-        } else if (quest.type === 'bulk') {
-          reputationGain = 0;
-          developmentGain = baseExp + qualityBonusExp;
-        } else {
-          const half = Math.floor(baseExp / 2);
-          reputationGain = half + qualityBonusExp;
-          developmentGain = half + qualityBonusExp;
-        }
-        if (quest.requiredItemId === 'elixir') {
-          reputationGain += baseExp;
-          developmentGain += baseExp;
-        }
-
-        const finalReputation = Math.floor(reputationGain * (1 + getBuildingReputationExpBonus() + getHelperReputationExpBonus()));
-        const finalDevelopment = Math.floor(developmentGain * (1 + getBuildingVillageExpBonus() + getHelperVillageExpBonus()));
-
-        return {
-          ...s,
-          inventory: newInventory,
-          money: s.money + quest.rewardMoney,
-          reputationExp: s.reputationExp + finalReputation,
-          villageExp: s.villageExp + finalDevelopment,
-          completedQuestCount: s.completedQuestCount + 1,
-          activeQuests: s.activeQuests.filter(q => q.id !== quest.id),
-          stats: {
-            ...s.stats,
-            consecutiveQuestSuccess: s.stats.consecutiveQuestSuccess + 1,
-          },
-        };
-      });
+      const result = executeQuestDelivery(quest, itemsToConsume);
 
       const itemDef = items[quest.requiredItemId];
-      log('quest', 'success', `納品「${quest.title}」(${itemDef?.name ?? quest.requiredItemId} x${remaining}) +${quest.rewardMoney}G +${quest.rewardReputation}名声`, 0);
+      log('quest', 'success', `納品「${quest.title}」(${itemDef?.name ?? quest.requiredItemId} x${remaining}) +${result.finalMoney}G +${result.finalReputation}名声`, 0);
       checkMilestoneProgress();
       await endTurn(0);
       return true;
