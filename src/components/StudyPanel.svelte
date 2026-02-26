@@ -29,6 +29,7 @@
   let showVideo = false;
   let showStudyDialog = false;
   let studyCompletedBook: RecipeBookDef | null = null;
+  let studyLearnedRecipeIds: string[] = [];
   let studyLearnedRecipeNames: string[] = [];
 
   $: availableBooks = $gameState.ownedBooks
@@ -80,6 +81,7 @@
     }
 
     studyCompletedBook = selectedBook;
+    studyLearnedRecipeIds = learned;
     studyLearnedRecipeNames = learnedNames;
     showStudyDialog = true;
   }
@@ -101,6 +103,7 @@
     setTimeout(() => {
       showStudyDialog = false;
       studyCompletedBook = null;
+      studyLearnedRecipeIds = [];
       studyLearnedRecipeNames = [];
       selectedBookId = null;
       onBack();
@@ -186,7 +189,7 @@
 {#if showStudyDialog && studyCompletedBook}
   <StudyCompleteDialog
     book={studyCompletedBook}
-    learnedRecipes={studyLearnedRecipeNames}
+    learnedRecipeIds={studyLearnedRecipeIds}
     onClose={handleStudyDialogClose}
   />
 {/if}

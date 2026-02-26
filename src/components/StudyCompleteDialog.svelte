@@ -1,44 +1,104 @@
 <script lang="ts">
   import type { RecipeBookDef } from '$lib/models/types';
+  import { recipes } from '$lib/data/recipes';
+  import { getItemIcon, handleIconError } from '$lib/data/items';
 
   export let book: RecipeBookDef;
-  export let learnedRecipes: string[];
+  /** 習得したレシピID配列 */
+  export let learnedRecipeIds: string[];
   export let onClose: () => void;
+
+  // ショーケース状態
+  let currentIndex = 0;
+  let phase: 'in' | 'show' | 'out' = 'in';
+  let timer: ReturnType<typeof setTimeout> | null = null;
+
+  $: total = learnedRecipeIds.length;
+  $: currentRecipe = total > 0 ? recipes[learnedRecipeIds[currentIndex]] : null;
+  $: currentItemIcon = currentRecipe ? getItemIcon(currentRecipe.resultItemId) : '';
+
+  // 初期表示開始
+  function start() {
+    if (total === 0) return;
+    phase = 'in';
+    timer = setTimeout(() => {
+      phase = 'show';
+    }, 80);
+  }
+
+  // 次のレシピまたは閉じる
+  function advance() {
+    if (total === 0) {
+      onClose();
+      return;
+    }
+    if (phase === 'out') return; // アニメーション中
+
+    stopTimer();
+    phase = 'out';
+    timer = setTimeout(() => {
+      if (currentIndex + 1 >= total) {
+        // 最後のレシピ：indexを変えずにそのまま閉じる（レイアウト崩れ防止）
+        onClose();
+      } else {
+        currentIndex++;
+        phase = 'in';
+        timer = setTimeout(() => {
+          phase = 'show';
+        }, 80);
+      }
+    }, 120);
+  }
+
+  function stopTimer() {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  }
 
   function handleKeydown(event: KeyboardEvent) {
     if (event.key === 'Enter' || event.key === ' ' || event.key === 'Escape') {
       event.preventDefault();
-      onClose();
+      advance();
     }
   }
+
+  // マウント時に開始
+  start();
 </script>
 
 <svelte:window on:keydown={handleKeydown} />
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
-<div class="dialog-overlay" on:click={onClose} role="button" tabindex="0">
+<div class="dialog-overlay" on:click={advance} role="button" tabindex="0">
   <div class="dialog-box">
     <div class="dialog-header">
       <span class="study-badge">読破！</span>
       <span class="book-title">{book.name}</span>
     </div>
 
-    <div class="dialog-image">
-      <img src="/images/study_complete.png" alt="勉強完了" />
-    </div>
-
-    <div class="dialog-content">
-      <p class="study-message">本を読み終えて、新しい知識を習得しました！</p>
-      {#if learnedRecipes.length > 0}
-        <div class="learned-recipes">
-          <span class="label">習得したレシピ:</span>
-          <span class="recipes">{learnedRecipes.join('、')}</span>
-        </div>
-      {/if}
-    </div>
+    {#if total === 0}
+      <div class="dialog-content">
+        <p class="study-message">すでに全てのレシピを習得済みでした。</p>
+      </div>
+    {:else}
+      <div class="showcase-area">
+        <p class="study-label">習得レシピ</p>
+        {#if currentRecipe}
+          <div class="showcase" class:phase-in={phase === 'in'} class:phase-show={phase === 'show'} class:phase-out={phase === 'out'}>
+            <div class="recipe-icon">
+              <img src={currentItemIcon} alt={currentRecipe.name} on:error={handleIconError} />
+            </div>
+            <div class="recipe-name">{currentRecipe.name}</div>
+          </div>
+        {/if}
+        <div class="showcase-counter">{currentIndex + 1} / {total}</div>
+      </div>
+    {/if}
 
     <div class="dialog-footer">
-      <span class="hint-text">クリック または Enter で閉じる</span>
+      <span class="hint-text">クリック または Enter で{currentIndex + 1 >= total ? '閉じる' : '次へ'}</span>
     </div>
   </div>
 </div>
@@ -104,21 +164,6 @@
     color: #f4e4bc;
   }
 
-  .dialog-image {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .dialog-image img {
-    width: 200px;
-    height: 200px;
-    object-fit: contain;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 1rem;
-  }
-
   .dialog-content {
     text-align: center;
     margin-bottom: 1.5rem;
@@ -127,27 +172,80 @@
   .study-message {
     font-size: 1.1rem;
     color: #e0e0f0;
+  }
+
+  /* ショーケースエリア */
+  .showcase-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 220px;
+    justify-content: center;
     margin-bottom: 1rem;
   }
 
-  .learned-recipes {
-    background: rgba(201, 169, 89, 0.15);
-    border: 1px solid #c9a959;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-  }
-
-  .learned-recipes .label {
-    display: block;
+  .study-label {
     font-size: 0.85rem;
     color: #a0a0b0;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.75rem;
   }
 
-  .learned-recipes .recipes {
-    font-size: 1rem;
-    color: #c9a959;
+  .showcase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .showcase.phase-in {
+    animation: showcaseIn 0.08s ease-out forwards;
+  }
+
+  .showcase.phase-show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .showcase.phase-out {
+    animation: showcaseOut 0.12s ease-in forwards;
+  }
+
+  @keyframes showcaseIn {
+    from { opacity: 0; transform: scale(0); }
+    60% { opacity: 0.9; transform: scale(1.15); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes showcaseOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(1.15); }
+  }
+
+  .recipe-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .recipe-icon img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 16px rgba(201, 169, 89, 0.5));
+  }
+
+  .recipe-name {
+    font-size: 1.5rem;
     font-weight: bold;
+    color: #f0e0c0;
+    text-shadow: 0 0 15px rgba(240, 224, 192, 0.3);
+    text-align: center;
+  }
+
+  .showcase-counter {
+    font-size: 0.8rem;
+    color: #6a6a8a;
+    margin-top: 0.75rem;
   }
 
   .dialog-footer {
