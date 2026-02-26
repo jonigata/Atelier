@@ -52,9 +52,11 @@
   tabindex={onClick ? 0 : undefined}
 >
   <div class="quest-main">
-    <div class="quest-type-area">
-      <QuestTypeIcon type={quest.type} size="medium" />
-    </div>
+    {#if quest.type !== 'deliver'}
+      <div class="quest-type-area">
+        <QuestTypeIcon type={quest.type} size="medium" />
+      </div>
+    {/if}
     <div class="quest-content">
       <div class="quest-header">
         {#if client}

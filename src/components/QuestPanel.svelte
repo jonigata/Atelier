@@ -230,9 +230,11 @@
             {/if}
             <div class="quest-header">
               <span class="quest-title">{quest.title}</span>
-              <span class="quest-type">
-                <QuestTypeIcon type={quest.type} showLabel={true} />
-              </span>
+              {#if quest.type !== 'deliver'}
+                <span class="quest-type">
+                  <QuestTypeIcon type={quest.type} showLabel={true} />
+                </span>
+              {/if}
             </div>
             <p class="quest-desc">{quest.description}</p>
             <div class="quest-details">
@@ -248,7 +250,14 @@
             </div>
             <div class="quest-rewards">
               <span class="reward-money">{quest.rewardMoney}G</span>
-              <span class="reward-rep">名声+{quest.rewardReputation}</span>
+              {#if quest.type === 'quality'}
+                <span class="reward-rep">名声+{quest.rewardReputation}</span>
+              {:else if quest.type === 'bulk'}
+                <span class="reward-dev">村発展+{quest.rewardReputation}</span>
+              {:else}
+                <span class="reward-rep">名声+{Math.floor(quest.rewardReputation / 2)}</span>
+                <span class="reward-dev">村発展+{Math.floor(quest.rewardReputation / 2)}</span>
+              {/if}
               {#if canFulfill(quest)}
                 <span class="ready-badge">納品可</span>
               {/if}
@@ -345,7 +354,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1rem;
-    max-height: 500px;
+    max-height: calc(100vh - 280px);
     overflow-y: auto;
   }
 
@@ -434,10 +443,15 @@
   .reward-money {
     color: #c9a959;
     font-weight: bold;
+    font-size: 1.1rem;
   }
 
   .reward-rep {
     color: #81c784;
+  }
+
+  .reward-dev {
+    color: #64b5f6;
   }
 
   .ready-badge {
