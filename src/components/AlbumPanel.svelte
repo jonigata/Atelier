@@ -1,8 +1,12 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
   import { items, getItemIcon, handleIconError } from '$lib/data/items';
+  import { recipes } from '$lib/data/recipes';
   import { CATEGORY_NAMES } from '$lib/data/categories';
   import type { ItemCategory } from '$lib/models/types';
+
+  // レシピのresultItemId → レシピが存在するアイテムIDのSet
+  const recipeResultItemIds = new Set(Object.values(recipes).map(r => r.resultItemId));
 
   export let onBack: () => void;
 
@@ -104,12 +108,19 @@
       <div class="item-grid">
         {#each group.items as item}
           {@const isDiscovered = discoveredItems.includes(item.id)}
-          <div class="album-item" class:undiscovered={!isDiscovered}>
+          {@const isRecipeKnown = !isDiscovered && recipeResultItemIds.has(item.id) && $gameState.knownRecipes.some(rid => recipes[rid]?.resultItemId === item.id)}
+          <div class="album-item" class:undiscovered={!isDiscovered} class:recipe-known={isRecipeKnown}>
             {#if isDiscovered}
               <img class="item-icon" src={getItemIcon(item.id)} alt={item.name} on:error={handleIconError} />
               <div class="item-info">
                 <span class="item-name">{item.name}</span>
                 <span class="item-desc">{item.description}</span>
+              </div>
+            {:else if isRecipeKnown}
+              <div class="icon-placeholder"></div>
+              <div class="item-info">
+                <span class="item-name recipe-hint">{item.name}</span>
+                <span class="item-desc recipe-hint">未調合</span>
               </div>
             {:else}
               <div class="silhouette-wrapper">
@@ -321,6 +332,29 @@
 
   .item-desc.unknown {
     color: #505060;
+    font-style: italic;
+  }
+
+  .album-item.recipe-known {
+    background: rgba(201, 169, 89, 0.05);
+    border-color: #4a4a5a;
+  }
+
+  .icon-placeholder {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed #4a4a5a;
+    border-radius: 4px;
+  }
+
+  .item-name.recipe-hint {
+    color: #908878;
+  }
+
+  .item-desc.recipe-hint {
+    color: #605848;
     font-style: italic;
   }
 </style>
