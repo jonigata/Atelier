@@ -144,6 +144,7 @@
           <StampRush
             items={[{ itemId: resultItemDef.id, quantity: result.successCount }]}
             active={phase !== 'brewing'}
+            initialDelay={0.25}
           />
 
           <!-- 情報を横並び -->

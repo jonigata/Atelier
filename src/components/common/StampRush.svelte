@@ -14,7 +14,7 @@
   /** アイコンサイズ(px) — 1個のときはこのサイズでデカく表示 */
   export let iconSize = 240;
   /** スタンプ開始までの初期遅延(秒) */
-  export let initialDelay = 0.25;
+  export let initialDelay = 0;
   /** 1スタンプあたりの遅延(秒) */
   export let delayPerStamp = 0.1;
 
@@ -51,17 +51,9 @@
     const count = expanded.length;
     if (count === 0) return;
 
-    // 1つならデカく表示、複数なら面積に合わせて自動縮小
-    if (count === 1) {
-      effectiveIconSize = iconSize;
-      zoneHeight = iconSize + 20;
-    } else {
-      const cols = Math.max(1, Math.round(Math.sqrt(count * (areaWidth / areaHeight))));
-      const rows = Math.max(1, Math.ceil(count / cols));
-      const cellSize = Math.min(areaWidth / cols, areaHeight / rows);
-      effectiveIconSize = Math.min(iconSize, cellSize * 0.85);
-      zoneHeight = Math.max(areaHeight + effectiveIconSize * 0.5, 200);
-    }
+    // 1つならiconSizeでデカく、複数なら元サイズ(170)
+    effectiveIconSize = count === 1 ? iconSize : Math.min(iconSize, 170);
+    zoneHeight = count === 1 ? iconSize + 20 : 250;
 
     const newStamps: Stamp[] = [];
 
