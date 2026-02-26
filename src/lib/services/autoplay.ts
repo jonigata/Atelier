@@ -277,18 +277,33 @@ async function tryDeliverQuest(state: GameState): Promise<boolean> {
       gameState.update(s => {
         const newInventory = removeItemsFromInventory(s.inventory, itemsToConsume);
 
-        let developmentGain = 1;
-        if (quest.type === 'quality') developmentGain = 2;
-        if (quest.type === 'bulk') developmentGain = 2;
-        if (quest.requiredItemId === 'elixir') developmentGain = 3;
+        const baseExp = quest.rewardReputation;
         const avgQuality = itemsToConsume.reduce((sum, i) => sum + i.quality, 0) / itemsToConsume.length;
-        if (avgQuality >= 70) developmentGain += 1;
+        const qualityBonusExp = avgQuality >= 70 ? Math.max(1, Math.floor(baseExp * 0.2)) : 0;
+
+        let reputationGain: number;
+        let developmentGain: number;
+        if (quest.type === 'quality') {
+          reputationGain = baseExp + qualityBonusExp;
+          developmentGain = 0;
+        } else if (quest.type === 'bulk') {
+          reputationGain = 0;
+          developmentGain = baseExp + qualityBonusExp;
+        } else {
+          const half = Math.floor(baseExp / 2);
+          reputationGain = half + qualityBonusExp;
+          developmentGain = half + qualityBonusExp;
+        }
+        if (quest.requiredItemId === 'elixir') {
+          reputationGain += baseExp;
+          developmentGain += baseExp;
+        }
 
         return {
           ...s,
           inventory: newInventory,
           money: s.money + quest.rewardMoney,
-          reputationExp: s.reputationExp + quest.rewardReputation,
+          reputationExp: s.reputationExp + reputationGain,
           villageExp: s.villageExp + developmentGain,
           completedQuestCount: s.completedQuestCount + 1,
           activeQuests: s.activeQuests.filter(q => q.id !== quest.id),

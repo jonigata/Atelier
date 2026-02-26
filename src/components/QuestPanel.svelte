@@ -98,15 +98,30 @@
       inventory: removeItemsFromInventory(state.inventory, itemsToConsume),
     }));
 
-    // 村発展度の増加量を計算（依頼難易度に応じて1-3）
-    let developmentGain = 1;
-    if (quest.type === 'quality') developmentGain = 2;
-    if (quest.type === 'bulk') developmentGain = 2;
-    if (quest.requiredItemId === 'elixir') developmentGain = 3;
-
-    // 高品質納品ボーナス（品質70以上で+1）
+    // 品質クエスト→名声特化、大量クエスト→村発展特化、通常→両方少量
+    const baseExp = quest.rewardReputation;
     const avgQuality = itemsToConsume.reduce((sum, i) => sum + i.quality, 0) / itemsToConsume.length;
-    if (avgQuality >= 70) developmentGain += 1;
+    const qualityBonusExp = avgQuality >= 70 ? Math.max(1, Math.floor(baseExp * 0.2)) : 0;
+
+    let reputationGain: number;
+    let developmentGain: number;
+    if (quest.type === 'quality') {
+      reputationGain = baseExp + qualityBonusExp;
+      developmentGain = 0;
+    } else if (quest.type === 'bulk') {
+      reputationGain = 0;
+      developmentGain = baseExp + qualityBonusExp;
+    } else {
+      // deliver: 両方に半分ずつ
+      const half = Math.floor(baseExp / 2);
+      reputationGain = half + qualityBonusExp;
+      developmentGain = half + qualityBonusExp;
+    }
+    // エリクサーは特別: 両方に加算
+    if (quest.requiredItemId === 'elixir') {
+      reputationGain += baseExp;
+      developmentGain += baseExp;
+    }
 
     // 機材効果: 報酬補正
     const moneyMult = getQuestMoneyMult();
@@ -114,7 +129,7 @@
     const qualityBonus = getQuestQualityBonus(avgQuality);
 
     const finalMoney = Math.floor(quest.rewardMoney * moneyMult) + qualityBonus.money;
-    const finalReputation = quest.rewardReputation + repBonus + qualityBonus.reputation;
+    const finalReputation = reputationGain + repBonus + qualityBonus.reputation;
 
     // ゲージ用: 変更前の状態を保存
     const stateBefore = get(gameState);
