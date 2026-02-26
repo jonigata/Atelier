@@ -11,6 +11,7 @@
     setSelectedQuestId,
   } from '$lib/stores/quests';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
+  import { recipes } from '$lib/data/recipes';
   import { getQuestClient } from '$lib/data/quests';
   import { checkMilestoneProgress } from '$lib/services/tutorial';
   import { executeQuestDelivery } from '$lib/services/quest';
@@ -187,6 +188,32 @@
     return matchingItems.length >= quest.requiredQuantity;
   }
 
+  // 要求アイテムのレシピを逆引き
+  function getRecipeForItem(itemId: string) {
+    return Object.values(recipes).find(r => r.resultItemId === itemId);
+  }
+
+  // レシピを知らない調合品か
+  function isRecipeUnknown(quest: QuestDef): boolean {
+    const recipe = getRecipeForItem(quest.requiredItemId);
+    if (!recipe) return false; // 素材アイテム（レシピなし）
+    return !$gameState.knownRecipes.includes(recipe.id);
+  }
+
+  // 素材が不足しているか（レシピ既知の調合品のみ）
+  function isMaterialShort(quest: QuestDef): boolean {
+    const recipe = getRecipeForItem(quest.requiredItemId);
+    if (!recipe) return false;
+    if (!$gameState.knownRecipes.includes(recipe.id)) return false;
+    for (const ing of recipe.ingredients) {
+      const owned = $gameState.inventory.filter(item =>
+        ing.itemId ? item.itemId === ing.itemId : (getItem(item.itemId)?.category === ing.category)
+      ).reduce((sum, item) => sum + 1, 0);
+      if (owned < ing.quantity * quest.requiredQuantity) return true;
+    }
+    return false;
+  }
+
   // 納品可能なクエスト数
   $: deliverableCount = $gameState.activeQuests.filter((quest) => canDeliver(quest)).length;
 </script>
@@ -246,7 +273,6 @@
                   (品質{quest.requiredQuality}以上)
                 {/if}
               </span>
-              <span class="deadline">期限: {quest.deadlineDays}日</span>
             </div>
             <div class="quest-rewards">
               <span class="reward-money">{quest.rewardMoney}G</span>
@@ -258,8 +284,15 @@
                 <span class="reward-rep">名声+{Math.floor(quest.rewardReputation / 2)}</span>
                 <span class="reward-dev">村発展+{Math.floor(quest.rewardReputation / 2)}</span>
               {/if}
+            </div>
+            <div class="quest-bottom-row">
+              <span class="deadline">期限: {quest.deadlineDays}日</span>
               {#if canFulfill(quest)}
                 <span class="ready-badge">納品可</span>
+              {:else if isRecipeUnknown(quest)}
+                <span class="badge-recipe-unknown">レシピ不明</span>
+              {:else if isMaterialShort(quest)}
+                <span class="badge-material-short">素材不足</span>
               {/if}
             </div>
             <button
@@ -435,9 +468,15 @@
   .quest-rewards {
     display: flex;
     gap: 1rem;
-    margin-bottom: 0.75rem;
     margin-top: auto;
     padding-top: 0.5rem;
+  }
+
+  .quest-bottom-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .reward-money {
@@ -455,7 +494,6 @@
   }
 
   .ready-badge {
-    margin-left: auto;
     padding: 0.2rem 0.5rem;
     background: linear-gradient(135deg, #0097a7, #26c6da);
     border-radius: 4px;
@@ -464,6 +502,22 @@
     color: #fff;
     box-shadow: 0 0 8px rgba(38, 198, 218, 0.6);
     animation: badge-pulse 1.5s ease-in-out infinite;
+  }
+
+  .badge-recipe-unknown {
+    padding: 0.2rem 0.5rem;
+    background: rgba(156, 39, 176, 0.2);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: #ce93d8;
+  }
+
+  .badge-material-short {
+    padding: 0.2rem 0.5rem;
+    background: rgba(255, 152, 0, 0.2);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: #ffb74d;
   }
 
   @keyframes badge-pulse {
