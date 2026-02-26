@@ -134,11 +134,10 @@
     craftResultData = null;
   }
 
-  function adjustQuantity(delta: number) {
-    const newQuantity = craftQuantity + delta;
-    if (newQuantity >= 1 && newQuantity <= maxCraftable) {
-      craftQuantity = newQuantity;
-      const newTotalSlots = itemsPerCraft * newQuantity;
+  function setQuantity(n: number) {
+    if (n >= 1 && n <= maxCraftable) {
+      craftQuantity = n;
+      const newTotalSlots = itemsPerCraft * n;
       if (selectedItems.length > newTotalSlots) {
         selectedItems = selectedItems.slice(0, newTotalSlots);
       }
@@ -317,9 +316,14 @@
       <div class="quantity-section">
         <h4>作成個数</h4>
         <div class="quantity-selector">
-          <button class="qty-btn" on:click={() => adjustQuantity(-1)} disabled={craftQuantity <= 1 || selectedItems.length > 0}>−</button>
-          <span class="qty-value">{craftQuantity}</span>
-          <button class="qty-btn" on:click={() => adjustQuantity(1)} disabled={craftQuantity >= maxCraftable || selectedItems.length > 0}>+</button>
+          {#each [1, 2, 3, 4, 5] as n}
+            <button
+              class="qty-num-btn"
+              class:selected={craftQuantity === n}
+              on:click={() => setQuantity(n)}
+              disabled={n > maxCraftable || selectedItems.length > 0}
+            >{n}</button>
+          {/each}
           <span class="qty-max">/ 最大 {maxCraftable}個</span>
         </div>
         <p class="quantity-hint">所要日数: {formatCraftDays(getEffectiveCraftDays(selectedRecipe))} × {craftQuantity}個 = {craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)}日</p>
@@ -440,36 +444,36 @@
     margin-top: 0.5rem;
   }
 
-  .qty-btn {
+  .qty-num-btn {
     width: 40px;
     height: 40px;
     background: rgba(255, 255, 255, 0.1);
     border: 2px solid #4a4a6a;
     border-radius: 6px;
     color: #e0e0f0;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: bold;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
-  .qty-btn:hover:not(:disabled) {
+  .qty-num-btn:hover:not(:disabled) {
     background: rgba(201, 169, 89, 0.3);
     border-color: #c9a959;
   }
 
-  .qty-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
+  .qty-num-btn.selected {
+    background: rgba(201, 169, 89, 0.4);
+    border-color: #c9a959;
+    color: #f4e4bc;
+    box-shadow: 0 0 6px rgba(201, 169, 89, 0.3);
   }
 
-  .qty-value {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #f4e4bc;
-    min-width: 3rem;
-    text-align: center;
+  .qty-num-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 
   .qty-max {
