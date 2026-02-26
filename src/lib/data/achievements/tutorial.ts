@@ -206,7 +206,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     narrative: 'workshop_discovery',
     narrativeCharacter: { name: 'コレット', title: '駆け出し錬金術師' },
     narrativeLines: [
-      '28日目までに、錬金術レベル2以上……',
+      '28日目までに、アルバムに5種類以上登録して……',
       'それと依頼を2件以上。……やるしかない',
     ],
     conditions: [],
