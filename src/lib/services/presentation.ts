@@ -154,9 +154,9 @@ export async function processAchievementPresentation(achievementId: string): Pro
   // 4. 報酬を付与（事前選択した機材を渡す）
   claimReward(achievementId, pickedEquipment);
 
-  // 最初の依頼完了時、ランダム依頼生成を開始
+  // 最初の依頼完了時、ランダム依頼生成を開始（初回は5件）
   if (achievementId === 'ach_first_complete') {
-    generateNewQuests();
+    generateNewQuests(5);
   }
 
   // 5. アンロックアニメーション＆トースト

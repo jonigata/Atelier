@@ -16,7 +16,7 @@ import { isActionUnlocked } from '$lib/stores/tutorial';
 import { getArea } from '$lib/data/areas';
 import { getItem } from '$lib/data/items';
 import { getAvailableQuestTemplates, questTemplates } from '$lib/data/quests';
-import { EXPEDITION, QUEST, calcLevelFromExp } from '$lib/data/balance';
+import { EXPEDITION, calcLevelFromExp } from '$lib/data/balance';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import { checkAutoCompleteAchievements } from '$lib/services/tutorial';
 import { processMorningAchievements, processInspectionSequence } from '$lib/services/presentation';
@@ -236,8 +236,9 @@ function checkQuestDeadlines(): void {
 
 /**
  * 新しい依頼の生成
+ * @param overrideCount 指定された場合、日付チェックをスキップしてこの件数を追加する
  */
-export function generateNewQuests(): void {
+export function generateNewQuests(overrideCount?: number): void {
   // クエストがアンロックされていない場合はスキップ
   if (!isActionUnlocked('quest')) {
     return;
@@ -249,6 +250,20 @@ export function generateNewQuests(): void {
   if (!state.achievementProgress.completed.includes('ach_first_complete')) {
     return;
   }
+
+  // 追加件数の決定
+  let count: number;
+  if (overrideCount !== undefined) {
+    // イベント等からの直接呼び出し（初回は5件）
+    count = overrideCount;
+  } else {
+    // 通常の朝フェーズ: n%7===1 のとき（1日目は除く）に7〜10件追加
+    if (state.day === 1 || state.day % 7 !== 1) {
+      return;
+    }
+    count = Math.floor(Math.random() * 4) + 7; // 7-10件
+  }
+
   const reputationLevel = calcLevelFromExp(state.reputationExp);
 
   // 既存の依頼IDセット
@@ -257,44 +272,24 @@ export function generateNewQuests(): void {
     ...state.activeQuests.map((q) => q.id),
   ]);
 
-  // 掲示板にショップ素材だけで作れるアイテムの依頼があるか確認
-  const basicItemIds = new Set(['potion_01', 'herbal_paste']);
-  const hasBasicQuest = state.availableQuests.some((q) => basicItemIds.has(q.requiredItemId));
+  const templates = getAvailableQuestTemplates(reputationLevel);
+  if (templates.length === 0) return;
 
-  // 一定確率 or 掲示板が少ない(2件以下) で新しい依頼を追加
-  if (Math.random() < QUEST.NEW_QUEST_CHANCE || state.availableQuests.length <= 2) {
-    const templates = getAvailableQuestTemplates(reputationLevel);
+  // 重複を除いた候補からランダムに選択
+  const available = templates.filter((q) => !existingIds.has(q.id));
+  const shuffled = [...available].sort(() => Math.random() - 0.5);
+  const selected = shuffled.slice(0, Math.min(count, shuffled.length));
 
-    if (templates.length > 0) {
-      // ランダムに1-2個選択
-      const count = Math.min(templates.length, Math.random() < 0.5 ? 1 : 2);
-      const shuffled = [...templates].sort(() => Math.random() - 0.5);
-      const selected = shuffled.slice(0, count);
+  if (selected.length > 0) {
+    setAvailableQuests([...state.availableQuests, ...selected]);
+    incrementNewQuestCount(selected.length);
 
-      const newQuests = selected.filter((q) => !existingIds.has(q.id));
-
-      if (newQuests.length > 0) {
-        setAvailableQuests([...state.availableQuests, ...newQuests]);
-        incrementNewQuestCount(newQuests.length);
-        newQuests.forEach((q) => existingIds.add(q.id));
-        addMessage(`新しい依頼が掲示板に追加されました！`);
-      }
-    }
-  }
-
-  // ショップ素材で作れる依頼が掲示板にない場合、1件保証追加
-  if (!hasBasicQuest) {
-    const templates = getAvailableQuestTemplates(reputationLevel);
-    const basicTemplates = templates.filter(
-      (q) => basicItemIds.has(q.requiredItemId) && !existingIds.has(q.id)
-    );
-    if (basicTemplates.length > 0) {
-      const pick = basicTemplates[Math.floor(Math.random() * basicTemplates.length)];
-      const updatedQuests = [...get(gameState).availableQuests, pick];
-      setAvailableQuests(updatedQuests);
-      incrementNewQuestCount(1);
-      addMessage(`新しい依頼が掲示板に追加されました！`);
-    }
+    const event: MorningEvent = {
+      type: 'new_quest',
+      message: `新しい依頼が${selected.length}件、掲示板に追加されました！`,
+    };
+    addMorningEvent(event);
+    addMessage(event.message);
   }
 }
 
