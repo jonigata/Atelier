@@ -163,6 +163,7 @@ export const equipment: Record<string, EquipmentDef> = {
     price: 750,
     effectDescription: '3日先の依頼を先読み',
     effects: [{ type: 'preview_quests', days: 3 }],
+    enabled: false, // 効果未実装
   },
   decomposition_grimoire: {
     id: 'decomposition_grimoire',
@@ -602,6 +603,7 @@ export const equipment: Record<string, EquipmentDef> = {
     price: 150,
     effectDescription: '翌日の天候を先読み',
     effects: [{ type: 'preview_weather', days: 1 }],
+    enabled: false, // 効果未実装
   },
   notice_board: {
     id: 'notice_board',
@@ -612,6 +614,7 @@ export const equipment: Record<string, EquipmentDef> = {
     price: 250,
     effectDescription: '翌日の依頼を1つ先読み',
     effects: [{ type: 'preview_quests', days: 1, count: 1 }],
+    enabled: false, // 効果未実装
   },
   almanac: {
     id: 'almanac',
@@ -622,6 +625,7 @@ export const equipment: Record<string, EquipmentDef> = {
     price: 350,
     effectDescription: '2日先までのイベント予告',
     effects: [{ type: 'preview_events', days: 2 }],
+    enabled: false, // 効果未実装
   },
   recycle_pot: {
     id: 'recycle_pot',
@@ -700,15 +704,15 @@ export function getEquipment(id: string): EquipmentDef | undefined {
 }
 
 export function getAllEquipment(): EquipmentDef[] {
-  return Object.values(equipment);
+  return Object.values(equipment).filter((e) => e.enabled !== false);
 }
 
 export function getEquipmentByCategory(category: EquipmentCategory): EquipmentDef[] {
-  return Object.values(equipment).filter((e) => e.category === category);
+  return Object.values(equipment).filter((e) => e.enabled !== false && e.category === category);
 }
 
 export function getEquipmentByRarity(rarity: EquipmentRarity): EquipmentDef[] {
-  return Object.values(equipment).filter((e) => e.rarity === rarity);
+  return Object.values(equipment).filter((e) => e.enabled !== false && e.rarity === rarity);
 }
 
 export function getEquipmentIcon(id: string): string {

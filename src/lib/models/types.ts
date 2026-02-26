@@ -81,6 +81,7 @@ export interface EquipmentDef {
   price: number;
   effectDescription: string; // UI表示用の効果説明
   effects: EquipmentEffect[];
+  enabled?: boolean; // false で入手候補から除外（未実装機能の封印用）。省略時は true 扱い
 }
 
 // =====================================

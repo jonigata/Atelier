@@ -311,13 +311,6 @@ export function claimReward(achievementId: string, pickedEquipment?: EquipmentDe
     }
   }
 
-  // アクションアンロック
-  if (reward.unlocks) {
-    for (const action of reward.unlocks) {
-      unlockAction(action);
-    }
-  }
-
   // 設備アンロック
   if (reward.facilities) {
     for (const facilityId of reward.facilities) {
@@ -335,6 +328,13 @@ export function claimReward(achievementId: string, pickedEquipment?: EquipmentDe
         activeCauldron:
           picked.category === 'cauldron' && !s.activeCauldron ? picked.id : s.activeCauldron,
       }));
+    }
+  }
+
+  // アクションアンロック（機材取得の後）
+  if (reward.unlocks) {
+    for (const action of reward.unlocks) {
+      unlockAction(action);
     }
   }
 
@@ -437,13 +437,6 @@ function getDetailedRewards(achievement: AchievementDef, pickedEquipment?: Equip
     }
   }
 
-  if (reward.unlocks) {
-    for (const action of reward.unlocks) {
-      const label = actionLabels[action] ?? action;
-      details.push(`「${label}」解放`);
-    }
-  }
-
   if (reward.facilities) {
     for (const facilityId of reward.facilities) {
       const facility = getFacility(facilityId);
@@ -459,6 +452,13 @@ function getDetailedRewards(achievement: AchievementDef, pickedEquipment?: Equip
   } else if (reward.randomCommonEquipment) {
     const count = reward.randomCommonEquipment;
     details.push(`コモン機材 x${count}（ランダム）`);
+  }
+
+  if (reward.unlocks) {
+    for (const action of reward.unlocks) {
+      const label = actionLabels[action] ?? action;
+      details.push(`「${label}」解放`);
+    }
   }
 
   return details;
@@ -578,17 +578,6 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
     }
   }
 
-  if (reward.unlocks) {
-    for (const action of reward.unlocks) {
-      const label = actionLabels[action] ?? action;
-      structured.push({
-        text: `「${label}」解放`,
-        type: 'unlock',
-        iconUrl: `/images/actions/${action}.png`,
-      });
-    }
-  }
-
   if (reward.facilities) {
     for (const facilityId of reward.facilities) {
       const facility = getFacility(facilityId);
@@ -615,6 +604,17 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
       text: `コモン機材 x${count}（ランダム）`,
       type: 'unlock',
     });
+  }
+
+  if (reward.unlocks) {
+    for (const action of reward.unlocks) {
+      const label = actionLabels[action] ?? action;
+      structured.push({
+        text: `「${label}」解放`,
+        type: 'unlock',
+        iconUrl: `/images/actions/${action}.png`,
+      });
+    }
   }
 
   return structured;
