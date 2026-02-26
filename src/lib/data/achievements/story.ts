@@ -136,7 +136,6 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_story_report_notice'],
     priority: 690,
-    important: true,
   },
 
   // --- Q2: この村の錬金術師 ---
@@ -188,7 +187,6 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_first_complete', 'ach_story_rival_appear'],
     priority: 715,
-    important: true,
   },
 
   ach_story_fonte_spring: {
@@ -215,7 +213,6 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_story_girl_partner'],
     priority: 725,
-    important: true,
   },
 
   ach_story_smith_repair: {
@@ -295,7 +292,6 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_story_q1_checkpoint'],
     priority: 790,
-    important: true,
   },
 
   // --- Q3: フォンテの宝 ---
@@ -324,7 +320,6 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_story_fonte_spring', 'ach_story_q2_checkpoint'],
     priority: 805,
-    important: true,
   },
 
   ach_story_specialty_fail: {
@@ -376,7 +371,6 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_story_specialty_fail'],
     priority: 825,
-    important: true,
   },
 
   ach_story_rival_taunt: {
@@ -427,7 +421,6 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_story_specialty_fail'],
     priority: 845,
-    important: true,
   },
 
   ach_story_crisis_resolved: {
@@ -452,7 +445,6 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_story_village_crisis'],
     priority: 855,
-    important: true,
   },
 
   ach_story_q3_checkpoint: {
@@ -481,7 +473,6 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_story_crisis_resolved'],
     priority: 890,
-    important: true,
   },
 
   // --- Q4: 自分の居場所 ---
@@ -511,7 +502,6 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_story_q3_checkpoint'],
     priority: 905,
-    important: true,
   },
 
   ach_story_girl_friendship: {
@@ -540,7 +530,6 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_story_specialty_complete'],
     priority: 920,
-    important: true,
   },
 
   ach_story_rival_final: {
@@ -613,6 +602,5 @@ export const storyAchievements: Record<string, AchievementDef> = {
     reward: {},
     prerequisite: ['ach_story_q3_checkpoint'],
     priority: 990,
-    important: true,
   },
 };

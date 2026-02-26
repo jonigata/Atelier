@@ -257,6 +257,5 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     },
     priority: 50,
     prerequisite: ['ach_adventurer_arrival'],
-    important: true,
   },
 };

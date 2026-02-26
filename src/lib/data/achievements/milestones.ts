@@ -140,7 +140,6 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     reward: { money: 800, reputationExp: 10 },
     priority: 220,
     prerequisite: ['ach_quest_5'],
-    important: true,
   },
 
   ach_quest_30: {
