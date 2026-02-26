@@ -11,8 +11,10 @@
   export let areaWidth = 300;
   /** 配置グリッドの高さ(px) */
   export let areaHeight = 200;
-  /** アイコンサイズ(px) */
-  export let iconSize = 170;
+  /** アイコンサイズ(px) — 1個のときはこのサイズでデカく表示 */
+  export let iconSize = 240;
+  /** スタンプ開始までの初期遅延(秒) */
+  export let initialDelay = 0.25;
   /** 1スタンプあたりの遅延(秒) */
   export let delayPerStamp = 0.1;
 
@@ -29,6 +31,8 @@
   let idCounter = 0;
   let started = false;
   let completeTimer: ReturnType<typeof setTimeout> | null = null;
+  let effectiveIconSize = iconSize;
+  let zoneHeight = iconSize + 20;
 
   $: if (active && !started) {
     started = true;
@@ -47,10 +51,22 @@
     const count = expanded.length;
     if (count === 0) return;
 
+    // 1つならデカく表示、複数なら面積に合わせて自動縮小
+    if (count === 1) {
+      effectiveIconSize = iconSize;
+      zoneHeight = iconSize + 20;
+    } else {
+      const cols = Math.max(1, Math.round(Math.sqrt(count * (areaWidth / areaHeight))));
+      const rows = Math.max(1, Math.ceil(count / cols));
+      const cellSize = Math.min(areaWidth / cols, areaHeight / rows);
+      effectiveIconSize = Math.min(iconSize, cellSize * 0.85);
+      zoneHeight = Math.max(areaHeight + effectiveIconSize * 0.5, 200);
+    }
+
     const newStamps: Stamp[] = [];
 
     if (count === 1) {
-      newStamps.push({ id: idCounter++, itemId: expanded[0], x: 0, y: 0, delay: 0, rotation: 0 });
+      newStamps.push({ id: idCounter++, itemId: expanded[0], x: 0, y: 0, delay: initialDelay, rotation: 0 });
     } else {
       const cols = Math.max(1, Math.round(Math.sqrt(count * (areaWidth / areaHeight))));
       const rows = Math.max(1, Math.ceil(count / cols));
@@ -67,7 +83,7 @@
             itemId: expanded[placed],
             x: cx + (Math.random() - 0.5) * cellW * 0.8,
             y: cy + (Math.random() - 0.5) * cellH * 0.8,
-            delay: placed * delayPerStamp,
+            delay: initialDelay + placed * delayPerStamp,
             rotation: (Math.random() - 0.5) * 30,
           });
           placed++;
@@ -101,7 +117,7 @@
   }
 </script>
 
-<div class="stamps-zone" style="--icon-size: {iconSize}px;">
+<div class="stamps-zone" style="--icon-size: {effectiveIconSize}px; height: {zoneHeight}px;">
   {#each stamps as s (s.id)}
     <img
       class="stamp"
@@ -117,7 +133,6 @@
   .stamps-zone {
     position: relative;
     width: 100%;
-    height: 250px;
     pointer-events: none;
   }
 

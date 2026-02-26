@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
+  import { getItem } from '$lib/data/items';
   import AnimatedGauge from '../common/AnimatedGauge.svelte';
+  import StampRush from '../common/StampRush.svelte';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
   import type { GaugeData } from '$lib/models/types';
 
@@ -15,9 +16,7 @@
   $: allFail = result.successCount === 0;
   $: mixed = result.successCount > 0 && result.failCount > 0;
   $: resultItemDef = result.items.length > 0 ? getItem(result.items[0].itemId) : null;
-  $: avgQuality = result.items.length > 0
-    ? Math.round(result.items.reduce((sum, item) => sum + item.quality, 0) / result.items.length)
-    : 0;
+  $: firstQuality = result.items.length > 0 ? result.items[0].quality : 0;
   // 品質ランク判定
   function getQualityRank(q: number): { label: string; cssClass: string } {
     if (q >= 90) return { label: 'S', cssClass: 'rank-s' };
@@ -27,7 +26,7 @@
     return { label: 'D', cssClass: 'rank-d' };
   }
 
-  $: qualityRank = getQualityRank(avgQuality);
+  $: qualityRank = getQualityRank(firstQuality);
 
   // アニメーション段階制御
   let phase: 'brewing' | 'reveal' | 'done' = 'brewing';
@@ -142,63 +141,24 @@
       <!-- 成功時: アイテム表示 -->
       {#if !allFail && resultItemDef}
         <div class="result-item-area">
-          <!-- パーティクル -->
-          {#if allSuccess}
-            <div class="sparkle s1"></div>
-            <div class="sparkle s2"></div>
-            <div class="sparkle s3"></div>
-            <div class="sparkle s4"></div>
-            <div class="sparkle s5"></div>
-            <div class="sparkle s6"></div>
-          {/if}
+          <StampRush
+            items={[{ itemId: resultItemDef.id, quantity: result.successCount }]}
+            active={phase !== 'brewing'}
+          />
 
-          <!-- 1段目: 大きなアイコン -->
-          <div class="item-showcase" class:high-quality={avgQuality >= 70}>
-            <img
-              class="result-icon"
-              src={getItemIcon(resultItemDef.id)}
-              alt={resultItemDef.name}
-              on:error={handleIconError}
-            />
-          </div>
-
-          <!-- 2段目: 情報を横並び -->
+          <!-- 情報を横並び -->
           <div class="item-info-row">
             {#if result.isNewDiscovery}
               <span class="new-album-badge">NEW</span>
             {/if}
             <span class="item-name">{resultItemDef.name}</span>
             <span class="info-sep"></span>
-            {#if result.items.length === 1}
-              <span class="quality-label">品質</span>
-              <span class="quality-value {qualityRank.cssClass}">{result.items[0].quality}</span>
-              <span class="quality-rank {qualityRank.cssClass}">{qualityRank.label}</span>
-            {:else}
-              <span class="quality-label">平均品質</span>
-              <span class="quality-value {qualityRank.cssClass}">{avgQuality}</span>
-              <span class="quality-rank {qualityRank.cssClass}">{qualityRank.label}</span>
-            {/if}
+            <span class="quality-label">品質</span>
+            <span class="quality-value {qualityRank.cssClass}">{result.items[0].quality}</span>
+            <span class="quality-rank {qualityRank.cssClass}">{qualityRank.label}</span>
           </div>
         </div>
 
-        <!-- 複数個の場合: アイテム一覧 -->
-        {#if result.items.length > 1}
-          <div class="items-grid">
-            {#each result.items as item, i}
-              <div class="grid-item" style="animation-delay: {i * 0.08}s">
-                <img
-                  class="grid-icon"
-                  src={getItemIcon(item.itemId)}
-                  alt={getItem(item.itemId)?.name}
-                  on:error={handleIconError}
-                />
-                <span class="grid-quality" class:high={item.quality >= 70} class:low={item.quality < 30}>
-                  {item.quality}
-                </span>
-              </div>
-            {/each}
-          </div>
-        {/if}
       {/if}
 
       <!-- 失敗時 -->
@@ -280,11 +240,9 @@
       </div>
 
       <!-- フッター -->
-      {#if phase === 'done'}
-        <div class="dialog-footer">
-          <span class="hint-text">クリック または Enter で閉じる</span>
-        </div>
-      {/if}
+      <div class="dialog-footer" class:visible={phase === 'done'}>
+        <span class="hint-text">クリック または Enter で閉じる</span>
+      </div>
     </div>
   {/if}
 </div>
@@ -439,35 +397,6 @@
     position: relative;
   }
 
-  .item-showcase {
-    width: 280px;
-    height: 280px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.4);
-    border: 2px solid #4a4a6a;
-    border-radius: 16px;
-    margin-bottom: 0.6rem;
-    animation: itemAppear 0.4s ease-out 0.2s both;
-  }
-
-  .item-showcase.high-quality {
-    border-color: #c9a959;
-    box-shadow: 0 0 24px rgba(201, 169, 89, 0.4);
-  }
-
-  @keyframes itemAppear {
-    0% { opacity: 0; transform: scale(0.5); }
-    70% { transform: scale(1.1); }
-    100% { opacity: 1; transform: scale(1); }
-  }
-
-  .result-icon {
-    width: 240px;
-    height: 240px;
-    object-fit: contain;
-  }
 
   /* === 2段目: 情報横並び === */
   .item-info-row {
@@ -541,73 +470,7 @@
   .rank-c { color: #e0e0f0; }
   .rank-d { color: #a0a0b0; }
 
-  /* === パーティクル === */
-  .sparkle {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #ffd700;
-    animation: sparkleAnim 1.2s ease-out infinite;
-    pointer-events: none;
-  }
 
-  .s1 { top: 10%; left: 20%; animation-delay: 0s; }
-  .s2 { top: 5%; right: 25%; animation-delay: 0.2s; }
-  .s3 { top: 40%; left: 10%; animation-delay: 0.4s; }
-  .s4 { top: 35%; right: 10%; animation-delay: 0.6s; }
-  .s5 { top: 60%; left: 25%; animation-delay: 0.3s; width: 4px; height: 4px; }
-  .s6 { top: 55%; right: 20%; animation-delay: 0.5s; width: 4px; height: 4px; }
-
-  @keyframes sparkleAnim {
-    0% { opacity: 0; transform: scale(0) rotate(0deg); }
-    30% { opacity: 1; transform: scale(1.5) rotate(180deg); }
-    100% { opacity: 0; transform: scale(0) rotate(360deg); }
-  }
-
-  /* === 複数アイテムグリッド === */
-  .items-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    padding: 0.75rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-  }
-
-  .grid-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.15rem;
-    padding: 0.35rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #4a4a6a;
-    border-radius: 6px;
-    animation: gridItemPop 0.3s ease-out both;
-  }
-
-  @keyframes gridItemPop {
-    from { opacity: 0; transform: scale(0.7); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  .grid-icon {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-  }
-
-  .grid-quality {
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #a0a0b0;
-  }
-
-  .grid-quality.high { color: #81c784; }
-  .grid-quality.low { color: #ff6b6b; }
 
   /* === 失敗表示 === */
   .fail-area {
@@ -719,7 +582,13 @@
   .dialog-footer {
     text-align: center;
     padding-top: 0.75rem;
-    border-top: 1px solid #4a4a6a;
+    border-top: 1px solid transparent;
+    visibility: hidden;
+  }
+
+  .dialog-footer.visible {
+    border-top-color: #4a4a6a;
+    visibility: visible;
     animation: fadeUp 0.3s ease-out;
   }
 
