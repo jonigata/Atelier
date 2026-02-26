@@ -24,7 +24,6 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     conditions: [{ type: 'craft_count', target: 10 }],
     reward: { money: 200, reputationExp: 5, facilities: ['improved_cauldron'] },
     priority: 110,
-    important: true,
     prerequisite: ['ach_rival_intro'],
   },
 
@@ -124,7 +123,6 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
       facilities: ['magic_circle'],
     },
     priority: 210,
-    important: true,
     prerequisite: ['ach_rival_intro'],
   },
 
@@ -299,7 +297,6 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     conditions: [{ type: 'level', target: 15 }],
     reward: { money: 300, recipes: ['bomb_01'], facilities: ['distiller'] },
     priority: 510,
-    important: true,
     prerequisite: ['ach_rival_intro'],
   },
 
@@ -315,7 +312,6 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     reward: { money: 800, reputationExp: 10, recipes: ['ingot_01'], facilities: ['furnace'] },
     priority: 520,
     prerequisite: ['ach_level_15'],
-    important: true,
   },
 
   ach_reputation_15: {
