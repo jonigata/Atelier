@@ -146,7 +146,9 @@ export type BuildingEffectType =
   | 'rest_bonus'         // 休息回復量+
   | 'expedition_bonus'   // 採取ドロップ増
   | 'sell_price'         // 売値+%
-  | 'buy_price';         // 買値-%
+  | 'buy_price'          // 買値-%
+  | 'reputation_exp_bonus'  // 名声exp+%
+  | 'village_exp_bonus';    // 村発展exp+%
 
 export interface BuildingEffect {
   type: BuildingEffectType;
@@ -190,6 +192,8 @@ export interface HelperDef {
   morningStamina: number[];
   staminaCostReduction: number[];
   rareEventBonus: number[];
+  reputationExpBonus: number[];
+  villageExpBonus: number[];
 }
 
 export interface OwnedHelper {

@@ -6,7 +6,7 @@ import { getHelper } from '$lib/data/helpers';
  * 助手の効果値を取得するユーティリティ
  * 全所有助手の指定フィールドの値を合算
  */
-function sumHelperEffect(field: 'craftSuccessBonus' | 'craftQualityBonus' | 'expeditionDropBonus' | 'expeditionRareBonus' | 'morningStamina' | 'staminaCostReduction' | 'rareEventBonus'): number {
+function sumHelperEffect(field: 'craftSuccessBonus' | 'craftQualityBonus' | 'expeditionDropBonus' | 'expeditionRareBonus' | 'morningStamina' | 'staminaCostReduction' | 'rareEventBonus' | 'reputationExpBonus' | 'villageExpBonus'): number {
   const state = get(gameState);
   let total = 0;
   for (const owned of state.ownedHelpers) {
@@ -64,6 +64,14 @@ export function getHelperBuyPriceMult(): number {
 
 export function getHelperSellPriceMult(): number {
   return multHelperEffect('sellPriceMult');
+}
+
+export function getHelperReputationExpBonus(): number {
+  return sumHelperEffect('reputationExpBonus');
+}
+
+export function getHelperVillageExpBonus(): number {
+  return sumHelperEffect('villageExpBonus');
 }
 
 /**

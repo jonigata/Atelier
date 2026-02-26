@@ -73,6 +73,24 @@ export function getBuildingSellPriceMult(): number {
 }
 
 /**
+ * 施設の名声Expボーナス合計（小数として返す。0.20 = +20%）
+ */
+export function getBuildingReputationExpBonus(): number {
+  return getAllBuildingEffects()
+    .filter((e) => e.type === 'reputation_exp_bonus')
+    .reduce((sum, e) => sum + e.value, 0);
+}
+
+/**
+ * 施設の村発展Expボーナス合計（小数として返す。0.20 = +20%）
+ */
+export function getBuildingVillageExpBonus(): number {
+  return getAllBuildingEffects()
+    .filter((e) => e.type === 'village_exp_bonus')
+    .reduce((sum, e) => sum + e.value, 0);
+}
+
+/**
  * 施設の買値割引合計（乗数として返す）
  */
 export function getBuildingBuyPriceMult(): number {
