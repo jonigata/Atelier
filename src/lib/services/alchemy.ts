@@ -44,6 +44,7 @@ export interface CraftMultipleResult {
   duplicatedCount: number;
   totalExpGained: number;
   totalReputationExpGained: number;
+  isNewDiscovery: boolean;
   message: string;
 }
 
@@ -175,12 +176,13 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
   let totalExpGained = 0;
   let totalReputationExpGained = 0;
   let duplicatedCount = 0;
+  let isNewDiscovery = false;
 
   if (isSuccess) {
     // 全成功: 品質は1回だけ計算し全個数に適用
     const quality = calculateQuality(recipe, firstItems, calcLevelFromExp(currentState.alchemyExp));
     const stateForOrigin = get(gameState);
-    const isNewDiscovery = !stateForOrigin.discoveredItems.includes(recipe.resultItemId);
+    isNewDiscovery = !stateForOrigin.discoveredItems.includes(recipe.resultItemId);
 
     for (let i = 0; i < actualQuantity; i++) {
       const newItem: OwnedItem = {
@@ -254,6 +256,7 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
     duplicatedCount,
     totalExpGained,
     totalReputationExpGained,
+    isNewDiscovery,
     message,
   };
 }
@@ -262,16 +265,16 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
 function validateBatchPreconditions(recipeId: string): { recipe: RecipeDef } | { error: CraftMultipleResult } {
   const recipe = getRecipe(recipeId);
   if (!recipe) {
-    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, message: 'レシピが見つかりません' } };
+    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, message: 'レシピが見つかりません' } };
   }
   const state = get(gameState);
   if (recipe.requiredLevel > calcLevelFromExp(state.alchemyExp)) {
-    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, message: `錬金術レベルが足りません（必要: Lv${recipe.requiredLevel}）` } };
+    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, message: `錬金術レベルが足りません（必要: Lv${recipe.requiredLevel}）` } };
   }
   return { recipe };
 }
 
-const EMPTY_BATCH_RESULT: CraftMultipleResult = { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, message: '素材が足りませんでした' };
+const EMPTY_BATCH_RESULT: CraftMultipleResult = { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, message: '素材が足りませんでした' };
 
 /**
  * 複数個の調合を実行（自動で素材を選択）

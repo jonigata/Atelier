@@ -152,6 +152,7 @@
             <div class="sparkle s6"></div>
           {/if}
 
+          <!-- 1段目: 大きなアイコン -->
           <div class="item-showcase" class:high-quality={avgQuality >= 70}>
             <img
               class="result-icon"
@@ -161,20 +162,21 @@
             />
           </div>
 
-          <div class="item-info">
+          <!-- 2段目: 情報を横並び -->
+          <div class="item-info-row">
+            {#if result.isNewDiscovery}
+              <span class="new-album-badge">NEW</span>
+            {/if}
             <span class="item-name">{resultItemDef.name}</span>
+            <span class="info-sep"></span>
             {#if result.items.length === 1}
-              <div class="quality-display">
-                <span class="quality-label">品質</span>
-                <span class="quality-value {qualityRank.cssClass}">{result.items[0].quality}</span>
-                <span class="quality-rank {qualityRank.cssClass}">{qualityRank.label}</span>
-              </div>
+              <span class="quality-label">品質</span>
+              <span class="quality-value {qualityRank.cssClass}">{result.items[0].quality}</span>
+              <span class="quality-rank {qualityRank.cssClass}">{qualityRank.label}</span>
             {:else}
-              <div class="quality-display">
-                <span class="quality-label">平均品質</span>
-                <span class="quality-value {qualityRank.cssClass}">{avgQuality}</span>
-                <span class="quality-rank {qualityRank.cssClass}">{qualityRank.label}</span>
-              </div>
+              <span class="quality-label">平均品質</span>
+              <span class="quality-value {qualityRank.cssClass}">{avgQuality}</span>
+              <span class="quality-rank {qualityRank.cssClass}">{qualityRank.label}</span>
             {/if}
           </div>
         </div>
@@ -433,26 +435,26 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     position: relative;
   }
 
   .item-showcase {
-    width: 80px;
-    height: 80px;
+    width: 280px;
+    height: 280px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.4);
     border: 2px solid #4a4a6a;
-    border-radius: 12px;
-    margin-bottom: 0.75rem;
+    border-radius: 16px;
+    margin-bottom: 0.6rem;
     animation: itemAppear 0.4s ease-out 0.2s both;
   }
 
   .item-showcase.high-quality {
     border-color: #c9a959;
-    box-shadow: 0 0 20px rgba(201, 169, 89, 0.4);
+    box-shadow: 0 0 24px rgba(201, 169, 89, 0.4);
   }
 
   @keyframes itemAppear {
@@ -462,13 +464,18 @@
   }
 
   .result-icon {
-    width: 56px;
-    height: 56px;
+    width: 240px;
+    height: 240px;
     object-fit: contain;
   }
 
-  .item-info {
-    text-align: center;
+  /* === 2段目: 情報横並び === */
+  .item-info-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
     animation: fadeUp 0.3s ease-out 0.4s both;
   }
 
@@ -477,19 +484,37 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .item-name {
-    display: block;
-    font-size: 1.2rem;
+  /* === 新規アルバム登録バッジ === */
+  .new-album-badge {
+    display: inline-block;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.7rem;
     font-weight: bold;
-    color: #f4e4bc;
-    margin-bottom: 0.5rem;
+    color: #fff;
+    background: linear-gradient(135deg, #6a4c93 0%, #9b59b6 50%, #6a4c93 100%);
+    border: 1px solid #b07cd8;
+    border-radius: 3px;
+    box-shadow: 0 0 8px rgba(155, 89, 182, 0.5);
+    animation: albumBadgeAppear 0.5s ease-out 0.3s both;
+    letter-spacing: 0.05em;
   }
 
-  .quality-display {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+  @keyframes albumBadgeAppear {
+    0% { opacity: 0; transform: scale(0.5); }
+    60% { transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .item-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #f4e4bc;
+  }
+
+  .info-sep {
+    width: 1px;
+    height: 1.2em;
+    background: rgba(255, 255, 255, 0.15);
   }
 
   .quality-label {
