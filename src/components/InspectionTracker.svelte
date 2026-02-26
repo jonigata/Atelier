@@ -283,9 +283,9 @@
             <div class="criterion-label">
               <span class="criterion-name">錬金Lv</span>
               <span class="criterion-value">Lv.{info.value}</span>
-              <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
-              {#if info.met}<span class="passed-chip">PASSED</span>{/if}
+              <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
               <span class="criterion-target">目標Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
+
             </div>
           </div>
 
@@ -319,9 +319,9 @@
             <div class="criterion-label">
               <span class="criterion-name">依頼</span>
               <span class="criterion-value">{info.value}件</span>
-              <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
-              {#if info.met}<span class="passed-chip">PASSED</span>{/if}
+              <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
               <span class="criterion-target">目標{criterion.thresholds.C}～{totalStars}件</span>
+
             </div>
           </div>
 
@@ -351,9 +351,9 @@
             <div class="criterion-label">
               <span class="criterion-name">村発展</span>
               <span class="criterion-value">Lv.{info.value}</span>
-              <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
-              {#if info.met}<span class="passed-chip">PASSED</span>{/if}
+              <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
               <span class="criterion-target">目標Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
+
             </div>
           </div>
 
@@ -395,9 +395,9 @@
             <div class="criterion-label">
               <span class="criterion-name">名声</span>
               <span class="criterion-value">Lv.{info.value}</span>
-              <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
-              {#if info.met}<span class="passed-chip">PASSED</span>{/if}
+              <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
               <span class="criterion-target">目標Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
+
             </div>
           </div>
 
@@ -436,9 +436,9 @@
             <div class="criterion-label">
               <span class="criterion-name">アルバム</span>
               <span class="criterion-value">{info.value}種</span>
-              <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
-              {#if info.met}<span class="passed-chip">PASSED</span>{/if}
+              <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
               <span class="criterion-target">目標{criterion.thresholds.C}～{criterion.thresholds.S}種</span>
+
             </div>
           </div>
 
@@ -465,9 +465,9 @@
             <div class="criterion-label">
               <span class="criterion-name">{criterion.label}</span>
               <span class="criterion-value">{info.value}{criterion.unit}</span>
-              <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
-              {#if info.met}<span class="passed-chip">PASSED</span>{/if}
+              <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
               <span class="criterion-target">目標{criterion.thresholds.C}～{criterion.thresholds.S}{criterion.unit}</span>
+
             </div>
           </div>
 
@@ -645,14 +645,18 @@
     line-height: 1;
   }
 
+  .grade-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
   .passed-chip {
-    grid-column: 1 / -1;
-    justify-self: center;
-    padding: 0.1rem 0.4rem;
+    padding: 0.05rem 0.25rem;
     background: rgba(76, 175, 80, 0.25);
     border: 1px solid rgba(76, 175, 80, 0.5);
     border-radius: 3px;
-    font-size: 0.6rem;
+    font-size: 0.5rem;
     font-weight: bold;
     color: #81c784;
     letter-spacing: 0.05em;
