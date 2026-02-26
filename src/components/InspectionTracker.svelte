@@ -284,6 +284,7 @@
               <span class="criterion-name">錬金Lv</span>
               <span class="criterion-value">Lv.{info.value}</span>
               <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
+              {#if info.met}<span class="passed-chip">PASSED</span>{/if}
               <span class="criterion-target">目標Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
             </div>
           </div>
@@ -299,7 +300,7 @@
                 {@const lit = i < info.value}
                 {@const boundary = isStarBoundary(i, criterion)}
                 {#if boundary}
-                  <div class="star-boundary" style="margin-left: {i === 0 ? 0 : overlap}px; z-index: {totalStars + 1}">
+                  <div class="star-boundary" style="z-index: {totalStars + 1}">
                     <div class="boundary-line" style="background: {gradeColors[boundary]}"></div>
                   </div>
                 {/if}
@@ -319,6 +320,7 @@
               <span class="criterion-name">依頼</span>
               <span class="criterion-value">{info.value}件</span>
               <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
+              {#if info.met}<span class="passed-chip">PASSED</span>{/if}
               <span class="criterion-target">目標{criterion.thresholds.C}～{totalStars}件</span>
             </div>
           </div>
@@ -350,6 +352,7 @@
               <span class="criterion-name">村発展</span>
               <span class="criterion-value">Lv.{info.value}</span>
               <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
+              {#if info.met}<span class="passed-chip">PASSED</span>{/if}
               <span class="criterion-target">目標Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
             </div>
           </div>
@@ -393,6 +396,7 @@
               <span class="criterion-name">名声</span>
               <span class="criterion-value">Lv.{info.value}</span>
               <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
+              {#if info.met}<span class="passed-chip">PASSED</span>{/if}
               <span class="criterion-target">目標Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
             </div>
           </div>
@@ -407,10 +411,14 @@
               <div class="album-grid" style="grid-template-columns: repeat({cols}, 1fr)">
                 {#each Array(tileCount) as _, i}
                   {@const isBoundaryC = i === getAlbumGradeBoundary(criterion, 'C', tileCount) - 1}
+                  {@const isBoundaryB = i === getAlbumGradeBoundary(criterion, 'B', tileCount) - 1}
+                  {@const isBoundaryA = i === getAlbumGradeBoundary(criterion, 'A', tileCount) - 1}
                   <div
                     class="album-tile"
                     class:lit={i < litCount}
                     class:boundary-c={isBoundaryC}
+                    class:boundary-b={isBoundaryB}
+                    class:boundary-a={isBoundaryA}
                     style="background: {getAlbumTileColor(i, litCount, info.grade)};
                            {i < litCount && info.grade !== 'S' ? `box-shadow: inset 0 0 4px ${gradeColors[info.grade]}44` : ''}
                            {i < litCount && info.grade === 'S' ? `box-shadow: 0 0 4px ${rainbowPalette[i % rainbowPalette.length]}66` : ''}"
@@ -429,6 +437,7 @@
               <span class="criterion-name">アルバム</span>
               <span class="criterion-value">{info.value}種</span>
               <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
+              {#if info.met}<span class="passed-chip">PASSED</span>{/if}
               <span class="criterion-target">目標{criterion.thresholds.C}～{criterion.thresholds.S}種</span>
             </div>
           </div>
@@ -457,6 +466,7 @@
               <span class="criterion-name">{criterion.label}</span>
               <span class="criterion-value">{info.value}{criterion.unit}</span>
               <span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>
+              {#if info.met}<span class="passed-chip">PASSED</span>{/if}
               <span class="criterion-target">目標{criterion.thresholds.C}～{criterion.thresholds.S}{criterion.unit}</span>
             </div>
           </div>
@@ -635,6 +645,20 @@
     line-height: 1;
   }
 
+  .passed-chip {
+    grid-column: 1 / -1;
+    justify-self: center;
+    padding: 0.1rem 0.4rem;
+    background: rgba(76, 175, 80, 0.25);
+    border: 1px solid rgba(76, 175, 80, 0.5);
+    border-radius: 3px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    color: #81c784;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
   /* ── 共通: 等級マーカー付きバー ── */
   .grade-bar {
     position: relative;
@@ -727,7 +751,7 @@
 
   .boundary-line {
     position: absolute;
-    left: -1px;
+    left: -2px;
     top: -2px;
     width: 2px;
     height: 22px;
@@ -807,8 +831,34 @@
     border-color: rgba(255, 255, 255, 0.12);
   }
 
-  .album-tile.boundary-c {
-    border-right: 2px solid #b8733388;
+  .album-tile.boundary-c,
+  .album-tile.boundary-b,
+  .album-tile.boundary-a {
+    position: relative;
+  }
+
+  .album-tile.boundary-c::after,
+  .album-tile.boundary-b::after,
+  .album-tile.boundary-a::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: -2px;
+    width: 2px;
+    height: 130%;
+    border-radius: 1px;
+  }
+
+  .album-tile.boundary-c::after {
+    background: #b8733388;
+  }
+
+  .album-tile.boundary-b::after {
+    background: #c0c0c088;
+  }
+
+  .album-tile.boundary-a::after {
+    background: #ffd70088;
   }
 
   .tile-icon {
