@@ -195,6 +195,7 @@ export interface HelperDef {
   rareEventBonus: number[];
   reputationExpBonus: number[];
   villageExpBonus: number[];
+  greetings: string[];  // レベルごとの挨拶セリフ（index 0=加入時, 1=Lv2, 2=Lv3）
 }
 
 export interface OwnedHelper {
