@@ -30,7 +30,7 @@
 
   // 週替わり特売
   $: bargainItemIds = getBargainItems($gameState.day, $villageLevel);
-  $: premiumItemIds = getPremiumPurchaseItems($gameState.day);
+  $: premiumItemIds = getPremiumPurchaseItems($gameState.day, $villageLevel);
   $: dealsRemaining = getDaysLeftInWeek($gameState.day);
 
   // 週初回訪問でメルダのトークを表示
