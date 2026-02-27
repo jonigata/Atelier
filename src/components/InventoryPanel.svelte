@@ -6,6 +6,8 @@
   import type { OwnedItem, EquipmentDef } from '$lib/models/types';
   import { CATEGORY_NAMES, getCategoryName } from '$lib/data/categories';
   import { getEquipment, getEquipmentIcon } from '$lib/data/equipment';
+  import { getHelper } from '$lib/data/helpers';
+  import type { HelperDef } from '$lib/models/types';
   import ItemCard from './common/ItemCard.svelte';
 
   export let onBack: () => void;
@@ -189,6 +191,14 @@
     },
     {} as Record<string, EquipmentDef[]>,
   );
+
+  // 所持助手
+  $: ownedHelperDefs = $gameState.ownedHelpers
+    .map((h) => {
+      const def = getHelper(h.helperId);
+      return def ? { def, level: h.level } : null;
+    })
+    .filter((h): h is { def: HelperDef; level: number } => h !== null);
 </script>
 
 <div class="inventory-panel">
@@ -325,6 +335,28 @@
                 <span class="equip-active-badge">使用中</span>
               {/if}
               <span class="equip-effect">{def.effectDescription}</span>
+            </div>
+          </div>
+        {/each}
+      </div>
+    </div>
+  {/if}
+
+  <!-- 助手セクション -->
+  {#if ownedHelperDefs.length > 0}
+    <div class="equipment-section">
+      <h3 class="equipment-header">助手 ({ownedHelperDefs.length})</h3>
+      <div class="equip-grid">
+        {#each ownedHelperDefs as { def, level }}
+          <div class="equip-card">
+            <div class="equip-img-wrap">
+              <img class="equip-icon" src="/images/helpers/{def.id}.png" alt={def.name} />
+            </div>
+            <div class="equip-info">
+              <span class="equip-category-label">{def.species}</span>
+              <span class="equip-name">{def.name}</span>
+              <span class="helper-level">Lv.{level}</span>
+              <span class="equip-effect">{def.levelEffects[level - 1].description}</span>
             </div>
           </div>
         {/each}
@@ -749,5 +781,15 @@
     font-size: 0.8rem;
     color: #8a9a8a;
     line-height: 1.3;
+  }
+
+  .helper-level {
+    align-self: flex-start;
+    font-size: 0.7rem;
+    font-weight: bold;
+    background: rgba(100, 180, 255, 0.2);
+    color: #8ac4ff;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
   }
 </style>
