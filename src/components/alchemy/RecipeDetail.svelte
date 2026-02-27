@@ -26,6 +26,7 @@
   $: missingFacilities = getMissingFacilities(recipe);
   $: successRate = calculateSuccessRate(recipe, calcLevelFromExp($gameState.alchemyExp));
   $: resultItem = getItem(recipe.resultItemId);
+  $: ownedCount = $gameState.inventory.filter(i => i.itemId === recipe.resultItemId).length;
 </script>
 
 <div class="recipe-detail">
@@ -34,7 +35,7 @@
   <div class="detail-header">
     <img class="detail-icon" class:silhouette={!$gameState.discoveredItems.includes(recipe.resultItemId)} src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
     <div>
-      <h3>{recipe.name}</h3>
+      <h3>{recipe.name} <span class="owned-count">所持: {ownedCount}個</span></h3>
       {#if resultItem?.description}
         <p class="detail-description">{resultItem.description}</p>
       {/if}
@@ -132,6 +133,15 @@
     font-size: 1.2rem;
     color: #f4e4bc;
     margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .owned-count {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: #a0a0b0;
   }
 
   h4 {
