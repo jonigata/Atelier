@@ -40,12 +40,12 @@ export const inspections: InspectionDef[] = [
     criteria: [
       {
         key: 'album', label: 'アルバム', unit: '種',
-        thresholds: { C: 7, B: 9, A: 11, S: 13 },
+        thresholds: { C: 11, B: 14, A: 17, S: 20 },
         getValue: (s) => s.discoveredItems.length,
       },
       {
         key: 'quests', label: '依頼', unit: '件',
-        thresholds: { C: 3, B: 5, A: 7, S: 9 },
+        thresholds: { C: 11, B: 14, A: 17, S: 20 },
         getValue: (s) => s.completedQuestCount,
       },
     ],
