@@ -8,17 +8,17 @@
   export let levelUpInfo: LevelUpInfo;
   export let onClose: () => void;
 
-  // 新レベルで解放されたレシピ（oldLevel < requiredLevel <= newLevel）
-  $: unlockedRecipes = Object.values(recipes).filter(
+  // 新レベルで成功率が向上したレシピ（oldLevel < requiredLevel <= newLevel）
+  $: improvedRecipes = Object.values(recipes).filter(
     (r) => r.requiredLevel > levelUpInfo.oldLevel && r.requiredLevel <= levelUpInfo.newLevel
   );
 
   // 習得済みのレシピ
   $: knownRecipeIds = $gameState.knownRecipes;
 
-  // 習得済み（すぐ作れる）と未習得に分ける
-  $: knownUnlocked = unlockedRecipes.filter((r) => knownRecipeIds.includes(r.id));
-  $: unknownUnlocked = unlockedRecipes.filter((r) => !knownRecipeIds.includes(r.id));
+  // 習得済みと未習得に分ける
+  $: knownImproved = improvedRecipes.filter((r) => knownRecipeIds.includes(r.id));
+  $: unknownImproved = improvedRecipes.filter((r) => !knownRecipeIds.includes(r.id));
 
   let mounted = false;
 
@@ -76,16 +76,16 @@
 
     <p class="congrats-text">錬金術の腕が上がった！</p>
 
-    <!-- 解放レシピ -->
-    {#if unlockedRecipes.length > 0}
+    <!-- 成功率向上レシピ -->
+    {#if improvedRecipes.length > 0}
       <div class="unlocked-section">
-        <h4 class="section-title">解放されたレシピ</h4>
+        <h4 class="section-title">成功率が安定したレシピ</h4>
 
-        {#if knownUnlocked.length > 0}
+        {#if knownImproved.length > 0}
           <div class="recipe-group">
-            <span class="group-label">調合可能</span>
+            <span class="group-label">習得済み</span>
             <div class="recipe-list">
-              {#each knownUnlocked as recipe, i}
+              {#each knownImproved as recipe, i}
                 <div class="recipe-item craftable" style="animation-delay: {i * 0.06}s">
                   <span class="recipe-name">{recipe.name}</span>
                   <span class="recipe-level">Lv.{recipe.requiredLevel}</span>
@@ -95,12 +95,12 @@
           </div>
         {/if}
 
-        {#if unknownUnlocked.length > 0}
+        {#if unknownImproved.length > 0}
           <div class="recipe-group">
-            <span class="group-label">レシピ習得で解放</span>
+            <span class="group-label">未習得</span>
             <div class="recipe-list">
-              {#each unknownUnlocked as recipe, i}
-                <div class="recipe-item locked" style="animation-delay: {(knownUnlocked.length + i) * 0.06}s">
+              {#each unknownImproved as recipe, i}
+                <div class="recipe-item locked" style="animation-delay: {(knownImproved.length + i) * 0.06}s">
                   <span class="recipe-name">{recipe.name}</span>
                   <span class="recipe-level">Lv.{recipe.requiredLevel}</span>
                 </div>

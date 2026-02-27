@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { countAvailableIngredients } from '$lib/services/alchemy';
+  import { countAvailableIngredients, calculateSuccessRate } from '$lib/services/alchemy';
   import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
+  import { calcLevelFromExp } from '$lib/data/balance';
   import { formatCraftDays } from '$lib/services/equipmentEffects';
   import { gameState } from '$lib/stores/game';
   import type { RecipeDef, Ingredient } from '$lib/models/types';
@@ -62,9 +63,13 @@
       {@const craftable = canCraft(recipe)}
       {@const reason = !craftable ? getDisabledReason(recipe) : null}
       {@const facilityMissing = !hasRequiredFacilities(recipe)}
+      {@const alchemyLevel = calcLevelFromExp($gameState.alchemyExp)}
+      {@const levelDeficit = recipe.requiredLevel - alchemyLevel}
+      {@const successRate = calculateSuccessRate(recipe, alchemyLevel)}
       <button
         class="recipe-item"
         class:disabled={!craftable}
+        class:level-warning={levelDeficit > 0}
         on:click={() => onSelect(recipe)}
       >
         <div class="recipe-header">
@@ -72,6 +77,9 @@
           <div class="recipe-name-block">
             <div class="recipe-name-row">
               <span class="recipe-name">{recipe.name}</span>
+              {#if levelDeficit > 0}
+                <span class="level-deficit-badge">Lv.{recipe.requiredLevel} ({Math.round(successRate * 100)}%)</span>
+              {/if}
               {#each getActiveQuestsForItem(recipe.resultItemId) as quest}
                 <span class="quest-badge active">{quest.title}({quest.requiredQuantity})</span>
               {/each}
@@ -273,5 +281,25 @@
 
   .craft-status.facility-status {
     background: #e65100;
+  }
+
+  .recipe-item.level-warning {
+    border-color: #8a6a2a;
+  }
+
+  .recipe-item.level-warning:hover:not(.disabled) {
+    border-color: #b8860b;
+  }
+
+  .level-deficit-badge {
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    white-space: nowrap;
+    flex-shrink: 0;
+    background: rgba(255, 152, 0, 0.2);
+    border: 1px solid #ff9800;
+    color: #ffb74d;
   }
 </style>

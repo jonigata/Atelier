@@ -639,7 +639,6 @@ function getCraftCandidates(state: GameState): { recipe: RecipeDef; missingItems
     .map(id => recipes[id])
     .filter((recipe): recipe is RecipeDef => {
       if (!recipe) return false;
-      if (recipe.requiredLevel > alchemyLv) return false;
       return true;
     })
     .map(recipe => {
@@ -837,7 +836,9 @@ function getOptimalCraftEfficiency(state: GameState): number {
   let best = 0;
   for (const recipeId of state.knownRecipes) {
     const recipe = recipes[recipeId];
-    if (!recipe || recipe.requiredLevel > alchemyLv) continue;
+    if (!recipe) continue;
+    // 成功率が低いレシピは効率が悪いので除外
+    if (recipe.requiredLevel > alchemyLv + 3) continue;
     const eff = recipe.expReward / Math.max(1, recipe.craftDaysTenths);
     if (eff > best) best = eff;
   }
@@ -928,7 +929,7 @@ function getNeededMaterials(state: GameState): Set<string> {
 
   for (const recipeId of state.knownRecipes) {
     const recipe = recipes[recipeId];
-    if (!recipe || recipe.requiredLevel > alchemyLv) continue;
+    if (!recipe) continue;
 
     for (const ing of recipe.ingredients) {
       if (!ing.itemId) continue;

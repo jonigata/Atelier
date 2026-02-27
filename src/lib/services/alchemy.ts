@@ -106,7 +106,6 @@ export function canCraftRecipe(recipeId: string): boolean {
   const state = get(gameState);
   const recipe = getRecipe(recipeId);
   if (!recipe) return false;
-  if (recipe.requiredLevel > calcLevelFromExp(state.alchemyExp)) return false;
   if (!state.knownRecipes.includes(recipeId)) return false;
   if (!hasRequiredFacilities(recipe)) return false;
 
@@ -261,15 +260,11 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
   };
 }
 
-/** バッチ調合の共通バリデーション（レシピ存在・レベル確認） */
+/** バッチ調合の共通バリデーション（レシピ存在確認） */
 function validateBatchPreconditions(recipeId: string): { recipe: RecipeDef } | { error: CraftMultipleResult } {
   const recipe = getRecipe(recipeId);
   if (!recipe) {
     return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, message: 'レシピが見つかりません' } };
-  }
-  const state = get(gameState);
-  if (recipe.requiredLevel > calcLevelFromExp(state.alchemyExp)) {
-    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, message: `錬金術レベルが足りません（必要: Lv${recipe.requiredLevel}）` } };
   }
   return { recipe };
 }
@@ -388,7 +383,11 @@ export function getFatigueLabel(stamina: number): string | null {
  */
 export function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number, stamina?: number): number {
   const baserate = CRAFT_SUCCESS.BASE_RATE - (recipe.difficulty - 1) * CRAFT_SUCCESS.DIFFICULTY_PENALTY;
-  const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * CRAFT_SUCCESS.LEVEL_BONUS);
+  const levelDiff = alchemyLevel - recipe.requiredLevel;
+  // レベルが足りていればボーナス、足りなければペナルティ
+  const levelMod = levelDiff >= 0
+    ? levelDiff * CRAFT_SUCCESS.LEVEL_BONUS
+    : levelDiff * CRAFT_SUCCESS.LEVEL_DEFICIT_PENALTY;
   const { successRateBonus } = getFacilityBonuses(recipe);
   const fatiguePenalty = stamina !== undefined ? calculateFatiguePenalty(stamina) : 0;
 
@@ -403,7 +402,7 @@ export function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number, st
 
   return Math.max(0.01, Math.min(
     CRAFT_SUCCESS.MAX_RATE,
-    baserate + levelBonus + successRateBonus + equipBonus + accumBonus + probBonus + villageBonus + helperBonus - fatiguePenalty
+    baserate + levelMod + successRateBonus + equipBonus + accumBonus + probBonus + villageBonus + helperBonus - fatiguePenalty
   ));
 }
 
