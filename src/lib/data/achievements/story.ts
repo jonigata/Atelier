@@ -66,6 +66,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     prerequisite: ['ach_first_craft'],
     priority: 610,
     triggerOnMorning: true,
+    eventImage: 'first_meeting_marco',
   },
 
   ach_story_baker_rumor: {
