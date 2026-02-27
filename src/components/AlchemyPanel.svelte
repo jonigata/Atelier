@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
-  import { gameState, pendingLevelUp, pendingAlchemyRecipeId } from '$lib/stores/game';
+  import { gameState, pendingLevelUp, pendingAlchemyRecipeId, pendingReputationLevelUp, suppressDrawDialog } from '$lib/stores/game';
   import type { LevelUpInfo } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { recipes } from '$lib/data/recipes';
@@ -42,6 +42,7 @@
   let reputationExpGaugeData: GaugeData | null = null;
   let staminaGaugeData: GaugeData | null = null;
   let levelUpData: LevelUpInfo | null = null;
+  let savedReputationLevelUp: LevelUpInfo | null = null;
 
   // 習得済みかつレベル条件を満たすレシピ
   $: availableRecipes = Object.values(recipes).filter(
@@ -210,7 +211,17 @@
     const repExpMax = calcExpForLevel(repLevelBefore);
     const staminaBefore = stateBefore.stamina;
 
+    // DrawDialogが調合リザルト中に表示されるのを抑制
+    suppressDrawDialog.set(true);
+
     const result = craftBatch(selectedRecipe.id, selectedItems, craftQuantity);
+
+    // 名声レベルアップを一時退避
+    savedReputationLevelUp = get(pendingReputationLevelUp);
+    if (savedReputationLevelUp) {
+      pendingReputationLevelUp.set(null);
+    }
+
     craftResultData = result;
 
     // 経験値ゲージデータを構築
@@ -279,6 +290,9 @@
     if (!selectedRecipe) return;
     const totalTenths = getEffectiveCraftDays(selectedRecipe) * craftQuantity;
     const days = craftDaysToActual(totalTenths);
+    // 退避していた名声レベルアップを復元（DrawDialogが反応する）
+    const repLevelUp = savedReputationLevelUp;
+    savedReputationLevelUp = null;
     // 先にendTurn → DayTransitionが上から被さる
     endTurn(days);
     // DayTransitionの暗転(0.3s)後にダイアログを片付け
@@ -286,6 +300,11 @@
       craftResultData = null;
       levelUpData = null;
       onBack();
+      // 抑制解除してから名声レベルアップを発火
+      suppressDrawDialog.set(false);
+      if (repLevelUp) {
+        pendingReputationLevelUp.set(repLevelUp);
+      }
     }, 350);
   }
 </script>

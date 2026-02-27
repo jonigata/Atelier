@@ -1,9 +1,11 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
+  import { get } from 'svelte/store';
   import {
     gameState,
     pendingVillageLevelUp,
     pendingReputationLevelUp,
+    suppressDrawDialog,
     addBuilding,
     addHelper,
     upgradeHelper,
@@ -104,7 +106,7 @@
 
   // 名声レベルアップ → 助手ドロー
   const unsubReputation = pendingReputationLevelUp.subscribe((info) => {
-    if (!info || drawMode !== 'none') return;
+    if (!info || drawMode !== 'none' || get(suppressDrawDialog)) return;
     const state = $gameState;
     const choices = generateHelperChoices(state.ownedHelpers);
     if (choices.length > 0) {

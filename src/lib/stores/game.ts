@@ -218,6 +218,7 @@ function hasDrawLevel(oldLevel: number, newLevel: number): boolean {
 export const pendingLevelUp = writable<LevelUpInfo | null>(null);
 export const pendingVillageLevelUp = writable<LevelUpInfo | null>(null);
 export const pendingReputationLevelUp = writable<LevelUpInfo | null>(null);
+export const suppressDrawDialog = writable(false);
 
 export function addBuilding(facilityId: string): void {
   gameState.update((state) => ({
