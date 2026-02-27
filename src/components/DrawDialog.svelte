@@ -11,6 +11,7 @@
     skipPresentation,
   } from '$lib/stores/game';
   import { generateBuildingChoices, generateHelperChoices } from '$lib/services/draw';
+  import { showDialogueAndWait } from '$lib/services/presentation';
   import type { BuildingDef, HelperDef } from '$lib/models/types';
 
   type DrawMode = 'none' | 'facility' | 'helper';
@@ -49,6 +50,22 @@
     }
   });
 
+  // 初回助手ドローの導入イベント
+  async function showFirstHelperIntro() {
+    await showDialogueAndWait({
+      characterName: 'コレット',
+      characterTitle: '駆け出し錬金術師',
+      characterFaceId: 'heroine',
+      lines: [
+        { text: '……あれ？ 工房の外がなんだか騒がしい', expression: 'surprised' },
+        { text: 'わっ、小さな生き物たちが集まってる……！', expression: 'surprised' },
+        { text: '噂を聞いてやって来てくれたのかな。嬉しいな', expression: 'happy' },
+        { text: 'よし、一緒に工房を手伝ってくれる子を選ぼう！', expression: 'determined' },
+      ],
+    });
+    startDrawAnimation();
+  }
+
   // 名声レベルアップ → 助手ドロー
   const unsubReputation = pendingReputationLevelUp.subscribe((info) => {
     if (!info || drawMode !== 'none') return;
@@ -57,7 +74,11 @@
     if (choices.length > 0) {
       helperChoices = choices;
       drawMode = 'helper';
-      startDrawAnimation();
+      if (state.ownedHelpers.length === 0) {
+        showFirstHelperIntro();
+      } else {
+        startDrawAnimation();
+      }
     } else {
       pendingReputationLevelUp.set(null);
     }

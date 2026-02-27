@@ -96,7 +96,7 @@ async function showInspectionCutsceneAndWait(data: InspectionCutsceneData): Prom
 /**
  * ダイアログを表示して閉じるまで待つ
  */
-async function showDialogueAndWait(dialogue: EventDialogue): Promise<void> {
+export async function showDialogueAndWait(dialogue: EventDialogue): Promise<void> {
   setEventDialogue(dialogue);
 
   return new Promise((resolve) => {
