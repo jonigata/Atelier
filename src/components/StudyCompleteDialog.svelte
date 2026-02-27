@@ -2,6 +2,7 @@
   import type { RecipeBookDef } from '$lib/models/types';
   import { recipes } from '$lib/data/recipes';
   import { getItemIcon, handleIconError } from '$lib/data/items';
+  import { gameState } from '$lib/stores/game';
 
   export let book: RecipeBookDef;
   /** 習得したレシピID配列 */
@@ -88,7 +89,7 @@
         {#if currentRecipe}
           <div class="showcase" class:phase-in={phase === 'in'} class:phase-show={phase === 'show'} class:phase-out={phase === 'out'}>
             <div class="recipe-icon">
-              <img src={currentItemIcon} alt={currentRecipe.name} on:error={handleIconError} />
+              <img class:silhouette={!$gameState.discoveredItems.includes(currentRecipe.resultItemId)} src={currentItemIcon} alt={currentRecipe.name} on:error={handleIconError} />
             </div>
             <div class="recipe-name">{currentRecipe.name}</div>
           </div>
@@ -232,6 +233,10 @@
     height: 120px;
     object-fit: contain;
     filter: drop-shadow(0 0 16px rgba(201, 169, 89, 0.5));
+  }
+
+  .recipe-icon img.silhouette {
+    filter: brightness(0) saturate(0) opacity(0.3);
   }
 
   .recipe-name {

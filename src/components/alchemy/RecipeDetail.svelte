@@ -32,7 +32,7 @@
   <button class="back-btn small" on:click={onBack}>← レシピ選択に戻る</button>
 
   <div class="detail-header">
-    <img class="detail-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
+    <img class="detail-icon" class:silhouette={!$gameState.discoveredItems.includes(recipe.resultItemId)} src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
     <div>
       <h3>{recipe.name}</h3>
       {#if resultItem?.description}
@@ -122,6 +122,10 @@
     height: 56px;
     object-fit: contain;
     flex-shrink: 0;
+  }
+
+  .detail-icon.silhouette {
+    filter: brightness(0) saturate(0) opacity(0.3);
   }
 
   h3 {

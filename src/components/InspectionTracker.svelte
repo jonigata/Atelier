@@ -209,7 +209,7 @@
     </div>
     <div class="tracker-meta">
       <span class="met-count" class:complete={allMet}>
-        {metCount}/{inspection.criteria.length}
+        全ての項目をCランク以上にしよう 達成項目 {metCount}/{inspection.criteria.length}
       </span>
       <span class="days-until {urgency}">あと{daysUntil}日</span>
     </div>
@@ -565,7 +565,7 @@
 
   .met-count {
     font-size: 0.85rem;
-    color: #a0a0b0;
+    color: #d0d0e0;
     font-weight: bold;
   }
 

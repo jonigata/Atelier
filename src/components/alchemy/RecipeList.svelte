@@ -68,7 +68,7 @@
         on:click={() => onSelect(recipe)}
       >
         <div class="recipe-header">
-          <img class="recipe-icon" src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
+          <img class="recipe-icon" class:silhouette={!$gameState.discoveredItems.includes(recipe.resultItemId)} src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
           <div class="recipe-name-block">
             <div class="recipe-name-row">
               <span class="recipe-name">{recipe.name}</span>
@@ -163,6 +163,10 @@
     height: 40px;
     object-fit: contain;
     flex-shrink: 0;
+  }
+
+  .recipe-icon.silhouette {
+    filter: brightness(0) saturate(0) opacity(0.3);
   }
 
   .recipe-name-block {
