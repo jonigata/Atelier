@@ -143,7 +143,7 @@
         <div class="result-item-area">
           <StampRush
             items={[{ itemId: resultItemDef.id, quantity: result.successCount }]}
-            active={phase !== 'brewing'}
+            active={phase === 'reveal' || phase === 'done'}
             initialDelay={0.25}
           />
 

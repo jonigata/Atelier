@@ -1,14 +1,15 @@
 <script lang="ts">
   import { gameState } from '$lib/stores/game';
+  import type { ActionType } from '$lib/models/types';
 
   interface MonologueDef {
     text: string;
     expression: string;
     priority: number;
     /** このアクションが解放済みなら表示（報酬受取後の判定に使う） */
-    afterAction?: string;
+    afterAction?: ActionType;
     /** このアクションが未解放の間だけ表示 */
-    untilAction?: string;
+    untilAction?: ActionType;
     /** 追加条件（stateを受け取りboolを返す） */
     condition?: (state: typeof $gameState) => boolean;
   }
