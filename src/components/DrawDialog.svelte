@@ -35,6 +35,38 @@
     timers.push(setTimeout(fn, ms));
   }
 
+  // 施設ごとの村長コメント
+  const buildingComments: Record<string, string> = {
+    herb_garden: 'おお、薬草園か！ これで毎朝新鮮な薬草が手に入るな。村の皆も喜ぶぞ',
+    apiary: 'ほほう、養蜂場とは賢い選択だ。蜂蜜は万能薬の材料にもなるし、村の特産にもなる',
+    mine: '採掘坑か！ あの辺りには良い鉱脈があると聞いておったんだ。楽しみだな',
+    well: '井戸を掘ったか。きれいな水は錬金術の基本と聞くぞ。良い判断だ',
+    market: '市場ができれば、村に商人も集まってくる。活気が出るぞぉ',
+    warehouse: '倉庫があれば、採取で持ち帰れる量も増えるな。探索が捗るぞ',
+    drying_shed: '乾燥小屋か。薬品の仕上がりが早くなるのは助かるなぁ',
+    watermill: '水車小屋！ わしも若い頃に見たことがあるぞ。調合の精度が上がるんだったな',
+    library: '図書館とは素晴らしい！ 知識は村の財産だ。勉強も捗るだろう',
+    clock_tower: 'おぉ、時計塔か！ 村のシンボルになるな。これで村の評判も上がるぞ',
+    clinic: '診療所ができれば、先生も安心して休めるだろう。体が資本だからな',
+    meeting_hall: '集会所か！ 村の皆が集まれる場所があると、村全体が元気になるぞ',
+  };
+
+  // 初回施設ドローの導入イベント
+  async function showFirstFacilityIntro() {
+    await showDialogueAndWait({
+      characterName: '村長',
+      characterTitle: 'フォンテ村長',
+      characterFaceId: 'mayor',
+      lines: [
+        { text: 'おお、先生！ 村の発展度が上がったぞ！', expression: 'happy' },
+        { text: '村が発展するとな、新しい施設を建てられるようになるんだ', expression: 'neutral' },
+        { text: '施設にはそれぞれ違った効果がある。工房の仕事を助けてくれるものもあるし、村全体を豊かにするものもある', expression: 'neutral' },
+        { text: 'さあ、どれを建てるか選んでくれ！ 村の未来は先生にかかっておるぞ', expression: 'happy' },
+      ],
+    });
+    startDrawAnimation();
+  }
+
   // 村発展度レベルアップ → 施設ドロー
   const unsubVillage = pendingVillageLevelUp.subscribe((info) => {
     if (!info || drawMode !== 'none') return;
@@ -43,7 +75,11 @@
     if (choices.length > 0) {
       facilityChoices = choices;
       drawMode = 'facility';
-      startDrawAnimation();
+      if (state.buildings.length === 0) {
+        showFirstFacilityIntro();
+      } else {
+        startDrawAnimation();
+      }
     } else {
       addMessage('村発展度がレベルアップしたが、建設できる施設がもうない');
       pendingVillageLevelUp.set(null);
@@ -151,7 +187,17 @@
     let pendingGreeting: EventDialogue | null = null;
 
     if (drawMode === 'facility' && selectedIndex >= 0) {
-      applyFacilitySelection(facilityChoices[selectedIndex]);
+      const facility = facilityChoices[selectedIndex];
+      const comment = buildingComments[facility.id];
+      if (comment) {
+        pendingGreeting = {
+          characterName: '村長',
+          characterTitle: 'フォンテ村長',
+          characterFaceId: 'mayor',
+          lines: [comment],
+        };
+      }
+      applyFacilitySelection(facility);
     } else if (drawMode === 'helper' && selectedIndex >= 0) {
       const choice = helperChoices[selectedIndex];
       const { def, currentLevel } = choice;
