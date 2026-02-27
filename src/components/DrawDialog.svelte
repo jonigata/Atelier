@@ -12,7 +12,7 @@
   } from '$lib/stores/game';
   import { generateBuildingChoices, generateHelperChoices } from '$lib/services/draw';
   import { showDialogueAndWait } from '$lib/services/presentation';
-  import type { BuildingDef, HelperDef } from '$lib/models/types';
+  import type { BuildingDef, HelperDef, EventDialogue } from '$lib/models/types';
 
   type DrawMode = 'none' | 'facility' | 'helper';
   type DrawPhase = 'entering' | 'cards-in' | 'flipping' | 'choosing' | 'selected' | 'result' | 'closing';
@@ -146,17 +146,35 @@
     }
   }
 
-  function finishDraw() {
+  async function finishDraw() {
     clearTimers();
+    let pendingGreeting: EventDialogue | null = null;
+
     if (drawMode === 'facility' && selectedIndex >= 0) {
       applyFacilitySelection(facilityChoices[selectedIndex]);
     } else if (drawMode === 'helper' && selectedIndex >= 0) {
-      applyHelperSelection(helperChoices[selectedIndex]);
+      const choice = helperChoices[selectedIndex];
+      const { def, currentLevel } = choice;
+      // MAX未満なら挨拶セリフを準備
+      if (currentLevel < def.maxLevel && def.greetings[currentLevel]) {
+        pendingGreeting = {
+          characterName: def.name,
+          characterTitle: def.species,
+          eventImage: `/images/helpers/${def.id}.png`,
+          lines: [def.greetings[currentLevel]],
+        };
+      }
+      applyHelperSelection(choice);
     }
     phase = 'entering';
     selectedIndex = -1;
     canInteract = false;
     resultText = '';
+
+    // ドロー演出の後にヘルパーの挨拶セリフを表示
+    if (pendingGreeting) {
+      await showDialogueAndWait(pendingGreeting);
+    }
   }
 
   function handleCardSelect(index: number) {
