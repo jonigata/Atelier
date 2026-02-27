@@ -57,16 +57,16 @@ export function checkMerchantEvents(): void {
 
 /**
  * 月のラインナップを生成
- * 構成: 機材1 + レシピ本1 + レア素材1-2
+ * 構成: 機材2 + レシピ本2 + レア素材2
  */
 export function generateMerchantLineup(month: number, state: GameState): MerchantLineup {
   const slots: MerchantSlot[] = [];
 
-  // 枠1: 未所持の機材からランダム1つ
+  // 機材: 未所持からランダム2つ
   const allEquipment = getAllEquipment();
   const unowned = allEquipment.filter((e) => !state.ownedEquipment.includes(e.id));
-  if (unowned.length > 0) {
-    const selected = unowned[Math.floor(Math.random() * unowned.length)];
+  const shuffledEquip = [...unowned].sort(() => Math.random() - 0.5);
+  for (const selected of shuffledEquip.slice(0, 2)) {
     slots.push({
       type: 'equipment',
       id: selected.id,
@@ -75,12 +75,12 @@ export function generateMerchantLineup(month: number, state: GameState): Merchan
     });
   }
 
-  // 枠2: 未所持のレシピ本からランダム1つ
+  // レシピ本: 未所持からランダム2つ
   const unownedBooks = Object.values(books).filter(
     (b) => !state.ownedBooks.includes(b.id),
   );
-  if (unownedBooks.length > 0) {
-    const selected = unownedBooks[Math.floor(Math.random() * unownedBooks.length)];
+  const shuffledBooks = [...unownedBooks].sort(() => Math.random() - 0.5);
+  for (const selected of shuffledBooks.slice(0, 2)) {
     slots.push({
       type: 'recipe_book',
       id: selected.id,
@@ -89,31 +89,16 @@ export function generateMerchantLineup(month: number, state: GameState): Merchan
     });
   }
 
-  // 枠3: レア素材
+  // レア素材: ランダム2つ（重複なし）
   const rareMaterials = getRareMaterialPool(state);
-  if (rareMaterials.length > 0) {
-    const selected = rareMaterials[Math.floor(Math.random() * rareMaterials.length)];
+  const shuffledRare = [...rareMaterials].sort(() => Math.random() - 0.5);
+  for (const selected of shuffledRare.slice(0, 2)) {
     slots.push({
       type: 'rare_material',
       id: selected.id,
       price: Math.floor(selected.basePrice * MERCHANT.RARE_MATERIAL_PRICE_RATE),
       purchased: false,
     });
-  }
-
-  // 枠4: 50%で追加レア素材
-  if (Math.random() < MERCHANT.EXTRA_SLOT_CHANCE && rareMaterials.length > 1) {
-    const alreadyOffered = new Set(slots.filter((s) => s.type === 'rare_material').map((s) => s.id));
-    const remaining = rareMaterials.filter((m) => !alreadyOffered.has(m.id));
-    if (remaining.length > 0) {
-      const selected = remaining[Math.floor(Math.random() * remaining.length)];
-      slots.push({
-        type: 'rare_material',
-        id: selected.id,
-        price: Math.floor(selected.basePrice * MERCHANT.RARE_MATERIAL_PRICE_RATE),
-        purchased: false,
-      });
-    }
   }
 
   return { month, slots };

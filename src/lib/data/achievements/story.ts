@@ -44,19 +44,20 @@ export const storyAchievements: Record<string, AchievementDef> = {
     id: 'ach_story_merchant_first',
     title: '胡散臭い来客',
     description: '旅商人マルコが初めてやって来た',
-    hint: '<strong>調合3回</strong>をこなして旅商人を呼ぼう',
+    hint: '<strong>8日目</strong>の来客を待とう',
     category: 'quest',
     narrative: 'merchant_visit',
     narrativeCharacter: { name: 'マルコ', title: '旅商人' },
     narrativeLines: [
-      'いやぁ、辺境にも錬金術師が来たって聞いてさ',
+      'おーい、ここが錬金術師の工房かい？',
+      { text: '俺はマルコ。各地を回ってる旅商人さ。よろしくな、先生！', expression: 'happy' },
+      'いやぁ、辺境にも錬金術師が来たって聞いてさ。こりゃ商売のチャンスだと思ってね',
       'こいつは「霧草の種」ってやつだ。この辺じゃ珍しいぞ？',
       { text: '特別価格で……まぁ、ちょーっとだけ上乗せさせてもらうがな', expression: 'smug' },
       'これからもちょくちょく顔を出すぜ。いい商売しようや、先生',
     ],
     conditions: [
-      { type: 'day', target: 10, comparison: '>=' },
-      { type: 'craft_count', target: 3 },
+      { type: 'day', target: 8, comparison: '>=' },
     ],
     reward: {
       items: [{ itemId: 'herb_02', quality: 55, quantity: 2 }],
@@ -64,6 +65,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
     },
     prerequisite: ['ach_first_craft'],
     priority: 610,
+    triggerOnMorning: true,
   },
 
   ach_story_baker_rumor: {
