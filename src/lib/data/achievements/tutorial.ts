@@ -221,6 +221,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     description: '村発展レベル2に到達した',
     hint: '<strong>村発展Lv2</strong>を目指そう',
     category: 'tutorial',
+    eventImage: 'adventurer_arrival',
     narrative: 'character_trial',
     narrativeCharacter: { name: 'レン', title: '冒険者' },
     narrativeLines: [
