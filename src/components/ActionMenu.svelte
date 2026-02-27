@@ -129,7 +129,9 @@
           <span class="label">{action.label}</span>
           <span class="description">{action.description}</span>
           {#if action.type === 'expedition' && $gameState.expedition !== null}
-            <span class="badge">派遣中</span>
+            {@const returnDay = $gameState.expedition.startDay + $gameState.expedition.duration}
+            {@const daysLeft = returnDay - $gameState.day}
+            <span class="badge">あと{daysLeft}日</span>
           {:else if action.type === 'quest' && $gameState.newQuestCount > 0}
             <span class="badge new-quest">{$gameState.newQuestCount}件</span>
           {/if}
