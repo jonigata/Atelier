@@ -120,7 +120,7 @@
   }
 
   .game-container {
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
@@ -132,6 +132,7 @@
   .main-panel {
     flex: 1;
     overflow-y: auto;
+    min-height: 0;
   }
 
   /* 広い画面での背景 */
