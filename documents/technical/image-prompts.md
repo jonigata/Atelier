@@ -49,6 +49,7 @@ bash scripts/generate-event.sh --help   # 利用可能キャラ一覧
 - 背景は `documents/design/setting_designs.md` のビジュアルキーワードを使う
 - 参照画像のポーズと矛盾する指示は避ける
 - `single unified illustration, no split screen` を入れて一枚絵を保証
+- キャラの目線に気をつけてください。指定しないとカメラ目線になってしまいます。
 
 ---
 

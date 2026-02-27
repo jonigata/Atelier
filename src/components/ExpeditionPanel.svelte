@@ -1,12 +1,26 @@
 <script lang="ts">
   import { gameState, addMessage, addMoney, setExpedition } from '$lib/stores/game';
   import { getAllAreas } from '$lib/data/areas';
+  import { getItem } from '$lib/data/items';
   import type { AreaDef } from '$lib/models/types';
   import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
 
   export let onBack: () => void;
 
-  const areas = getAllAreas();
+  const areas = getAllAreas().sort((a, b) => a.costPerDay - b.costPerDay);
+
+  function getMainDropNames(area: AreaDef): string {
+    const seen = new Set<string>();
+    const names: string[] = [];
+    for (const drop of area.drops) {
+      if (!seen.has(drop.itemId)) {
+        seen.add(drop.itemId);
+        const item = getItem(drop.itemId);
+        if (item) names.push(item.name);
+      }
+    }
+    return names.join('、');
+  }
   const durations = [3, 5, 7];
 
   let selectedArea: AreaDef | null = null;
@@ -67,7 +81,10 @@
             class:selected={selectedArea?.id === area.id}
             on:click={() => selectArea(area)}
           >
-            <span class="area-name">{area.name}</span>
+            <div class="area-info">
+              <span class="area-name">{area.name}</span>
+              <span class="area-drops">{getMainDropNames(area)}</span>
+            </div>
             <span class="area-cost">{area.costPerDay}G/日</span>
           </button>
         {/each}
@@ -175,12 +192,24 @@
   .area-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 1rem;
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid #4a4a6a;
     border-radius: 6px;
     color: #e0e0f0;
     cursor: pointer;
+  }
+
+  .area-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .area-drops {
+    font-size: 0.8rem;
+    color: #a0a0b0;
   }
 
   .area-item:hover {
