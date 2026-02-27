@@ -10,12 +10,6 @@
 
   export let onQuestClick: (quest: ActiveQuest) => void;
 
-  let expandedGoalId: string | null = null;
-
-  function toggleDetail(goalId: string) {
-    expandedGoalId = expandedGoalId === goalId ? null : goalId;
-  }
-
   const conditionLabels: Record<string, string> = {
     level: '錬金レベル',
     reputation: '名声',
@@ -132,65 +126,6 @@
     return getActiveGoals();
   })();
 
-  function getProgressDetail(achievement: AchievementDef): { label: string; current: number; target: number } | null {
-    if (achievement.conditions.length !== 1) return null;
-
-    const cond = achievement.conditions[0];
-    const target = cond.target as number;
-    let current = 0;
-    let label = '';
-
-    switch (cond.type) {
-      case 'level':
-        current = $alchemyLevel;
-        label = '錬金Lv';
-        break;
-      case 'reputation':
-        current = $reputationLevel;
-        label = '名声Lv';
-        break;
-      case 'money':
-        current = $gameState.money;
-        label = '所持金';
-        break;
-      case 'quest_count':
-        current = $gameState.completedQuestCount;
-        label = '依頼完了';
-        break;
-      case 'craft_count':
-        current = $gameState.stats.totalCraftCount;
-        label = '調合回数';
-        break;
-      case 'craft_quality':
-        current = $gameState.stats.highestQualityCrafted;
-        label = '最高品質';
-        break;
-      case 'expedition_count':
-        current = $gameState.stats.totalExpeditionCount;
-        label = '採取回数';
-        break;
-      case 'recipe_count':
-        current = $gameState.knownRecipes.length;
-        label = 'レシピ数';
-        break;
-      case 'consecutive_quests':
-        current = $gameState.stats.consecutiveQuestSuccess;
-        label = '連続成功';
-        break;
-      case 'total_sales':
-        current = $gameState.stats.totalSalesAmount;
-        label = '累計売上';
-        break;
-      case 'village_development':
-        current = $villageLevel;
-        label = '村発展Lv';
-        break;
-      default:
-        return null;
-    }
-
-    return { label, current: Math.min(current, target), target };
-  }
 </script>
 
 {#if activeGoals.length > 0 || $gameState.activeQuests.length > 0}
@@ -200,18 +135,11 @@
         <h5>現在の目標</h5>
         <div class="goal-grid">
           {#each activeGoals as goal}
-            {@const progressDetail = getProgressDetail(goal)}
             {@const progressPercent = getAchievementProgress(goal.id)}
-            {@const isExpanded = expandedGoalId === goal.id}
-            {@const condDetails = isExpanded ? getConditionDetails(goal) : []}
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            {@const condDetails = getConditionDetails(goal)}
             <div
               class="objective-item achievement"
               class:important={goal.important}
-              class:expanded={isExpanded}
-              on:click={() => toggleDetail(goal.id)}
-              role="button"
-              tabindex="0"
             >
               <div class="objective-main">
                 <div class="objective-icon">
@@ -220,43 +148,29 @@
                 <div class="objective-content">
                   <div class="objective-header">
                     <span class="objective-title">{goal.title}</span>
-                    {#if progressDetail}
-                      <span class="progress-badge">{progressDetail.label}: {progressDetail.current}/{progressDetail.target}</span>
-                    {/if}
                   </div>
                   <div class="objective-hint">{@html goal.hint}</div>
                 </div>
               </div>
-              {#if isExpanded}
-                <div class="objective-detail">
-                  <div class="detail-conditions">
-                    {#each condDetails as cond}
-                      <div class="condition-row" class:met={cond.met}>
-                        <span class="condition-check">{cond.met ? '✓' : '○'}</span>
-                        <span class="condition-label">{cond.label}</span>
-                        <span class="condition-value">{cond.current} / {cond.target}</span>
-                      </div>
-                    {/each}
+              <div class="detail-conditions">
+                {#each condDetails as cond}
+                  <div class="condition-row" class:met={cond.met}>
+                    <span class="condition-check">{cond.met ? '✓' : '○'}</span>
+                    <span class="condition-label">{cond.label}</span>
+                    <span class="condition-value">{cond.current} / {cond.target}</span>
                   </div>
-                  <div class="objective-rewards">
-                    <span class="reward-label">報酬:</span>
-                    {#each getRewardSummary(goal) as reward}
-                      <span class="reward-item">{reward}</span>
-                    {/each}
-                  </div>
+                {/each}
+              </div>
+              <div class="objective-rewards">
+                <span class="reward-label">報酬:</span>
+                {#each getRewardSummary(goal) as reward}
+                  <span class="reward-item">{reward}</span>
+                {/each}
+              </div>
+              {#if progressPercent > 0}
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: {progressPercent}%"></div>
                 </div>
-              {:else}
-                <div class="objective-rewards">
-                  <span class="reward-label">報酬:</span>
-                  {#each getRewardSummary(goal) as reward}
-                    <span class="reward-item">{reward}</span>
-                  {/each}
-                </div>
-                {#if progressPercent > 0 && progressDetail}
-                  <div class="progress-bar">
-                    <div class="progress-fill" style="width: {progressPercent}%"></div>
-                  </div>
-                {/if}
               {/if}
             </div>
           {/each}
@@ -318,6 +232,9 @@
     border: 1px solid #3a3a5a;
     border-radius: 6px;
     border-left: 3px solid #2196f3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
   }
 
   .objective-item.achievement {
@@ -334,7 +251,6 @@
   .objective-main {
     display: flex;
     gap: 0.75rem;
-    margin-bottom: 0.5rem;
   }
 
   .objective-icon {
@@ -369,20 +285,10 @@
     font-weight: bold;
   }
 
-  .progress-badge {
-    padding: 0.15rem 0.4rem;
-    background: rgba(201, 169, 89, 0.3);
-    border-radius: 3px;
-    font-size: 0.75rem;
-    color: #c9a959;
-    font-weight: bold;
-  }
-
   .progress-bar {
     height: 4px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 2px;
-    margin-top: 0.5rem;
     overflow: hidden;
   }
 
@@ -409,45 +315,17 @@
     color: #c9a959;
   }
 
-  .objective-item.achievement {
-    cursor: pointer;
-    transition: background 0.15s ease;
-  }
-
-  .objective-item.achievement:hover {
-    background: rgba(255, 255, 255, 0.06);
-  }
-
-  .objective-item.expanded {
-    grid-column: 1 / -1;
-  }
-
-  .objective-detail {
-    margin-top: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .detail-description {
-    color: #c0c0d0;
-    font-size: 0.85rem;
-    line-height: 1.4;
-  }
-
   .detail-conditions {
     display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    font-size: 0.8rem;
   }
 
   .condition-row {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
+    gap: 0.25rem;
     color: #a0a0b0;
   }
 
@@ -456,17 +334,10 @@
   }
 
   .condition-check {
-    width: 1.2em;
-    text-align: center;
     flex-shrink: 0;
   }
 
-  .condition-label {
-    flex: 0 0 auto;
-  }
-
   .condition-value {
-    margin-left: auto;
     font-variant-numeric: tabular-nums;
   }
 </style>
