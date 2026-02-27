@@ -44,9 +44,9 @@
   let levelUpData: LevelUpInfo | null = null;
   let savedReputationLevelUp: LevelUpInfo | null = null;
 
-  // 習得済みかつレベル条件を満たすレシピ
+  // 習得済みのレシピ（レベル不足でも表示、成功率が下がるのみ）
   $: availableRecipes = Object.values(recipes).filter(
-    (r) => $gameState.knownRecipes.includes(r.id) && r.requiredLevel <= calcLevelFromExp($gameState.alchemyExp)
+    (r) => $gameState.knownRecipes.includes(r.id)
   );
 
   // 選択中のレシピが調合可能か

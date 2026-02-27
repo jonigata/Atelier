@@ -41,6 +41,8 @@ export const CRAFT_SUCCESS = {
   DIFFICULTY_PENALTY: 0.05,
   /** レベル超過1ごとの成功率ボーナス */
   LEVEL_BONUS: 0.02,
+  /** レベル不足1ごとの成功率ペナルティ */
+  LEVEL_DEFICIT_PENALTY: 0.08,
   /** 最大成功率 */
   MAX_RATE: 1.0,
 } as const;

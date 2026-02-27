@@ -5,7 +5,6 @@
   import { isMerchantVisiting } from '$lib/services/calendar';
   import { getNextInspection, INSPECTION_DAYS } from '$lib/data/inspection';
   import { recipes } from '$lib/data/recipes';
-  import { calcLevelFromExp } from '$lib/data/balance';
   import InspectionTracker from './InspectionTracker.svelte';
   import ObjectivesSection from './ObjectivesSection.svelte';
   import type { ActionType, ActiveQuest } from '$lib/models/types';
@@ -23,9 +22,8 @@
   }
 
   function findRecipeForItem(itemId: string): string | null {
-    const level = calcLevelFromExp($gameState.alchemyExp);
     const recipe = Object.values(recipes).find(
-      (r) => r.resultItemId === itemId && $gameState.knownRecipes.includes(r.id) && r.requiredLevel <= level
+      (r) => r.resultItemId === itemId && $gameState.knownRecipes.includes(r.id)
     );
     return recipe?.id ?? null;
   }
