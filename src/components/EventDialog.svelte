@@ -334,6 +334,9 @@
             <div class="achievement-info">
               <span class="achievement-badge">達成</span>
               <span class="achievement-title">{dialogue.achievementTitle}</span>
+              {#if dialogue.achievementDescription}
+                <span class="achievement-description">{dialogue.achievementDescription}</span>
+              {/if}
             </div>
           </div>
         {/if}
@@ -462,6 +465,11 @@
     font-weight: bold;
     color: #ffd700;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  }
+
+  .achievement-description {
+    font-size: 0.85rem;
+    color: #a0a0b8;
   }
 
   .dialogue-body {

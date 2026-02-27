@@ -350,6 +350,7 @@ export interface EventDialogue {
   lines: NarrativeLine[];
   eventImage?: string;  // イベントCG画像パス
   achievementTitle?: string;  // アチーブメント達成時のタイトル
+  achievementDescription?: string;  // アチーブメント達成理由（例: "調合を10回達成した"）
   achievementCategory?: AchievementCategory;  // アチーブメントカテゴリ（アイコン表示用）
   rewardsTitle?: string;      // 報酬画面のメインタイトル（デフォルト: "報酬獲得！"）
   rewards?: string[];         // 報酬詳細リスト（後方互換性のため残す）
