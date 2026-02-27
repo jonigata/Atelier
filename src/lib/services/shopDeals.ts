@@ -61,11 +61,26 @@ export function getBargainItems(day: number, villageLv: number): string[] {
   return shuffled.slice(0, Math.min(SHOP_DEALS.BARGAIN_COUNT, pool.length));
 }
 
-/** 今週の高価買取対象アイテムID（最大3個） */
-export function getPremiumPurchaseItems(day: number): string[] {
+/** 村発展度に応じた高価買取アイテムの価格帯 */
+function getPremiumPriceRange(villageLv: number): { min: number; max: number } {
+  if (villageLv <= 2) return { min: 0, max: 100 };
+  if (villageLv <= 4) return { min: 20, max: 200 };
+  if (villageLv <= 6) return { min: 50, max: 500 };
+  if (villageLv <= 9) return { min: 80, max: 1000 };
+  if (villageLv <= 12) return { min: 150, max: 3000 };
+  if (villageLv <= 15) return { min: 300, max: 8000 };
+  return { min: 500, max: Infinity };
+}
+
+/** 今週の高価買取対象アイテムID（最大3個、村発展度で価格帯が変動） */
+export function getPremiumPurchaseItems(day: number, villageLv: number): string[] {
   const week = getWeek(day);
   const rng = seededRandom(week * 13331);
-  const pool = Object.values(items).map((item) => item.id);
+  const { min, max } = getPremiumPriceRange(villageLv);
+  const pool = Object.values(items)
+    .filter((item) => item.basePrice >= min && item.basePrice <= max)
+    .map((item) => item.id);
+  if (pool.length === 0) return [];
   const shuffled = seededShuffle(pool, rng);
   return shuffled.slice(0, Math.min(SHOP_DEALS.PREMIUM_COUNT, pool.length));
 }
