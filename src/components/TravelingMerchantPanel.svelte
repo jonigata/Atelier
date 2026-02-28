@@ -4,13 +4,15 @@
   import { getEquipment, getEquipmentIcon } from '$lib/data/equipment';
   import { getBook } from '$lib/data/books';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
-  import { getMonth } from '$lib/services/calendar';
+  import { getMonth, getDayOfMonth } from '$lib/services/calendar';
+  import { MERCHANT } from '$lib/data/balance';
   import type { MerchantSlot } from '$lib/models/types';
 
   export let onBack: () => void;
 
   $: lineup = $gameState.merchantLineup;
   $: currentMonth = getMonth($gameState.day);
+  $: merchantDaysLeft = MERCHANT.VISIT_END_DAY - getDayOfMonth($gameState.day) + 1;
 
   function getSlotInfo(slot: MerchantSlot): {
     name: string;
@@ -56,7 +58,7 @@
 
 <div class="merchant-panel">
   <button class="back-btn" on:click={onBack}>← 戻る</button>
-  <h2>マルコの行商 ── {currentMonth}月の品揃え</h2>
+  <h2>マルコの行商 ── {currentMonth}月の品揃え <span class="days-left">（あと{merchantDaysLeft}日）</span></h2>
 
   <div class="money-display">
     所持金: <span class="amount">{$gameState.money.toLocaleString()}G</span>
@@ -133,6 +135,11 @@
     font-size: 1.5rem;
     color: #f4e4bc;
     margin-bottom: 1rem;
+  }
+
+  .days-left {
+    font-size: 0.9rem;
+    color: #a0c8ff;
   }
 
   .money-display {

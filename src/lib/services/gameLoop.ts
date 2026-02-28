@@ -272,7 +272,7 @@ export function generateNewQuests(overrideCount?: number): void {
     ...state.activeQuests.map((q) => q.id),
   ]);
 
-  const templates = getAvailableQuestTemplates(reputationLevel);
+  const templates = getAvailableQuestTemplates(reputationLevel, state.achievementProgress.completed);
   if (templates.length === 0) return;
 
   // 重複を除いた候補からランダムに選択
