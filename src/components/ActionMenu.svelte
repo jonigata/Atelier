@@ -106,9 +106,10 @@
         on:click={() => onSelect('traveling_merchant')}
       >
         <img class="icon" src="/images/characters/marco/marco-face-smug.png" alt="マルコ" />
-        <span class="label">旅商人マルコ</span>
-        <span class="description">マルコの行商を覗く</span>
-        <span class="badge merchant">来訪中（あと{merchantDaysLeft}日）</span>
+        <div class="merchant-info">
+          <span class="label">旅商人マルコ <span class="merchant-days">あと{merchantDaysLeft}日</span></span>
+          <span class="description">マルコの行商を覗く</span>
+        </div>
       </button>
     </div>
   {/if}
@@ -302,9 +303,15 @@
   .merchant-btn {
     width: 100%;
     flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
     min-height: auto;
     padding: 1rem 1.25rem;
     border-color: #ff9800 !important;
+    background-image: url(/images/actions/traveling_merchant.png) !important;
+    background-size: cover;
+    background-position: center;
     animation: merchantPulse 3s ease-in-out infinite;
   }
 
@@ -312,14 +319,37 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .merchant-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
   }
 
   .merchant-btn .label {
     font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .merchant-days {
+    font-size: 0.8rem;
+    color: #fff;
+    background: rgba(255, 152, 0, 0.4);
+    border: 1px solid #ff9800;
+    padding: 0.1rem 0.5rem;
+    border-radius: 4px;
+    font-weight: bold;
   }
 
   .merchant-btn .description {
     text-align: left;
+    font-size: 0.8rem;
+    opacity: 0.7;
   }
 
   @keyframes merchantPulse {

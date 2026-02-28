@@ -58,7 +58,10 @@
 
 <div class="merchant-panel">
   <button class="back-btn" on:click={onBack}>← 戻る</button>
-  <h2>マルコの行商 ── {currentMonth}月の品揃え <span class="days-left">（あと{merchantDaysLeft}日）</span></h2>
+  <div class="merchant-header">
+    <h2>マルコの行商 ── {currentMonth}月の品揃え</h2>
+    <span class="days-left">あと{merchantDaysLeft}日</span>
+  </div>
 
   <div class="money-display">
     所持金: <span class="amount">{$gameState.money.toLocaleString()}G</span>
@@ -131,15 +134,28 @@
     background: rgba(255, 255, 255, 0.2);
   }
 
-  h2 {
-    font-size: 1.5rem;
-    color: #f4e4bc;
+  .merchant-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
     margin-bottom: 1rem;
   }
 
+  h2 {
+    font-size: 1.5rem;
+    color: #f4e4bc;
+    margin-bottom: 0;
+  }
+
   .days-left {
-    font-size: 0.9rem;
-    color: #a0c8ff;
+    font-size: 0.85rem;
+    color: #ff9800;
+    background: rgba(255, 152, 0, 0.15);
+    border: 1px solid #ff9800;
+    padding: 0.15rem 0.6rem;
+    border-radius: 4px;
+    font-weight: bold;
+    white-space: nowrap;
   }
 
   .money-display {
