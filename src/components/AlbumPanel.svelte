@@ -2,10 +2,11 @@
   import { gameState } from '$lib/stores/game';
   import { items, getItemIcon, handleIconError } from '$lib/data/items';
   import { recipes } from '$lib/data/recipes';
-  import { CATEGORY_NAMES } from '$lib/data/categories';
+  import { CATEGORY_NAMES, PRODUCT_SUBCATEGORY_NAMES, PRODUCT_SUBCATEGORY_ORDER, PRODUCT_SUBCATEGORY_MAP } from '$lib/data/categories';
+  import type { ProductSubcategory } from '$lib/data/categories';
   import { getAllAchievements } from '$lib/data/achievements';
   import { getAchievementProgress, isStoryAchievement } from '$lib/services/achievement';
-  import type { ItemCategory, AchievementCategory, AchievementDef } from '$lib/models/types';
+  import type { ItemCategory, AchievementCategory, AchievementDef, ItemDef } from '$lib/models/types';
 
   // レシピのresultItemId → レシピが存在するアイテムIDのSet
   const recipeResultItemIds = new Set(Object.values(recipes).map(r => r.resultItemId));
@@ -16,47 +17,74 @@
   let activeTab: 'items' | 'achievements' = 'items';
 
   // === アイテムタブ ===
-  let filterCategory: string = 'all';
+  let openItemCategories: Set<string> = new Set();
+  let openAchCategories: Set<string> = new Set();
+
+  function toggleItemCategory(cat: string) {
+    if (openItemCategories.has(cat)) {
+      openItemCategories.delete(cat);
+    } else {
+      openItemCategories.add(cat);
+    }
+    openItemCategories = openItemCategories;
+  }
+
+  function toggleAchCategory(cat: string) {
+    if (openAchCategories.has(cat)) {
+      openAchCategories.delete(cat);
+    } else {
+      openAchCategories.add(cat);
+    }
+    openAchCategories = openAchCategories;
+  }
 
   const allItems = Object.values(items);
   const totalItemCount = allItems.length;
-  const categories = [...new Set(allItems.map(item => item.category))];
 
-  function getCategoryItemCount(category: string): number {
-    return allItems.filter(item => item.category === category).length;
+  // 採取物（product以外）
+  const gatheringItems = allItems.filter(item => item.category !== 'product');
+  const gatheringCategoryOrder: ItemCategory[] = ['herb', 'ore', 'water', 'plant', 'wood', 'crystal', 'misc'];
+
+  // 錬成物（product）をサブカテゴリ別にグルーピング
+  const craftedItems = allItems.filter(item => item.category === 'product');
+
+  interface ItemGroup {
+    key: string;
+    label: string;
+    items: ItemDef[];
   }
 
-  function getCategoryDiscoveredCount(category: string, discovered: string[]): number {
-    return allItems.filter(item => item.category === category && discovered.includes(item.id)).length;
+  const gatheringGroups: ItemGroup[] = gatheringCategoryOrder
+    .map(cat => ({
+      key: cat,
+      label: CATEGORY_NAMES[cat] || cat,
+      items: gatheringItems.filter(item => item.category === cat),
+    }))
+    .filter(g => g.items.length > 0);
+
+  const craftedGroups: ItemGroup[] = PRODUCT_SUBCATEGORY_ORDER
+    .map(sub => ({
+      key: `product_${sub}`,
+      label: PRODUCT_SUBCATEGORY_NAMES[sub],
+      items: craftedItems.filter(item => (PRODUCT_SUBCATEGORY_MAP[item.id] ?? 'material') === sub),
+    }))
+    .filter(g => g.items.length > 0);
+
+  function getGroupDiscoveredCount(group: ItemGroup, discovered: string[]): number {
+    return group.items.filter(item => discovered.includes(item.id)).length;
+  }
+
+  function getSectionDiscoveredCount(groups: ItemGroup[], discovered: string[]): number {
+    return groups.reduce((sum, g) => sum + g.items.filter(item => discovered.includes(item.id)).length, 0);
+  }
+
+  function getSectionTotalCount(groups: ItemGroup[]): number {
+    return groups.reduce((sum, g) => sum + g.items.length, 0);
   }
 
   $: discoveredItems = $gameState.discoveredItems;
   $: discoveredCount = discoveredItems.length;
   $: maxQualityByItem = $gameState.maxQualityByItem ?? {};
-
-  $: groupedItems = (() => {
-    const groups: { category: ItemCategory; label: string; items: typeof allItems }[] = [];
-    const categoryOrder: ItemCategory[] = ['herb', 'ore', 'water', 'plant', 'wood', 'crystal', 'misc', 'product'];
-
-    if (filterCategory === 'all') {
-      for (const cat of categoryOrder) {
-        const catItems = allItems.filter(item => item.category === cat);
-        if (catItems.length > 0) {
-          groups.push({ category: cat, label: CATEGORY_NAMES[cat] || cat, items: catItems });
-        }
-      }
-    } else {
-      const catItems = allItems.filter(item => item.category === filterCategory);
-      if (catItems.length > 0) {
-        groups.push({
-          category: filterCategory as ItemCategory,
-          label: CATEGORY_NAMES[filterCategory as ItemCategory] || filterCategory,
-          items: catItems,
-        });
-      }
-    }
-    return groups;
-  })();
 
   // === アチーブメントタブ ===
   const ACHIEVEMENT_CATEGORY_NAMES: Record<AchievementCategory, string> = {
@@ -142,62 +170,108 @@
         </div>
         <span class="rate-percent">{Math.floor((discoveredCount / totalItemCount) * 100)}%</span>
       </div>
-
-      <div class="filter-group">
-        <label for="album-filter">カテゴリ:</label>
-        <select id="album-filter" bind:value={filterCategory}>
-          <option value="all">すべて</option>
-          {#each categories as cat}
-            <option value={cat}>
-              {CATEGORY_NAMES[cat] || cat} ({getCategoryDiscoveredCount(cat, discoveredItems)}/{getCategoryItemCount(cat)})
-            </option>
-          {/each}
-        </select>
-      </div>
     </div>
 
-    {#each groupedItems as group}
+    <!-- 採取物セクション -->
+    <div class="section-header">
+      <h3 class="section-title">採取物</h3>
+      <span class="section-count">
+        {getSectionDiscoveredCount(gatheringGroups, discoveredItems)}/{getSectionTotalCount(gatheringGroups)}
+      </span>
+    </div>
+    {#each gatheringGroups as group}
       <div class="category-group">
-        <h3 class="category-title">
+        <button class="category-title" on:click={() => toggleItemCategory(group.key)}>
+          <span class="accordion-arrow" class:open={openItemCategories.has(group.key)}>▶</span>
           {group.label}
           <span class="category-count">
-            {getCategoryDiscoveredCount(group.category, discoveredItems)}/{group.items.length}
+            {getGroupDiscoveredCount(group, discoveredItems)}/{group.items.length}
           </span>
-        </h3>
-        <div class="item-grid">
-          {#each group.items as item}
-            {@const isDiscovered = discoveredItems.includes(item.id)}
-            {@const isRecipeKnown = !isDiscovered && recipeResultItemIds.has(item.id) && $gameState.knownRecipes.some(rid => recipes[rid]?.resultItemId === item.id)}
-            <div class="album-item" class:undiscovered={!isDiscovered} class:recipe-known={isRecipeKnown}>
-              {#if isDiscovered}
-                <img class="item-icon" src={getItemIcon(item.id)} alt={item.name} on:error={handleIconError} />
-                <div class="item-info">
-                  <span class="item-name">{item.name}</span>
-                  <span class="item-desc">{item.description}</span>
-                </div>
-                {#if maxQualityByItem[item.id]}
-                  <span class="item-max-quality" class:high-quality={maxQualityByItem[item.id] >= 70}>
-                    最高 {maxQualityByItem[item.id]}
-                  </span>
+        </button>
+        {#if openItemCategories.has(group.key)}
+          <div class="item-grid">
+            {#each group.items as item}
+              {@const isDiscovered = discoveredItems.includes(item.id)}
+              <div class="album-item" class:undiscovered={!isDiscovered}>
+                {#if isDiscovered}
+                  <img class="item-icon" src={getItemIcon(item.id)} alt={item.name} on:error={handleIconError} />
+                  <div class="item-info">
+                    <span class="item-name">{item.name}</span>
+                    <span class="item-desc">{item.description}</span>
+                  </div>
+                  {#if maxQualityByItem[item.id]}
+                    <span class="item-max-quality" class:high-quality={maxQualityByItem[item.id] >= 70}>
+                      最高 {maxQualityByItem[item.id]}
+                    </span>
+                  {/if}
+                {:else}
+                  <div class="silhouette-wrapper">
+                    <img class="item-icon silhouette" src={getItemIcon(item.id)} alt="???" on:error={handleIconError} />
+                  </div>
+                  <div class="item-info">
+                    <span class="item-name unknown">???</span>
+                    <span class="item-desc unknown">まだ発見されていないアイテム</span>
+                  </div>
                 {/if}
-              {:else if isRecipeKnown}
-                <div class="icon-placeholder"></div>
-                <div class="item-info">
-                  <span class="item-name recipe-hint">{item.name}</span>
-                  <span class="item-desc recipe-hint">未調合</span>
-                </div>
-              {:else}
-                <div class="silhouette-wrapper">
-                  <img class="item-icon silhouette" src={getItemIcon(item.id)} alt="???" on:error={handleIconError} />
-                </div>
-                <div class="item-info">
-                  <span class="item-name unknown">???</span>
-                  <span class="item-desc unknown">まだ発見されていないアイテム</span>
-                </div>
-              {/if}
-            </div>
-          {/each}
-        </div>
+              </div>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    {/each}
+
+    <!-- 錬成物セクション -->
+    <div class="section-header">
+      <h3 class="section-title">錬成物</h3>
+      <span class="section-count">
+        {getSectionDiscoveredCount(craftedGroups, discoveredItems)}/{getSectionTotalCount(craftedGroups)}
+      </span>
+    </div>
+    {#each craftedGroups as group}
+      <div class="category-group">
+        <button class="category-title" on:click={() => toggleItemCategory(group.key)}>
+          <span class="accordion-arrow" class:open={openItemCategories.has(group.key)}>▶</span>
+          {group.label}
+          <span class="category-count">
+            {getGroupDiscoveredCount(group, discoveredItems)}/{group.items.length}
+          </span>
+        </button>
+        {#if openItemCategories.has(group.key)}
+          <div class="item-grid">
+            {#each group.items as item}
+              {@const isDiscovered = discoveredItems.includes(item.id)}
+              {@const isRecipeKnown = !isDiscovered && recipeResultItemIds.has(item.id) && $gameState.knownRecipes.some(rid => recipes[rid]?.resultItemId === item.id)}
+              <div class="album-item" class:undiscovered={!isDiscovered} class:recipe-known={isRecipeKnown}>
+                {#if isDiscovered}
+                  <img class="item-icon" src={getItemIcon(item.id)} alt={item.name} on:error={handleIconError} />
+                  <div class="item-info">
+                    <span class="item-name">{item.name}</span>
+                    <span class="item-desc">{item.description}</span>
+                  </div>
+                  {#if maxQualityByItem[item.id]}
+                    <span class="item-max-quality" class:high-quality={maxQualityByItem[item.id] >= 70}>
+                      最高 {maxQualityByItem[item.id]}
+                    </span>
+                  {/if}
+                {:else if isRecipeKnown}
+                  <div class="icon-placeholder"></div>
+                  <div class="item-info">
+                    <span class="item-name recipe-hint">{item.name}</span>
+                    <span class="item-desc recipe-hint">未調合</span>
+                  </div>
+                {:else}
+                  <div class="silhouette-wrapper">
+                    <img class="item-icon silhouette" src={getItemIcon(item.id)} alt="???" on:error={handleIconError} />
+                  </div>
+                  <div class="item-info">
+                    <span class="item-name unknown">???</span>
+                    <span class="item-desc unknown">まだ発見されていないアイテム</span>
+                  </div>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        {/if}
       </div>
     {/each}
 
@@ -228,12 +302,14 @@
 
     {#each groupedAchievements as group}
       <div class="category-group">
-        <h3 class="category-title">
+        <button class="category-title" on:click={() => toggleAchCategory(group.category)}>
+          <span class="accordion-arrow" class:open={openAchCategories.has(group.category)}>▶</span>
           {group.label}
           <span class="category-count">
             {getCategoryCompletedCount(group.category, completedIds)}/{group.achievements.length}
           </span>
-        </h3>
+        </button>
+        {#if openAchCategories.has(group.category)}
         <div class="ach-list">
           {#each group.achievements as ach}
             {@const isCompleted = completedIds.includes(ach.id)}
@@ -270,6 +346,7 @@
             </div>
           {/each}
         </div>
+        {/if}
       </div>
     {/each}
   {/if}
@@ -409,19 +486,65 @@
     font-size: 0.9rem;
   }
 
+  /* セクション大見出し */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid #c9a959;
+  }
+
+  .section-header:first-of-type {
+    margin-top: 0;
+  }
+
+  .section-title {
+    font-size: 1.15rem;
+    color: #f4e4bc;
+    margin: 0;
+  }
+
+  .section-count {
+    font-size: 0.85rem;
+    color: #a09070;
+  }
+
   .category-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.25rem;
   }
 
   .category-title {
-    font-size: 1rem;
+    width: 100%;
+    font-size: 0.95rem;
+    font-weight: bold;
     color: #c9a959;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.25rem;
+    margin-bottom: 0;
+    padding: 0.4rem 0.5rem;
+    border: none;
     border-bottom: 1px solid #3a3a5a;
+    background: none;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  .category-title:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .accordion-arrow {
+    font-size: 0.7rem;
+    color: #808090;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+
+  .accordion-arrow.open {
+    transform: rotate(90deg);
   }
 
   .category-count {
@@ -435,6 +558,8 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .album-item {
@@ -547,6 +672,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+    margin-top: 0.5rem;
   }
 
   .ach-item {
