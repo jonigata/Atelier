@@ -1396,6 +1396,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 8,
     deadlineDays: 12,
     requiredReputationLevel: 5,
+    requiredAchievement: 'ach_adventurer_arrival',
     clientId: 'ren',
   },
   {
@@ -1410,6 +1411,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 7,
     deadlineDays: 10,
     requiredReputationLevel: 6,
+    requiredAchievement: 'ach_adventurer_arrival',
     clientId: 'ren',
   },
   {
@@ -1424,6 +1426,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 8,
     deadlineDays: 12,
     requiredReputationLevel: 8,
+    requiredAchievement: 'ach_adventurer_arrival',
     clientId: 'ren',
   },
   {
@@ -1439,6 +1442,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 12,
     deadlineDays: 18,
     requiredReputationLevel: 13,
+    requiredAchievement: 'ach_adventurer_arrival',
     clientId: 'ren',
   },
   {
@@ -1454,6 +1458,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 7,
     deadlineDays: 12,
     requiredReputationLevel: 11,
+    requiredAchievement: 'ach_adventurer_arrival',
     clientId: 'ren',
   },
 
@@ -1470,6 +1475,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 4,
     deadlineDays: 8,
     requiredReputationLevel: 1,
+    requiredAchievement: 'ach_adventurer_arrival',
     clientId: 'fee',
   },
   {
@@ -1485,6 +1491,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 4,
     deadlineDays: 8,
     requiredReputationLevel: 2,
+    requiredAchievement: 'ach_adventurer_arrival',
     clientId: 'fee',
   },
   {
@@ -1499,6 +1506,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 6,
     deadlineDays: 12,
     requiredReputationLevel: 9,
+    requiredAchievement: 'ach_adventurer_arrival',
     clientId: 'fee',
   },
   {
@@ -1513,6 +1521,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 7,
     deadlineDays: 15,
     requiredReputationLevel: 11,
+    requiredAchievement: 'ach_adventurer_arrival',
     clientId: 'fee',
   },
   {
@@ -1527,6 +1536,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 6,
     deadlineDays: 15,
     requiredReputationLevel: 12,
+    requiredAchievement: 'ach_adventurer_arrival',
     clientId: 'fee',
   },
 
@@ -1707,6 +1717,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 10,
     deadlineDays: 7,
     requiredReputationLevel: 5,
+    requiredAchievement: 'ach_story_merchant_first',
     clientId: 'marco',
   },
   {
@@ -1721,6 +1732,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 12,
     deadlineDays: 7,
     requiredReputationLevel: 9,
+    requiredAchievement: 'ach_story_merchant_first',
     clientId: 'marco',
   },
   {
@@ -1735,6 +1747,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 8,
     deadlineDays: 7,
     requiredReputationLevel: 10,
+    requiredAchievement: 'ach_story_merchant_first',
     clientId: 'marco',
   },
   {
@@ -1749,6 +1762,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 15,
     deadlineDays: 7,
     requiredReputationLevel: 14,
+    requiredAchievement: 'ach_story_merchant_first',
     clientId: 'marco',
   },
   {
@@ -1764,6 +1778,7 @@ export const questTemplates: QuestDef[] = [
     rewardReputation: 15,
     deadlineDays: 7,
     requiredReputationLevel: 20,
+    requiredAchievement: 'ach_story_merchant_first',
     clientId: 'marco',
   },
 
@@ -1999,7 +2014,11 @@ export const questTemplates: QuestDef[] = [
   },
 ];
 
-// 名声レベルに応じた依頼を取得
-export function getAvailableQuestTemplates(reputationLevel: number): QuestDef[] {
-  return questTemplates.filter(q => reputationLevel >= (q.requiredReputationLevel ?? 1));
+// 名声レベルとアチーブメントに応じた依頼を取得
+export function getAvailableQuestTemplates(reputationLevel: number, completedAchievements?: string[]): QuestDef[] {
+  return questTemplates.filter(q => {
+    if (reputationLevel < (q.requiredReputationLevel ?? 1)) return false;
+    if (q.requiredAchievement && (!completedAchievements || !completedAchievements.includes(q.requiredAchievement))) return false;
+    return true;
+  });
 }

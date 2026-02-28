@@ -2,7 +2,8 @@
   import { gameState, pendingAlchemyRecipeId } from '$lib/stores/game';
   import { setSelectedQuestId } from '$lib/stores/quests';
   import { showingUnlockActions } from '$lib/stores/toast';
-  import { isMerchantVisiting } from '$lib/services/calendar';
+  import { isMerchantVisiting, getDayOfMonth } from '$lib/services/calendar';
+  import { MERCHANT } from '$lib/data/balance';
   import { getNextInspection, INSPECTION_DAYS } from '$lib/data/inspection';
   import { recipes } from '$lib/data/recipes';
   import InspectionTracker from './InspectionTracker.svelte';
@@ -63,6 +64,7 @@
   }
 
   $: merchantInTown = isMerchantVisiting($gameState.day);
+  $: merchantDaysLeft = MERCHANT.VISIT_END_DAY - getDayOfMonth($gameState.day) + 1;
 
   // 査察トラッカー用データ
   $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_q1_goal_reminder');
@@ -106,7 +108,7 @@
         <img class="icon" src="/images/characters/marco/marco-face-smug.png" alt="マルコ" />
         <span class="label">旅商人マルコ</span>
         <span class="description">マルコの行商を覗く</span>
-        <span class="badge merchant">来訪中</span>
+        <span class="badge merchant">来訪中（あと{merchantDaysLeft}日）</span>
       </button>
     </div>
   {/if}

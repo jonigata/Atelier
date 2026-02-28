@@ -263,6 +263,7 @@ export interface QuestDef {
   rewardReputation: number;
   deadlineDays: number;
   requiredReputationLevel?: number;
+  requiredAchievement?: string; // このアチーブメント完了後にのみ出現
   clientId?: string; // 依頼主ID
   completionMessage?: string; // 達成時のセリフ（未設定時はdescriptionにフォールバック）
 }
