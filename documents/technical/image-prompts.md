@@ -106,6 +106,27 @@ bash scripts/generate-action-banners.sh --phase2 alchemy  # 指定のみ
 
 ---
 
+## エリアバナー画像 (Area Banners)
+
+**モデル**: `fal-ai/bytedance/seedream/v5/lite/text-to-image`
+**出力先**: `static/images/areas/`（1024x576）
+**プロンプト**: `documents/image-prompts/areas/`
+
+### ワークフロー
+
+1. seedream v5 lite text-to-image で `landscape_16_9` サイズ（3072x1728）の原画を生成
+2. リサイズして `static/images/areas/<area_id>.png`（1024x576）に配置
+3. プロンプトを `documents/image-prompts/areas/<area_id>.txt` に保存
+
+### スタイル規約
+
+- 水彩アニメ風、暖かい落ち着いた色調
+- キャラクターやテキストは含めない（UIでオーバーレイするため）
+- `setting_designs.md` のビジュアルキーワードを参考にする
+- ファイル名は `src/lib/data/areas.ts` のエリアIDに一致させる
+
+---
+
 ## 機材画像 (Equipment Images)
 
 **モデル**: `fal-ai/bytedance/seedream/v4.5/text-to-image`

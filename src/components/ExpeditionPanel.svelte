@@ -9,6 +9,10 @@
 
   const areas = getAllAreas().sort((a, b) => a.costPerDay - b.costPerDay);
 
+  const areaBgPosition: Record<string, string> = {
+    lake: 'center 90%',
+  };
+
   function getMainDropNames(area: AreaDef): string {
     const seen = new Set<string>();
     const names: string[] = [];
@@ -80,6 +84,7 @@
             class="area-item"
             class:selected={selectedArea?.id === area.id}
             on:click={() => selectArea(area)}
+            style="background-image: url(/images/areas/{area.id}.png); background-position: {areaBgPosition[area.id] ?? 'center'}"
           >
             <div class="area-info">
               <span class="area-name">{area.name}</span>
@@ -193,41 +198,67 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem 1.2rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    background-size: cover;
     border: 2px solid #4a4a6a;
     border-radius: 6px;
     color: #e0e0f0;
     cursor: pointer;
     text-align: left;
+    position: relative;
+    overflow: hidden;
+    min-height: 4.5rem;
+  }
+
+  .area-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(10, 10, 25, 0.85) 0%, rgba(10, 10, 25, 0.45) 35%, transparent 60%);
+    z-index: 0;
   }
 
   .area-info {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
+    position: relative;
+    z-index: 1;
   }
 
   .area-drops {
     font-size: 0.8rem;
-    color: #a0a0b0;
+    color: #b0b0c0;
   }
 
   .area-item:hover {
-    background: rgba(201, 169, 89, 0.15);
+    border-color: #6a6a8a;
+  }
+
+  .area-item:hover::before {
+    background: linear-gradient(to right, rgba(30, 25, 10, 0.85) 0%, rgba(30, 25, 10, 0.35) 35%, transparent 60%);
   }
 
   .area-item.selected {
     border-color: #c9a959;
-    background: rgba(201, 169, 89, 0.2);
+  }
+
+  .area-item.selected::before {
+    background: linear-gradient(to right, rgba(40, 30, 10, 0.85) 0%, rgba(40, 30, 10, 0.35) 35%, transparent 60%);
   }
 
   .area-name {
     font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
   }
 
   .area-cost {
-    color: #a0a0b0;
+    color: #d0d0e0;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    font-weight: bold;
   }
 
   .duration-list {
