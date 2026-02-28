@@ -45,7 +45,7 @@
     const target = (event.currentTarget || event.target) as HTMLElement;
     const rect = target.getBoundingClientRect();
     tooltipX = rect.left + rect.width / 2;
-    tooltipY = rect.bottom + 6;
+    tooltipY = rect.top - 6;
     activeTooltip = eq;
 
     tooltipTimer = setTimeout(() => { activeTooltip = null; }, 3000);
@@ -136,7 +136,7 @@
 
   .equip-tooltip-fixed {
     position: fixed;
-    transform: translateX(-50%);
+    transform: translate(-50%, -100%);
     background: rgba(20, 20, 40, 0.95);
     border: 1px solid rgba(76, 175, 80, 0.6);
     border-radius: 5px;
@@ -150,14 +150,14 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   }
 
-  .equip-tooltip-fixed::before {
+  .equip-tooltip-fixed::after {
     content: '';
     position: absolute;
-    bottom: 100%;
+    top: 100%;
     left: 50%;
     transform: translateX(-50%);
     border: 5px solid transparent;
-    border-bottom-color: rgba(76, 175, 80, 0.6);
+    border-top-color: rgba(76, 175, 80, 0.6);
   }
 
   .equip-tooltip-fixed strong {
