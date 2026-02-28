@@ -37,6 +37,7 @@ function createInitialState(): GameState {
 
     craftedItems: [],
     discoveredItems: ['herb_01', 'water_01'],
+    maxQualityByItem: {},
     facilities: [],
 
     // 機材システム
@@ -141,13 +142,20 @@ export function setPhase(phase: GameState['phase']): void {
 // =====================================
 
 export function addItem(item: OwnedItem): void {
-  gameState.update((state) => ({
-    ...state,
-    inventory: [...state.inventory, item],
-    discoveredItems: state.discoveredItems.includes(item.itemId)
-      ? state.discoveredItems
-      : [...state.discoveredItems, item.itemId],
-  }));
+  gameState.update((state) => {
+    const prevMax = (state.maxQualityByItem ?? {})[item.itemId] ?? 0;
+    return {
+      ...state,
+      inventory: [...state.inventory, item],
+      discoveredItems: state.discoveredItems.includes(item.itemId)
+        ? state.discoveredItems
+        : [...state.discoveredItems, item.itemId],
+      maxQualityByItem: {
+        ...(state.maxQualityByItem ?? {}),
+        [item.itemId]: Math.max(prevMax, item.quality),
+      },
+    };
+  });
 }
 
 export function removeItem(itemId: string, quality: number): boolean {

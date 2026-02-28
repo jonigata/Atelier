@@ -391,6 +391,7 @@ export interface GameState {
 
   craftedItems: string[];
   discoveredItems: string[];
+  maxQualityByItem: Record<string, number>; // アイテムごとの入手最大品質
   facilities: string[]; // 解放済み永続設備ID
 
   // 機材システム

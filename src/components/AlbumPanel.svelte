@@ -32,6 +32,7 @@
 
   $: discoveredItems = $gameState.discoveredItems;
   $: discoveredCount = discoveredItems.length;
+  $: maxQualityByItem = $gameState.maxQualityByItem ?? {};
 
   $: groupedItems = (() => {
     const groups: { category: ItemCategory; label: string; items: typeof allItems }[] = [];
@@ -174,6 +175,11 @@
                   <span class="item-name">{item.name}</span>
                   <span class="item-desc">{item.description}</span>
                 </div>
+                {#if maxQualityByItem[item.id]}
+                  <span class="item-max-quality" class:high-quality={maxQualityByItem[item.id] >= 70}>
+                    最高 {maxQualityByItem[item.id]}
+                  </span>
+                {/if}
               {:else if isRecipeKnown}
                 <div class="icon-placeholder"></div>
                 <div class="item-info">
@@ -518,6 +524,22 @@
   .item-desc.recipe-hint {
     color: #605848;
     font-style: italic;
+  }
+
+  .item-max-quality {
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    color: #a0a0b0;
+    margin-left: auto;
+    padding: 0.15rem 0.4rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .item-max-quality.high-quality {
+    color: #c9a959;
+    background: rgba(201, 169, 89, 0.12);
   }
 
   /* アチーブメントリスト */
