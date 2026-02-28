@@ -66,6 +66,71 @@
 
   $: metCount = inspection.criteria.filter((c) => getCriterionInfo(c, values, expValues).met).length;
 
+  // ── ランク変動検知 ──
+  let prevInspectionDay: number = -1;
+  let prevGrades: Record<string, InspectionGrade> = {};
+  let prevMetCount: number = -1;
+  let gradeUpAnimations: Record<string, { from: InspectionGrade; to: InspectionGrade }> = {};
+  let metCountUpAnim = false;
+  let gradeInitialized = false;
+
+  function detectGradeChanges(currentValues: Record<string, number>, currentInspection: InspectionDef) {
+    const newGrades: Record<string, InspectionGrade> = {};
+    for (const c of currentInspection.criteria) {
+      newGrades[c.key] = getGradeForValue(c.thresholds, currentValues[c.key] ?? 0);
+    }
+    const newMet = currentInspection.criteria.filter((c) => newGrades[c.key] !== 'D').length;
+
+    // 査察が切り替わったらリセット
+    if (currentInspection.day !== prevInspectionDay) {
+      prevInspectionDay = currentInspection.day;
+      prevGrades = newGrades;
+      prevMetCount = newMet;
+      gradeUpAnimations = {};
+      metCountUpAnim = false;
+      gradeInitialized = true;
+      return;
+    }
+
+    if (gradeInitialized) {
+      const gradeOrder: InspectionGrade[] = ['D', 'C', 'B', 'A', 'S'];
+      const newAnims: Record<string, { from: InspectionGrade; to: InspectionGrade }> = {};
+
+      for (const key of Object.keys(newGrades)) {
+        const prev = prevGrades[key];
+        const curr = newGrades[key];
+        if (prev && curr !== prev && gradeOrder.indexOf(curr) > gradeOrder.indexOf(prev)) {
+          newAnims[key] = { from: prev, to: curr };
+        }
+      }
+
+      if (Object.keys(newAnims).length > 0) {
+        gradeUpAnimations = newAnims;
+      }
+
+      if (newMet > prevMetCount) {
+        metCountUpAnim = true;
+      }
+    }
+
+    prevGrades = newGrades;
+    prevMetCount = newMet;
+    if (!gradeInitialized) gradeInitialized = true;
+  }
+
+  $: detectGradeChanges(values, inspection);
+
+  function handleGradeUpAnimEnd(e: AnimationEvent, key: string) {
+    if (e.animationName === 'gradeUpGlow') {
+      const { [key]: _, ...rest } = gradeUpAnimations;
+      gradeUpAnimations = rest;
+    }
+  }
+
+  function handleMetCountUpEnd() {
+    metCountUpAnim = false;
+  }
+
   // ── しきい値の位置を0-1の割合で返す ──
   function getThresholdRatio(criterion: InspectionCriterion, grade: 'C' | 'B' | 'A' | 'S'): number {
     return criterion.thresholds[grade] / criterion.thresholds.S;
@@ -208,7 +273,8 @@
       <span class="title-text">査察: {inspection.title}</span>
     </div>
     <div class="tracker-meta">
-      <span class="met-count" class:complete={allMet}>
+      <span class="met-count" class:complete={allMet} class:met-up={metCountUpAnim}
+        on:animationend={() => handleMetCountUpEnd()}>
         全ての項目をCランク以上にしよう 達成項目 {metCount}/{inspection.criteria.length}
       </span>
       <span class="days-until {urgency}">あと{daysUntil}日</span>
@@ -231,6 +297,19 @@
   <div class="criteria-grid">
     {#each inspection.criteria as criterion}
         {@const info = getCriterionInfo(criterion, values, expValues)}
+        {@const gradeUp = gradeUpAnimations[criterion.key]}
+
+        <div class="criterion-slot"
+          class:grade-up={!!gradeUp}
+          on:animationend={(e) => handleGradeUpAnimEnd(e, criterion.key)}
+        >
+          {#if gradeUp}
+            <div class="grade-change-indicator">
+              <span style="color: {gradeColors[gradeUp.from]}">{gradeUp.from}</span>
+              <span class="grade-arrow">→</span>
+              <span style="color: {gradeColors[gradeUp.to]}">{gradeUp.to}</span>
+            </div>
+          {/if}
 
         {#if criterion.key === 'level'}
           <!-- ═══ 錬金Lv: ポーション瓶 + 等級ライン ═══ -->
@@ -479,6 +558,7 @@
           </div>
 
         {/if}
+        </div>
       {/each}
     </div>
 </div>
@@ -892,5 +972,75 @@
     font-size: 1.8rem;
     font-weight: bold;
     line-height: 1;
+  }
+
+  /* ── ランク変動フィードバック ── */
+  .criterion-slot {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    display: flex;
+  }
+
+  .criterion-slot.grade-up {
+    animation: gradeUpGlow 2s ease-out;
+  }
+
+  @keyframes gradeUpGlow {
+    0% { filter: brightness(1); }
+    10% { filter: brightness(1.8); }
+    30% { filter: brightness(1.3); }
+    100% { filter: brightness(1); }
+  }
+
+  .criterion-slot.grade-up .grade-badge {
+    animation: gradeBadgeBounce 1.5s ease-out;
+  }
+
+  @keyframes gradeBadgeBounce {
+    0%, 100% { transform: scale(1); }
+    10% { transform: scale(2.2); }
+    25% { transform: scale(0.9); }
+    35% { transform: scale(1.5); }
+    50% { transform: scale(1); }
+  }
+
+  .grade-change-indicator {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    font-size: 0.85rem;
+    font-weight: bold;
+    white-space: nowrap;
+    animation: gradeIndicatorFloat 2s ease-out forwards;
+    pointer-events: none;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  .grade-arrow {
+    color: #ffd700;
+  }
+
+  @keyframes gradeIndicatorFloat {
+    0% { opacity: 0; transform: translateX(-50%) translateY(8px); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    60% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+  }
+
+  .met-count.met-up {
+    animation: metCountUpPulse 1.8s ease-out;
+  }
+
+  @keyframes metCountUpPulse {
+    0% { transform: scale(1); text-shadow: none; }
+    12% { transform: scale(1.2); text-shadow: 0 0 15px rgba(129, 199, 132, 0.8), 0 0 30px rgba(129, 199, 132, 0.4); }
+    30% { transform: scale(1.05); }
+    100% { transform: scale(1); text-shadow: none; }
   }
 </style>
