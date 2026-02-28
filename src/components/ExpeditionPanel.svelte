@@ -199,6 +199,7 @@
     border-radius: 6px;
     color: #e0e0f0;
     cursor: pointer;
+    text-align: left;
   }
 
   .area-info {
