@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { gameState, markInventoryOpened, skipPresentation } from '$lib/stores/game';
   import { initializeGame } from '$lib/services/gameLoop';
-  import { checkMilestoneProgress } from '$lib/services/tutorial';
+  import { processActionComplete } from '$lib/services/presentation';
   import HUD from '../components/HUD.svelte';
   import MessageLog from '../components/MessageLog.svelte';
   import MorningPanel from '../components/MorningPanel.svelte';
@@ -43,18 +43,20 @@
     };
   });
 
-  function handleActionSelect(action: ActionType) {
+  async function handleActionSelect(action: ActionType) {
     selectedAction = action;
     if (action === 'inventory') {
       markInventoryOpened();
-      checkMilestoneProgress();
+      await processActionComplete();
     }
   }
 
-  function handleBackToMenu() {
+  async function handleBackToMenu(opts?: { skipMilestoneCheck?: boolean }) {
     selectedAction = null;
-    // アクション完了後にチュートリアル進行をチェック
-    checkMilestoneProgress();
+    if (!opts?.skipMilestoneCheck) {
+      // アクション完了後にアチーブメント進行をチェック
+      await processActionComplete();
+    }
   }
 </script>
 

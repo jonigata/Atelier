@@ -13,7 +13,7 @@
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { recipes } from '$lib/data/recipes';
   import { getQuestClient } from '$lib/data/quests';
-  import { checkMilestoneProgress } from '$lib/services/tutorial';
+  import { processActionComplete } from '$lib/services/presentation';
   import { executeQuestDelivery } from '$lib/services/quest';
   import { setEventDialogue } from '$lib/stores/tutorial';
   import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments, calcNextDrawLevel } from '$lib/data/balance';
@@ -40,7 +40,7 @@
   let activeTab: Tab = $gameState.selectedQuestId ? 'active' : 'available';
 
   // 依頼を受注
-  function acceptQuest(quest: QuestDef) {
+  async function acceptQuest(quest: QuestDef) {
     if ($gameState.activeQuests.length >= 3) {
       addMessage('同時に受注できる依頼は3件までです');
       return;
@@ -57,7 +57,7 @@
     addMessage(`依頼「${quest.title}」を受注しました`);
 
     // アチーブメントチェック（依頼受注関連）
-    checkMilestoneProgress();
+    await processActionComplete();
   }
 
   // 納品可能かチェック

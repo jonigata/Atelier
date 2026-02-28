@@ -11,7 +11,7 @@
   import type { ActionType } from '$lib/models/types';
 
   export let action: ActionType;
-  export let onBack: () => void;
+  export let onBack: (opts?: { skipMilestoneCheck?: boolean }) => void;
 </script>
 
 {#if action === 'alchemy'}

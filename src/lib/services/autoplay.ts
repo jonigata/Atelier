@@ -2,8 +2,7 @@ import { get } from 'svelte/store';
 import { gameState, learnRecipesFromBook, addBook, consumeStamina, addMessage, markInventoryOpened } from '$lib/stores/game';
 import { incrementExpeditionCount } from '$lib/stores/stats';
 import { endTurn, startActionPhase } from './gameLoop';
-import { checkMilestoneProgress } from './tutorial';
-import { resolveDialogue } from './presentation';
+import { processActionComplete, resolveDialogue } from './presentation';
 import { executeQuestDelivery } from './quest';
 import { areas } from '$lib/data/areas';
 import { items } from '$lib/data/items';
@@ -204,7 +203,7 @@ async function executeAction(state: GameState, remainingDays: number): Promise<v
   if (unlocked.includes('inventory') && !state.stats.inventoryOpened) {
     markInventoryOpened();
     log('tutorial', 'success', '所持品を確認');
-    checkMilestoneProgress();
+    await processActionComplete();
     return;
   }
 
@@ -215,7 +214,7 @@ async function executeAction(state: GameState, remainingDays: number): Promise<v
 
   // 2. 余剰品を売却して資金確保
   if (unlocked.includes('shop')) {
-    if (trySellExcess(state)) return;
+    if (await trySellExcess(state)) return;
   }
 
   // 3. レシピ本を購入・勉強（未習得レシピがある本を優先）
@@ -225,7 +224,7 @@ async function executeAction(state: GameState, remainingDays: number): Promise<v
 
   // 4. 依頼受注（達成可能な依頼を優先）
   if (unlocked.includes('quest') && state.activeQuests.length < 3 && state.availableQuests.length > 0) {
-    if (tryAcceptSmartQuest(state)) return;
+    if (await tryAcceptSmartQuest(state)) return;
   }
 
   // 5. 素材購入（調合に必要な素材を買う）
@@ -240,7 +239,7 @@ async function executeAction(state: GameState, remainingDays: number): Promise<v
 
   // 7. 採取隊を派遣
   if (unlocked.includes('expedition') && !state.expedition) {
-    if (tryDispatchBestExpedition(state)) return;
+    if (await tryDispatchBestExpedition(state)) return;
   }
 
   // 残り日数が足りなければ日数消費アクションをスキップ
@@ -278,7 +277,7 @@ async function tryDeliverQuest(state: GameState): Promise<boolean> {
 
       const itemDef = items[quest.requiredItemId];
       log('quest', 'success', `納品「${quest.title}」(${itemDef?.name ?? quest.requiredItemId} x${remaining}) +${result.finalMoney}G +${result.finalReputation}名声`, 0);
-      checkMilestoneProgress();
+      await processActionComplete();
       await endTurn(0);
       return true;
     }
@@ -290,7 +289,7 @@ async function tryDeliverQuest(state: GameState): Promise<boolean> {
 // 余剰品売却
 // =====================================================================
 
-function trySellExcess(state: GameState): boolean {
+async function trySellExcess(state: GameState): Promise<boolean> {
   // 依頼で必要なアイテムIDと数量を集計
   const neededItems: Record<string, number> = {};
   for (const quest of state.activeQuests) {
@@ -338,7 +337,7 @@ function trySellExcess(state: GameState): boolean {
       }));
 
       log('sell', 'success', `${def.name}(Q${item.quality})を${sellPrice}Gで売却`);
-      checkMilestoneProgress();
+      await processActionComplete();
       return true;
     }
   }
@@ -417,7 +416,7 @@ async function tryBuyAndStudy(state: GameState, remainingDays: number): Promise<
       log('study', 'info', `「${book.name}」は全て習得済み`, studyDays);
     }
 
-    checkMilestoneProgress();
+    await processActionComplete();
     await endTurn(studyDays);
     return true;
   }
@@ -429,7 +428,7 @@ async function tryBuyAndStudy(state: GameState, remainingDays: number): Promise<
 // 依頼受注（賢い選択）
 // =====================================================================
 
-function tryAcceptSmartQuest(state: GameState): boolean {
+async function tryAcceptSmartQuest(state: GameState): Promise<boolean> {
   if (state.availableQuests.length === 0) return false;
 
   const alchemyLv = calcLevelFromExp(state.alchemyExp);
@@ -533,7 +532,7 @@ function tryAcceptSmartQuest(state: GameState): boolean {
     }));
 
     log('quest', 'success', `依頼受注「${best.quest.title}」(${items[best.quest.requiredItemId]?.name ?? best.quest.requiredItemId} x${best.quest.requiredQuantity}, スコア${Math.floor(best.score)})`);
-    checkMilestoneProgress();
+    await processActionComplete();
     return true;
   }
 
@@ -808,7 +807,7 @@ async function tryCraftBest(state: GameState, remainingDays: number): Promise<bo
     log('craft', 'error', `${name}の調合に失敗 +${result.totalExpGained}Exp`, bestRecipe.craftDaysTenths);
   }
 
-  checkMilestoneProgress();
+  await processActionComplete();
   await endTurn(bestRecipe.craftDaysTenths);
   return true;
 }
@@ -868,7 +867,7 @@ function getMaxCraftQuantity(recipe: RecipeDef, state: GameState): number {
 // 採取隊派遣（最適エリア選択）
 // =====================================================================
 
-function tryDispatchBestExpedition(state: GameState): boolean {
+async function tryDispatchBestExpedition(state: GameState): Promise<boolean> {
   // 必要な素材に基づいてエリアを選択
   const neededMaterials = getNeededMaterials(state);
   const areaScores: { areaId: string; score: number; duration: number }[] = [];
@@ -916,7 +915,7 @@ function tryDispatchBestExpedition(state: GameState): boolean {
 
   incrementExpeditionCount();
   log('expedition', 'success', `採取隊を${area.name}に派遣 (${best.duration}日, ${cost}G, スコア${Math.floor(best.score)})`);
-  checkMilestoneProgress();
+  await processActionComplete();
   return true;
 }
 

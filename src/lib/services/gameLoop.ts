@@ -18,7 +18,7 @@ import { getItem } from '$lib/data/items';
 import { getAvailableQuestTemplates, questTemplates } from '$lib/data/quests';
 import { EXPEDITION, calcLevelFromExp } from '$lib/data/balance';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
-import { checkAutoCompleteAchievements } from '$lib/services/tutorial';
+import { processAutoCompleteAchievements } from '$lib/services/presentation';
 import { processMorningAchievements, processInspectionSequence } from '$lib/services/presentation';
 import { processBuildingMorningItems } from '$lib/services/buildingEffects';
 import { processHelperMorningStamina } from '$lib/services/helperEffects';
@@ -315,7 +315,7 @@ export function skipOpening(): void {
 /**
  * ゲーム開始時の初期化
  */
-export function initializeGame(): void {
+export async function initializeGame(): Promise<void> {
   // 初期依頼を設定（村長の固定クエスト）
   const mayorFirstQuest = questTemplates.find((q) => q.id === 'quest_mayor_first');
   if (mayorFirstQuest) {
@@ -333,5 +333,5 @@ export function initializeGame(): void {
   initializeActiveGoalTracking();
 
   // ゲーム開始アチーブメントをチェック（ダイアログ表示）
-  checkAutoCompleteAchievements();
+  await processAutoCompleteAchievements();
 }

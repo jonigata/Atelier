@@ -4,6 +4,7 @@
   import { gameState, pendingLevelUp, pendingAlchemyRecipeId, pendingReputationLevelUp, suppressDrawDialog } from '$lib/stores/game';
   import type { LevelUpInfo } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
+  import { processActionComplete } from '$lib/services/presentation';
   import { recipes } from '$lib/data/recipes';
   import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient, calculateStaminaCost, calculateFatiguePenalty, getFatigueLabel } from '$lib/services/alchemy';
   import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
@@ -22,7 +23,7 @@
   import FacilityInfo from './alchemy/FacilityInfo.svelte';
   import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
 
-  export let onBack: () => void;
+  export let onBack: (opts?: { skipMilestoneCheck?: boolean }) => void;
 
   let showFacilities = false;
   let selectedRecipe: RecipeDef | null = null;
@@ -296,11 +297,13 @@
     // 先にendTurn → DayTransitionが上から被さる
     endTurn(days);
     // DayTransitionの暗転(0.3s)後にダイアログを片付け
-    setTimeout(() => {
+    setTimeout(async () => {
       craftResultData = null;
       levelUpData = null;
-      onBack();
-      // 抑制解除してから名声レベルアップを発火
+      // 画面遷移のみ（マイルストーンチェックはここで自前でawaitする）
+      onBack({ skipMilestoneCheck: true });
+      // アチーブメント処理を完了してからDrawDialogの抑制を解除
+      await processActionComplete();
       suppressDrawDialog.set(false);
       if (repLevelUp) {
         pendingReputationLevelUp.set(repLevelUp);
@@ -310,7 +313,7 @@
 </script>
 
 <div class="alchemy-panel">
-  <button class="back-btn" on:click={onBack}>← 戻る</button>
+  <button class="back-btn" on:click={() => onBack()}>← 戻る</button>
   <h2>⚗️ 調合 <ActiveEquipmentIcons prefixes={['craft_', 'material_', 'all_probability']} /></h2>
 
   {#if !selectedRecipe}
