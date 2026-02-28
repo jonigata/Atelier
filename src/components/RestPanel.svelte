@@ -21,16 +21,16 @@
     showVideo = true;
   }
 
-  function onVideoEnd() {
+  async function onVideoEnd() {
     const bonus = getBuildingRestBonus();
     restoreStamina(100 + bonus);
     addMessage(`休息しました。体力が全回復しました。${bonus > 0 ? `（施設ボーナス+${bonus}）` : ''}`);
-    endTurn(1);
-    // DayTransitionの暗転(0.3s)が完了してからオーバーレイを消す
-    setTimeout(() => {
-      showVideo = false;
-      onBack();
-    }, 350);
+    // endTurnのPromiseを保持しつつ、DayTransition暗転を待つ
+    const turnPromise = endTurn(1);
+    await new Promise(r => setTimeout(r, 350));
+    showVideo = false;
+    onBack();
+    await turnPromise;
   }
 </script>
 

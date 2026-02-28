@@ -33,7 +33,7 @@
     timers = [];
   }
 
-  function addTimer(fn: () => void, ms: number) {
+  function addTimer(fn: () => void | Promise<void>, ms: number) {
     timers.push(setTimeout(fn, ms));
   }
 
@@ -184,7 +184,11 @@
     }
   }
 
+  let isFinishing = false;
+
   async function finishDraw() {
+    if (isFinishing) return;
+    isFinishing = true;
     clearTimers();
     let pendingGreeting: EventDialogue | null = null;
 
@@ -223,6 +227,7 @@
     if (pendingGreeting) {
       await showDialogueAndWait(pendingGreeting);
     }
+    isFinishing = false;
   }
 
   function handleCardSelect(index: number) {
@@ -243,19 +248,18 @@
     // 1.1s: auto close
     addTimer(() => {
       phase = 'closing';
-      addTimer(() => { finishDraw(); }, 200);
+      addTimer(async () => { await finishDraw(); }, 200);
     }, 1100);
   }
 
-  function handleOverlayClick() {
+  async function handleOverlayClick() {
     if (phase === 'result') {
       clearTimers();
-      if ($skipPresentation) {
-        finishDraw();
-      } else {
-        phase = 'closing';
-        addTimer(() => { finishDraw(); }, 200);
+      phase = 'closing';
+      if (!$skipPresentation) {
+        await new Promise(r => setTimeout(r, 200));
       }
+      await finishDraw();
     }
   }
 

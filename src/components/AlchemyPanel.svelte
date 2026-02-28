@@ -287,28 +287,27 @@
     finishCraft();
   }
 
-  function finishCraft() {
+  async function finishCraft() {
     if (!selectedRecipe) return;
     const totalTenths = getEffectiveCraftDays(selectedRecipe) * craftQuantity;
     const days = craftDaysToActual(totalTenths);
     // 退避していた名声レベルアップを復元（DrawDialogが反応する）
     const repLevelUp = savedReputationLevelUp;
     savedReputationLevelUp = null;
-    // 先にendTurn → DayTransitionが上から被さる
-    endTurn(days);
-    // DayTransitionの暗転(0.3s)後にダイアログを片付け
-    setTimeout(async () => {
-      craftResultData = null;
-      levelUpData = null;
-      // 画面遷移のみ（マイルストーンチェックはここで自前でawaitする）
-      onBack({ skipMilestoneCheck: true });
-      // アチーブメント処理を完了してからDrawDialogの抑制を解除
-      await processActionComplete();
-      suppressDrawDialog.set(false);
-      if (repLevelUp) {
-        pendingReputationLevelUp.set(repLevelUp);
-      }
-    }, 350);
+    // endTurnのPromiseを保持しつつ、DayTransition暗転を待つ
+    const turnPromise = endTurn(days);
+    await new Promise(r => setTimeout(r, 350));
+    craftResultData = null;
+    levelUpData = null;
+    // 画面遷移のみ（マイルストーンチェックはここで自前でawaitする）
+    onBack({ skipMilestoneCheck: true });
+    // アチーブメント処理を完了してからDrawDialogの抑制を解除
+    await processActionComplete();
+    suppressDrawDialog.set(false);
+    if (repLevelUp) {
+      pendingReputationLevelUp.set(repLevelUp);
+    }
+    await turnPromise;
   }
 </script>
 

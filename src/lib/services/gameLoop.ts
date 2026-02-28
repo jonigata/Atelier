@@ -54,13 +54,13 @@ export async function endTurn(daysSpent: number): Promise<void> {
   if (gameOver) return;
 
   // 朝のフェーズに移行
-  processMorningPhase();
+  await processMorningPhase();
 }
 
 /**
  * 朝のフェーズ処理
  */
-function processMorningPhase(): void {
+async function processMorningPhase(): Promise<void> {
   clearMorningEvents();
 
   const state = get(gameState);
@@ -85,7 +85,7 @@ function processMorningPhase(): void {
   processHelperMorningStamina();
 
   // 7. 朝発動アチーブメント（triggerOnMorning）
-  processMorningAchievements();
+  await processMorningAchievements();
 
   // イベントがあればmorning画面を表示、なければ直接actionへ
   const updatedState = get(gameState);

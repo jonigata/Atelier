@@ -59,7 +59,7 @@
     showVideo = true;
   }
 
-  function onVideoEnd() {
+  async function onVideoEnd() {
     showVideo = false;
     if (!selectedBookId || !selectedBook) return;
 
@@ -74,7 +74,7 @@
 
     if ($skipPresentation) {
       const days = getStudyDays(selectedBook);
-      endTurn(days);
+      await endTurn(days);
       selectedBookId = null;
       onBack();
       return;
@@ -93,21 +93,20 @@
     return getEffectiveStudyDays(book, maxLevel);
   }
 
-  function handleStudyDialogClose() {
+  async function handleStudyDialogClose() {
     if (!studyCompletedBook) return;
 
     const days = getStudyDays(studyCompletedBook);
-    // 先にendTurn → DayTransitionが上から被さる
-    endTurn(days);
-    // DayTransitionの暗転(0.3s)後にダイアログを片付け
-    setTimeout(() => {
-      showStudyDialog = false;
-      studyCompletedBook = null;
-      studyLearnedRecipeIds = [];
-      studyLearnedRecipeNames = [];
-      selectedBookId = null;
-      onBack();
-    }, 350);
+    // endTurnのPromiseを保持しつつ、DayTransition暗転を待つ
+    const turnPromise = endTurn(days);
+    await new Promise(r => setTimeout(r, 350));
+    showStudyDialog = false;
+    studyCompletedBook = null;
+    studyLearnedRecipeIds = [];
+    studyLearnedRecipeNames = [];
+    selectedBookId = null;
+    onBack();
+    await turnPromise;
   }
 
   function selectBook(bookId: string) {
