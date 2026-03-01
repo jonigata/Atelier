@@ -1,12 +1,8 @@
 <script lang="ts">
-  import { gameState, addMessage, restoreStamina, skipPresentation } from '$lib/stores/game';
-  import { endTurn } from '$lib/services/gameLoop';
+  import { gameState } from '$lib/stores/game';
   import { getFatigueLabel } from '$lib/services/alchemy';
-  import { getBuildingRestBonus } from '$lib/services/buildingEffects';
-  import { selectRestEvent, resolveRestEventRewards, applyRestEventRewards } from '$lib/services/restEvent';
-  import { showDrawAndWait } from '$lib/services/drawEvent';
+  import { executeRest } from '$lib/services/restSequence';
   import type { RestEventDef, ResolvedReward } from '$lib/data/restEvents';
-  import VideoOverlay from './common/VideoOverlay.svelte';
   import RestEventDialog from './RestEventDialog.svelte';
 
   export let onBack: () => void;
@@ -15,63 +11,70 @@
   $: staminaPercent = Math.round(($gameState.stamina / $gameState.maxStamina) * 100);
   $: isFullStamina = $gameState.stamina >= $gameState.maxStamina;
 
-  let showVideo = false;
+  // --- シーケンス用の状態 ---
+  let backdrop = false;
+  let playingVideo = false;
+  let canSkipVideo = false;
   let restEvent: { event: RestEventDef; rewards: ResolvedReward[] } | null = null;
-
-  async function handleRest() {
-    // 休日イベント選出＆報酬確定（動画の前に表示）
-    const event = selectRestEvent();
-    const rewards = resolveRestEventRewards(event);
-    const drawInfos = applyRestEventRewards(event, rewards);
-
-    if (!$skipPresentation) {
-      // RestEventDialog を表示し、閉じるまで待つ
-      await new Promise<void>((resolve) => {
-        restEvent = { event, rewards };
-        restEventResolver = resolve;
-      });
-      // 動画再生し、終了まで待つ
-      await new Promise<void>((resolve) => {
-        showVideo = true;
-        videoResolver = resolve;
-      });
-    }
-
-    // 体力回復 + ターン終了
-    const bonus = getBuildingRestBonus();
-    restoreStamina(100 + bonus);
-    addMessage(`休息しました。体力が全回復しました。${bonus > 0 ? `（施設ボーナス+${bonus}）` : ''}`);
-    showVideo = false;
-    const turnPromise = endTurn(1);
-    await new Promise(r => setTimeout(r, 350));
-    onBack();
-
-    // ドロー表示（明示的に待つ）
-    if (drawInfos.village) await showDrawAndWait({ type: 'facility', levelUpInfo: drawInfos.village });
-    if (drawInfos.reputation) await showDrawAndWait({ type: 'helper', levelUpInfo: drawInfos.reputation });
-
-    await turnPromise;
-  }
-
-  // RestEventDialog / VideoOverlay の Promise resolver
-  let restEventResolver: (() => void) | null = null;
+  let eventDialogResolver: (() => void) | null = null;
   let videoResolver: (() => void) | null = null;
 
+  function handleRest() {
+    executeRest({
+      showBackdrop() {
+        backdrop = true;
+      },
+      showEventDialog(event, rewards) {
+        return new Promise<void>((resolve) => {
+          restEvent = { event, rewards };
+          eventDialogResolver = resolve;
+        });
+      },
+      hideEventDialog() {
+        restEvent = null;
+        eventDialogResolver = null;
+      },
+      playVideo() {
+        return new Promise<void>((resolve) => {
+          playingVideo = true;
+          videoResolver = resolve;
+          setTimeout(() => { canSkipVideo = true; }, 500);
+        });
+      },
+      leave() {
+        onBack();
+      },
+    });
+  }
+
   function onEventClose() {
-    restEvent = null;
-    if (restEventResolver) {
-      restEventResolver();
-      restEventResolver = null;
+    if (eventDialogResolver) {
+      eventDialogResolver();
     }
   }
 
-  function onVideoEnd() {
-    if (videoResolver) {
-      videoResolver();
-      videoResolver = null;
+  function endVideo() {
+    if (!videoResolver) return;
+    videoResolver();
+    videoResolver = null;
+    playingVideo = false;
+    canSkipVideo = false;
+  }
+
+  function handleVideoClick() {
+    if (canSkipVideo) endVideo();
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (!canSkipVideo) return;
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+      e.preventDefault();
+      endVideo();
     }
   }
 </script>
+
+<svelte:window on:keydown={handleKeydown} />
 
 <div class="rest-panel">
   <button class="back-btn" on:click={onBack}>← 戻る</button>
@@ -103,8 +106,22 @@
   </button>
 </div>
 
-{#if showVideo}
-  <VideoOverlay src="/movies/rest.mp4" text="休息中..." onEnd={onVideoEnd} />
+<!-- 休息シーケンス専用オーバーレイ（z-1000: DayTransition z-1100 の下） -->
+<!-- RestPanel unmount まで維持 → DayTransition に引き継ぐ -->
+{#if backdrop}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <div class="rest-backdrop" class:clickable={canSkipVideo} on:click={handleVideoClick} role="button" tabindex="-1">
+    {#if playingVideo}
+      <div class="video-container">
+        <!-- svelte-ignore a11y_media_has_caption -->
+        <video class="video-player" autoplay muted on:ended={endVideo}>
+          <source src="/movies/rest.mp4" type="video/mp4" />
+        </video>
+        <div class="video-text">休息中...</div>
+        <div class="video-hint" class:visible={canSkipVideo}>クリック または Enter でスキップ</div>
+      </div>
+    {/if}
+  </div>
 {/if}
 
 {#if restEvent}
@@ -224,4 +241,62 @@
     color: #808090;
   }
 
+  /* --- 休息シーケンス専用オーバーレイ --- */
+  .rest-backdrop {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    user-select: none;
+  }
+
+  .rest-backdrop.clickable {
+    cursor: pointer;
+  }
+
+  .video-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .video-player {
+    max-width: 480px;
+    width: 90vw;
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(201, 169, 89, 0.2);
+  }
+
+  .video-text {
+    font-size: 1.3rem;
+    color: #f4e4bc;
+    font-weight: bold;
+    animation: textPulse 1.5s ease-in-out infinite alternate;
+  }
+
+  .video-hint {
+    font-size: 0.85rem;
+    color: #6a6a8a;
+    visibility: hidden;
+  }
+
+  .video-hint.visible {
+    visibility: visible;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes textPulse {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+  }
 </style>
