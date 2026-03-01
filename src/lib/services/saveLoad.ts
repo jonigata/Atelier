@@ -1,9 +1,20 @@
-import { get } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { gameState } from '$lib/stores/game';
 import { calcLevelFromExp } from '$lib/data/balance';
 import type { GameState } from '$lib/models/types';
 
+/** セーブ/ロードインジケータ表示用 */
+export const saveIndicator = writable<string | null>(null);
+let indicatorTimer: ReturnType<typeof setTimeout> | null = null;
+
+function flashIndicator(msg: string, durationMs = 1500): void {
+  if (indicatorTimer) clearTimeout(indicatorTimer);
+  saveIndicator.set(msg);
+  indicatorTimer = setTimeout(() => saveIndicator.set(null), durationMs);
+}
+
 const STORAGE_KEY_PREFIX = 'atelier_save_slot_';
+const AUTOSAVE_KEY = 'atelier_autosave';
 const MAX_SLOTS = 10;
 
 export interface SaveSlotMeta {
@@ -77,6 +88,7 @@ export function loadFromSlot(index: number): boolean {
     const data: SaveData = JSON.parse(raw);
     migrateState(data.state);
     gameState.set(data.state);
+    autoSave();
     return true;
   } catch {
     return false;
@@ -114,6 +126,39 @@ export function updateSlotLabel(index: number, label: string): void {
   } catch {
     // ignore
   }
+}
+
+// ==================== 本番用オートセーブ ====================
+
+/** 毎日の開始時に自動セーブ（1スロットのみ） */
+export function autoSave(): void {
+  try {
+    const state = get(gameState);
+    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(state));
+    flashIndicator('セーブしました');
+  } catch {
+    // localStorage容量超過等は無視
+  }
+}
+
+/** リロード時にオートセーブからロード。成功でtrue */
+export function autoLoad(): boolean {
+  try {
+    const raw = localStorage.getItem(AUTOSAVE_KEY);
+    if (!raw) return false;
+    const state: GameState = JSON.parse(raw);
+    migrateState(state);
+    gameState.set(state);
+    flashIndicator('ロードしました');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** オートセーブデータを削除 */
+export function clearAutoSave(): void {
+  localStorage.removeItem(AUTOSAVE_KEY);
 }
 
 /** スロットのメモを更新 */

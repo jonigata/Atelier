@@ -30,6 +30,7 @@ import { getBuildingExpeditionBonus } from '$lib/services/buildingEffects';
 import { getHelperExpeditionDropBonus, getHelperExpeditionRareBonus } from '$lib/services/helperEffects';
 import { getItem as getItemDef } from '$lib/data/items';
 import type { OwnedItem, MorningEvent, GameState } from '$lib/models/types';
+import { autoSave } from '$lib/services/saveLoad';
 import skipDataJson from '$lib/data/skipData.json';
 
 /**
@@ -110,6 +111,9 @@ async function processMorningPhase(): Promise<void> {
   } else {
     startActionPhase();
   }
+
+  // 朝処理完了後にオートセーブ（イベント・フェーズ確定済み）
+  autoSave();
 }
 
 /**
@@ -371,4 +375,7 @@ export async function initializeGame(): Promise<void> {
 
   // ゲーム開始アチーブメントをチェック（ダイアログ表示）
   await processAutoCompleteAchievements();
+
+  // 1日目開始時にオートセーブ
+  autoSave();
 }

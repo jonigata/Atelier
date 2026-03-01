@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import { gameState, markInventoryOpened, skipPresentation } from '$lib/stores/game';
   import { initializeGame } from '$lib/services/gameLoop';
+  import { autoLoad, clearAutoSave, saveIndicator } from '$lib/services/saveLoad';
+  import { initializeActiveGoalTracking } from '$lib/services/achievement';
   import { processActionComplete } from '$lib/services/presentation';
   import HUD from '../components/HUD.svelte';
   import MessageLog from '../components/MessageLog.svelte';
@@ -23,10 +25,20 @@
   let selectedAction: ActionType | null = null;
 
   onMount(() => {
-    initializeGame();
+    // URLパラメータで本番セーブ削除
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('clearSave') === 'true') {
+      clearAutoSave();
+    }
+
+    const loaded = autoLoad();
+    if (loaded) {
+      initializeActiveGoalTracking();
+    } else {
+      initializeGame();
+    }
 
     // URLパラメータで演出スキップを制御
-    const params = new URLSearchParams(window.location.search);
     if (params.get('skipPresentation') === 'true') {
       skipPresentation.set(true);
     }
@@ -107,6 +119,11 @@
 
   <!-- デバッグパネル -->
   <DebugPanel />
+
+  <!-- オートセーブインジケータ -->
+  {#if $saveIndicator}
+    <div class="save-indicator">{$saveIndicator}</div>
+  {/if}
 </div>
 
 <!-- セーブ・ロードサイドバー（左側） -->
@@ -139,6 +156,27 @@
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+  }
+
+  .save-indicator {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    padding: 0.3rem 0.7rem;
+    background: rgba(0, 0, 0, 0.6);
+    color: #8a8aa0;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 500;
+    animation: saveFlash 1.5s ease-out forwards;
+  }
+
+  @keyframes saveFlash {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
   }
 
   /* 広い画面での背景 */

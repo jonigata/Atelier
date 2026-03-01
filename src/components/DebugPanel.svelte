@@ -18,6 +18,7 @@
     loadFromSlot,
     deleteSlot,
     updateSlotLabel,
+    clearAutoSave,
     type SaveSlotMeta,
   } from '$lib/services/saveLoad';
   import { addFakePastScore, countPastGameScores, clearAllPastGameScores } from '$lib/services/pastScores';
@@ -183,6 +184,8 @@
     }));
   }
 
+  let autosaveCleared = false;
+
   function togglePanel() {
     isOpen = !isOpen;
   }
@@ -291,6 +294,16 @@
         <button on:click={handleClearScores}>全消去</button>
       </div>
       <p class="info">登録数: {fakeScoreCount}件</p>
+    </div>
+
+    <div class="section">
+      <h4>本番セーブ</h4>
+      <div class="buttons">
+        <button class="delete-btn" on:click={() => { clearAutoSave(); autosaveCleared = true; }}>オートセーブ削除</button>
+      </div>
+      {#if autosaveCleared}
+        <p class="info" style="color: #ef5350;">削除済み（リロードで最初から）</p>
+      {/if}
     </div>
 
     <div class="section">

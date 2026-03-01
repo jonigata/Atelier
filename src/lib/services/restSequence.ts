@@ -52,18 +52,18 @@ export async function executeRest(ui: RestSequenceUI): Promise<void> {
 		`休息しました。体力が全回復しました。${bonus > 0 ? `（施設ボーナス+${bonus}）` : ''}`,
 	);
 
+	// --- ドロー表示（日をまたぐ前に実行） ---
+	if (drawInfos.village)
+		await showDrawAndWait({ type: 'facility', levelUpInfo: drawInfos.village });
+	if (drawInfos.reputation)
+		await showDrawAndWait({ type: 'helper', levelUpInfo: drawInfos.reputation });
+
 	// --- ターン終了（DayTransition が z-1100 で画面を覆う） ---
 	const turnPromise = endTurn(1);
 	await new Promise((r) => setTimeout(r, 350));
 
 	// DayTransition が描画されているので RestPanel unmount してもフラッシュしない
 	ui.leave();
-
-	// --- ドロー表示 ---
-	if (drawInfos.village)
-		await showDrawAndWait({ type: 'facility', levelUpInfo: drawInfos.village });
-	if (drawInfos.reputation)
-		await showDrawAndWait({ type: 'helper', levelUpInfo: drawInfos.reputation });
 
 	await turnPromise;
 }

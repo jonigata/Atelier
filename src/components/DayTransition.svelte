@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { gameState, skipPresentation } from '$lib/stores/game';
   import { resolveDayTransition } from '$lib/services/presentation';
   import { INSPECTION_DAYS } from '$lib/data/inspection';
@@ -8,6 +9,16 @@
   let transitioning = false;
   let displayDay = 0;
   let daysAdvanced = 0;
+
+  onMount(() => {
+    // オートロード時は pendingDayTransition が null のまま → 黒画面を解除
+    requestAnimationFrame(() => {
+      if (!transitioning && !$gameState.pendingDayTransition) {
+        visible = false;
+        initialLoad = false;
+      }
+    });
+  });
 
   $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_q1_goal_reminder');
   $: nextInspectionDay = INSPECTION_DAYS.find((d) => d >= displayDay) ?? null;
