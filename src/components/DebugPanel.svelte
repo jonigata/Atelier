@@ -20,6 +20,7 @@
     updateSlotLabel,
     type SaveSlotMeta,
   } from '$lib/services/saveLoad';
+  import { addFakePastScore, loadPastGameScores } from '$lib/services/pastScores';
 
   let isOpen = false;
   let isRunning = false;
@@ -160,6 +161,16 @@
     addMoney(amount);
   }
 
+  let fakeScoreCount = 0;
+  function handleAddFakeScore() {
+    addFakePastScore();
+    fakeScoreCount = loadPastGameScores().length;
+  }
+  // 初期値
+  $: if (isOpen && typeof window !== 'undefined') {
+    fakeScoreCount = loadPastGameScores().length;
+  }
+
   function handleAddTestEquipment() {
     const testIds = ['bargain_book', 'silver_pot', 'energy_ring', 'study_lamp', 'gathering_bag', 'quest_badge', 'lucky_coin'];
     gameState.update((s) => ({
@@ -267,6 +278,14 @@
         <button on:click={handleAddTestEquipment}>テスト機材追加</button>
       </div>
       <p class="info">所持: {$gameState.ownedEquipment.length}個</p>
+    </div>
+
+    <div class="section">
+      <h4>過去スコアデータ</h4>
+      <div class="buttons">
+        <button on:click={handleAddFakeScore}>+1件追加</button>
+      </div>
+      <p class="info">登録数: {fakeScoreCount}件</p>
     </div>
 
     <div class="section">

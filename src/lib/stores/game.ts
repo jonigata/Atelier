@@ -3,6 +3,7 @@ import type {
   GameState,
   OwnedItem,
   MorningEvent,
+  DailyScoreEntry,
 } from '$lib/models/types';
 import { removeItemFromInventory } from '$lib/services/inventory';
 import { calcExpForLevel, calcLevelFromExp, calcExpProgress, ALCHEMY, LEVEL } from '$lib/data/balance';
@@ -85,6 +86,8 @@ function createInitialState(): GameState {
     gameOverReason: null,
     pendingInspectionCutscene: null,
     inspectionBackdrop: false,
+
+    scoreHistory: [],
   };
 }
 
@@ -435,5 +438,27 @@ export const pendingAlchemyRecipeId = writable<string | null>(null);
 
 export function toggleSkipPresentation(): void {
   skipPresentation.update((v) => !v);
+}
+
+// =====================================
+// スコア履歴
+// =====================================
+
+export function recordDailyScore(): void {
+  gameState.update((state) => {
+    const score = calcScore(state);
+    const entry: DailyScoreEntry = { day: state.day, total: score.total };
+
+    // 同日の重複記録を防止
+    if (state.scoreHistory.length > 0 &&
+        state.scoreHistory[state.scoreHistory.length - 1].day === state.day) {
+      return state;
+    }
+
+    return {
+      ...state,
+      scoreHistory: [...state.scoreHistory, entry],
+    };
+  });
 }
 

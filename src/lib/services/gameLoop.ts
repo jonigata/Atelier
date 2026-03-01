@@ -10,6 +10,7 @@ import {
   addItem,
   addReputationExp,
   setDayTransition,
+  recordDailyScore,
 } from '$lib/stores/game';
 import { removeActiveQuest, incrementFailedQuests, setAvailableQuests, incrementNewQuestCount } from '$lib/stores/quests';
 import { isActionUnlocked } from '$lib/stores/tutorial';
@@ -74,6 +75,9 @@ export async function endTurn(daysSpent: number): Promise<void> {
  */
 async function processMorningPhase(): Promise<void> {
   clearMorningEvents();
+
+  // 毎朝スコアを記録
+  recordDailyScore();
 
   const state = get(gameState);
   addMessage(`--- ${state.day}日目の朝 ---`);
@@ -329,10 +333,17 @@ export function startActionPhase(): void {
  * src/lib/data/skipData.json のセーブデータをロードする
  */
 export function skipOpening(): void {
-  gameState.set(skipDataJson as unknown as GameState);
+  const state = skipDataJson as unknown as GameState;
+  if (!state.scoreHistory) {
+    (state as any).scoreHistory = [];
+  }
+  gameState.set(state);
 
   // 目標追跡を初期化
   initializeActiveGoalTracking();
+
+  // スキップ後の日のスコアを記録
+  recordDailyScore();
 }
 
 /**
@@ -354,6 +365,9 @@ export async function initializeGame(): Promise<void> {
 
   // 発動済み目標の追跡を初期化
   initializeActiveGoalTracking();
+
+  // 1日目のスコアを記録
+  recordDailyScore();
 
   // ゲーム開始アチーブメントをチェック（ダイアログ表示）
   await processAutoCompleteAchievements();

@@ -89,6 +89,11 @@ function migrateState(state: GameState): void {
   if (Array.isArray(state.buildings) && state.buildings.length > 0 && typeof state.buildings[0] === 'string') {
     state.buildings = (state.buildings as unknown as string[]).map((id) => ({ buildingId: id, level: 1 }));
   }
+
+  // scoreHistory: 旧セーブデータに存在しない場合の補完
+  if (!state.scoreHistory) {
+    (state as any).scoreHistory = [];
+  }
 }
 
 /** 指定スロットを削除 */

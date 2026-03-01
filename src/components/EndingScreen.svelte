@@ -1,6 +1,10 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { gameState, resetGame, alchemyLevel, villageLevel, reputationLevel, scoreBreakdown } from '$lib/stores/game';
   import { initializeGame } from '$lib/services/gameLoop';
+  import { savePastGameScores } from '$lib/services/pastScores';
+  import { calcScore } from '$lib/services/score';
+  import { get } from 'svelte/store';
 
   type EndingType = 'true' | 'good' | 'normal' | 'mediocre' | 'fail';
 
@@ -9,6 +13,21 @@
   $: provisionalTitle = $gameState.completedInspections.includes(28)
     ? '1月末の査察が終了しました'
     : 'リタイア';
+
+  // エンディング到達時にスコア履歴をlocalStorageに保存
+  let scoreSaved = false;
+  onMount(() => {
+    if (scoreSaved) return;
+    const state = get(gameState);
+    const score = calcScore(state);
+    const endingType = state.gameOverReason != null
+      ? 'gameover'
+      : state.day <= 336
+        ? (state.completedInspections.includes(28) ? 'provisional' : 'retire')
+        : getEnding().type;
+    savePastGameScores(state.scoreHistory, endingType, state.day, score.total);
+    scoreSaved = true;
+  });
 
   // 仮エンディングのステップ管理（クリックで順に開示）
   let revealStep = 0;

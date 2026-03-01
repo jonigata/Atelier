@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { gameState } from '$lib/stores/game';
+  import { gameState, totalScore } from '$lib/stores/game';
   import { items, getItemIcon, handleIconError } from '$lib/data/items';
+  import ScoreChart from './ScoreChart.svelte';
+  import { loadPastGameScores } from '$lib/services/pastScores';
   import { recipes } from '$lib/data/recipes';
   import { CATEGORY_NAMES, PRODUCT_SUBCATEGORY_NAMES, PRODUCT_SUBCATEGORY_ORDER, PRODUCT_SUBCATEGORY_MAP } from '$lib/data/categories';
   import type { ProductSubcategory } from '$lib/data/categories';
@@ -14,7 +16,11 @@
   export let onBack: () => void;
 
   // タブ切り替え
-  let activeTab: 'items' | 'achievements' = 'items';
+  let activeTab: 'items' | 'achievements' | 'scores' = 'items';
+
+  // スコア推移タブ用
+  $: pastGames = typeof window !== 'undefined' ? loadPastGameScores() : [];
+  $: currentScores = $gameState.scoreHistory ?? [];
 
   // === アイテムタブ ===
   let openItemCategories: Set<string> = new Set();
@@ -157,6 +163,9 @@
     <button class="tab" class:active={activeTab === 'achievements'} on:click={() => activeTab = 'achievements'}>
       アチーブメント
     </button>
+    <button class="tab" class:active={activeTab === 'scores'} on:click={() => activeTab = 'scores'}>
+      スコア推移
+    </button>
   </div>
 
   {#if activeTab === 'items'}
@@ -275,7 +284,7 @@
       </div>
     {/each}
 
-  {:else}
+  {:else if activeTab === 'achievements'}
     <!-- アチーブメントタブ -->
     <div class="album-header">
       <div class="collection-rate">
@@ -349,6 +358,30 @@
         {/if}
       </div>
     {/each}
+  {:else if activeTab === 'scores'}
+    <!-- スコア推移タブ -->
+    <div class="album-header">
+      <div class="collection-rate">
+        <span class="rate-label">現在のスコア</span>
+        <span class="rate-value" style="color: #f0c040; font-weight: bold;">
+          {$totalScore.toLocaleString()} pt
+        </span>
+      </div>
+      {#if pastGames.length > 0}
+        <span style="color: #808090; font-size: 0.85rem;">
+          過去{pastGames.length}回分と比較
+        </span>
+      {/if}
+    </div>
+
+    <ScoreChart {currentScores} {pastGames} currentDay={$gameState.day} />
+
+    {#if pastGames.length === 0 && currentScores.length <= 1}
+      <p class="score-empty-msg">
+        ゲームを進めるとスコア推移が表示されます。<br/>
+        ゲーム終了後、過去のスコアと比較できます。
+      </p>
+    {/if}
   {/if}
 </div>
 
@@ -775,5 +808,13 @@
     background: linear-gradient(90deg, #6a7a5a, #90b070);
     border-radius: 2px;
     transition: width 0.3s ease;
+  }
+
+  .score-empty-msg {
+    color: #808090;
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
   }
 </style>

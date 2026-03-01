@@ -376,6 +376,12 @@ export interface TutorialProgress {
   pendingDialogue: EventDialogue | null;
 }
 
+// スコア履歴エントリ（毎朝記録）
+export interface DailyScoreEntry {
+  day: number;
+  total: number;
+}
+
 // ゲーム状態
 export interface GameState {
   playerName: string;
@@ -434,6 +440,9 @@ export interface GameState {
   gameOverReason: string | null;   // ゲームオーバー理由（null=通常）
   pendingInspectionCutscene: InspectionCutsceneData | null;  // 査察カットシーン用
   inspectionBackdrop: boolean;  // 査察シーケンス中の黒オーバーレイ
+
+  // スコア履歴（毎朝記録）
+  scoreHistory: DailyScoreEntry[];
 }
 
 // 査察カットシーン用データ
