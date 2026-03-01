@@ -419,35 +419,30 @@
         </div>
       {/if}
 
-      <!-- 報酬表示 -->
+      <!-- 報酬表示（スペース事前確保：全要素を最初からレンダリングし、表示タイミングをCSSで制御） -->
       {#if data.mode === 'reward'}
         {#if phase === 'reward-title' || phase === 'reward-money' || phase === 'reward-items' || phase === 'reward-hold' || phase === 'fade-out'}
           <div class="reward-header">
             <div class="reward-header-sub">師匠組合</div>
             <div class="reward-header-main">支援物資</div>
           </div>
-        {/if}
 
-        {#if (phase === 'reward-money' || phase === 'reward-items' || phase === 'reward-hold' || phase === 'fade-out') && data.rewardMoney && data.rewardMoney > 0}
-          <div class="reward-money-wrap">
-            <PopIn stamped={rewardMoneyStamped}>
-              <span class="reward-money-value">{data.rewardMoney}G</span>
-            </PopIn>
-          </div>
-        {/if}
+          {#if data.rewardMoney && data.rewardMoney > 0}
+            <div class="reward-money-wrap">
+              <PopIn stamped={rewardMoneyStamped}>
+                <span class="reward-money-value">{data.rewardMoney}G</span>
+              </PopIn>
+            </div>
+          {/if}
 
-        {#if stampRushActive}
           <StampRush
             bind:this={stampRushRef}
             items={data.rewardItems ?? []}
             active={stampRushActive}
             onComplete={() => { stampRushDone = true; }}
           />
-        {/if}
 
-        <!-- スタンプ完了後にアイテム名と数量のサマリー -->
-        {#if stampRushDone || phase === 'fade-out'}
-          <div class="reward-summary">
+          <div class="reward-summary" class:visible={stampRushDone || phase === 'fade-out'}>
             {#each data.rewardItems ?? [] as item}
               <span class="reward-summary-item">{item.name}(品質{item.quality}) x{item.quantity}</span>
             {/each}
@@ -859,6 +854,10 @@
     flex-wrap: wrap;
     gap: 0.3rem 0.8rem;
     justify-content: center;
+    opacity: 0;
+  }
+
+  .reward-summary.visible {
     animation: slideUp 0.4s ease-out both;
   }
 
