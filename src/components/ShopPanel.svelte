@@ -20,12 +20,11 @@
 
   export let onBack: () => void;
 
-  type Tab = 'buy' | 'sell';
+  type Tab = 'buy' | 'sell' | 'parttime';
   let activeTab: Tab = 'buy';
 
   import { villageLevel, reputationLevel } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
-  import { showConfirmAndWait } from '$lib/stores/confirmDialog';
   import { showDialogueAndWait } from '$lib/services/presentation';
 
   // 村発展レベルに応じた購入可能アイテム
@@ -259,16 +258,11 @@
 
   // アルバイト
   $: partTimeEarnings = 100 + $reputationLevel * 10;
+  let partTimeProcessing = false;
 
-  async function handlePartTimeJob() {
-    const confirmed = await showConfirmAndWait({
-      message: `今日もお手伝いしてくれるの？\n報酬は${partTimeEarnings}Gよ。1日かかるけどどうする？`,
-      confirmLabel: '働く',
-      cancelLabel: 'やめとく',
-      characterName: 'メルダ',
-      characterFaceUrl: '/images/characters/melda/melda-face-happy.png',
-    });
-    if (!confirmed) return;
+  async function executePartTimeJob() {
+    if (partTimeProcessing) return;
+    partTimeProcessing = true;
 
     addMoney(partTimeEarnings);
     addMessage(`アルバイトで${partTimeEarnings}Gを稼ぎました。`);
@@ -285,6 +279,7 @@
 
     const turnPromise = endTurn(1);
     await new Promise(r => setTimeout(r, 350));
+    partTimeProcessing = false;
     onBack();
     await turnPromise;
   }
@@ -306,17 +301,6 @@
     所持金: <span class="amount">{$gameState.money.toLocaleString()}G</span>
   </div>
 
-  <!-- アルバイト -->
-  <div class="part-time-row">
-    <img class="part-time-face" src="/images/characters/melda/melda-face-neutral.png" alt="メルダ" />
-    <div class="part-time-info">
-      <span class="item-name">アルバイト</span>
-      <span class="item-desc">メルダの店を手伝う（1日経過）</span>
-    </div>
-    <span class="part-time-pay">{partTimeEarnings}G</span>
-    <button class="buy-btn" on:click={handlePartTimeJob}>働く</button>
-  </div>
-
   <div class="tabs">
     <button
       class="tab"
@@ -331,6 +315,13 @@
       on:click={() => (activeTab = 'sell')}
     >
       売却
+    </button>
+    <button
+      class="tab"
+      class:active={activeTab === 'parttime'}
+      on:click={() => (activeTab = 'parttime')}
+    >
+      アルバイト
     </button>
   </div>
 
@@ -467,7 +458,7 @@
       {/if}
     </div>
 
-  {:else}
+  {:else if activeTab === 'sell'}
     {#if premiumItemIds.length > 0}
       <div class="deals-banner premium-banner">
         <span class="deals-icon premium-icon">高価買取</span>
@@ -525,6 +516,21 @@
           {/if}
         {/each}
       {/if}
+    </div>
+  {:else if activeTab === 'parttime'}
+    <!-- アルバイト確認（タブ内埋め込み） -->
+    <div class="parttime-confirm">
+      <div class="parttime-confirm-body">
+        <img class="parttime-confirm-face" src="/images/characters/melda/melda-face-happy.png" alt="メルダ" />
+        <div class="parttime-confirm-text">
+          <span class="parttime-confirm-name">メルダ</span>
+          <span class="parttime-confirm-message">今日もお手伝いしてくれるの？ 報酬は{partTimeEarnings}Gよ。1日かかるけどどうする？</span>
+        </div>
+      </div>
+      <div class="parttime-confirm-buttons">
+        <button class="confirm-btn cancel" on:click={() => (activeTab = 'buy')}>やめとく</button>
+        <button class="confirm-btn ok" on:click={executePartTimeJob} disabled={partTimeProcessing}>働く</button>
+      </div>
     </div>
   {/if}
 
@@ -1105,39 +1111,95 @@
     border: 1px solid rgba(100, 200, 100, 0.3);
   }
 
-  /* アルバイト */
-  .part-time-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.6rem 1rem;
-    margin-bottom: 1rem;
-    background: rgba(255, 255, 255, 0.05);
+  /* アルバイト確認（タブ内埋め込み） */
+  .parttime-confirm {
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid #4a4a6a;
-    border-radius: 6px;
+    border-radius: 8px;
+    padding: 1.25rem;
   }
 
-  .part-time-face {
-    width: 40px;
-    height: 40px;
+  .parttime-confirm-body {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+  }
+
+  .parttime-confirm-face {
+    width: 80px;
+    height: 80px;
     object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid rgba(201, 169, 89, 0.4);
+    border: 2px solid #8b7355;
     flex-shrink: 0;
   }
 
-  .part-time-info {
+  .parttime-confirm-text {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.4rem;
     flex: 1;
-    min-width: 0;
   }
 
-  .part-time-pay {
+  .parttime-confirm-name {
     font-size: 1.1rem;
     font-weight: bold;
     color: #c9a959;
-    white-space: nowrap;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid #4a4a6a;
+  }
+
+  .parttime-confirm-message {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #e0e0f0;
+  }
+
+  .parttime-confirm-buttons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .confirm-btn {
+    flex: 1;
+    max-width: 160px;
+    padding: 0.7rem 1.5rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .confirm-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .confirm-btn.ok {
+    background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
+    border: none;
+    color: #1a1a2e;
+  }
+
+  .confirm-btn.ok:hover {
+    box-shadow: 0 2px 12px rgba(201, 169, 89, 0.4);
+  }
+
+  .confirm-btn.ok:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .confirm-btn.cancel {
+    background: transparent;
+    border: 1px solid #6a6a8a;
+    color: #a0a0b0;
+  }
+
+  .confirm-btn.cancel:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #8a8aaa;
+    color: #c0c0d0;
   }
 </style>
