@@ -6,7 +6,7 @@
   import { endTurn } from '$lib/services/gameLoop';
   import { processActionComplete } from '$lib/services/presentation';
   import { recipes } from '$lib/data/recipes';
-  import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient, calculateStaminaCost, calculateFatiguePenalty, getFatigueLabel } from '$lib/services/alchemy';
+  import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient, calculateStaminaCost, calculateFatiguePenalty, getFatigueLabel, getInspectionConflict } from '$lib/services/alchemy';
   import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
   import { calcExpForLevel, calcLevelFromExp, calcExpProgress, buildExpGaugeSegments, calcNextDrawLevel } from '$lib/data/balance';
   import { getEffectiveCraftDays, getEffectiveIngredientCount, craftDaysToActual, formatCraftDays } from '$lib/services/equipmentEffects';
@@ -116,6 +116,14 @@
   $: successRate = selectedRecipe
     ? calculateSuccessRate(selectedRecipe, calcLevelFromExp($gameState.alchemyExp), $gameState.stamina)
     : 0;
+
+  // 査察日をまたぐかチェック
+  $: craftDaysRequired = selectedRecipe
+    ? craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)
+    : 0;
+  $: inspectionConflictDay = selectedRecipe
+    ? getInspectionConflict($gameState.day, craftDaysRequired)
+    : null;
 
   // 予想品質
   $: expectedQuality = selectedRecipe && selectedItems.length >= itemsPerCraft
@@ -371,13 +379,14 @@
           {successRate}
           {expectedQuality}
           {craftQuantity}
-          daysRequired={craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)}
+          daysRequired={craftDaysRequired}
           recipe={selectedRecipe}
           {staminaCost}
           {totalStaminaCost}
           currentStamina={$gameState.stamina}
           {fatiguePenalty}
           {fatigueLabel}
+          {inspectionConflictDay}
           onCraft={executeCraft}
         />
       {/if}

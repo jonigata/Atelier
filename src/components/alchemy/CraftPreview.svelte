@@ -11,6 +11,7 @@
   export let currentStamina: number;
   export let fatiguePenalty: number;
   export let fatigueLabel: string | null;
+  export let inspectionConflictDay: number | null;
   export let onCraft: () => void;
 
   $: bonuses = getFacilityBonuses(recipe);
@@ -66,7 +67,13 @@
     </div>
   {/if}
 
-  <button class="craft-btn" on:click={onCraft}>
+  {#if inspectionConflictDay}
+    <div class="inspection-warning">
+      {inspectionConflictDay}日目に査察があるため、この日数では調合できません
+    </div>
+  {/if}
+
+  <button class="craft-btn" on:click={onCraft} disabled={!!inspectionConflictDay}>
     {craftQuantity}個 調合する ({daysRequired}日)
   </button>
 </div>
@@ -190,6 +197,23 @@
   .stamina-current {
     color: #808090;
     font-size: 0.85rem;
+  }
+
+  .inspection-warning {
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 152, 0, 0.15);
+    border: 1px solid rgba(255, 152, 0, 0.5);
+    border-radius: 4px;
+    color: #ff9800;
+    font-size: 0.85rem;
+  }
+
+  .craft-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 
   .fatigue-warning {

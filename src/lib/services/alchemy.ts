@@ -10,6 +10,7 @@ import {
 import { incrementCraftCount } from '$lib/stores/stats';
 import { getRecipe } from '$lib/data/recipes';
 import { getItem } from '$lib/data/items';
+import { INSPECTION_DAYS } from '$lib/data/inspection';
 import { removeItemsFromInventory } from '$lib/services/inventory';
 import { ALCHEMY, CRAFT_SUCCESS, QUALITY, STAMINA, calcLevelFromExp } from '$lib/data/balance';
 import { getFacilityBonuses, hasRequiredFacilities } from '$lib/services/facility';
@@ -363,6 +364,20 @@ function consumeItems(items: OwnedItem[]): void {
 export function calculateStaminaCost(recipe: RecipeDef): number {
   const base = STAMINA.CRAFT_BASE_COST + recipe.difficulty * STAMINA.CRAFT_DIFFICULTY_COST;
   return Math.max(1, Math.round(base * getStaminaCostMult()));
+}
+
+/**
+ * 調合が査察日をまたぐかチェック
+ * またぐ場合はその査察日を返す、またがなければ null
+ */
+export function getInspectionConflict(currentDay: number, daysRequired: number): number | null {
+  if (daysRequired <= 1) return null;
+  for (const inspDay of INSPECTION_DAYS) {
+    if (inspDay > currentDay && inspDay < currentDay + daysRequired) {
+      return inspDay;
+    }
+  }
+  return null;
 }
 
 /**
