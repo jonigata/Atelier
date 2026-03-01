@@ -21,6 +21,7 @@
     totalExpGained: 4,
     totalReputationExpGained: 2,
     isNewDiscovery: true,
+    isNewQualityRecord: false,
     message: '',
   };
   const newAlbumExpGauge: GaugeData = {
@@ -43,6 +44,7 @@
     totalExpGained: 6,
     totalReputationExpGained: 0,
     isNewDiscovery: false,
+    isNewQualityRecord: false,
     message: '',
   };
   const knownExpGauge: GaugeData = {
@@ -61,6 +63,7 @@
     totalExpGained: 8,
     totalReputationExpGained: 4,
     isNewDiscovery: true,
+    isNewQualityRecord: false,
     message: '',
   };
   const highQualityExpGauge: GaugeData = {
@@ -87,6 +90,7 @@
     totalExpGained: 12,
     totalReputationExpGained: 2,
     isNewDiscovery: true,
+    isNewQualityRecord: false,
     message: '',
   };
   const multiExpGauge: GaugeData = {
@@ -113,12 +117,32 @@
     totalExpGained: 1,
     totalReputationExpGained: 0,
     isNewDiscovery: false,
+    isNewQualityRecord: false,
     message: '',
   };
   const failExpGauge: GaugeData = {
     before: 10, after: 11, max: 30, label: 'Lv.2',
   };
   const failStaminaGauge: GaugeData = {
+    before: 72, after: 64, max: 100, label: '体力',
+  };
+
+  // ケース6: 品質新記録
+  const recordResult: CraftMultipleResult = {
+    successCount: 1,
+    failCount: 0,
+    items: [{ itemId: 'potion_01', quality: 78 }],
+    duplicatedCount: 0,
+    totalExpGained: 6,
+    totalReputationExpGained: 0,
+    isNewDiscovery: false,
+    isNewQualityRecord: true,
+    message: '',
+  };
+  const recordExpGauge: GaugeData = {
+    before: 10, after: 16, max: 30, label: 'Lv.2',
+  };
+  const recordStaminaGauge: GaugeData = {
     before: 72, after: 64, max: 100, label: '体力',
   };
 
@@ -137,6 +161,7 @@
     { label: '既知アイテム（A品質）', key: 'known', result: knownResult, recipeName: '回復薬', expGauge: knownExpGauge, repGauge: null, staminaGauge: knownStaminaGauge },
     { label: '高品質S + 新規', key: 'highQuality', result: highQualityResult, recipeName: '回復薬', expGauge: highQualityExpGauge, repGauge: highQualityRepGauge, staminaGauge: highQualityStaminaGauge },
     { label: '複数個 + 新規', key: 'multi', result: multiResult, recipeName: '回復薬', expGauge: multiExpGauge, repGauge: multiRepGauge, staminaGauge: multiStaminaGauge },
+    { label: '品質新記録', key: 'record', result: recordResult, recipeName: '回復薬', expGauge: recordExpGauge, repGauge: null, staminaGauge: recordStaminaGauge },
     { label: '全失敗', key: 'fail', result: failResult, recipeName: '回復薬', expGauge: failExpGauge, repGauge: null, staminaGauge: failStaminaGauge },
   ];
 
@@ -167,6 +192,9 @@
     現在: {current.label}
     {#if current.result.isNewDiscovery}
       <span class="tag new">NEW</span>
+    {/if}
+    {#if current.result.isNewQualityRecord}
+      <span class="tag record">RECORD</span>
     {/if}
     | 品質: {current.result.items[0]?.quality ?? '---'}
     | 成功: {current.result.successCount} 失敗: {current.result.failCount}
@@ -256,6 +284,15 @@
 
   .tag.new {
     background: #6a4c93;
+    color: #fff;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: bold;
+  }
+
+  .tag.record {
+    background: #b8860b;
     color: #fff;
     padding: 0.1rem 0.4rem;
     border-radius: 3px;

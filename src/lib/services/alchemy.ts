@@ -45,6 +45,7 @@ export interface CraftMultipleResult {
   totalExpGained: number;
   totalReputationExpGained: number;
   isNewDiscovery: boolean;
+  isNewQualityRecord: boolean;
   message: string;
 }
 
@@ -68,7 +69,7 @@ function calculateCraftExpGained(
     exp += bonus;
     reputationExp = bonus;
   }
-  return { alchemyExp: exp, reputationExp };
+  return { alchemyExp: Math.floor(exp * ALCHEMY.EXP_RATE), reputationExp };
 }
 
 /**
@@ -176,12 +177,17 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
   let totalReputationExpGained = 0;
   let duplicatedCount = 0;
   let isNewDiscovery = false;
+  let isNewQualityRecord = false;
 
   if (isSuccess) {
     // 全成功: 品質は1回だけ計算し全個数に適用
     const quality = calculateQuality(recipe, firstItems, calcLevelFromExp(currentState.alchemyExp));
     const stateForOrigin = get(gameState);
     isNewDiscovery = !stateForOrigin.discoveredItems.includes(recipe.resultItemId);
+
+    // addItem()がmaxQualityByItemを更新する前に旧最高値を取得
+    const prevMaxQuality = (stateForOrigin.maxQualityByItem ?? {})[recipe.resultItemId] ?? 0;
+    isNewQualityRecord = quality > prevMaxQuality && prevMaxQuality > 0;
 
     for (let i = 0; i < actualQuantity; i++) {
       const newItem: OwnedItem = {
@@ -213,7 +219,7 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
     recordSuccess(recipe.id);
   } else {
     // 全失敗
-    const expGained = Math.floor(recipe.expReward * (recipe.craftDaysTenths / 10) * ALCHEMY.FAIL_EXP_RATE) * actualQuantity;
+    const expGained = Math.floor(recipe.expReward * (recipe.craftDaysTenths / 10) * ALCHEMY.FAIL_EXP_RATE * ALCHEMY.EXP_RATE) * actualQuantity;
     addExp(expGained);
     totalExpGained = expGained;
     resetCombo();
@@ -256,6 +262,7 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
     totalExpGained,
     totalReputationExpGained,
     isNewDiscovery,
+    isNewQualityRecord,
     message,
   };
 }
@@ -264,12 +271,12 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
 function validateBatchPreconditions(recipeId: string): { recipe: RecipeDef } | { error: CraftMultipleResult } {
   const recipe = getRecipe(recipeId);
   if (!recipe) {
-    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, message: 'レシピが見つかりません' } };
+    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, isNewQualityRecord: false, message: 'レシピが見つかりません' } };
   }
   return { recipe };
 }
 
-const EMPTY_BATCH_RESULT: CraftMultipleResult = { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, message: '素材が足りませんでした' };
+const EMPTY_BATCH_RESULT: CraftMultipleResult = { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, isNewQualityRecord: false, message: '素材が足りませんでした' };
 
 /**
  * 複数個の調合を実行（自動で素材を選択）

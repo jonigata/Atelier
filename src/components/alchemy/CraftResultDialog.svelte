@@ -157,6 +157,9 @@
             <span class="quality-label">品質</span>
             <span class="quality-value {qualityRank.cssClass}">{result.items[0].quality}</span>
             <span class="quality-rank {qualityRank.cssClass}">{qualityRank.label}</span>
+            {#if result.isNewQualityRecord}
+              <span class="new-record-badge">RECORD</span>
+            {/if}
           </div>
         </div>
 
@@ -433,6 +436,21 @@
     0% { opacity: 0; transform: scale(0.5); }
     60% { transform: scale(1.1); }
     100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* === 品質新記録バッジ === */
+  .new-record-badge {
+    display: inline-block;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #1a1a2e;
+    background: linear-gradient(135deg, #b8860b 0%, #ffd700 50%, #b8860b 100%);
+    border: 1px solid #ffd700;
+    border-radius: 3px;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+    animation: albumBadgeAppear 0.5s ease-out 0.5s both;
+    letter-spacing: 0.05em;
   }
 
   .item-name {

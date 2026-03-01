@@ -28,6 +28,8 @@ export const ALCHEMY = {
   HIGH_QUALITY_EXP_BONUS: 1.2,
   /** 初回アルバム登録時の追加経験値倍率（レシピ基本経験値の100%） */
   ALBUM_FIRST_CRAFT_EXP_BONUS: 1.0,
+  /** 錬金経験値の獲得倍率 */
+  EXP_RATE: 0.67,
 } as const;
 
 // =====================================
