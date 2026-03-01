@@ -68,8 +68,8 @@ export const buildings: Record<string, BuildingDef> = {
     name: '乾燥小屋',
     description: '薬品の乾燥・熟成を効率化する小屋。薬品系の調合が速くなる',
     icon: '🏚️',
-    effects: [{ type: 'craft_days_reduce', value: 1, itemCategory: 'product' }],
-    effectDescription: '薬品系の調合日数-1（最低1日）',
+    effects: [{ type: 'craft_days_halve', value: 0, itemCategory: 'product' }],
+    effectDescription: '薬品系の調合日数半減',
   },
   watermill: {
     id: 'watermill',

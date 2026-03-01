@@ -143,6 +143,7 @@ export type BuildingEffectType =
   | 'craft_success'      // 調合成功率+
   | 'craft_quality'      // 調合品質+
   | 'craft_days_reduce'  // 調合日数短縮（カテゴリ限定可）
+  | 'craft_days_halve'  // 調合日数半減（カテゴリ限定可）
   | 'study_days_reduce'  // 勉強日数-
   | 'rest_bonus'         // 休息回復量+
   | 'expedition_bonus'   // 採取ドロップ増

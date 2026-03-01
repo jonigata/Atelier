@@ -18,6 +18,15 @@ function getAllBuildingEffects(): BuildingEffect[] {
 }
 
 /**
+ * 施設の調合日数半減カテゴリ一覧を取得
+ */
+export function getBuildingCraftDaysHalveCategories(): (string | undefined)[] {
+  return getAllBuildingEffects()
+    .filter((e) => e.type === 'craft_days_halve')
+    .map((e) => e.itemCategory);
+}
+
+/**
  * 施設の調合成功率ボーナス合計
  */
 export function getBuildingCraftSuccessBonus(): number {

@@ -13,7 +13,7 @@ import type {
   RecipeBookDef,
   ItemCategory,
 } from '$lib/models/types';
-import { getBuildingStudyDaysReduce } from '$lib/services/buildingEffects';
+import { getBuildingStudyDaysReduce, getBuildingCraftDaysHalveCategories } from '$lib/services/buildingEffects';
 
 // =====================================================================
 // 一時的な状態（セーブ不要）
@@ -168,10 +168,20 @@ export function getStaminaCostMult(): number {
 export function getEffectiveCraftDays(recipe: RecipeDef): number {
   let days = recipe.craftDaysTenths;
 
-  // 半減
+  // 機材による半減（全カテゴリ）
   const halves = getEffectsOfType('craft_days_halve');
   if (halves.length > 0) {
     days = Math.ceil(days / 2);
+  }
+
+  // 施設による半減（カテゴリ限定）
+  const itemDef = getItem(recipe.resultItemId);
+  const buildingHalveCategories = getBuildingCraftDaysHalveCategories();
+  for (const cat of buildingHalveCategories) {
+    if (!cat || (itemDef && itemDef.category === cat)) {
+      days = Math.ceil(days / 2);
+      break;
+    }
   }
 
   // 固定短縮
