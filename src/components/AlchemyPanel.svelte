@@ -121,10 +121,6 @@
   $: craftDaysRequired = selectedRecipe
     ? craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)
     : 0;
-  $: inspectionConflictDay = selectedRecipe
-    ? getInspectionConflict($gameState.day, craftDaysRequired)
-    : null;
-
   // 各個数で査察コンフリクトが起きるか（ボタン無効化用）
   function getInspectionConflictForQuantity(n: number): number | null {
     if (!selectedRecipe) return null;
@@ -363,7 +359,7 @@
           <div class="inspection-warning">
             {conflictDay}日目に査察があるため、調合できません
           </div>
-        {:else if maxWithoutInspection < maxCraftable}
+        {:else if maxWithoutInspection < maxCraftable && maxWithoutInspection < 5}
           {@const conflictDay = getInspectionConflictForQuantity(maxWithoutInspection + 1)}
           <div class="inspection-warning">
             {conflictDay}日目に査察があるため、{maxWithoutInspection + 1}個以上は調合できません
@@ -400,7 +396,6 @@
             currentStamina={$gameState.stamina}
             {fatiguePenalty}
             {fatigueLabel}
-            inspectionConflictDay={null}
             onCraft={executeCraft}
           />
         {/if}
