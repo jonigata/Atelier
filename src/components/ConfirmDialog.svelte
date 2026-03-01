@@ -35,7 +35,19 @@
           <img class="confirm-image" src={data.eventImage} alt="" />
         </div>
       {/if}
-      <div class="confirm-message">{data.message}</div>
+      <div class="confirm-body" class:has-face={!!data.characterFaceUrl}>
+        {#if data.characterFaceUrl}
+          <div class="face-column">
+            <img class="character-face" src={data.characterFaceUrl} alt={data.characterName ?? ''} />
+          </div>
+        {/if}
+        <div class="text-column">
+          {#if data.characterName}
+            <div class="character-name">{data.characterName}</div>
+          {/if}
+          <div class="confirm-message">{data.message}</div>
+        </div>
+      </div>
       <div class="confirm-buttons">
         <button class="confirm-btn cancel" on:click={handleCancel}>
           {data.cancelLabel ?? 'やめる'}
@@ -70,7 +82,7 @@
     background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
     border: 2px solid #8b7355;
     border-radius: 12px;
-    max-width: 480px;
+    max-width: 520px;
     width: 90%;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     overflow: hidden;
@@ -92,8 +104,42 @@
     border-bottom: 2px solid #8b7355;
   }
 
-  .confirm-message {
+  .confirm-body {
     padding: 1.5rem 2rem;
+  }
+
+  .confirm-body.has-face {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .face-column {
+    flex-shrink: 0;
+  }
+
+  .character-face {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #8b7355;
+    object-fit: cover;
+  }
+
+  .text-column {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .character-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #c9a959;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid #4a4a6a;
+  }
+
+  .confirm-message {
     font-size: 1.05rem;
     line-height: 1.7;
     color: #e0e0f0;

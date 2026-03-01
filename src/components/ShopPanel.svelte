@@ -262,10 +262,11 @@
 
   async function handlePartTimeJob() {
     const confirmed = await showConfirmAndWait({
-      message: `メルダの店でアルバイトをしますか？\n報酬: ${partTimeEarnings}G（1日経過）`,
+      message: `今日もお手伝いしてくれるの？\n報酬は${partTimeEarnings}Gよ。1日かかるけどどうする？`,
       confirmLabel: '働く',
-      cancelLabel: 'やめる',
-      eventImage: '/images/events/part_time.png',
+      cancelLabel: 'やめとく',
+      characterName: 'メルダ',
+      characterFaceUrl: '/images/characters/melda/melda-face-happy.png',
     });
     if (!confirmed) return;
 
@@ -276,6 +277,7 @@
       characterName: 'メルダ',
       characterTitle: '雑貨屋の店主',
       characterFaceId: 'melda',
+      eventImage: '/images/events/part_time.png',
       lines: [
         { text: `今日もありがとね！ はい、${partTimeEarnings}Gのお給料よ`, expression: 'happy' },
       ],
@@ -302,6 +304,17 @@
 
   <div class="money-display">
     所持金: <span class="amount">{$gameState.money.toLocaleString()}G</span>
+  </div>
+
+  <!-- アルバイト -->
+  <div class="part-time-row">
+    <img class="part-time-face" src="/images/characters/melda/melda-face-neutral.png" alt="メルダ" />
+    <div class="part-time-info">
+      <span class="item-name">アルバイト</span>
+      <span class="item-desc">メルダの店を手伝う（1日経過）</span>
+    </div>
+    <span class="part-time-pay">{partTimeEarnings}G</span>
+    <button class="buy-btn" on:click={handlePartTimeJob}>働く</button>
   </div>
 
   <div class="tabs">
@@ -515,23 +528,6 @@
     </div>
   {/if}
 
-  <!-- アルバイト -->
-  <div class="part-time-section">
-    <h3 class="section-header">アルバイト</h3>
-    <div class="part-time-card">
-      <div class="part-time-img-wrap">
-        <img src="/images/events/part_time.png" alt="アルバイト" class="part-time-img" />
-      </div>
-      <div class="part-time-body">
-        <span class="item-name">メルダの店を手伝う</span>
-        <span class="item-desc">荷運びや店番を手伝って報酬を得ます（1日経過）</span>
-        <div class="part-time-footer">
-          <span class="part-time-pay">{partTimeEarnings}G</span>
-          <button class="buy-btn" on:click={handlePartTimeJob}>働く</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <style>
@@ -1110,50 +1106,38 @@
   }
 
   /* アルバイト */
-  .part-time-section {
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid #4a4a6a;
-  }
-
-  .part-time-card {
-    display: flex;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #4a4a6a;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .part-time-img-wrap {
-    width: 160px;
-    flex-shrink: 0;
-    background: rgba(0, 0, 0, 0.3);
-  }
-
-  .part-time-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .part-time-body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    padding: 0.75rem 1rem;
-    flex: 1;
-  }
-
-  .part-time-footer {
+  .part-time-row {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-top: auto;
+    padding: 0.6rem 1rem;
+    margin-bottom: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #4a4a6a;
+    border-radius: 6px;
+  }
+
+  .part-time-face {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid rgba(201, 169, 89, 0.4);
+    flex-shrink: 0;
+  }
+
+  .part-time-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    flex: 1;
+    min-width: 0;
   }
 
   .part-time-pay {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
     color: #c9a959;
+    white-space: nowrap;
   }
 </style>

@@ -5,6 +5,8 @@ export interface ConfirmDialogData {
   confirmLabel?: string;
   cancelLabel?: string;
   eventImage?: string;
+  characterName?: string;
+  characterFaceUrl?: string;
 }
 
 export const pendingConfirm = writable<ConfirmDialogData | null>(null);
