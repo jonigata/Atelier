@@ -9,6 +9,7 @@
   export let compact: boolean = false;
   export let showDeliverButton: boolean = false;
   export let onDeliver: ((quest: ActiveQuest) => void) | null = null;
+  export let onCancel: ((quest: ActiveQuest) => void) | null = null;
   export let onClick: ((quest: ActiveQuest) => void) | null = null;
 
   // 依頼に合致するアイテムを取得
@@ -95,13 +96,23 @@
   </div>
 
   {#if showDeliverButton && onDeliver}
-    <button
-      class="deliver-btn"
-      disabled={!canDeliverNow}
-      on:click={() => onDeliver(quest)}
-    >
-      {canDeliverNow ? '納品する' : '準備中...'}
-    </button>
+    <div class="quest-actions">
+      <button
+        class="deliver-btn"
+        disabled={!canDeliverNow}
+        on:click={() => onDeliver(quest)}
+      >
+        {canDeliverNow ? '納品する' : '準備中...'}
+      </button>
+      {#if onCancel}
+        <button
+          class="cancel-btn"
+          on:click={() => onCancel(quest)}
+        >
+          キャンセル
+        </button>
+      {/if}
+    </div>
   {/if}
 </div>
 
@@ -281,11 +292,16 @@
     font-size: 0.65rem;
   }
 
-  /* 納品ボタン */
-  .deliver-btn {
-    width: 100%;
-    padding: 0.5rem;
+  /* アクションボタン群 */
+  .quest-actions {
+    display: flex;
+    gap: 0.5rem;
     margin-top: 0.5rem;
+  }
+
+  .deliver-btn {
+    flex: 1;
+    padding: 0.5rem;
     background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
     border: none;
     border-radius: 6px;
@@ -302,5 +318,20 @@
 
   .deliver-btn:hover:not(:disabled) {
     transform: translateY(-1px);
+  }
+
+  .cancel-btn {
+    padding: 0.5rem 0.75rem;
+    background: rgba(244, 67, 54, 0.15);
+    border: 1px solid rgba(244, 67, 54, 0.4);
+    border-radius: 6px;
+    color: #ef9a9a;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .cancel-btn:hover {
+    background: rgba(244, 67, 54, 0.3);
+    color: #ffcdd2;
   }
 </style>

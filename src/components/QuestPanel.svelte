@@ -3,9 +3,12 @@
   import {
     gameState,
     addMessage,
+    addReputationExp,
   } from '$lib/stores/game';
   import {
     addActiveQuest,
+    removeActiveQuest,
+    incrementFailedQuests,
     setAvailableQuests,
     clearNewQuestCount,
     setSelectedQuestId,
@@ -58,6 +61,17 @@
 
     // アチーブメントチェック（依頼受注関連）
     await processActionComplete();
+  }
+
+  // 依頼をキャンセル（失敗と同じペナルティ）
+  function cancelQuest(quest: ActiveQuest) {
+    if (!confirm(`依頼「${quest.title}」をキャンセルしますか？\n失敗と同じペナルティ（名声-5）が発生します。`)) {
+      return;
+    }
+    addReputationExp(-5);
+    incrementFailedQuests();
+    removeActiveQuest(quest.id);
+    addMessage(`依頼「${quest.title}」をキャンセルしました。名声が下がりました。`);
   }
 
   // 納品可能かチェック
@@ -323,7 +337,7 @@
         <p class="empty">受注中の依頼はありません</p>
       {:else}
         {#each $gameState.activeQuests as quest}
-          <ActiveQuestCard {quest} showDeliverButton={true} onDeliver={deliverQuest} />
+          <ActiveQuestCard {quest} showDeliverButton={true} onDeliver={deliverQuest} onCancel={cancelQuest} />
         {/each}
       {/if}
     </div>
