@@ -23,7 +23,8 @@
   type Tab = 'buy' | 'sell';
   let activeTab: Tab = 'buy';
 
-  import { villageLevel } from '$lib/stores/game';
+  import { villageLevel, reputationLevel } from '$lib/stores/game';
+  import { endTurn } from '$lib/services/gameLoop';
 
   // 村発展レベルに応じた購入可能アイテム
   $: buyableItems = getBuyableItems($villageLevel);
@@ -254,6 +255,19 @@
     {} as Record<string, OwnedItem[]>
   );
 
+  // アルバイト
+  $: partTimeEarnings = 100 + $reputationLevel * 10;
+
+  async function handlePartTimeJob() {
+    if (!confirm(`メルダの店でアルバイトをしますか？\n報酬: ${partTimeEarnings}G（1日経過）`)) return;
+    addMoney(partTimeEarnings);
+    addMessage(`アルバイトで${partTimeEarnings}Gを稼ぎました。`);
+    const turnPromise = endTurn(1);
+    await new Promise(r => setTimeout(r, 350));
+    onBack();
+    await turnPromise;
+  }
+
   function getSellPrice(item: OwnedItem): number {
     const def = getItem(item.itemId);
     if (!def) return 0;
@@ -481,6 +495,24 @@
       {/if}
     </div>
   {/if}
+
+  <!-- アルバイト -->
+  <div class="part-time-section">
+    <h3 class="section-header">アルバイト</h3>
+    <div class="part-time-card">
+      <div class="part-time-img-wrap">
+        <img src="/images/events/part_time.png" alt="アルバイト" class="part-time-img" />
+      </div>
+      <div class="part-time-body">
+        <span class="item-name">メルダの店を手伝う</span>
+        <span class="item-desc">荷運びや店番を手伝って報酬を得ます（1日経過）</span>
+        <div class="part-time-footer">
+          <span class="part-time-pay">{partTimeEarnings}G</span>
+          <button class="buy-btn" on:click={handlePartTimeJob}>働く</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
@@ -1056,5 +1088,53 @@
 
   .premium-group {
     border: 1px solid rgba(100, 200, 100, 0.3);
+  }
+
+  /* アルバイト */
+  .part-time-section {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #4a4a6a;
+  }
+
+  .part-time-card {
+    display: flex;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #4a4a6a;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .part-time-img-wrap {
+    width: 160px;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .part-time-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .part-time-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    flex: 1;
+  }
+
+  .part-time-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: auto;
+  }
+
+  .part-time-pay {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #c9a959;
   }
 </style>
