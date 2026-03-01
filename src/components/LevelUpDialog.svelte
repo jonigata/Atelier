@@ -1,24 +1,9 @@
 <script lang="ts">
-  import { recipes } from '$lib/data/recipes';
-  import { gameState } from '$lib/stores/game';
   import type { LevelUpInfo } from '$lib/stores/game';
-  import type { RecipeDef } from '$lib/models/types';
   import { onMount } from 'svelte';
 
   export let levelUpInfo: LevelUpInfo;
   export let onClose: () => void;
-
-  // 新レベルで成功率が向上したレシピ（oldLevel < requiredLevel <= newLevel）
-  $: improvedRecipes = Object.values(recipes).filter(
-    (r) => r.requiredLevel > levelUpInfo.oldLevel && r.requiredLevel <= levelUpInfo.newLevel
-  );
-
-  // 習得済みのレシピ
-  $: knownRecipeIds = $gameState.knownRecipes;
-
-  // 習得済みと未習得に分ける
-  $: knownImproved = improvedRecipes.filter((r) => knownRecipeIds.includes(r.id));
-  $: unknownImproved = improvedRecipes.filter((r) => !knownRecipeIds.includes(r.id));
 
   let mounted = false;
 
@@ -75,41 +60,6 @@
     </div>
 
     <p class="congrats-text">錬金術の腕が上がった！</p>
-
-    <!-- 成功率向上レシピ -->
-    {#if improvedRecipes.length > 0}
-      <div class="unlocked-section">
-        <h4 class="section-title">成功率が安定したレシピ</h4>
-
-        {#if knownImproved.length > 0}
-          <div class="recipe-group">
-            <span class="group-label">習得済み</span>
-            <div class="recipe-list">
-              {#each knownImproved as recipe, i}
-                <div class="recipe-item craftable" style="animation-delay: {i * 0.06}s">
-                  <span class="recipe-name">{recipe.name}</span>
-                  <span class="recipe-level">Lv.{recipe.requiredLevel}</span>
-                </div>
-              {/each}
-            </div>
-          </div>
-        {/if}
-
-        {#if unknownImproved.length > 0}
-          <div class="recipe-group">
-            <span class="group-label">未習得</span>
-            <div class="recipe-list">
-              {#each unknownImproved as recipe, i}
-                <div class="recipe-item locked" style="animation-delay: {(knownImproved.length + i) * 0.06}s">
-                  <span class="recipe-name">{recipe.name}</span>
-                  <span class="recipe-level">Lv.{recipe.requiredLevel}</span>
-                </div>
-              {/each}
-            </div>
-          </div>
-        {/if}
-      </div>
-    {/if}
 
     <!-- フッター -->
     <div class="dialog-footer">
@@ -266,85 +216,6 @@
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
-  }
-
-  /* 解放レシピ */
-  .unlocked-section {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(201, 169, 89, 0.3);
-    border-radius: 10px;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    animation: fadeIn 0.4s ease-out 0.7s both;
-    max-height: 250px;
-    overflow-y: auto;
-  }
-
-  .section-title {
-    font-size: 0.95rem;
-    color: #c9a959;
-    margin-bottom: 0.75rem;
-    text-align: center;
-  }
-
-  .recipe-group {
-    margin-bottom: 0.75rem;
-  }
-
-  .recipe-group:last-child {
-    margin-bottom: 0;
-  }
-
-  .group-label {
-    display: block;
-    font-size: 0.8rem;
-    color: #808090;
-    margin-bottom: 0.4rem;
-    padding-left: 0.25rem;
-  }
-
-  .recipe-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-  }
-
-  .recipe-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.4rem 0.75rem;
-    border-radius: 6px;
-    animation: recipeSlide 0.3s ease-out both;
-  }
-
-  @keyframes recipeSlide {
-    from { opacity: 0; transform: translateX(-10px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  .recipe-item.craftable {
-    background: rgba(201, 169, 89, 0.15);
-    border: 1px solid rgba(201, 169, 89, 0.4);
-  }
-
-  .recipe-item.locked {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .recipe-item.craftable .recipe-name {
-    color: #f4e4bc;
-    font-weight: bold;
-  }
-
-  .recipe-item.locked .recipe-name {
-    color: #808090;
-  }
-
-  .recipe-level {
-    font-size: 0.8rem;
-    color: #808090;
   }
 
   /* フッター */
