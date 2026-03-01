@@ -20,6 +20,7 @@
   import SaveLoadSidebar from '../components/SaveLoadSidebar.svelte';
   import ToastContainer from '../components/ToastContainer.svelte';
   import TalkBanner from '../components/TalkBanner.svelte';
+  import { dev } from '$app/environment';
   import type { ActionType } from '$lib/models/types';
 
   let selectedAction: ActionType | null = null;
@@ -118,7 +119,9 @@
   <EventDialog />
 
   <!-- デバッグパネル -->
-  <DebugPanel />
+  {#if dev}
+    <DebugPanel />
+  {/if}
 
   <!-- オートセーブインジケータ -->
   {#if $saveIndicator}
@@ -127,7 +130,9 @@
 </div>
 
 <!-- セーブ・ロードサイドバー（左側） -->
-<SaveLoadSidebar />
+{#if dev}
+  <SaveLoadSidebar />
+{/if}
 
 <!-- トースト通知（メイン画面に合わせて配置） -->
 <ToastContainer />
