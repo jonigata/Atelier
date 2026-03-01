@@ -238,6 +238,26 @@
     return false;
   }
 
+  // 即納品（受注→即納品をワンアクションで）
+  async function instantDeliver(questDef: QuestDef) {
+    if ($gameState.activeQuests.length >= 3) {
+      addMessage('同時に受注できる依頼は3件までです');
+      return;
+    }
+
+    const activeQuest: ActiveQuest = {
+      ...questDef,
+      acceptedDay: $gameState.day,
+      deliveredCount: 0,
+    };
+
+    addActiveQuest(activeQuest);
+    setAvailableQuests($gameState.availableQuests.filter((q) => q.id !== questDef.id));
+    addMessage(`依頼「${questDef.title}」を受注しました`);
+
+    await deliverQuest(activeQuest);
+  }
+
   // 納品可能なクエスト数
   $: deliverableCount = $gameState.activeQuests.filter((quest) => canDeliver(quest)).length;
 </script>
@@ -319,13 +339,23 @@
                 <span class="badge-material-short">素材不足</span>
               {/if}
             </div>
-            <button
-              class="accept-btn"
-              disabled={!canAccept}
-              on:click={() => acceptQuest(quest)}
-            >
-              受注する
-            </button>
+            <div class="quest-actions">
+              <button
+                class="accept-btn"
+                disabled={!canAccept}
+                on:click={() => acceptQuest(quest)}
+              >
+                受注する
+              </button>
+              {#if canFulfill(quest) && canAccept}
+                <button
+                  class="instant-deliver-btn"
+                  on:click={() => instantDeliver(quest)}
+                >
+                  即納品
+                </button>
+              {/if}
+            </div>
           </div>
         {/each}
       {/if}
@@ -549,8 +579,13 @@
     50% { box-shadow: 0 0 14px rgba(38, 198, 218, 0.9); }
   }
 
+  .quest-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
   .accept-btn {
-    width: 100%;
+    flex: 1;
     padding: 0.6rem;
     background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
     border: none;
@@ -566,6 +601,21 @@
   }
 
   .accept-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .instant-deliver-btn {
+    flex: 1;
+    padding: 0.6rem;
+    background: linear-gradient(135deg, #1a6b3c 0%, #2ecc71 100%);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .instant-deliver-btn:hover {
     transform: translateY(-1px);
   }
 </style>
