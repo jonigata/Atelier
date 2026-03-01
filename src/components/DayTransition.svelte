@@ -66,6 +66,7 @@
     class:fade-in={fading === 'in'}
     class:fade-out={fading === 'out'}
   >
+    <img class="title-logo" class:visible={showText} src="/images/title-logo.png" alt="コレットの村おこし工房" />
     <div class="transition-content" class:visible={showText}>
       {#if daysAdvanced > 0}
         <div class="days-passed">
@@ -117,6 +118,20 @@
   @keyframes fadeFromBlack {
     from { opacity: 1; }
     to { opacity: 0; }
+  }
+
+  .title-logo {
+    position: absolute;
+    top: 25%;
+    width: min(640px, 80vw);
+    height: auto;
+    filter: drop-shadow(0 0 12px rgba(244, 228, 188, 0.3));
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+  }
+
+  .title-logo.visible {
+    opacity: 1;
   }
 
   .transition-content {

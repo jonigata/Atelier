@@ -62,7 +62,7 @@
 </script>
 
 <svelte:head>
-  <title>アトリエシミュレーター</title>
+  <title>コレットの村おこし工房</title>
 </svelte:head>
 
 <div class="game-container">
