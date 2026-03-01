@@ -2,6 +2,7 @@
   import { gameState, totalScore } from '$lib/stores/game';
   import { items, getItemIcon, handleIconError } from '$lib/data/items';
   import ScoreChart from './ScoreChart.svelte';
+  import RankingPanel from './RankingPanel.svelte';
   import { loadPastGameScores, loadBestPastGame } from '$lib/services/pastScores';
   import { recipes } from '$lib/data/recipes';
   import { CATEGORY_NAMES, PRODUCT_SUBCATEGORY_NAMES, PRODUCT_SUBCATEGORY_ORDER, PRODUCT_SUBCATEGORY_MAP } from '$lib/data/categories';
@@ -16,7 +17,7 @@
   export let onBack: () => void;
 
   // タブ切り替え
-  let activeTab: 'items' | 'achievements' | 'scores' = 'items';
+  let activeTab: 'items' | 'achievements' | 'scores' | 'ranking' = 'items';
 
   // スコア推移タブ用
   $: pastGames = typeof window !== 'undefined' ? loadPastGameScores() : [];
@@ -166,6 +167,9 @@
     </button>
     <button class="tab" class:active={activeTab === 'scores'} on:click={() => activeTab = 'scores'}>
       スコア推移
+    </button>
+    <button class="tab" class:active={activeTab === 'ranking'} on:click={() => activeTab = 'ranking'}>
+      ランキング
     </button>
   </div>
 
@@ -383,6 +387,8 @@
         ゲーム終了後、過去のスコアと比較できます。
       </p>
     {/if}
+  {:else if activeTab === 'ranking'}
+    <RankingPanel />
   {/if}
 </div>
 

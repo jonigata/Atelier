@@ -5,6 +5,8 @@
   import { savePastGameScores } from '$lib/services/pastScores';
   import { calcScore } from '$lib/services/score';
   import { get } from 'svelte/store';
+  import { getNickname, saveNickname, submitScore } from '$lib/services/ranking';
+  import NicknameInput from './NicknameInput.svelte';
 
   type EndingType = 'true' | 'good' | 'normal' | 'mediocre' | 'fail';
 
@@ -99,6 +101,44 @@
 
   $: ending = getEnding();
 
+  // ランキング登録フロー
+  let rankingState: 'idle' | 'input' | 'submitting' | 'done' | 'error' = 'idle';
+  let rankingResult: { weeklyRank: number | null; totalRank: number | null } | null = null;
+  let rankingError = '';
+
+  function openRankingInput() {
+    rankingState = 'input';
+  }
+
+  async function handleRankingSubmit(nickname: string) {
+    rankingState = 'submitting';
+    rankingError = '';
+    saveNickname(nickname);
+    try {
+      const state = get(gameState);
+      const bd = get(scoreBreakdown);
+      const endType = state.gameOverReason != null
+        ? 'gameover'
+        : state.day <= 336
+          ? (state.completedInspections.includes(28) ? 'provisional' : 'retire')
+          : getEnding().type;
+      const result = await submitScore(nickname, bd.total, endType, state.day, bd, state);
+      rankingResult = { weeklyRank: result.weeklyRank, totalRank: result.totalRank };
+      rankingState = 'done';
+    } catch (e: unknown) {
+      rankingError = e instanceof Error ? e.message : '送信に失敗しました';
+      rankingState = 'error';
+    }
+  }
+
+  function cancelRankingInput() {
+    rankingState = 'idle';
+  }
+
+  function retryRanking() {
+    rankingState = 'input';
+  }
+
   function handleRestart() {
     revealStep = 0;
     resetGame();
@@ -167,6 +207,21 @@
       </div>
     </div>
 
+    <div class="ranking-area fade-in">
+      {#if rankingState === 'idle'}
+        <button class="ranking-btn" on:click|stopPropagation={openRankingInput}>ランキングに登録</button>
+      {:else if rankingState === 'done' && rankingResult}
+        <div class="ranking-done">
+          <span class="ranking-done-label">登録完了！</span>
+          {#if rankingResult.weeklyRank}<span>週間 {rankingResult.weeklyRank}位</span>{/if}
+          {#if rankingResult.totalRank}<span>全期間 {rankingResult.totalRank}位</span>{/if}
+        </div>
+      {:else if rankingState === 'error'}
+        <p class="ranking-error">{rankingError}</p>
+        <button class="ranking-btn small" on:click|stopPropagation={retryRanking}>再試行</button>
+      {/if}
+    </div>
+
     <p class="provisional-note fade-in">体験版はここまでです</p>
 
     <button class="restart-btn fade-in" on:click|stopPropagation={handleRestart}>
@@ -225,6 +280,21 @@
           <span class="bd-label">建物・助手</span><span class="bd-value">{$scoreBreakdown.buildings.toLocaleString()}</span>
         </div>
       </div>
+    </div>
+
+    <div class="ranking-area">
+      {#if rankingState === 'idle'}
+        <button class="ranking-btn" on:click={openRankingInput}>ランキングに登録</button>
+      {:else if rankingState === 'done' && rankingResult}
+        <div class="ranking-done">
+          <span class="ranking-done-label">登録完了！</span>
+          {#if rankingResult.weeklyRank}<span>週間 {rankingResult.weeklyRank}位</span>{/if}
+          {#if rankingResult.totalRank}<span>全期間 {rankingResult.totalRank}位</span>{/if}
+        </div>
+      {:else if rankingState === 'error'}
+        <p class="ranking-error">{rankingError}</p>
+        <button class="ranking-btn small" on:click={retryRanking}>再試行</button>
+      {/if}
     </div>
 
     <button class="restart-btn" on:click={handleRestart}>
@@ -294,11 +364,35 @@
       </div>
     </div>
 
+    <div class="ranking-area">
+      {#if rankingState === 'idle'}
+        <button class="ranking-btn" on:click={openRankingInput}>ランキングに登録</button>
+      {:else if rankingState === 'done' && rankingResult}
+        <div class="ranking-done">
+          <span class="ranking-done-label">登録完了！</span>
+          {#if rankingResult.weeklyRank}<span>週間 {rankingResult.weeklyRank}位</span>{/if}
+          {#if rankingResult.totalRank}<span>全期間 {rankingResult.totalRank}位</span>{/if}
+        </div>
+      {:else if rankingState === 'error'}
+        <p class="ranking-error">{rankingError}</p>
+        <button class="ranking-btn small" on:click={retryRanking}>再試行</button>
+      {/if}
+    </div>
+
     <button class="restart-btn" on:click={handleRestart}>
       もう一度プレイする
     </button>
   </div>
 </div>
+{/if}
+
+{#if rankingState === 'input' || rankingState === 'submitting'}
+  <NicknameInput
+    defaultNickname={getNickname()}
+    onSubmit={handleRankingSubmit}
+    onCancel={cancelRankingInput}
+    submitting={rankingState === 'submitting'}
+  />
 {/if}
 
 <style>
@@ -527,5 +621,52 @@
   .restart-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(201, 169, 89, 0.4);
+  }
+
+  .ranking-area {
+    margin-bottom: 1.5rem;
+  }
+
+  .ranking-btn {
+    padding: 0.7rem 2rem;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #c9a959;
+    border-radius: 8px;
+    color: #c9a959;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .ranking-btn:hover {
+    background: rgba(201, 169, 89, 0.15);
+  }
+
+  .ranking-btn.small {
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .ranking-done {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(100, 160, 80, 0.1);
+    border: 1px solid rgba(100, 160, 80, 0.3);
+    border-radius: 8px;
+    color: #a0d080;
+    font-size: 0.95rem;
+  }
+
+  .ranking-done-label {
+    font-weight: bold;
+  }
+
+  .ranking-error {
+    color: #e07060;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
   }
 </style>

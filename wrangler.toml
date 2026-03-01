@@ -1,0 +1,10 @@
+name = "atelier-colette"
+compatibility_date = "2025-12-01"
+compatibility_flags = ["nodejs_compat"]
+main = ".svelte-kit/cloudflare/_worker.js"
+assets = { directory = ".svelte-kit/cloudflare", binding = "ASSETS" }
+
+[[d1_databases]]
+binding = "DB"
+database_name = "atelier-ranking"
+database_id = "<wrangler d1 create 後に設定>"
