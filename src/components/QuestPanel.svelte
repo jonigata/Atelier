@@ -13,9 +13,9 @@
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { recipes } from '$lib/data/recipes';
   import { getQuestClient } from '$lib/data/quests';
-  import { processActionComplete } from '$lib/services/presentation';
+  import { processActionComplete, processAchievementPresentation, showDialogueAndWait } from '$lib/services/presentation';
   import { executeQuestDelivery } from '$lib/services/quest';
-  import { setEventDialogue } from '$lib/stores/tutorial';
+  import { checkAchievements } from '$lib/services/achievement';
   import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments, calcNextDrawLevel } from '$lib/data/balance';
   import { get } from 'svelte/store';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
@@ -77,7 +77,7 @@
   }
 
   // 納品処理
-  function deliverQuest(quest: ActiveQuest) {
+  async function deliverQuest(quest: ActiveQuest) {
     const remaining = quest.requiredQuantity - quest.deliveredCount;
     const matchingItems = getMatchingItemsForQuest(quest);
 
@@ -157,11 +157,17 @@
       achievementTitle: quest.title,
       structuredRewards,
     };
-    setEventDialogue(dialogue);
-
     addMessage(
       `依頼「${quest.title}」を達成しました！ 報酬: ${finalMoney}G, 名声+${finalReputation}, 村発展+${finalDevelopment}`
     );
+
+    // 納品ダイアログ → 閉じた後にアチーブメントを明示的にチェック
+    await showDialogueAndWait(dialogue);
+    let achievedId = checkAchievements();
+    while (achievedId) {
+      await processAchievementPresentation(achievedId);
+      achievedId = checkAchievements();
+    }
   }
 
   // 残り日数を計算
