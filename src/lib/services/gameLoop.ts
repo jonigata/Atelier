@@ -271,11 +271,14 @@ export function generateNewQuests(overrideCount?: number): void {
 
   const reputationLevel = calcLevelFromExp(state.reputationExp);
 
-  // 既存の依頼IDセット
-  const existingIds = new Set([
-    ...state.availableQuests.map((q) => q.id),
-    ...state.activeQuests.map((q) => q.id),
-  ]);
+  // 定期入れ替え（overrideCountなし）の場合、古い未受託依頼を破棄
+  const isScheduledRefresh = overrideCount === undefined;
+
+  // 受注済みIDセット（重複防止）
+  const activeIds = new Set(state.activeQuests.map((q) => q.id));
+  const existingIds = isScheduledRefresh
+    ? activeIds
+    : new Set([...state.availableQuests.map((q) => q.id), ...activeIds]);
 
   const templates = getAvailableQuestTemplates(reputationLevel, state.achievementProgress.completed);
   if (templates.length === 0) return;
@@ -286,12 +289,15 @@ export function generateNewQuests(overrideCount?: number): void {
   const selected = shuffled.slice(0, Math.min(count, shuffled.length));
 
   if (selected.length > 0) {
-    setAvailableQuests([...state.availableQuests, ...selected]);
+    const newBoard = isScheduledRefresh ? selected : [...state.availableQuests, ...selected];
+    setAvailableQuests(newBoard);
     incrementNewQuestCount(selected.length);
 
     const event: MorningEvent = {
       type: 'new_quest',
-      message: `新しい依頼が${selected.length}件、掲示板に追加されました！`,
+      message: isScheduledRefresh
+        ? `依頼が入れ替わりました！ 新しい依頼が${selected.length}件あります`
+        : `新しい依頼が${selected.length}件、掲示板に追加されました！`,
     };
     addMorningEvent(event);
     addMessage(event.message);
