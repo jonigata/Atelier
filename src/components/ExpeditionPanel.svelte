@@ -254,11 +254,16 @@
   }
 
   .area-cost {
-    color: #d0d0e0;
+    color: #f4e4bc;
     position: relative;
     z-index: 1;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
     font-weight: bold;
+    font-size: 0.95rem;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    border: 1px solid rgba(201, 169, 89, 0.4);
+    white-space: nowrap;
   }
 
   .duration-list {
