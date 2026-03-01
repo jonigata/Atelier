@@ -144,11 +144,15 @@
     ];
 
     const client = quest.clientId ? getQuestClient(quest.clientId) : undefined;
+    // 採取隊派遣中はレン・フィーが遠征で不在 → 書き置きとして表示
+    const isAdventurerAbsent = (quest.clientId === 'ren' || quest.clientId === 'fee') && $gameState.expedition !== null;
     const dialogue: EventDialogue = {
       characterName: client?.name ?? '依頼主',
-      characterTitle: client?.title ?? '',
-      characterFaceId: client?.faceId,
-      lines: [quest.completionMessage ?? quest.description],
+      characterTitle: isAdventurerAbsent ? '書き置き' : (client?.title ?? ''),
+      characterFaceId: isAdventurerAbsent ? undefined : client?.faceId,
+      lines: isAdventurerAbsent
+        ? [`（掲示板に書き置きが残されていた）`, `「${quest.completionMessage ?? quest.description}」`]
+        : [quest.completionMessage ?? quest.description],
       rewardsTitle: '依頼達成！',
       achievementTitle: quest.title,
       structuredRewards,
