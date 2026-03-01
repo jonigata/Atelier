@@ -8,6 +8,7 @@ import { removeItemFromInventory } from '$lib/services/inventory';
 import { calcExpForLevel, calcLevelFromExp, calcExpProgress, ALCHEMY, LEVEL } from '$lib/data/balance';
 import { getHelper } from '$lib/data/helpers';
 import { getBuilding } from '$lib/data/buildings';
+import { calcScore } from '$lib/services/score';
 
 // =====================================
 // 初期状態
@@ -109,6 +110,10 @@ export const reputationLevel = derived(gameState, ($state) => calcLevelFromExp($
 export const expForNextLevel = derived(gameState, ($state) => {
   return calcExpForLevel(calcLevelFromExp($state.alchemyExp));
 });
+
+// スコア（派生ストア）
+export const scoreBreakdown = derived(gameState, ($state) => calcScore($state));
+export const totalScore = derived(scoreBreakdown, ($b) => $b.total);
 
 // =====================================
 // メッセージ・フェーズ

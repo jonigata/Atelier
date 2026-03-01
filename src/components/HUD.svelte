@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameState, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel, skipPresentation, toggleSkipPresentation } from '$lib/stores/game';
+  import { gameState, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel, totalScore, skipPresentation, toggleSkipPresentation } from '$lib/stores/game';
   import { calcExpForLevel, calcExpProgress, calcNextDrawLevel } from '$lib/data/balance';
   import MoneyIndicator from './MoneyIndicator.svelte';
 
@@ -35,6 +35,14 @@
       <div class="section-content">
         <span class="money-value">{$gameState.money.toLocaleString()} G</span>
         <MoneyIndicator />
+      </div>
+    </div>
+
+    <div class="hud-section score-section">
+      <div class="section-icon">⭐</div>
+      <div class="section-content">
+        <span class="score-value">{$totalScore.toLocaleString()} pt</span>
+        <span class="score-label">スコア</span>
       </div>
     </div>
 
@@ -173,6 +181,22 @@
     font-size: 1.1rem;
     font-weight: bold;
     color: #ffd700;
+  }
+
+  .score-section .section-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .score-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #f0c040;
+  }
+
+  .score-label {
+    font-size: 0.7rem;
+    color: #a89060;
   }
 
   .stats-section,

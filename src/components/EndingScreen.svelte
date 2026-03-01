@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { gameState, resetGame, alchemyLevel, villageLevel, reputationLevel } from '$lib/stores/game';
+  import { gameState, resetGame, alchemyLevel, villageLevel, reputationLevel, scoreBreakdown } from '$lib/stores/game';
 
   type EndingType = 'true' | 'good' | 'normal' | 'mediocre' | 'fail';
 
@@ -80,6 +80,12 @@
       <p class="description">{$gameState.gameOverReason}</p>
     </div>
 
+    <div class="final-score">
+      <span class="final-score-label">SCORE</span>
+      <span class="final-score-value">{$scoreBreakdown.total.toLocaleString()}</span>
+      <span class="final-score-unit">pt</span>
+    </div>
+
     <div class="stats">
       <h3>{$gameState.day}日目の成績</h3>
       <div class="stat-grid">
@@ -98,6 +104,18 @@
         <div class="stat">
           <span class="label">達成依頼</span>
           <span class="value">{$gameState.completedQuestCount}件</span>
+        </div>
+      </div>
+      <div class="score-breakdown">
+        <h4>スコア内訳</h4>
+        <div class="breakdown-grid">
+          <span class="bd-label">所持金</span><span class="bd-value">{$scoreBreakdown.money.toLocaleString()}</span>
+          <span class="bd-label">所持品</span><span class="bd-value">{$scoreBreakdown.inventory.toLocaleString()}</span>
+          <span class="bd-label">レベル</span><span class="bd-value">{$scoreBreakdown.levels.toLocaleString()}</span>
+          <span class="bd-label">依頼達成</span><span class="bd-value">{$scoreBreakdown.quests.toLocaleString()}</span>
+          <span class="bd-label">アルバム</span><span class="bd-value">{$scoreBreakdown.album.toLocaleString()}</span>
+          <span class="bd-label">調合実績</span><span class="bd-value">{$scoreBreakdown.crafting.toLocaleString()}</span>
+          <span class="bd-label">建物・助手</span><span class="bd-value">{$scoreBreakdown.buildings.toLocaleString()}</span>
         </div>
       </div>
     </div>
@@ -119,6 +137,12 @@
     <div class="ending-card">
       <h2>{ending.title}</h2>
       <p class="description">{ending.description}</p>
+    </div>
+
+    <div class="final-score">
+      <span class="final-score-label">SCORE</span>
+      <span class="final-score-value">{$scoreBreakdown.total.toLocaleString()}</span>
+      <span class="final-score-unit">pt</span>
     </div>
 
     <div class="stats">
@@ -147,6 +171,18 @@
         <div class="stat">
           <span class="label">調合回数</span>
           <span class="value">{$gameState.stats.totalCraftCount}回</span>
+        </div>
+      </div>
+      <div class="score-breakdown">
+        <h4>スコア内訳</h4>
+        <div class="breakdown-grid">
+          <span class="bd-label">所持金</span><span class="bd-value">{$scoreBreakdown.money.toLocaleString()}</span>
+          <span class="bd-label">所持品</span><span class="bd-value">{$scoreBreakdown.inventory.toLocaleString()}</span>
+          <span class="bd-label">レベル</span><span class="bd-value">{$scoreBreakdown.levels.toLocaleString()}</span>
+          <span class="bd-label">依頼達成</span><span class="bd-value">{$scoreBreakdown.quests.toLocaleString()}</span>
+          <span class="bd-label">アルバム</span><span class="bd-value">{$scoreBreakdown.album.toLocaleString()}</span>
+          <span class="bd-label">調合実績</span><span class="bd-value">{$scoreBreakdown.crafting.toLocaleString()}</span>
+          <span class="bd-label">建物・助手</span><span class="bd-value">{$scoreBreakdown.buildings.toLocaleString()}</span>
         </div>
       </div>
     </div>
@@ -280,6 +316,62 @@
     font-size: 1.25rem;
     font-weight: bold;
     color: #e0e0f0;
+  }
+
+  .final-score {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .final-score-label {
+    font-size: 1rem;
+    color: #a0a0b0;
+    letter-spacing: 0.1em;
+  }
+
+  .final-score-value {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #f0c040;
+    text-shadow: 0 0 20px rgba(240, 192, 64, 0.4);
+  }
+
+  .final-score-unit {
+    font-size: 1.2rem;
+    color: #c9a959;
+  }
+
+  .score-breakdown {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .score-breakdown h4 {
+    color: #a0a0b0;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.25rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .bd-label {
+    color: #a0a0b0;
+    text-align: left;
+  }
+
+  .bd-value {
+    color: #e0e0f0;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
   }
 
   .restart-btn {
