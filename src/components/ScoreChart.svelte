@@ -4,6 +4,7 @@
 
   export let currentScores: DailyScoreEntry[];
   export let pastGames: PastGameScoreRecord[];
+  export let bestGame: PastGameScoreRecord | null = null;
   export let currentDay: number = 1;
 
   const WIDTH = 560;
@@ -17,16 +18,15 @@
 
   // X軸: 左端=1日目, 右端=xEnd日目
   $: xEnd = scaleMode === 'full'
-    ? Math.max(336, ...pastGames.map(g => g.finalDay))
+    ? Math.max(336, ...pastGames.map(g => g.finalDay), bestGame?.finalDay ?? 0)
     : Math.max(currentDay, 2); // 最低2日で0除算回避
 
-  // 表示範囲内のスコアだけでY軸を計算
-  $: visibleTotals = [
+  // Y軸はBESTを基準に計算（常にBESTが収まるスケール）
+  $: rawMax = Math.max(
+    1,
     ...currentScores.filter(s => s.day <= xEnd).map(s => s.total),
-    ...pastGames.flatMap(g => g.dailyScores.filter(s => s.day <= xEnd).map(s => s.total)),
-  ];
-
-  $: rawMax = Math.max(1, ...visibleTotals);
+    ...(bestGame ? bestGame.dailyScores.filter(s => s.day <= xEnd).map(s => s.total) : []),
+  );
 
   $: yMax = (() => {
     if (rawMax <= 100) return 100;
@@ -60,23 +60,33 @@
     (_, i) => i * xInterval
   ).filter(d => d >= 1 && d <= xEnd);
 
-  const pastColors = [
-    'rgba(130, 130, 190, 0.4)',
-    'rgba(110, 160, 170, 0.35)',
-    'rgba(160, 130, 150, 0.35)',
-    'rgba(130, 170, 140, 0.35)',
-    'rgba(170, 140, 130, 0.35)',
-    'rgba(140, 140, 180, 0.3)',
-    'rgba(120, 150, 160, 0.3)',
-    'rgba(150, 120, 140, 0.3)',
-    'rgba(120, 160, 130, 0.3)',
-    'rgba(160, 130, 120, 0.3)',
-  ];
+  // 過去ゲームの色: 新しいほど明るく（pastGamesは古い順）
+  $: pastLineStyle = (idx: number): { color: string; width: number } => {
+    const count = pastGames.length;
+    // 0(最古)→1(最新) の正規化値
+    const t = count <= 1 ? 1 : idx / (count - 1);
+    const opacity = 0.15 + t * 0.45; // 0.15〜0.6
+    const brightness = 140 + Math.round(t * 60); // 140〜200
+    return {
+      color: `rgba(${brightness}, ${brightness - 10}, ${brightness + 30}, ${opacity})`,
+      width: 1.2 + t * 0.6, // 1.2〜1.8
+    };
+  };
+
+  // bestGameが表示中のpastGamesに含まれていればそのインデックス、なければ-1
+  $: bestPastIdx = (() => {
+    if (!bestGame) return -1;
+    return pastGames.findIndex(g =>
+      g.finishedAt === bestGame!.finishedAt && g.finalScore === bestGame!.finalScore
+    );
+  })();
+
+  // bestGameが表示10件に含まれない場合、別途描画するか
+  $: bestGameSeparate = bestGame && bestPastIdx === -1;
 
   // 過去データの表示用フィルタ（表示範囲内にデータがあるもの）
-  $: visiblePastGames = pastGames.filter(g =>
-    g.dailyScores.some(s => s.day <= xEnd)
-  );
+  $: visiblePastGames = pastGames.map((g, i) => ({ game: g, originalIdx: i }))
+    .filter(({ game }) => game.dailyScores.some(s => s.day <= xEnd));
 </script>
 
 <div class="chart-wrap">
@@ -126,19 +136,60 @@
       stroke="rgba(255,255,255,0.15)" stroke-width="1" />
 
     <!-- 過去ゲームの線 -->
-    {#each visiblePastGames as game, i}
+    {#each visiblePastGames as { game, originalIdx }}
       {@const pts = polyline(game.dailyScores)}
+      {@const style = pastLineStyle(originalIdx)}
+      {@const isBest = originalIdx === bestPastIdx}
       {#if pts.includes(',')}
         <polyline
           points={pts}
           fill="none"
-          stroke={pastColors[i % pastColors.length]}
-          stroke-width="1.5"
+          stroke={isBest ? 'rgba(180, 210, 255, 0.7)' : style.color}
+          stroke-width={isBest ? 2.2 : style.width}
           stroke-linejoin="round"
           stroke-linecap="round"
         />
+        {#if isBest}
+          {@const lastEntry = game.dailyScores.filter(e => e.day <= xEnd).slice(-1)[0]}
+          {#if lastEntry}
+            <circle
+              cx={sx(lastEntry.day)} cy={sy(lastEntry.total)}
+              r="3" fill="rgba(180, 210, 255, 0.8)" stroke="rgba(220, 230, 255, 0.9)" stroke-width="0.8"
+            />
+            <text
+              x={sx(lastEntry.day)} y={sy(lastEntry.total) - 6}
+              fill="rgba(200, 220, 255, 0.8)" font-size="7.5" text-anchor="middle"
+            >BEST</text>
+          {/if}
+        {/if}
       {/if}
     {/each}
+
+    <!-- bestGameが表示10件に含まれない場合、別途描画 -->
+    {#if bestGameSeparate && bestGame}
+      {@const pts = polyline(bestGame.dailyScores)}
+      {#if pts.includes(',')}
+        <polyline
+          points={pts}
+          fill="none"
+          stroke="rgba(180, 210, 255, 0.7)"
+          stroke-width="2.2"
+          stroke-linejoin="round"
+          stroke-linecap="round"
+        />
+        {@const lastEntry = bestGame.dailyScores.filter(e => e.day <= xEnd).slice(-1)[0]}
+        {#if lastEntry}
+          <circle
+            cx={sx(lastEntry.day)} cy={sy(lastEntry.total)}
+            r="3" fill="rgba(180, 210, 255, 0.8)" stroke="rgba(220, 230, 255, 0.9)" stroke-width="0.8"
+          />
+          <text
+            x={sx(lastEntry.day)} y={sy(lastEntry.total) - 6}
+            fill="rgba(200, 220, 255, 0.8)" font-size="7.5" text-anchor="middle"
+          >BEST</text>
+        {/if}
+      {/if}
+    {/if}
 
     <!-- 今回のゲーム（金色太線） -->
     {#if currentScores.length >= 2}
@@ -172,9 +223,15 @@
     </div>
     {#if pastGames.length > 0}
       <div class="legend-item">
-        <span class="legend-line" style="background: rgba(130,130,190,0.6); height: 1.5px;"></span>
+        <span class="legend-line" style="background: rgba(180,180,210,0.5); height: 1.5px;"></span>
         <span>過去 ({pastGames.length}回)</span>
       </div>
+      {#if bestGame}
+        <div class="legend-item">
+          <span class="legend-line" style="background: rgba(180,210,255,0.7); height: 2.2px;"></span>
+          <span>BEST ({bestGame.finalScore.toLocaleString()}pt)</span>
+        </div>
+      {/if}
     {/if}
   </div>
 </div>

@@ -20,7 +20,7 @@
     updateSlotLabel,
     type SaveSlotMeta,
   } from '$lib/services/saveLoad';
-  import { addFakePastScore, loadPastGameScores } from '$lib/services/pastScores';
+  import { addFakePastScore, countPastGameScores, clearAllPastGameScores } from '$lib/services/pastScores';
 
   let isOpen = false;
   let isRunning = false;
@@ -164,11 +164,15 @@
   let fakeScoreCount = 0;
   function handleAddFakeScore() {
     addFakePastScore();
-    fakeScoreCount = loadPastGameScores().length;
+    fakeScoreCount = countPastGameScores();
+  }
+  function handleClearScores() {
+    clearAllPastGameScores();
+    fakeScoreCount = 0;
   }
   // 初期値
   $: if (isOpen && typeof window !== 'undefined') {
-    fakeScoreCount = loadPastGameScores().length;
+    fakeScoreCount = countPastGameScores();
   }
 
   function handleAddTestEquipment() {
@@ -284,6 +288,7 @@
       <h4>過去スコアデータ</h4>
       <div class="buttons">
         <button on:click={handleAddFakeScore}>+1件追加</button>
+        <button on:click={handleClearScores}>全消去</button>
       </div>
       <p class="info">登録数: {fakeScoreCount}件</p>
     </div>

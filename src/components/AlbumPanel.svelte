@@ -2,7 +2,7 @@
   import { gameState, totalScore } from '$lib/stores/game';
   import { items, getItemIcon, handleIconError } from '$lib/data/items';
   import ScoreChart from './ScoreChart.svelte';
-  import { loadPastGameScores } from '$lib/services/pastScores';
+  import { loadPastGameScores, loadBestPastGame } from '$lib/services/pastScores';
   import { recipes } from '$lib/data/recipes';
   import { CATEGORY_NAMES, PRODUCT_SUBCATEGORY_NAMES, PRODUCT_SUBCATEGORY_ORDER, PRODUCT_SUBCATEGORY_MAP } from '$lib/data/categories';
   import type { ProductSubcategory } from '$lib/data/categories';
@@ -20,6 +20,7 @@
 
   // スコア推移タブ用
   $: pastGames = typeof window !== 'undefined' ? loadPastGameScores() : [];
+  $: bestGame = typeof window !== 'undefined' ? loadBestPastGame() : null;
   $: currentScores = $gameState.scoreHistory ?? [];
 
   // === アイテムタブ ===
@@ -374,7 +375,7 @@
       {/if}
     </div>
 
-    <ScoreChart {currentScores} {pastGames} currentDay={$gameState.day} />
+    <ScoreChart {currentScores} {pastGames} {bestGame} currentDay={$gameState.day} />
 
     {#if pastGames.length === 0 && currentScores.length <= 1}
       <p class="score-empty-msg">
