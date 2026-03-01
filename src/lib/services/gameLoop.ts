@@ -153,7 +153,12 @@ function calculateExpeditionDrops(areaId: string, duration: number): OwnedItem[]
   if (!area) return [];
 
   const items: OwnedItem[] = [];
-  const baseDropCount = duration * EXPEDITION.DROPS_PER_DAY;
+  // 日ごとにドロップ数をランダムに決定
+  let baseDropCount = 0;
+  for (let d = 0; d < duration; d++) {
+    const variance = Math.floor(Math.random() * (EXPEDITION.DROPS_PER_DAY_VARIANCE * 2 + 1)) - EXPEDITION.DROPS_PER_DAY_VARIANCE;
+    baseDropCount += EXPEDITION.DROPS_PER_DAY + variance;
+  }
 
   // 機材効果: 汎用ドロップ乗数（カテゴリ指定なし）
   const generalMult = getExpeditionDropsMult();
