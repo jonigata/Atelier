@@ -306,7 +306,7 @@
               >
                 <!-- 裏面 -->
                 <div class="card-face card-back facility-back">
-                  <span class="card-back-mark">?</span>
+                  <img class="card-back-img" src="/images/cards/facility-back.png" alt="" />
                 </div>
                 <!-- 表面 -->
                 <div class="card-face card-front facility-card">
@@ -347,7 +347,7 @@
               >
                 <!-- 裏面 -->
                 <div class="card-face card-back helper-back">
-                  <span class="card-back-mark">?</span>
+                  <img class="card-back-img" src="/images/cards/helper-back.png" alt="" />
                 </div>
                 <!-- 表面 -->
                 <div class="card-face card-front helper-card">
@@ -559,31 +559,13 @@
   }
 
   .card-back {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
   }
 
-  .card-back.facility-back {
-    background: linear-gradient(135deg, #1a3a1a, #2e5a2e);
-  }
-
-  .card-back.helper-back {
-    background: linear-gradient(135deg, #1a2a3e, #2e4a6e);
-  }
-
-  .card-back-mark {
-    font-size: 2.5rem;
-    font-weight: bold;
-    opacity: 0.6;
-  }
-
-  .facility-back .card-back-mark {
-    color: #4caf50;
-  }
-
-  .helper-back .card-back-mark {
-    color: #42a5f5;
+  .card-back-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .card-front {
