@@ -10,6 +10,7 @@
   import ActionPanel from '../components/ActionPanel.svelte';
   import EndingScreen from '../components/EndingScreen.svelte';
   import EventDialog from '../components/EventDialog.svelte';
+  import ConfirmDialog from '../components/ConfirmDialog.svelte';
   import DayTransition from '../components/DayTransition.svelte';
   import InspectionCutscene from '../components/InspectionCutscene.svelte';
   import DrawDialog from '../components/DrawDialog.svelte';
@@ -97,6 +98,9 @@
 
   <!-- ドローダイアログ -->
   <DrawDialog />
+
+  <!-- 確認ダイアログ -->
+  <ConfirmDialog />
 
   <!-- イベントダイアログ（最前面） -->
   <EventDialog />

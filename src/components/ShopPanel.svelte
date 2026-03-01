@@ -25,6 +25,8 @@
 
   import { villageLevel, reputationLevel } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
+  import { showConfirmAndWait } from '$lib/stores/confirmDialog';
+  import { showDialogueAndWait } from '$lib/services/presentation';
 
   // 村発展レベルに応じた購入可能アイテム
   $: buyableItems = getBuyableItems($villageLevel);
@@ -259,9 +261,26 @@
   $: partTimeEarnings = 100 + $reputationLevel * 10;
 
   async function handlePartTimeJob() {
-    if (!confirm(`メルダの店でアルバイトをしますか？\n報酬: ${partTimeEarnings}G（1日経過）`)) return;
+    const confirmed = await showConfirmAndWait({
+      message: `メルダの店でアルバイトをしますか？\n報酬: ${partTimeEarnings}G（1日経過）`,
+      confirmLabel: '働く',
+      cancelLabel: 'やめる',
+      eventImage: '/images/events/part_time.png',
+    });
+    if (!confirmed) return;
+
     addMoney(partTimeEarnings);
     addMessage(`アルバイトで${partTimeEarnings}Gを稼ぎました。`);
+
+    await showDialogueAndWait({
+      characterName: 'メルダ',
+      characterTitle: '雑貨屋の店主',
+      characterFaceId: 'melda',
+      lines: [
+        { text: `今日もありがとね！ はい、${partTimeEarnings}Gのお給料よ`, expression: 'happy' },
+      ],
+    });
+
     const turnPromise = endTurn(1);
     await new Promise(r => setTimeout(r, 350));
     onBack();
