@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy } from 'svelte';
   import { get } from 'svelte/store';
   import {
     gameState,
@@ -18,6 +18,7 @@
   type DrawMode = 'none' | 'facility' | 'helper';
   type DrawPhase = 'entering' | 'cards-in' | 'flipping' | 'choosing' | 'selected' | 'result' | 'closing';
 
+  // UI状態（テンプレート参照用）
   let drawMode: DrawMode = 'none';
   let phase: DrawPhase = 'entering';
   let facilityChoices: { def: BuildingDef; currentLevel: number }[] = [];
@@ -25,15 +26,22 @@
   let selectedIndex: number = -1;
   let canInteract = false;
   let resultText = '';
+
+  // async flow 制御
+  let running = false;
   let timers: ReturnType<typeof setTimeout>[] = [];
+  let resolveSelection: ((index: number) => void) | null = null;
+  let resolveResultDismiss: (() => void) | null = null;
 
   function clearTimers() {
     timers.forEach(clearTimeout);
     timers = [];
   }
 
-  function addTimer(fn: () => void | Promise<void>, ms: number) {
-    timers.push(setTimeout(fn, ms));
+  function wait(ms: number): Promise<void> {
+    return new Promise(resolve => {
+      timers.push(setTimeout(resolve, ms));
+    });
   }
 
   // 施設ごとの村長コメント
@@ -52,129 +60,6 @@
     meeting_hall: '集会所か！ 村の皆が集まれる場所があると、村全体が元気になるぞ',
   };
 
-  // 初回施設ドローの導入イベント
-  async function showFirstFacilityIntro() {
-    await showDialogueAndWait({
-      characterName: '村長',
-      characterTitle: 'フォンテ村長',
-      characterFaceId: 'mayor',
-      lines: [
-        { text: 'おお、先生！ 村の発展度が上がったぞ！', expression: 'happy' },
-        { text: '村が発展するとな、新しい施設を建てられるようになるんだ', expression: 'neutral' },
-        { text: '施設にはそれぞれ違った効果がある。工房の仕事を助けてくれるものもあるし、村全体を豊かにするものもある', expression: 'neutral' },
-        { text: 'さあ、どれを建てるか選んでくれ！ 村の未来は先生にかかっておるぞ', expression: 'happy' },
-      ],
-    });
-    startDrawAnimation();
-  }
-
-  // 初回助手ドローの導入イベント
-  async function showFirstHelperIntro() {
-    await showDialogueAndWait({
-      characterName: 'コレット',
-      characterTitle: '駆け出し錬金術師',
-      characterFaceId: 'heroine',
-      lines: [
-        { text: '……あれ？ 工房の外がなんだか騒がしい', expression: 'surprised' },
-        { text: 'わっ、小さな生き物たちが集まってる……！', expression: 'surprised' },
-        { text: '噂を聞いてやって来てくれたのかな。嬉しいな', expression: 'happy' },
-        { text: 'よし、一緒に工房を手伝ってくれる子を選ぼう！', expression: 'determined' },
-      ],
-    });
-    startDrawAnimation();
-  }
-
-  // pendingDraw を subscribe してドローを開始
-  const unsubDraw = pendingDraw.subscribe((req) => {
-    if (!req || drawMode !== 'none') return;
-    const state = $gameState;
-    if (req.type === 'facility') {
-      const choices = generateBuildingChoices(state.buildings);
-      if (choices.length > 0) {
-        facilityChoices = choices;
-        drawMode = 'facility';
-        const hasAnyBuilding = state.buildings.length > 0;
-        if (!hasAnyBuilding) {
-          showFirstFacilityIntro();
-        } else {
-          startDrawAnimation();
-        }
-      } else {
-        addMessage('村発展度がレベルアップしたが、建設・強化できる施設がもうない');
-        resolveDraw();
-      }
-    } else {
-      const choices = generateHelperChoices(state.ownedHelpers);
-      if (choices.length > 0) {
-        helperChoices = choices;
-        drawMode = 'helper';
-        if (state.ownedHelpers.length === 0) {
-          showFirstHelperIntro();
-        } else {
-          startDrawAnimation();
-        }
-      } else {
-        resolveDraw();
-      }
-    }
-  });
-
-  onDestroy(() => {
-    unsubDraw();
-    clearTimers();
-  });
-
-  function startDrawAnimation() {
-    if ($skipPresentation) {
-      // スキップ時: 選択待ちまで即到達
-      phase = 'choosing';
-      canInteract = true;
-      return;
-    }
-    phase = 'entering';
-    selectedIndex = -1;
-    canInteract = false;
-    resultText = '';
-    // 0.2s: overlay + badge
-    addTimer(() => { phase = 'cards-in'; }, 200);
-    // +0.5s: cards slide in then flip
-    addTimer(() => { phase = 'flipping'; }, 700);
-    // +0.4s: flip animation completes
-    addTimer(() => { phase = 'choosing'; canInteract = true; }, 1100);
-  }
-
-  function applyFacilitySelection(choice: { def: BuildingDef; currentLevel: number }) {
-    const { def, currentLevel } = choice;
-    if (currentLevel === 0) {
-      addBuilding(def.id);
-      addMessage(`施設「${def.name}」を建設した！ ${def.levels[0].effectDescription}`);
-    } else if (currentLevel < def.maxLevel) {
-      upgradeBuilding(def.id);
-      const newLevel = currentLevel + 1;
-      addMessage(`施設「${def.name}」がLv.${newLevel}になった！ ${def.levels[newLevel - 1].effectDescription}`);
-    } else {
-      addMessage(`施設「${def.name}」は既にLv.MAX`);
-    }
-    facilityChoices = [];
-    drawMode = 'none';
-  }
-
-  function applyHelperSelection(choice: { def: HelperDef; currentLevel: number }) {
-    const { def, currentLevel } = choice;
-    if (currentLevel === 0) {
-      addHelper(def.id);
-      addMessage(`助手「${def.name}」が仲間になった！ ${def.levelEffects[0].description}`);
-    } else if (currentLevel < def.maxLevel) {
-      upgradeHelper(def.id);
-      const newLevel = currentLevel + 1;
-      addMessage(`助手「${def.name}」がLv.${newLevel}になった！ ${def.levelEffects[newLevel - 1].description}`);
-    } else {
-      addMessage(`助手「${def.name}」は既にLv.MAX`);
-    }
-    helperChoices = [];
-    drawMode = 'none';
-  }
-
   function getResultText(index: number): string {
     if (drawMode === 'facility') {
       const c = facilityChoices[index];
@@ -189,90 +74,201 @@
     }
   }
 
-  let isFinishing = false;
+  // ========== メインシーケンス ==========
+  async function runDraw(req: { type: 'facility' | 'helper' }) {
+    running = true;
+    const state = get(gameState);
+    const skip = get(skipPresentation);
 
-  async function finishDraw() {
-    if (isFinishing) return;
-    isFinishing = true;
-    clearTimers();
-    let pendingGreeting: EventDialogue | null = null;
-
-    if (drawMode === 'facility' && selectedIndex >= 0) {
-      const choice = facilityChoices[selectedIndex];
-      // 新規建設時のみ村長コメント
-      if (choice.currentLevel === 0) {
-        const comment = buildingComments[choice.def.id];
-        if (comment) {
-          pendingGreeting = {
+    try {
+      // --- 選択肢を生成 ---
+      if (req.type === 'facility') {
+        const choices = generateBuildingChoices(state.buildings);
+        if (choices.length === 0) {
+          addMessage('村発展度がレベルアップしたが、建設・強化できる施設がもうない');
+          resolveDraw();
+          return;
+        }
+        facilityChoices = choices;
+        // 初回イントロ（オーバーレイ表示前に完了する）
+        if (state.buildings.length === 0) {
+          await showDialogueAndWait({
             characterName: '村長',
             characterTitle: 'フォンテ村長',
             characterFaceId: 'mayor',
-            lines: [comment],
+            lines: [
+              { text: 'おお、先生！ 村の発展度が上がったぞ！', expression: 'happy' },
+              { text: '村が発展するとな、新しい施設を建てられるようになるんだ', expression: 'neutral' },
+              { text: '施設にはそれぞれ違った効果がある。工房の仕事を助けてくれるものもあるし、村全体を豊かにするものもある', expression: 'neutral' },
+              { text: 'さあ、どれを建てるか選んでくれ！ 村の未来は先生にかかっておるぞ', expression: 'happy' },
+            ],
+          });
+        }
+        drawMode = 'facility';
+      } else {
+        const choices = generateHelperChoices(state.ownedHelpers);
+        if (choices.length === 0) {
+          resolveDraw();
+          return;
+        }
+        helperChoices = choices;
+        // 初回イントロ
+        if (state.ownedHelpers.length === 0) {
+          await showDialogueAndWait({
+            characterName: 'コレット',
+            characterTitle: '駆け出し錬金術師',
+            characterFaceId: 'heroine',
+            lines: [
+              { text: '……あれ？ 工房の外がなんだか騒がしい', expression: 'surprised' },
+              { text: 'わっ、小さな生き物たちが集まってる……！', expression: 'surprised' },
+              { text: '噂を聞いてやって来てくれたのかな。嬉しいな', expression: 'happy' },
+              { text: 'よし、一緒に工房を手伝ってくれる子を選ぼう！', expression: 'determined' },
+            ],
+          });
+        }
+        drawMode = 'helper';
+      }
+
+      // --- カードアニメーション ---
+      selectedIndex = -1;
+      canInteract = false;
+      resultText = '';
+
+      if (!skip) {
+        phase = 'entering';
+        await wait(200);
+        phase = 'cards-in';
+        await wait(500);
+        phase = 'flipping';
+        await wait(400);
+      }
+
+      // --- ユーザー選択を待つ ---
+      phase = 'choosing';
+      canInteract = true;
+      const idx = await new Promise<number>(resolve => { resolveSelection = resolve; });
+      resolveSelection = null;
+
+      // --- 選択演出 ---
+      selectedIndex = idx;
+      canInteract = false;
+      resultText = getResultText(idx);
+      phase = 'selected';
+
+      if (!skip) {
+        await wait(600);
+        phase = 'result';
+        // 自動閉じ or クリックで閉じる
+        await Promise.race([
+          wait(500),
+          new Promise<void>(resolve => { resolveResultDismiss = resolve; }),
+        ]);
+        resolveResultDismiss = null;
+      } else {
+        await wait(300);
+        phase = 'result';
+        // スキップ時もクリック待ち
+        await new Promise<void>(resolve => { resolveResultDismiss = resolve; });
+        resolveResultDismiss = null;
+      }
+
+      // --- 選択を適用 ---
+      let pendingGreeting: EventDialogue | null = null;
+
+      if (req.type === 'facility') {
+        const choice = facilityChoices[idx];
+        if (choice.currentLevel === 0) {
+          const comment = buildingComments[choice.def.id];
+          if (comment) {
+            pendingGreeting = {
+              characterName: '村長',
+              characterTitle: 'フォンテ村長',
+              characterFaceId: 'mayor',
+              lines: [comment],
+            };
+          }
+          addBuilding(choice.def.id);
+          addMessage(`施設「${choice.def.name}」を建設した！ ${choice.def.levels[0].effectDescription}`);
+        } else if (choice.currentLevel < choice.def.maxLevel) {
+          upgradeBuilding(choice.def.id);
+          const newLevel = choice.currentLevel + 1;
+          addMessage(`施設「${choice.def.name}」がLv.${newLevel}になった！ ${choice.def.levels[newLevel - 1].effectDescription}`);
+        } else {
+          addMessage(`施設「${choice.def.name}」は既にLv.MAX`);
+        }
+      } else {
+        const choice = helperChoices[idx];
+        const { def, currentLevel } = choice;
+        if (currentLevel === 0) {
+          addHelper(def.id);
+          addMessage(`助手「${def.name}」が仲間になった！ ${def.levelEffects[0].description}`);
+        } else if (currentLevel < def.maxLevel) {
+          upgradeHelper(def.id);
+          const newLevel = currentLevel + 1;
+          addMessage(`助手「${def.name}」がLv.${newLevel}になった！ ${def.levelEffects[newLevel - 1].description}`);
+        } else {
+          addMessage(`助手「${def.name}」は既にLv.MAX`);
+        }
+        if (currentLevel < def.maxLevel && def.greetings[currentLevel]) {
+          pendingGreeting = {
+            characterName: def.name,
+            characterTitle: def.species,
+            eventImage: `/images/helpers/${def.id}.png`,
+            lines: [def.greetings[currentLevel]],
           };
         }
       }
-      applyFacilitySelection(choice);
-    } else if (drawMode === 'helper' && selectedIndex >= 0) {
-      const choice = helperChoices[selectedIndex];
-      const { def, currentLevel } = choice;
-      // MAX未満なら挨拶セリフを準備
-      if (currentLevel < def.maxLevel && def.greetings[currentLevel]) {
-        pendingGreeting = {
-          characterName: def.name,
-          characterTitle: def.species,
-          eventImage: `/images/helpers/${def.id}.png`,
-          lines: [def.greetings[currentLevel]],
-        };
-      }
-      applyHelperSelection(choice);
-    }
-    phase = 'entering';
-    selectedIndex = -1;
-    canInteract = false;
-    resultText = '';
 
-    // ドロー演出の後にヘルパーの挨拶セリフを表示
-    if (pendingGreeting) {
-      await showDialogueAndWait(pendingGreeting);
-    }
-    isFinishing = false;
-    resolveDraw();
-  }
-
-  function handleCardSelect(index: number) {
-    if (!canInteract || phase !== 'choosing') return;
-    canInteract = false;
-    selectedIndex = index;
-    resultText = getResultText(index);
-
-    if ($skipPresentation) {
-      phase = 'selected';
-      addTimer(() => { phase = 'result'; }, 300);
-      return;
-    }
-
-    phase = 'selected';
-    // 0.6s: selection animation → result
-    addTimer(() => { phase = 'result'; }, 600);
-    // 1.1s: auto close
-    addTimer(() => {
+      // --- 閉じアニメーション ---
       phase = 'closing';
-      addTimer(async () => { await finishDraw(); }, 200);
-    }, 1100);
-  }
+      if (!skip) {
+        await wait(200);
+      }
 
-  async function handleOverlayClick() {
-    if (phase === 'result') {
+      // --- リセット ---
+      drawMode = 'none';
+      phase = 'entering';
+      selectedIndex = -1;
+      canInteract = false;
+      resultText = '';
+      facilityChoices = [];
+      helperChoices = [];
+
+      // --- 後続の挨拶ダイアログ ---
+      if (pendingGreeting) {
+        await showDialogueAndWait(pendingGreeting);
+      }
+
+      resolveDraw();
+    } finally {
+      running = false;
       clearTimers();
-      phase = 'closing';
-      if (!$skipPresentation) {
-        await new Promise(r => setTimeout(r, 200));
-      }
-      await finishDraw();
     }
   }
 
-  $: cardCount = drawMode === 'facility' ? facilityChoices.length : helperChoices.length;
+  // ========== イベントハンドラ ==========
+  function handleCardSelect(index: number) {
+    if (!canInteract || phase !== 'choosing' || !resolveSelection) return;
+    resolveSelection(index);
+  }
+
+  function handleOverlayClick() {
+    if (phase === 'result' && resolveResultDismiss) {
+      resolveResultDismiss();
+    }
+  }
+
+  // ========== pendingDraw 監視 ==========
+  const unsubDraw = pendingDraw.subscribe((req) => {
+    if (!req || running) return;
+    runDraw(req);
+  });
+
+  onDestroy(() => {
+    unsubDraw();
+    clearTimers();
+  });
+
   $: showCards = phase !== 'entering';
   $: flipped = phase === 'flipping' || phase === 'choosing' || phase === 'selected' || phase === 'result' || phase === 'closing';
 </script>
@@ -287,7 +283,7 @@
     on:keydown={() => {}}
   >
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="draw-dialog" on:click={() => handleOverlayClick()} on:keydown={() => {}}>
+    <div class="draw-dialog" on:click={handleOverlayClick} on:keydown={() => {}}>
       <div class="draw-header">
         <span class="draw-badge" class:facility={drawMode === 'facility'} class:helper={drawMode === 'helper'}>
           {drawMode === 'facility' ? '村発展度UP!' : '名声UP!'}
