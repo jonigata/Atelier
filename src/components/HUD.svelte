@@ -1,15 +1,28 @@
 <script lang="ts">
-  import { gameState, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel, totalScore, skipPresentation, toggleSkipPresentation } from '$lib/stores/game';
+  import { gameState, setPhase, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel, totalScore, skipPresentation, toggleSkipPresentation } from '$lib/stores/game';
   import { calcExpForLevel, calcExpProgress } from '$lib/data/balance';
+  import { showConfirmAndWait } from '$lib/stores/confirmDialog';
   import MoneyIndicator from './MoneyIndicator.svelte';
 
   $: staminaRatio = $gameState.stamina / $gameState.maxStamina;
   $: staminaClass = staminaRatio <= 0.2 ? 'critical' : staminaRatio <= 0.5 ? 'low' : '';
+
+  async function handleRetire() {
+    const ok = await showConfirmAndWait({
+      message: 'リタイアしてゲームを終了しますか？\n現在のスコアでエンディングになります。',
+      confirmLabel: 'リタイアする',
+      cancelLabel: 'キャンセル',
+    });
+    if (ok) {
+      setPhase('ending');
+    }
+  }
 </script>
 
 <div class="hud">
   <div class="hud-row main-row">
     <div class="hud-section skip-section">
+      <button class="retire-btn" on:click={handleRetire}>リタイア</button>
       <label class="skip-checkbox">
         <input
           type="checkbox"
@@ -117,6 +130,23 @@
   .skip-section {
     margin-left: auto;
     order: 999;
+  }
+
+  .retire-btn {
+    font-size: 0.8rem;
+    color: #a08060;
+    background: none;
+    border: 1px solid rgba(160, 128, 96, 0.4);
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+  }
+
+  .retire-btn:hover {
+    color: #e07050;
+    border-color: rgba(224, 112, 80, 0.6);
+    background-color: rgba(224, 112, 80, 0.1);
   }
 
   .skip-checkbox {

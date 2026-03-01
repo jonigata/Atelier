@@ -6,6 +6,9 @@
 
   $: isGameOver = $gameState.gameOverReason != null;
   $: isProvisionalEnding = !isGameOver && $gameState.day <= 336;
+  $: provisionalTitle = $gameState.completedInspections.includes(28)
+    ? '1月末の査察が終了しました'
+    : 'リタイア';
 
   // 仮エンディングのステップ管理（クリックで順に開示）
   let revealStep = 0;
@@ -89,7 +92,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 <div class="ending-screen provisional" on:click={handleRevealClick}>
   <div class="content">
-    <h1 class="fade-in">1月末の査察が終了しました</h1>
+    <h1 class="fade-in">{provisionalTitle}</h1>
 
     <div class="final-score fade-in">
       <span class="final-score-label">SCORE</span>
