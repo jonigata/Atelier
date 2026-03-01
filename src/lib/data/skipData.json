@@ -2,32 +2,166 @@
   "playerName": "コレット",
   "day": 4,
   "money": 500,
-  "reputationExp": 0,
+  "reputationExp": 7,
   "villageExp": 0,
-  "alchemyExp": 12,
+  "alchemyExp": 7,
   "stamina": 72,
   "maxStamina": 100,
   "inventory": [
-    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
-    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
-    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
-    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
-    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
-    { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
-    { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 1, "flavorText": "持参品" } },
-    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 3, "flavorText": "師匠イリーナからの仕送り" } },
-    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 3, "flavorText": "師匠イリーナからの仕送り" } },
-    { "itemId": "herb_01", "quality": 50, "origin": { "type": "reward", "day": 3, "flavorText": "師匠イリーナからの仕送り" } },
-    { "itemId": "potion_01", "quality": 71, "origin": { "type": "crafted", "day": 3, "flavorText": "慎重に仕上げた一品" } },
-    { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
-    { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
-    { "itemId": "water_01", "quality": 50, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
-    { "itemId": "ore_01", "quality": 40, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
-    { "itemId": "ore_01", "quality": 40, "origin": { "type": "reward", "day": 4, "flavorText": "メルダが店から分けてくれた" } },
-    { "itemId": "water_02", "quality": 80, "origin": { "type": "reward", "day": 4, "flavorText": "工房の棚の奥から見つけた" } }
+    {
+      "itemId": "herb_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 1,
+        "flavorText": "持参品"
+      }
+    },
+    {
+      "itemId": "herb_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 1,
+        "flavorText": "持参品"
+      }
+    },
+    {
+      "itemId": "herb_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 1,
+        "flavorText": "持参品"
+      }
+    },
+    {
+      "itemId": "herb_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 1,
+        "flavorText": "持参品"
+      }
+    },
+    {
+      "itemId": "herb_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 1,
+        "flavorText": "持参品"
+      }
+    },
+    {
+      "itemId": "water_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 1,
+        "flavorText": "持参品"
+      }
+    },
+    {
+      "itemId": "water_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 1,
+        "flavorText": "持参品"
+      }
+    },
+    {
+      "itemId": "herb_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 3,
+        "flavorText": "師匠イリーナからの仕送り"
+      }
+    },
+    {
+      "itemId": "herb_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 3,
+        "flavorText": "師匠イリーナからの仕送り"
+      }
+    },
+    {
+      "itemId": "herb_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 3,
+        "flavorText": "師匠イリーナからの仕送り"
+      }
+    },
+    {
+      "itemId": "potion_01",
+      "quality": 62,
+      "origin": {
+        "type": "crafted",
+        "day": 3,
+        "flavorText": "慎重に仕上げた一品"
+      }
+    },
+    {
+      "itemId": "water_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 4,
+        "flavorText": "メルダが店から分けてくれた"
+      }
+    },
+    {
+      "itemId": "water_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 4,
+        "flavorText": "メルダが店から分けてくれた"
+      }
+    },
+    {
+      "itemId": "water_01",
+      "quality": 50,
+      "origin": {
+        "type": "reward",
+        "day": 4,
+        "flavorText": "メルダが店から分けてくれた"
+      }
+    },
+    {
+      "itemId": "ore_01",
+      "quality": 40,
+      "origin": {
+        "type": "reward",
+        "day": 4,
+        "flavorText": "メルダが店から分けてくれた"
+      }
+    },
+    {
+      "itemId": "ore_01",
+      "quality": 40,
+      "origin": {
+        "type": "reward",
+        "day": 4,
+        "flavorText": "メルダが店から分けてくれた"
+      }
+    }
   ],
-  "ownedBooks": ["book_basics"],
-  "knownRecipes": ["potion_01", "plant_oil", "charcoal", "rope"],
+  "ownedBooks": [
+    "book_basics"
+  ],
+  "knownRecipes": [
+    "potion_01",
+    "plant_oil",
+    "charcoal",
+    "rope"
+  ],
   "activeQuests": [],
   "availableQuests": [
     {
@@ -50,10 +184,25 @@
   "newQuestCount": 0,
   "selectedQuestId": null,
   "expedition": null,
-  "craftedItems": ["potion_01"],
-  "discoveredItems": ["herb_01", "water_01", "potion_01", "ore_01", "water_02"],
+  "craftedItems": [
+    "potion_01"
+  ],
+  "discoveredItems": [
+    "herb_01",
+    "water_01",
+    "potion_01",
+    "ore_01"
+  ],
+  "maxQualityByItem": {
+    "herb_01": 70,
+    "water_01": 50,
+    "potion_01": 62,
+    "ore_01": 40
+  },
   "facilities": [],
-  "ownedEquipment": ["measuring_cup"],
+  "ownedEquipment": [
+    "quality_drop"
+  ],
   "activeCauldron": null,
   "shopEquipment": [],
   "merchantLineup": null,
@@ -63,6 +212,7 @@
   "messageLog": [
     "ゲームを開始しました。",
     "フォンテ村での1年間が始まります。",
+    "【休日のできごと】猫の来客：錬金経験値 +5、名声経験値 +5",
     "休息しました。体力が全回復しました。",
     "--- 2日目の朝 ---",
     "「錬金術入門」を読破！ 回復薬、植物油、木炭、麻縄のレシピを習得しました！",
@@ -71,7 +221,13 @@
   ],
   "pendingDayTransition": null,
   "tutorialProgress": {
-    "unlockedActions": ["inventory", "rest", "study", "alchemy", "quest"],
+    "unlockedActions": [
+      "inventory",
+      "rest",
+      "study",
+      "alchemy",
+      "quest"
+    ],
     "pendingDialogue": null
   },
   "achievementProgress": {
@@ -80,8 +236,7 @@
       "ach_check_inventory",
       "ach_story_village_girl_cold",
       "ach_first_recipe",
-      "ach_first_craft",
-      "ach_quality_70"
+      "ach_first_craft"
     ],
     "pendingReward": null
   },
@@ -89,10 +244,12 @@
     "totalCraftCount": 1,
     "totalExpeditionCount": 0,
     "consecutiveQuestSuccess": 0,
-    "highestQualityCrafted": 71,
+    "highestQualityCrafted": 62,
     "totalSalesAmount": 0,
     "inventoryOpened": true
   },
+  "buildings": [],
+  "ownedHelpers": [],
   "completedInspections": [],
   "gameOverReason": null,
   "pendingInspectionCutscene": null,

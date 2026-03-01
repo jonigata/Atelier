@@ -10,8 +10,6 @@
     testKey++;
   }
 
-  const drawIcon = '<img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="">';
-
   // ケース1: 新規アルバム登録（成功1個）
   const newAlbumResult: CraftMultipleResult = {
     successCount: 1,
@@ -31,7 +29,6 @@
   };
   const newAlbumRepGauge: GaugeData = {
     before: 0, after: 2, max: 14, label: '名声 Lv.1',
-    subtext: `NEXT${drawIcon}Lv.3`,
   };
   const newAlbumStaminaGauge: GaugeData = {
     before: 80, after: 72, max: 100, label: '体力',
@@ -77,7 +74,6 @@
   };
   const highQualityRepGauge: GaugeData = {
     before: 0, after: 4, max: 14, label: '名声 Lv.1',
-    subtext: `NEXT${drawIcon}Lv.3`,
   };
   const highQualityStaminaGauge: GaugeData = {
     before: 80, after: 72, max: 100, label: '体力',
@@ -110,7 +106,6 @@
   };
   const multiRepGauge: GaugeData = {
     before: 0, after: 2, max: 14, label: '名声 Lv.1',
-    subtext: `NEXT${drawIcon}Lv.3`,
   };
   const multiStaminaGauge: GaugeData = {
     before: 80, after: 56, max: 100, label: '体力',

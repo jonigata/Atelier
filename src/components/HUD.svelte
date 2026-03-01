@@ -1,12 +1,10 @@
 <script lang="ts">
   import { gameState, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel, totalScore, skipPresentation, toggleSkipPresentation } from '$lib/stores/game';
-  import { calcExpForLevel, calcExpProgress, calcNextDrawLevel } from '$lib/data/balance';
+  import { calcExpForLevel, calcExpProgress } from '$lib/data/balance';
   import MoneyIndicator from './MoneyIndicator.svelte';
 
   $: staminaRatio = $gameState.stamina / $gameState.maxStamina;
   $: staminaClass = staminaRatio <= 0.2 ? 'critical' : staminaRatio <= 0.5 ? 'low' : '';
-  $: villageDrawImminent = calcNextDrawLevel($villageLevel) === $villageLevel + 1;
-  $: reputationDrawImminent = calcNextDrawLevel($reputationLevel) === $reputationLevel + 1;
 </script>
 
 <div class="hud">
@@ -51,26 +49,18 @@
         <span class="stat-label">村発展</span>
         <div class="stat-value-row">
           <span class="stat-value village">Lv.{$villageLevel}</span>
-          {#if calcNextDrawLevel($villageLevel)}
-            <span class="draw-target village"><img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="⚡" />Lv.{calcNextDrawLevel($villageLevel)}</span>
-          {/if}
         </div>
-        <div class="exp-bar" class:draw-imminent={villageDrawImminent}>
+        <div class="exp-bar">
           <div class="exp-fill village-fill" style="width: {Math.min(100, (calcExpProgress($gameState.villageExp) / calcExpForLevel($villageLevel)) * 100)}%"></div>
-          {#if villageDrawImminent}<span class="draw-hint">⚡️</span>{/if}
         </div>
       </div>
       <div class="stat-item">
         <span class="stat-label">名声</span>
         <div class="stat-value-row">
           <span class="stat-value reputation">Lv.{$reputationLevel}</span>
-          {#if calcNextDrawLevel($reputationLevel)}
-            <span class="draw-target reputation"><img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="⚡" />Lv.{calcNextDrawLevel($reputationLevel)}</span>
-          {/if}
         </div>
-        <div class="exp-bar" class:draw-imminent={reputationDrawImminent}>
+        <div class="exp-bar">
           <div class="exp-fill reputation-fill" style="width: {Math.min(100, (calcExpProgress($gameState.reputationExp) / calcExpForLevel($reputationLevel)) * 100)}%"></div>
-          {#if reputationDrawImminent}<span class="draw-hint">⚡️</span>{/if}
         </div>
       </div>
       <div class="stat-item">
@@ -235,46 +225,6 @@
     gap: 0.3rem;
   }
 
-  .draw-target {
-    display: flex;
-    align-items: center;
-    font-size: 0.7rem;
-    font-weight: bold;
-    position: relative;
-    top: 3px;
-  }
-
-  .draw-icon {
-    height: 1.3em;
-    width: auto;
-    margin-right: 1px;
-    position: relative;
-  }
-
-  .draw-target.village {
-    color: #81c784;
-  }
-
-  .draw-target.reputation {
-    color: #e0c080;
-  }
-
-  .draw-hint {
-    position: absolute;
-    right: -3px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.6rem;
-    line-height: 1;
-    filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.8));
-    animation: draw-blink 1.5s ease-in-out infinite;
-  }
-
-  @keyframes draw-blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
   .exp-bar,
   .stamina-bar {
     width: 65px;
@@ -283,10 +233,6 @@
     border-radius: 2px;
     overflow: hidden;
     position: relative;
-  }
-
-  .exp-bar.draw-imminent {
-    overflow: visible;
   }
 
   .exp-fill {

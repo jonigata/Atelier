@@ -167,15 +167,6 @@
     justify-content: flex-end;
   }
 
-  .gauge-subtext :global(.draw-icon) {
-    height: 1.3em;
-    width: auto;
-    margin-left: 1px;
-    margin-right: 1px;
-    position: relative;
-    top: 2px;
-  }
-
   /* ゴールド（名声） */
   .gauge-gold .gauge-fill {
     background: linear-gradient(90deg, #c9a959, #ffd700);

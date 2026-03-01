@@ -6,7 +6,7 @@ import { getItem } from '$lib/data/items';
 import { getAllEquipment } from '$lib/data/equipment';
 import { getHelper } from '$lib/data/helpers';
 import type { GameState } from '$lib/models/types';
-import { calcLevelFromExp, calcExpProgress, calcExpForLevel, calcNextDrawLevel, buildExpGaugeSegments } from '$lib/data/balance';
+import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments } from '$lib/data/balance';
 
 export interface DrawInfos {
   village: LevelUpInfo | null;
@@ -207,8 +207,6 @@ function attachExpGaugeData(
   const progressAfter = calcExpProgress(totalAfter);
   const max = calcExpForLevel(levelBefore);
   const leveledUp = levelAfter > levelBefore;
-  const nextDraw = calcNextDrawLevel(levelAfter);
-
   reward.gaugeData = {
     before: progressBefore,
     after: leveledUp ? max : progressAfter,
@@ -216,9 +214,6 @@ function attachExpGaugeData(
     label: `Lv.${levelBefore}`,
     segments: leveledUp
       ? buildExpGaugeSegments(levelBefore, progressBefore, levelAfter, progressAfter)
-      : undefined,
-    subtext: nextDraw
-      ? `NEXT<img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="">Lv.${nextDraw}`
       : undefined,
   };
   reward.gaugeColor = color;

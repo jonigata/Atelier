@@ -3,7 +3,6 @@
   import type { GaugeSegment } from '$lib/models/types';
 
   let testKey = 0;
-  const drawIcon = '<img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="">';
 
   function replay() {
     testKey++;
@@ -124,8 +123,8 @@
     </section>
 
     <section>
-      <h2>5. 名声ゲージ 1レベルアップ (green) + ドロー目標</h2>
-      <p class="desc">名声 Lv.1(71→100%) → 名声 Lv.2(0→50%) / 次のドロー: Lv.3</p>
+      <h2>5. 名声ゲージ 1レベルアップ (green)</h2>
+      <p class="desc">名声 Lv.1(71→100%) → 名声 Lv.2(0→50%)</p>
       <div class="gauge-wrapper">
         <AnimatedGauge
           before={10}
@@ -135,7 +134,6 @@
           text="+12 名声Exp"
           color="green"
           segments={reputationLevelUp}
-          subtext={`NEXT${drawIcon}Lv.3`}
         />
       </div>
     </section>
@@ -156,8 +154,8 @@
     </section>
 
     <section>
-      <h2>7. 錬金ゲージ + ドロー目標なし</h2>
-      <p class="desc">錬金Expにはドローがないのでsubtextなし</p>
+      <h2>7. 錬金ゲージ（subtextなし）</h2>
+      <p class="desc">錬金Exp</p>
       <div class="gauge-wrapper">
         <AnimatedGauge
           before={noLevelUp.before}
@@ -166,42 +164,6 @@
           label={noLevelUp.label}
           text={noLevelUp.text}
           color="blue"
-        />
-      </div>
-    </section>
-
-    <section>
-      <h2>8. 村発展ゲージ + 施設ドロー目標</h2>
-      <p class="desc">Lv.4: 次のドロー Lv.6</p>
-      <div class="gauge-wrapper">
-        <AnimatedGauge
-          before={3}
-          after={10}
-          max={21}
-          label="Lv.4"
-          text="+7 村発展Exp"
-          color="green"
-          subtext={`NEXT${drawIcon}Lv.6`}
-        />
-      </div>
-    </section>
-
-    <section>
-      <h2>9. 名声ゲージ（ドロー直前 Lv.5→Lv.6）</h2>
-      <p class="desc">Lv.5→Lv.6でドロー発動、次は Lv.9</p>
-      <div class="gauge-wrapper">
-        <AnimatedGauge
-          before={10}
-          after={5}
-          max={22}
-          label="名声 Lv.5"
-          text="+17 名声Exp"
-          color="gold"
-          segments={[
-            { from: 10, to: 22, max: 22, label: '名声 Lv.5' },
-            { from: 0, to: 5, max: 25, label: '名声 Lv.6' },
-          ]}
-          subtext={`NEXT${drawIcon}Lv.9`}
         />
       </div>
     </section>
