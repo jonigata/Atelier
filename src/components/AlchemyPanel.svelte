@@ -125,22 +125,6 @@
     ? getInspectionConflict($gameState.day, craftDaysRequired)
     : null;
 
-  // 各個数で査察コンフリクトが起きるか（ボタン無効化用）
-  function getInspectionConflictForQuantity(n: number): number | null {
-    if (!selectedRecipe) return null;
-    const days = craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * n);
-    return getInspectionConflict($gameState.day, days);
-  }
-
-  // 査察で制限される最大個数
-  $: maxWithoutInspection = (() => {
-    if (!selectedRecipe) return maxCraftable;
-    for (let n = 1; n <= maxCraftable; n++) {
-      if (getInspectionConflictForQuantity(n)) return n - 1;
-    }
-    return maxCraftable;
-  })();
-
   // 予想品質
   $: expectedQuality = selectedRecipe && selectedItems.length >= itemsPerCraft
     ? calculateExpectedQuality(selectedRecipe, selectedItems.slice(0, itemsPerCraft), calcLevelFromExp($gameState.alchemyExp))
@@ -354,26 +338,20 @@
               class="qty-num-btn"
               class:selected={craftQuantity === n}
               on:click={() => setQuantity(n)}
-              disabled={n > maxCraftable || n > maxWithoutInspection || selectedItems.length > 0}
+              disabled={n > maxCraftable || selectedItems.length > 0}
             >{n}</button>
           {/each}
           <span class="qty-max">/ 最大 {maxCraftable}個</span>
         </div>
         <p class="quantity-hint">所要日数: {formatCraftDays(getEffectiveCraftDays(selectedRecipe))} × {craftQuantity}個 = {craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)}日</p>
-        {#if maxWithoutInspection === 0}
-          {@const conflictDay = getInspectionConflictForQuantity(1)}
+        {#if inspectionConflictDay}
           <div class="inspection-warning">
-            {conflictDay}日目に査察があるため、調合できません
-          </div>
-        {:else if maxWithoutInspection < maxCraftable}
-          {@const conflictDay = getInspectionConflictForQuantity(maxWithoutInspection + 1)}
-          <div class="inspection-warning">
-            {conflictDay}日目に査察があるため、{maxWithoutInspection + 1}個以上は調合できません
+            {inspectionConflictDay}日目に査察があるため、この日数では調合できません
           </div>
         {/if}
       </div>
 
-      {#if maxWithoutInspection > 0}
+      {#if !inspectionConflictDay}
         <MaterialSlots
           ingredients={selectedRecipe.ingredients}
           {selectedItems}
