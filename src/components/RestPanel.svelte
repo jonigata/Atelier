@@ -3,7 +3,10 @@
   import { endTurn } from '$lib/services/gameLoop';
   import { getFatigueLabel } from '$lib/services/alchemy';
   import { getBuildingRestBonus } from '$lib/services/buildingEffects';
+  import { selectRestEvent, resolveRestEventRewards, applyRestEventRewards } from '$lib/services/restEvent';
+  import type { RestEventDef, ResolvedReward } from '$lib/data/restEvents';
   import VideoOverlay from './common/VideoOverlay.svelte';
+  import RestEventDialog from './RestEventDialog.svelte';
 
   export let onBack: () => void;
 
@@ -12,23 +15,38 @@
   $: isFullStamina = $gameState.stamina >= $gameState.maxStamina;
 
   let showVideo = false;
+  let restEvent: { event: RestEventDef; rewards: ResolvedReward[] } | null = null;
 
   function handleRest() {
+    // 休日イベント選出＆報酬確定（動画の前に表示）
+    const event = selectRestEvent();
+    const rewards = resolveRestEventRewards(event);
+    applyRestEventRewards(event, rewards);
+
     if ($skipPresentation) {
-      onVideoEnd();
-      return;
+      // 演出スキップ時はダイアログを出さずに即実行
+      doRest();
+    } else {
+      restEvent = { event, rewards };
     }
+  }
+
+  function onEventClose() {
+    restEvent = null;
     showVideo = true;
   }
 
   async function onVideoEnd() {
+    doRest();
+  }
+
+  async function doRest() {
     const bonus = getBuildingRestBonus();
     restoreStamina(100 + bonus);
     addMessage(`休息しました。体力が全回復しました。${bonus > 0 ? `（施設ボーナス+${bonus}）` : ''}`);
-    // endTurnのPromiseを保持しつつ、DayTransition暗転を待つ
+    showVideo = false;
     const turnPromise = endTurn(1);
     await new Promise(r => setTimeout(r, 350));
-    showVideo = false;
     onBack();
     await turnPromise;
   }
@@ -66,6 +84,10 @@
 
 {#if showVideo}
   <VideoOverlay src="/movies/rest.mp4" text="休息中..." onEnd={onVideoEnd} />
+{/if}
+
+{#if restEvent}
+  <RestEventDialog event={restEvent.event} rewards={restEvent.rewards} onClose={onEventClose} />
 {/if}
 
 <style>
