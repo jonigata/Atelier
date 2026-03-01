@@ -370,7 +370,7 @@
               <span class="criterion-name">錬金Lv</span>
               <span class="criterion-value">Lv.{info.value}</span>
               <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
-              <span class="criterion-target">目標Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
+              <span class="criterion-target">目標 Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
 
             </div>
           </div>
@@ -404,9 +404,9 @@
             </div>
             <div class="criterion-label">
               <span class="criterion-name">依頼</span>
-              <span class="criterion-value">{info.value}件</span>
+              <span class="criterion-value">完了 {info.value}件</span>
               <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
-              <span class="criterion-target">目標{criterion.thresholds.C}～{totalStars}件</span>
+              <span class="criterion-target">目標 {criterion.thresholds.C}～{totalStars}件</span>
 
             </div>
           </div>
@@ -438,7 +438,7 @@
               <span class="criterion-name">村発展</span>
               <span class="criterion-value">Lv.{info.value}</span>
               <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
-              <span class="criterion-target">目標Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
+              <span class="criterion-target">目標 Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
 
             </div>
           </div>
@@ -482,7 +482,7 @@
               <span class="criterion-name">名声</span>
               <span class="criterion-value">Lv.{info.value}</span>
               <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
-              <span class="criterion-target">目標Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
+              <span class="criterion-target">目標 Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
 
             </div>
           </div>
@@ -523,7 +523,7 @@
               <span class="criterion-name">アルバム</span>
               <span class="criterion-value">{info.value}種</span>
               <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
-              <span class="criterion-target">目標{criterion.thresholds.C}～{criterion.thresholds.S}種</span>
+              <span class="criterion-target">目標 {criterion.thresholds.C}～{criterion.thresholds.S}種</span>
 
             </div>
           </div>
@@ -552,7 +552,7 @@
               <span class="criterion-name">{criterion.label}</span>
               <span class="criterion-value">{info.value}{criterion.unit}</span>
               <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
-              <span class="criterion-target">目標{criterion.thresholds.C}～{criterion.thresholds.S}{criterion.unit}</span>
+              <span class="criterion-target">目標 {criterion.thresholds.C}～{criterion.thresholds.S}{criterion.unit}</span>
 
             </div>
           </div>
