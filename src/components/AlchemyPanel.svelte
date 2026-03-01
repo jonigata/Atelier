@@ -46,9 +46,9 @@
   let levelUpData: LevelUpInfo | null = null;
 
   // 習得済みのレシピ（レベル不足でも表示、成功率が下がるのみ）
-  $: availableRecipes = Object.values(recipes).filter(
-    (r) => $gameState.knownRecipes.includes(r.id)
-  );
+  $: availableRecipes = Object.values(recipes)
+    .filter((r) => $gameState.knownRecipes.includes(r.id))
+    .sort((a, b) => a.requiredLevel - b.requiredLevel);
 
   // 選択中のレシピが調合可能か
   $: canCraftSelected = selectedRecipe
@@ -344,39 +344,46 @@
           <span class="qty-max">/ 最大 {maxCraftable}個</span>
         </div>
         <p class="quantity-hint">所要日数: {formatCraftDays(getEffectiveCraftDays(selectedRecipe))} × {craftQuantity}個 = {craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)}日</p>
+        {#if inspectionConflictDay}
+          <div class="inspection-warning">
+            {inspectionConflictDay}日目に査察があるため、この日数では調合できません
+          </div>
+        {/if}
       </div>
 
-      <MaterialSlots
-        ingredients={selectedRecipe.ingredients}
-        {selectedItems}
-        {craftQuantity}
-        {currentIngredient}
-        onUndoLast={undoLastSelection}
-        onAutoFill={autoFillAll}
-        onClear={clearSelection}
-      />
-
-      {#if !selectionComplete}
-        <ItemPicker
-          items={availableItemsForSelection}
-          {currentIngredient}
-          onSelect={selectItem}
-        />
-      {:else}
-        <CraftPreview
-          {successRate}
-          {expectedQuality}
+      {#if !inspectionConflictDay}
+        <MaterialSlots
+          ingredients={selectedRecipe.ingredients}
+          {selectedItems}
           {craftQuantity}
-          daysRequired={craftDaysRequired}
-          recipe={selectedRecipe}
-          {staminaCost}
-          {totalStaminaCost}
-          currentStamina={$gameState.stamina}
-          {fatiguePenalty}
-          {fatigueLabel}
-          {inspectionConflictDay}
-          onCraft={executeCraft}
+          {currentIngredient}
+          onUndoLast={undoLastSelection}
+          onAutoFill={autoFillAll}
+          onClear={clearSelection}
         />
+
+        {#if !selectionComplete}
+          <ItemPicker
+            items={availableItemsForSelection}
+            {currentIngredient}
+            onSelect={selectItem}
+          />
+        {:else}
+          <CraftPreview
+            {successRate}
+            {expectedQuality}
+            {craftQuantity}
+            daysRequired={craftDaysRequired}
+            recipe={selectedRecipe}
+            {staminaCost}
+            {totalStaminaCost}
+            currentStamina={$gameState.stamina}
+            {fatiguePenalty}
+            {fatigueLabel}
+            inspectionConflictDay={null}
+            onCraft={executeCraft}
+          />
+        {/if}
       {/if}
     </div>
   {/if}
@@ -529,6 +536,16 @@
 
   .tab:hover:not(.active) {
     background: rgba(255, 255, 255, 0.1);
+  }
+
+  .inspection-warning {
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 152, 0, 0.15);
+    border: 1px solid rgba(255, 152, 0, 0.5);
+    border-radius: 4px;
+    color: #ff9800;
+    font-size: 0.85rem;
   }
 
 </style>
