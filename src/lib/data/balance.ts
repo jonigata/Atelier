@@ -231,11 +231,11 @@ export function calcExpProgress(totalExp: number): number {
 }
 
 /**
- * 現在レベルから次のカードドロー（3の倍数レベル）を算出
+ * 現在レベルから次のカードドローレベルを算出（毎レベル発火）
  * ドロー対象レベルがMAX_LEVELを超える場合は0を返す
  */
 export function calcNextDrawLevel(currentLevel: number): number {
-  const next = Math.ceil((currentLevel + 1) / 3) * 3;
+  const next = currentLevel + 1;
   return next <= LEVEL.MAX_LEVEL ? next : 0;
 }
 

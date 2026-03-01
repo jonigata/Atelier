@@ -1,15 +1,25 @@
 import { getAllBuildings } from '$lib/data/buildings';
 import { getAllHelpers } from '$lib/data/helpers';
-import type { BuildingDef, HelperDef, OwnedHelper } from '$lib/models/types';
+import type { BuildingDef, HelperDef, OwnedBuilding, OwnedHelper } from '$lib/models/types';
 
 /**
- * 施設ドローの選択肢を生成（未所有から最大3つ）
+ * 施設ドローの選択肢を生成（未所有+レベルアップ可能な施設から最大3つ）
+ * 既所有はレベルアップ候補として表示される
  */
-export function generateBuildingChoices(ownedIds: string[]): BuildingDef[] {
+export function generateBuildingChoices(ownedBuildings: OwnedBuilding[]): { def: BuildingDef; currentLevel: number }[] {
   const all = getAllBuildings();
-  const available = all.filter((f) => !ownedIds.includes(f.id));
+  // 未所有 or レベルアップ可能な施設を候補に
+  const available = all.filter((b) => {
+    const owned = ownedBuildings.find((o) => o.buildingId === b.id);
+    if (!owned) return true; // 未所有
+    return owned.level < b.maxLevel; // レベルアップ可能
+  });
   if (available.length === 0) return [];
-  return shuffleArray(available).slice(0, Math.min(3, available.length));
+  const choices = shuffleArray(available).slice(0, Math.min(3, available.length));
+  return choices.map((def) => {
+    const owned = ownedBuildings.find((o) => o.buildingId === def.id);
+    return { def, currentLevel: owned ? owned.level : 0 };
+  });
 }
 
 /**

@@ -5,14 +5,16 @@ import { getItem } from '$lib/data/items';
 import type { BuildingEffect } from '$lib/models/types';
 
 /**
- * 所有施設の全効果を取得
+ * 所有施設の全効果を取得（レベルに応じた効果を返す）
  */
 function getAllBuildingEffects(): BuildingEffect[] {
   const state = get(gameState);
   const effects: BuildingEffect[] = [];
-  for (const fId of state.buildings) {
-    const def = getBuilding(fId);
-    if (def) effects.push(...def.effects);
+  for (const owned of state.buildings) {
+    const def = getBuilding(owned.buildingId);
+    if (!def) continue;
+    const levelData = def.levels[owned.level - 1];
+    if (levelData) effects.push(...levelData.effects);
   }
   return effects;
 }
@@ -116,11 +118,13 @@ export function processBuildingMorningItems(): void {
   const state = get(gameState);
   const generatedItems: string[] = [];
 
-  for (const fId of state.buildings) {
-    const def = getBuilding(fId);
+  for (const owned of state.buildings) {
+    const def = getBuilding(owned.buildingId);
     if (!def) continue;
+    const levelData = def.levels[owned.level - 1];
+    if (!levelData) continue;
 
-    for (const effect of def.effects) {
+    for (const effect of levelData.effects) {
       if (effect.type === 'daily_item' && effect.itemId) {
         const itemDef = getItem(effect.itemId);
         const quality = 20 + Math.floor(Math.random() * 30); // 品質20-49

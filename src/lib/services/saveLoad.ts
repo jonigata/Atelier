@@ -75,10 +75,19 @@ export function loadFromSlot(index: number): boolean {
 
   try {
     const data: SaveData = JSON.parse(raw);
+    migrateState(data.state);
     gameState.set(data.state);
     return true;
   } catch {
     return false;
+  }
+}
+
+/** 旧フォーマットのセーブデータを現行形式にマイグレーション */
+function migrateState(state: GameState): void {
+  // buildings: string[] → OwnedBuilding[] マイグレーション
+  if (Array.isArray(state.buildings) && state.buildings.length > 0 && typeof state.buildings[0] === 'string') {
+    state.buildings = (state.buildings as unknown as string[]).map((id) => ({ buildingId: id, level: 1 }));
   }
 }
 

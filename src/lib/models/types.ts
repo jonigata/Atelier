@@ -160,13 +160,23 @@ export interface BuildingEffect {
   interval?: number;         // periodic_item用（日数間隔）
 }
 
+export interface BuildingLevelData {
+  effects: BuildingEffect[];
+  effectDescription: string;
+}
+
 export interface BuildingDef {
   id: string;
   name: string;
   description: string;
   icon: string;
-  effects: BuildingEffect[];
-  effectDescription: string;
+  maxLevel: number;
+  levels: BuildingLevelData[];  // index 0 = Lv.1
+}
+
+export interface OwnedBuilding {
+  buildingId: string;
+  level: number;
 }
 
 // =====================================
@@ -416,7 +426,7 @@ export interface GameState {
   stats: GameStats;
 
   // 村施設・助手システム
-  buildings: string[];              // 所有する村施設ID
+  buildings: OwnedBuilding[];       // 所有する村施設
   ownedHelpers: OwnedHelper[];     // 所有する助手
 
   // 査察システム

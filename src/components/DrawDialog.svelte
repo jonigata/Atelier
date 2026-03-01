@@ -4,6 +4,7 @@
   import {
     gameState,
     addBuilding,
+    upgradeBuilding,
     addHelper,
     upgradeHelper,
     addMessage,
@@ -19,7 +20,7 @@
 
   let drawMode: DrawMode = 'none';
   let phase: DrawPhase = 'entering';
-  let facilityChoices: BuildingDef[] = [];
+  let facilityChoices: { def: BuildingDef; currentLevel: number }[] = [];
   let helperChoices: { def: HelperDef; currentLevel: number }[] = [];
   let selectedIndex: number = -1;
   let canInteract = false;
@@ -92,13 +93,14 @@
       if (choices.length > 0) {
         facilityChoices = choices;
         drawMode = 'facility';
-        if (state.buildings.length === 0) {
+        const hasAnyBuilding = state.buildings.length > 0;
+        if (!hasAnyBuilding) {
           showFirstFacilityIntro();
         } else {
           startDrawAnimation();
         }
       } else {
-        addMessage('村発展度がレベルアップしたが、建設できる施設がもうない');
+        addMessage('村発展度がレベルアップしたが、建設・強化できる施設がもうない');
         resolveDraw();
       }
     } else {
@@ -141,9 +143,18 @@
     addTimer(() => { phase = 'choosing'; canInteract = true; }, 1100);
   }
 
-  function applyFacilitySelection(facility: BuildingDef) {
-    addBuilding(facility.id);
-    addMessage(`施設「${facility.name}」を建設した！ ${facility.effectDescription}`);
+  function applyFacilitySelection(choice: { def: BuildingDef; currentLevel: number }) {
+    const { def, currentLevel } = choice;
+    if (currentLevel === 0) {
+      addBuilding(def.id);
+      addMessage(`施設「${def.name}」を建設した！ ${def.levels[0].effectDescription}`);
+    } else if (currentLevel < def.maxLevel) {
+      upgradeBuilding(def.id);
+      const newLevel = currentLevel + 1;
+      addMessage(`施設「${def.name}」がLv.${newLevel}になった！ ${def.levels[newLevel - 1].effectDescription}`);
+    } else {
+      addMessage(`施設「${def.name}」は既にLv.MAX`);
+    }
     facilityChoices = [];
     drawMode = 'none';
   }
@@ -166,8 +177,10 @@
 
   function getResultText(index: number): string {
     if (drawMode === 'facility') {
-      const f = facilityChoices[index];
-      return `🏗️ ${f.name}を建設！`;
+      const c = facilityChoices[index];
+      if (c.currentLevel === 0) return `🏗️ ${c.def.name}を建設！`;
+      if (c.currentLevel >= c.def.maxLevel) return `（これ以上強化できない）`;
+      return `⬆️ ${c.def.name}がLv.${c.currentLevel + 1}に！`;
     } else {
       const c = helperChoices[index];
       if (c.currentLevel === 0) return `🤝 ${c.def.name}が仲間になった！`;
@@ -185,17 +198,20 @@
     let pendingGreeting: EventDialogue | null = null;
 
     if (drawMode === 'facility' && selectedIndex >= 0) {
-      const facility = facilityChoices[selectedIndex];
-      const comment = buildingComments[facility.id];
-      if (comment) {
-        pendingGreeting = {
-          characterName: '村長',
-          characterTitle: 'フォンテ村長',
-          characterFaceId: 'mayor',
-          lines: [comment],
-        };
+      const choice = facilityChoices[selectedIndex];
+      // 新規建設時のみ村長コメント
+      if (choice.currentLevel === 0) {
+        const comment = buildingComments[choice.def.id];
+        if (comment) {
+          pendingGreeting = {
+            characterName: '村長',
+            characterTitle: 'フォンテ村長',
+            characterFaceId: 'mayor',
+            lines: [comment],
+          };
+        }
       }
-      applyFacilitySelection(facility);
+      applyFacilitySelection(choice);
     } else if (drawMode === 'helper' && selectedIndex >= 0) {
       const choice = helperChoices[selectedIndex];
       const { def, currentLevel } = choice;
@@ -283,7 +299,11 @@
 
       <div class="cards">
         {#if drawMode === 'facility'}
-          {#each facilityChoices as facility, i}
+          {#each facilityChoices as choice, i}
+            {@const isNew = choice.currentLevel === 0}
+            {@const isMaxed = choice.currentLevel >= choice.def.maxLevel}
+            {@const nextLevel = isNew ? 1 : choice.currentLevel + 1}
+            {@const effectDesc = isMaxed ? choice.def.levels[choice.def.maxLevel - 1].effectDescription : choice.def.levels[Math.max(0, nextLevel - 1)].effectDescription}
             <div
               class="card-wrapper"
               class:slide-in={showCards}
@@ -294,6 +314,7 @@
               <button
                 class="card-flip-container"
                 class:flipped
+                class:maxed={isMaxed}
                 disabled={!canInteract}
                 on:click={() => handleCardSelect(i)}
               >
@@ -305,12 +326,21 @@
                 <div class="card-face card-front facility-card">
                   <img
                     class="card-building-img"
-                    src="/images/buildings/{facility.id}.png"
-                    alt={facility.name}
+                    src="/images/buildings/{choice.def.id}.png"
+                    alt={choice.def.name}
                   />
                   <div class="building-card-info">
-                    <span class="card-name">{facility.name}</span>
-                    <span class="card-effect-overlay">{facility.effectDescription}</span>
+                    <span class="card-name">{choice.def.name}</span>
+                    {#if isNew}
+                      <span class="card-level new">NEW</span>
+                      <span class="card-effect-overlay">{effectDesc}</span>
+                    {:else if isMaxed}
+                      <span class="card-level max">Lv.MAX</span>
+                      <span class="card-effect-overlay dimmed">これ以上強化できない</span>
+                    {:else}
+                      <span class="card-level upgrade">Lv.{choice.currentLevel} → Lv.{nextLevel}</span>
+                      <span class="card-effect-overlay">{effectDesc}</span>
+                    {/if}
                   </div>
                 </div>
               </button>

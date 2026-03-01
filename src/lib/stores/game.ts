@@ -6,6 +6,8 @@ import type {
 } from '$lib/models/types';
 import { removeItemFromInventory } from '$lib/services/inventory';
 import { calcExpForLevel, calcLevelFromExp, calcExpProgress, ALCHEMY, LEVEL } from '$lib/data/balance';
+import { getHelper } from '$lib/data/helpers';
+import { getBuilding } from '$lib/data/buildings';
 
 // =====================================
 // 初期状態
@@ -221,17 +223,27 @@ export interface LevelUpInfo {
   newLevel: number;
 }
 
-/** oldLevel～newLevelの間に3の倍数レベルがあるか（ドロー発火判定） */
-function hasDrawLevel(oldLevel: number, newLevel: number): boolean {
-  const nextDraw = Math.ceil((oldLevel + 1) / 3) * 3;
-  return nextDraw <= newLevel;
+/** レベルアップでドローが発火するか（毎レベル発火） */
+function hasDrawLevel(_oldLevel: number, _newLevel: number): boolean {
+  return true;
 }
 
 
 export function addBuilding(facilityId: string): void {
   gameState.update((state) => ({
     ...state,
-    buildings: [...state.buildings, facilityId],
+    buildings: [...state.buildings, { buildingId: facilityId, level: 1 }],
+  }));
+}
+
+export function upgradeBuilding(buildingId: string): void {
+  const def = getBuilding(buildingId);
+  const maxLevel = def?.maxLevel ?? 3;
+  gameState.update((state) => ({
+    ...state,
+    buildings: state.buildings.map((b) =>
+      b.buildingId === buildingId ? { ...b, level: Math.min(b.level + 1, maxLevel) } : b
+    ),
   }));
 }
 
@@ -243,10 +255,12 @@ export function addHelper(helperId: string): void {
 }
 
 export function upgradeHelper(helperId: string): void {
+  const def = getHelper(helperId);
+  const maxLevel = def?.maxLevel ?? 7;
   gameState.update((state) => ({
     ...state,
     ownedHelpers: state.ownedHelpers.map((h) =>
-      h.helperId === helperId ? { ...h, level: Math.min(h.level + 1, 3) } : h
+      h.helperId === helperId ? { ...h, level: Math.min(h.level + 1, maxLevel) } : h
     ),
   }));
 }
