@@ -181,16 +181,18 @@ export function addMoney(amount: number): void {
   }));
 }
 
-export function addReputationExp(amount: number): void {
+export function addReputationExp(amount: number): LevelUpInfo | null {
+  let drawInfo: LevelUpInfo | null = null;
   gameState.update((state) => {
     const oldLevel = calcLevelFromExp(state.reputationExp);
     const newExp = Math.max(0, state.reputationExp + amount);
     const newLevel = calcLevelFromExp(newExp);
     if (newLevel > oldLevel && hasDrawLevel(oldLevel, newLevel)) {
-      pendingReputationLevelUp.set({ oldLevel, newLevel });
+      drawInfo = { oldLevel, newLevel };
     }
     return { ...state, reputationExp: newExp };
   });
+  return drawInfo;
 }
 
 export function markInventoryOpened(): void {
@@ -200,16 +202,18 @@ export function markInventoryOpened(): void {
   }));
 }
 
-export function addVillageExp(amount: number): void {
+export function addVillageExp(amount: number): LevelUpInfo | null {
+  let drawInfo: LevelUpInfo | null = null;
   gameState.update((state) => {
     const oldLevel = calcLevelFromExp(state.villageExp);
     const newExp = Math.max(0, state.villageExp + amount);
     const newLevel = calcLevelFromExp(newExp);
     if (newLevel > oldLevel && hasDrawLevel(oldLevel, newLevel)) {
-      pendingVillageLevelUp.set({ oldLevel, newLevel });
+      drawInfo = { oldLevel, newLevel };
     }
     return { ...state, villageExp: newExp };
   });
+  return drawInfo;
 }
 
 export interface LevelUpInfo {
@@ -223,10 +227,6 @@ function hasDrawLevel(oldLevel: number, newLevel: number): boolean {
   return nextDraw <= newLevel;
 }
 
-export const pendingLevelUp = writable<LevelUpInfo | null>(null);
-export const pendingVillageLevelUp = writable<LevelUpInfo | null>(null);
-export const pendingReputationLevelUp = writable<LevelUpInfo | null>(null);
-export const suppressDrawDialog = writable(false);
 
 export function addBuilding(facilityId: string): void {
   gameState.update((state) => ({
@@ -251,14 +251,15 @@ export function upgradeHelper(helperId: string): void {
   }));
 }
 
-export function addExp(amount: number): void {
+export function addExp(amount: number): LevelUpInfo | null {
+  let levelUp: LevelUpInfo | null = null;
   gameState.update((state) => {
     const oldLevel = calcLevelFromExp(state.alchemyExp);
     const newExp = state.alchemyExp + amount;
     const newLevel = calcLevelFromExp(newExp);
 
     if (newLevel > oldLevel) {
-      pendingLevelUp.set({ oldLevel, newLevel });
+      levelUp = { oldLevel, newLevel };
     }
 
     return {
@@ -266,6 +267,7 @@ export function addExp(amount: number): void {
       alchemyExp: newExp,
     };
   });
+  return levelUp;
 }
 
 // =====================================

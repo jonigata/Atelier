@@ -3,9 +3,6 @@
   import { get } from 'svelte/store';
   import {
     gameState,
-    pendingVillageLevelUp,
-    pendingReputationLevelUp,
-    suppressDrawDialog,
     addBuilding,
     addHelper,
     upgradeHelper,
@@ -14,6 +11,7 @@
   } from '$lib/stores/game';
   import { generateBuildingChoices, generateHelperChoices } from '$lib/services/draw';
   import { showDialogueAndWait } from '$lib/services/presentation';
+  import { pendingDraw, resolveDraw } from '$lib/services/drawEvent';
   import type { BuildingDef, HelperDef, EventDialogue } from '$lib/models/types';
 
   type DrawMode = 'none' | 'facility' | 'helper';
@@ -69,25 +67,6 @@
     startDrawAnimation();
   }
 
-  // 村発展度レベルアップ → 施設ドロー
-  const unsubVillage = pendingVillageLevelUp.subscribe((info) => {
-    if (!info || drawMode !== 'none') return;
-    const state = $gameState;
-    const choices = generateBuildingChoices(state.buildings);
-    if (choices.length > 0) {
-      facilityChoices = choices;
-      drawMode = 'facility';
-      if (state.buildings.length === 0) {
-        showFirstFacilityIntro();
-      } else {
-        startDrawAnimation();
-      }
-    } else {
-      addMessage('村発展度がレベルアップしたが、建設できる施設がもうない');
-      pendingVillageLevelUp.set(null);
-    }
-  });
-
   // 初回助手ドローの導入イベント
   async function showFirstHelperIntro() {
     await showDialogueAndWait({
@@ -104,27 +83,42 @@
     startDrawAnimation();
   }
 
-  // 名声レベルアップ → 助手ドロー
-  const unsubReputation = pendingReputationLevelUp.subscribe((info) => {
-    if (!info || drawMode !== 'none' || get(suppressDrawDialog)) return;
+  // pendingDraw を subscribe してドローを開始
+  const unsubDraw = pendingDraw.subscribe((req) => {
+    if (!req || drawMode !== 'none') return;
     const state = $gameState;
-    const choices = generateHelperChoices(state.ownedHelpers);
-    if (choices.length > 0) {
-      helperChoices = choices;
-      drawMode = 'helper';
-      if (state.ownedHelpers.length === 0) {
-        showFirstHelperIntro();
+    if (req.type === 'facility') {
+      const choices = generateBuildingChoices(state.buildings);
+      if (choices.length > 0) {
+        facilityChoices = choices;
+        drawMode = 'facility';
+        if (state.buildings.length === 0) {
+          showFirstFacilityIntro();
+        } else {
+          startDrawAnimation();
+        }
       } else {
-        startDrawAnimation();
+        addMessage('村発展度がレベルアップしたが、建設できる施設がもうない');
+        resolveDraw();
       }
     } else {
-      pendingReputationLevelUp.set(null);
+      const choices = generateHelperChoices(state.ownedHelpers);
+      if (choices.length > 0) {
+        helperChoices = choices;
+        drawMode = 'helper';
+        if (state.ownedHelpers.length === 0) {
+          showFirstHelperIntro();
+        } else {
+          startDrawAnimation();
+        }
+      } else {
+        resolveDraw();
+      }
     }
   });
 
   onDestroy(() => {
-    unsubVillage();
-    unsubReputation();
+    unsubDraw();
     clearTimers();
   });
 
@@ -152,7 +146,6 @@
     addMessage(`施設「${facility.name}」を建設した！ ${facility.effectDescription}`);
     facilityChoices = [];
     drawMode = 'none';
-    pendingVillageLevelUp.set(null);
   }
 
   function applyHelperSelection(choice: { def: HelperDef; currentLevel: number }) {
@@ -169,7 +162,6 @@
     }
     helperChoices = [];
     drawMode = 'none';
-    pendingReputationLevelUp.set(null);
   }
 
   function getResultText(index: number): string {
@@ -228,6 +220,7 @@
       await showDialogueAndWait(pendingGreeting);
     }
     isFinishing = false;
+    resolveDraw();
   }
 
   function handleCardSelect(index: number) {

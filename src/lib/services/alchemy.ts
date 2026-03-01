@@ -48,6 +48,8 @@ export interface CraftMultipleResult {
   isNewDiscovery: boolean;
   isNewQualityRecord: boolean;
   message: string;
+  alchemyLevelUp: import('$lib/stores/game').LevelUpInfo | null;
+  reputationDrawInfo: import('$lib/stores/game').LevelUpInfo | null;
 }
 
 /**
@@ -179,6 +181,8 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
   let duplicatedCount = 0;
   let isNewDiscovery = false;
   let isNewQualityRecord = false;
+  let alchemyLevelUp: import('$lib/stores/game').LevelUpInfo | null = null;
+  let reputationDrawInfo: import('$lib/stores/game').LevelUpInfo | null = null;
 
   if (isSuccess) {
     // 全成功: 品質は1回だけ計算し全個数に適用
@@ -213,15 +217,15 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
     }
 
     const { alchemyExp: expGained, reputationExp: repExpGained } = calculateCraftExpGained(recipe, quality, actualQuantity, isNewDiscovery);
-    addExp(expGained);
-    if (repExpGained > 0) addReputationExp(repExpGained);
+    alchemyLevelUp = addExp(expGained);
+    if (repExpGained > 0) reputationDrawInfo = addReputationExp(repExpGained);
     totalExpGained = expGained;
     totalReputationExpGained = repExpGained;
     recordSuccess(recipe.id);
   } else {
     // 全失敗
     const expGained = Math.floor(recipe.expReward * (recipe.craftDaysTenths / 10) * ALCHEMY.FAIL_EXP_RATE * ALCHEMY.EXP_RATE) * actualQuantity;
-    addExp(expGained);
+    alchemyLevelUp = addExp(expGained);
     totalExpGained = expGained;
     resetCombo();
     recordFailure(recipe.id);
@@ -265,6 +269,8 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
     isNewDiscovery,
     isNewQualityRecord,
     message,
+    alchemyLevelUp,
+    reputationDrawInfo,
   };
 }
 
@@ -272,12 +278,12 @@ function executeBatch(recipe: RecipeDef, allBatchItems: OwnedItem[][]): CraftMul
 function validateBatchPreconditions(recipeId: string): { recipe: RecipeDef } | { error: CraftMultipleResult } {
   const recipe = getRecipe(recipeId);
   if (!recipe) {
-    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, isNewQualityRecord: false, message: 'レシピが見つかりません' } };
+    return { error: { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, isNewQualityRecord: false, message: 'レシピが見つかりません', alchemyLevelUp: null, reputationDrawInfo: null } };
   }
   return { recipe };
 }
 
-const EMPTY_BATCH_RESULT: CraftMultipleResult = { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, isNewQualityRecord: false, message: '素材が足りませんでした' };
+const EMPTY_BATCH_RESULT: CraftMultipleResult = { successCount: 0, failCount: 0, items: [], duplicatedCount: 0, totalExpGained: 0, totalReputationExpGained: 0, isNewDiscovery: false, isNewQualityRecord: false, message: '素材が足りませんでした', alchemyLevelUp: null, reputationDrawInfo: null };
 
 /**
  * 複数個の調合を実行（自動で素材を選択）

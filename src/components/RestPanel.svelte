@@ -4,6 +4,7 @@
   import { getFatigueLabel } from '$lib/services/alchemy';
   import { getBuildingRestBonus } from '$lib/services/buildingEffects';
   import { selectRestEvent, resolveRestEventRewards, applyRestEventRewards } from '$lib/services/restEvent';
+  import { showDrawAndWait } from '$lib/services/drawEvent';
   import type { RestEventDef, ResolvedReward } from '$lib/data/restEvents';
   import VideoOverlay from './common/VideoOverlay.svelte';
   import RestEventDialog from './RestEventDialog.svelte';
@@ -17,30 +18,26 @@
   let showVideo = false;
   let restEvent: { event: RestEventDef; rewards: ResolvedReward[] } | null = null;
 
-  function handleRest() {
+  async function handleRest() {
     // 休日イベント選出＆報酬確定（動画の前に表示）
     const event = selectRestEvent();
     const rewards = resolveRestEventRewards(event);
-    applyRestEventRewards(event, rewards);
+    const drawInfos = applyRestEventRewards(event, rewards);
 
-    if ($skipPresentation) {
-      // 演出スキップ時はダイアログを出さずに即実行
-      doRest();
-    } else {
-      restEvent = { event, rewards };
+    if (!$skipPresentation) {
+      // RestEventDialog を表示し、閉じるまで待つ
+      await new Promise<void>((resolve) => {
+        restEvent = { event, rewards };
+        restEventResolver = resolve;
+      });
+      // 動画再生し、終了まで待つ
+      await new Promise<void>((resolve) => {
+        showVideo = true;
+        videoResolver = resolve;
+      });
     }
-  }
 
-  function onEventClose() {
-    restEvent = null;
-    showVideo = true;
-  }
-
-  async function onVideoEnd() {
-    doRest();
-  }
-
-  async function doRest() {
+    // 体力回復 + ターン終了
     const bonus = getBuildingRestBonus();
     restoreStamina(100 + bonus);
     addMessage(`休息しました。体力が全回復しました。${bonus > 0 ? `（施設ボーナス+${bonus}）` : ''}`);
@@ -48,7 +45,31 @@
     const turnPromise = endTurn(1);
     await new Promise(r => setTimeout(r, 350));
     onBack();
+
+    // ドロー表示（明示的に待つ）
+    if (drawInfos.village) await showDrawAndWait({ type: 'facility', levelUpInfo: drawInfos.village });
+    if (drawInfos.reputation) await showDrawAndWait({ type: 'helper', levelUpInfo: drawInfos.reputation });
+
     await turnPromise;
+  }
+
+  // RestEventDialog / VideoOverlay の Promise resolver
+  let restEventResolver: (() => void) | null = null;
+  let videoResolver: (() => void) | null = null;
+
+  function onEventClose() {
+    restEvent = null;
+    if (restEventResolver) {
+      restEventResolver();
+      restEventResolver = null;
+    }
+  }
+
+  function onVideoEnd() {
+    if (videoResolver) {
+      videoResolver();
+      videoResolver = null;
+    }
   }
 </script>
 

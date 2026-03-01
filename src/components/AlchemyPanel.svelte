@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
-  import { gameState, pendingLevelUp, pendingAlchemyRecipeId, pendingReputationLevelUp, suppressDrawDialog } from '$lib/stores/game';
+  import { gameState, pendingAlchemyRecipeId } from '$lib/stores/game';
   import type { LevelUpInfo } from '$lib/stores/game';
   import { endTurn } from '$lib/services/gameLoop';
   import { processActionComplete } from '$lib/services/presentation';
+  import { showDrawAndWait } from '$lib/services/drawEvent';
   import { recipes } from '$lib/data/recipes';
   import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient, calculateStaminaCost, calculateFatiguePenalty, getFatigueLabel, getInspectionConflict } from '$lib/services/alchemy';
   import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
@@ -43,7 +44,6 @@
   let reputationExpGaugeData: GaugeData | null = null;
   let staminaGaugeData: GaugeData | null = null;
   let levelUpData: LevelUpInfo | null = null;
-  let savedReputationLevelUp: LevelUpInfo | null = null;
 
   // 習得済みのレシピ（レベル不足でも表示、成功率が下がるのみ）
   $: availableRecipes = Object.values(recipes).filter(
@@ -207,9 +207,6 @@
   function executeCraft() {
     if (!selectedRecipe || !selectionComplete) return;
 
-    // 錬成前にpendingLevelUpをクリア
-    pendingLevelUp.set(null);
-
     // ゲージ用にbefore値をキャプチャ
     const stateBefore = get(gameState);
     const levelBefore = calcLevelFromExp(stateBefore.alchemyExp);
@@ -220,16 +217,7 @@
     const repExpMax = calcExpForLevel(repLevelBefore);
     const staminaBefore = stateBefore.stamina;
 
-    // DrawDialogが調合リザルト中に表示されるのを抑制
-    suppressDrawDialog.set(true);
-
     const result = craftBatch(selectedRecipe.id, selectedItems, craftQuantity);
-
-    // 名声レベルアップを一時退避
-    savedReputationLevelUp = get(pendingReputationLevelUp);
-    if (savedReputationLevelUp) {
-      pendingReputationLevelUp.set(null);
-    }
 
     craftResultData = result;
 
@@ -278,14 +266,12 @@
   }
 
   function closeCraftResult() {
-    if (!selectedRecipe) return;
+    if (!selectedRecipe || !craftResultData) return;
 
     // レベルアップがあればダイアログを表示
-    const lvUp = $pendingLevelUp;
-    if (lvUp) {
+    if (craftResultData.alchemyLevelUp) {
+      levelUpData = craftResultData.alchemyLevelUp;
       craftResultData = null;
-      levelUpData = lvUp;
-      pendingLevelUp.set(null);
     } else {
       finishCraft();
     }
@@ -299,9 +285,10 @@
     if (!selectedRecipe) return;
     const totalTenths = getEffectiveCraftDays(selectedRecipe) * craftQuantity;
     const days = craftDaysToActual(totalTenths);
-    // 退避していた名声レベルアップを復元（DrawDialogが反応する）
-    const repLevelUp = savedReputationLevelUp;
-    savedReputationLevelUp = null;
+
+    // 調合結果から draw 情報を取得
+    const repDrawInfo = craftResultData?.reputationDrawInfo ?? null;
+
     // endTurnのPromiseを保持しつつ、DayTransition暗転を待つ
     const turnPromise = endTurn(days);
     await new Promise(r => setTimeout(r, 350));
@@ -309,12 +296,13 @@
     levelUpData = null;
     // 画面遷移のみ（マイルストーンチェックはここで自前でawaitする）
     onBack({ skipMilestoneCheck: true });
-    // アチーブメント処理を完了してからDrawDialogの抑制を解除
     await processActionComplete();
-    suppressDrawDialog.set(false);
-    if (repLevelUp) {
-      pendingReputationLevelUp.set(repLevelUp);
+
+    // ドロー表示（明示的に待つ）
+    if (repDrawInfo) {
+      await showDrawAndWait({ type: 'helper', levelUpInfo: repDrawInfo });
     }
+
     await turnPromise;
   }
 </script>

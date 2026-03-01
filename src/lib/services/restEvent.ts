@@ -1,10 +1,16 @@
 import { get } from 'svelte/store';
 import { gameState, addItem, addMoney, addExp, addReputationExp, addVillageExp, addMessage, upgradeHelper } from '$lib/stores/game';
+import type { LevelUpInfo } from '$lib/stores/game';
 import { restEvents, type RestEventDef, type ResolvedReward, type RestEventRewardTemplate } from '$lib/data/restEvents';
 import { getItem } from '$lib/data/items';
 import { getAllEquipment } from '$lib/data/equipment';
 import { getHelper } from '$lib/data/helpers';
 import type { GameState } from '$lib/models/types';
+
+export interface DrawInfos {
+  village: LevelUpInfo | null;
+  reputation: LevelUpInfo | null;
+}
 
 function randInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -187,8 +193,10 @@ export function resolveRestEventRewards(event: RestEventDef): ResolvedReward[] {
 /**
  * 確定済み報酬をゲーム状態に適用
  */
-export function applyRestEventRewards(event: RestEventDef, rewards: ResolvedReward[]): void {
+export function applyRestEventRewards(event: RestEventDef, rewards: ResolvedReward[]): DrawInfos {
   const state = get(gameState);
+  let village: LevelUpInfo | null = null;
+  let reputation: LevelUpInfo | null = null;
 
   for (const reward of rewards) {
     const a = reward.apply;
@@ -227,10 +235,10 @@ export function applyRestEventRewards(event: RestEventDef, rewards: ResolvedRewa
         if (a.amount) addExp(a.amount);
         break;
       case 'reputationExp':
-        if (a.amount) addReputationExp(a.amount);
+        if (a.amount) reputation = addReputationExp(a.amount) ?? reputation;
         break;
       case 'villageExp':
-        if (a.amount) addVillageExp(a.amount);
+        if (a.amount) village = addVillageExp(a.amount) ?? village;
         break;
     }
   }
@@ -238,4 +246,6 @@ export function applyRestEventRewards(event: RestEventDef, rewards: ResolvedRewa
   // メッセージログに報酬概要を追加
   const rewardDescs = rewards.map((r) => r.description).join('、');
   addMessage(`【休日のできごと】${event.name}：${rewardDescs}`);
+
+  return { village, reputation };
 }

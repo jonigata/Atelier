@@ -1,4 +1,5 @@
 import { gameState, addMoney, addReputationExp, addVillageExp } from '$lib/stores/game';
+import type { LevelUpInfo } from '$lib/stores/game';
 import { removeActiveQuest, incrementCompletedQuests } from '$lib/stores/quests';
 import { removeItemsFromInventory } from '$lib/services/inventory';
 import { getQuestMoneyMult, getQuestReputationBonus, getQuestQualityBonus } from '$lib/services/equipmentEffects';
@@ -10,6 +11,8 @@ export interface QuestDeliveryResult {
   finalMoney: number;
   finalReputation: number;
   finalDevelopment: number;
+  reputationDrawInfo: LevelUpInfo | null;
+  villageDrawInfo: LevelUpInfo | null;
 }
 
 /**
@@ -60,8 +63,8 @@ export function executeQuestDelivery(quest: ActiveQuest, itemsToConsume: OwnedIt
 
   // 報酬付与
   addMoney(finalMoney);
-  addReputationExp(finalReputation);
-  addVillageExp(finalDevelopment);
+  const reputationDrawInfo = addReputationExp(finalReputation);
+  const villageDrawInfo = addVillageExp(finalDevelopment);
   incrementCompletedQuests();
   removeActiveQuest(quest.id);
 
@@ -71,5 +74,5 @@ export function executeQuestDelivery(quest: ActiveQuest, itemsToConsume: OwnedIt
     stats: { ...s.stats, consecutiveQuestSuccess: s.stats.consecutiveQuestSuccess + 1 },
   }));
 
-  return { finalMoney, finalReputation, finalDevelopment };
+  return { finalMoney, finalReputation, finalDevelopment, reputationDrawInfo, villageDrawInfo };
 }

@@ -19,6 +19,7 @@
   import { processActionComplete, processAchievementPresentation, showDialogueAndWait } from '$lib/services/presentation';
   import { executeQuestDelivery } from '$lib/services/quest';
   import { checkAchievements } from '$lib/services/achievement';
+  import { showDrawAndWait } from '$lib/services/drawEvent';
   import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments, calcNextDrawLevel } from '$lib/data/balance';
   import { get } from 'svelte/store';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
@@ -112,7 +113,7 @@
     const vilExpMax = calcExpForLevel(vilLevelBefore);
 
     // 共通納品ロジック
-    const { finalMoney, finalReputation, finalDevelopment } = executeQuestDelivery(quest, itemsToConsume);
+    const { finalMoney, finalReputation, finalDevelopment, reputationDrawInfo, villageDrawInfo } = executeQuestDelivery(quest, itemsToConsume);
 
     // ゲージ用: 変更後の状態を取得
     const stateAfter = get(gameState);
@@ -182,6 +183,10 @@
       await processAchievementPresentation(achievedId);
       achievedId = checkAchievements();
     }
+
+    // ドロー表示（明示的に待つ）
+    if (villageDrawInfo) await showDrawAndWait({ type: 'facility', levelUpInfo: villageDrawInfo });
+    if (reputationDrawInfo) await showDrawAndWait({ type: 'helper', levelUpInfo: reputationDrawInfo });
   }
 
   // 残り日数を計算

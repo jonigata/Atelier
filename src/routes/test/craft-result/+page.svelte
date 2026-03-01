@@ -23,6 +23,8 @@
     isNewDiscovery: true,
     isNewQualityRecord: false,
     message: '',
+    alchemyLevelUp: null,
+    reputationDrawInfo: null,
   };
   const newAlbumExpGauge: GaugeData = {
     before: 0, after: 4, max: 14, label: 'Lv.1',
@@ -46,6 +48,8 @@
     isNewDiscovery: false,
     isNewQualityRecord: false,
     message: '',
+    alchemyLevelUp: null,
+    reputationDrawInfo: null,
   };
   const knownExpGauge: GaugeData = {
     before: 10, after: 16, max: 30, label: 'Lv.2',
@@ -65,6 +69,8 @@
     isNewDiscovery: true,
     isNewQualityRecord: false,
     message: '',
+    alchemyLevelUp: null,
+    reputationDrawInfo: null,
   };
   const highQualityExpGauge: GaugeData = {
     before: 5, after: 13, max: 14, label: 'Lv.1',
@@ -92,6 +98,8 @@
     isNewDiscovery: true,
     isNewQualityRecord: false,
     message: '',
+    alchemyLevelUp: null,
+    reputationDrawInfo: null,
   };
   const multiExpGauge: GaugeData = {
     before: 2, after: 14, max: 14, label: 'Lv.1',
@@ -119,6 +127,8 @@
     isNewDiscovery: false,
     isNewQualityRecord: false,
     message: '',
+    alchemyLevelUp: null,
+    reputationDrawInfo: null,
   };
   const failExpGauge: GaugeData = {
     before: 10, after: 11, max: 30, label: 'Lv.2',
@@ -138,6 +148,8 @@
     isNewDiscovery: false,
     isNewQualityRecord: true,
     message: '',
+    alchemyLevelUp: null,
+    reputationDrawInfo: null,
   };
   const recordExpGauge: GaugeData = {
     before: 10, after: 16, max: 30, label: 'Lv.2',

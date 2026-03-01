@@ -16,6 +16,7 @@ import {
   isStoryAchievement,
   preSelectRandomEquipment,
 } from './achievement';
+import { showDrawAndWait } from './drawEvent';
 import { getAchievementById } from '$lib/data/achievements';
 import { INSPECTION_DAYS, inspections, getOverallGrade, getGradeForValue, getInspectionReward } from '$lib/data/inspection';
 import type { InspectionGrade } from '$lib/data/inspection';
@@ -152,7 +153,7 @@ export async function processAchievementPresentation(achievementId: string): Pro
   }
 
   // 4. 報酬を付与（事前選択した機材を渡す）
-  claimReward(achievementId, pickedEquipment);
+  const drawInfos = claimReward(achievementId, pickedEquipment);
 
   // 最初の依頼完了時、ランダム依頼生成を開始（初回は5件）
   if (achievementId === 'ach_first_complete') {
@@ -171,6 +172,10 @@ export async function processAchievementPresentation(achievementId: string): Pro
   // 6. 新しく発動した目標のトースト
   await sleep(300);
   checkNewActiveGoals();
+
+  // 7. ドロー表示（明示的に待つ）
+  if (drawInfos.villageDrawInfo) await showDrawAndWait({ type: 'facility', levelUpInfo: drawInfos.villageDrawInfo });
+  if (drawInfos.reputationDrawInfo) await showDrawAndWait({ type: 'helper', levelUpInfo: drawInfos.reputationDrawInfo });
 }
 
 /**
@@ -323,8 +328,9 @@ export async function processInspectionSequence(): Promise<boolean> {
           });
         }
       }
+      let inspRepDrawInfo = null;
       if (reward.reputationExp > 0) {
-        addReputationExp(reward.reputationExp);
+        inspRepDrawInfo = addReputationExp(reward.reputationExp);
       }
 
       // メッセージログに報酬内容を記録
@@ -334,6 +340,9 @@ export async function processInspectionSequence(): Promise<boolean> {
         rewardDescParts.push(`${ri.name}(品質${ri.quality})×${ri.quantity}`);
       }
       addMessage(`【査察報酬】${rewardDescParts.join('、')}`);
+
+      // ドロー表示
+      if (inspRepDrawInfo) await showDrawAndWait({ type: 'helper', levelUpInfo: inspRepDrawInfo });
     }
 
     // 次の査察日を告知

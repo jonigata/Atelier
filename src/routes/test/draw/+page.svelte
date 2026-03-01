@@ -1,11 +1,10 @@
 <script lang="ts">
   import {
-    pendingVillageLevelUp,
-    pendingReputationLevelUp,
     gameState,
     skipPresentation,
     toggleSkipPresentation,
   } from '$lib/stores/game';
+  import { showDrawAndWait } from '$lib/services/drawEvent';
   import DrawDialog from '../../../components/DrawDialog.svelte';
 
   // 所持施設をクリアして全施設が出るようにする
@@ -31,11 +30,11 @@
   }
 
   function triggerFacilityDraw() {
-    pendingVillageLevelUp.set({ oldLevel: 1, newLevel: 2 });
+    showDrawAndWait({ type: 'facility', levelUpInfo: { oldLevel: 1, newLevel: 2 } });
   }
 
   function triggerHelperDraw() {
-    pendingReputationLevelUp.set({ oldLevel: 1, newLevel: 2 });
+    showDrawAndWait({ type: 'helper', levelUpInfo: { oldLevel: 1, newLevel: 2 } });
   }
 
   $: facilities = $gameState.buildings;

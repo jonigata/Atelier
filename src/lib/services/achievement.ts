@@ -9,6 +9,7 @@ import {
   learnRecipe,
   unlockFacility,
 } from '$lib/stores/game';
+import type { LevelUpInfo } from '$lib/stores/game';
 import { calcExpForLevel, calcLevelFromExp, calcExpProgress, buildExpGaugeSegments, calcNextDrawLevel } from '$lib/data/balance';
 import { completeAchievement, clearPendingReward, isAchievementCompleted } from '$lib/stores/achievements';
 import { unlockAction } from '$lib/stores/tutorial';
@@ -270,11 +271,18 @@ export function getActiveGoals(): AchievementDef[] {
 /**
  * 報酬を付与
  */
-export function claimReward(achievementId: string, pickedEquipment?: EquipmentDef[]): void {
+export interface ClaimRewardDrawInfos {
+  reputationDrawInfo: LevelUpInfo | null;
+  villageDrawInfo: LevelUpInfo | null;
+}
+
+export function claimReward(achievementId: string, pickedEquipment?: EquipmentDef[]): ClaimRewardDrawInfos {
   const achievement = getAchievementById(achievementId);
-  if (!achievement) return;
+  if (!achievement) return { reputationDrawInfo: null, villageDrawInfo: null };
 
   const { reward } = achievement;
+  let reputationDrawInfo: LevelUpInfo | null = null;
+  let villageDrawInfo: LevelUpInfo | null = null;
 
   if (reward.money) {
     addMoney(reward.money);
@@ -294,7 +302,7 @@ export function claimReward(achievementId: string, pickedEquipment?: EquipmentDe
   }
 
   if (reward.reputationExp) {
-    addReputationExp(reward.reputationExp);
+    reputationDrawInfo = addReputationExp(reward.reputationExp);
   }
 
   if (reward.exp) {
@@ -302,7 +310,7 @@ export function claimReward(achievementId: string, pickedEquipment?: EquipmentDe
   }
 
   if (reward.villageExp) {
-    addVillageExp(reward.villageExp);
+    villageDrawInfo = addVillageExp(reward.villageExp);
   }
 
   if (reward.recipes) {
@@ -339,6 +347,8 @@ export function claimReward(achievementId: string, pickedEquipment?: EquipmentDe
   }
 
   clearPendingReward();
+
+  return { reputationDrawInfo, villageDrawInfo };
 }
 
 /**
