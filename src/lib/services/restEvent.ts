@@ -6,6 +6,7 @@ import { getItem } from '$lib/data/items';
 import { getAllEquipment } from '$lib/data/equipment';
 import { getHelper } from '$lib/data/helpers';
 import type { GameState } from '$lib/models/types';
+import { calcLevelFromExp, calcExpProgress, calcExpForLevel, calcNextDrawLevel, buildExpGaugeSegments } from '$lib/data/balance';
 
 export interface DrawInfos {
   village: LevelUpInfo | null;
@@ -191,6 +192,39 @@ export function resolveRestEventRewards(event: RestEventDef): ResolvedReward[] {
 }
 
 /**
+ * EXP報酬にゲージアニメーション用データを付与する
+ */
+function attachExpGaugeData(
+  reward: ResolvedReward,
+  expField: 'alchemyExp' | 'reputationExp' | 'villageExp',
+  color: 'blue' | 'gold' | 'green',
+  totalBefore: number,
+  totalAfter: number,
+): void {
+  const levelBefore = calcLevelFromExp(totalBefore);
+  const levelAfter = calcLevelFromExp(totalAfter);
+  const progressBefore = calcExpProgress(totalBefore);
+  const progressAfter = calcExpProgress(totalAfter);
+  const max = calcExpForLevel(levelBefore);
+  const leveledUp = levelAfter > levelBefore;
+  const nextDraw = calcNextDrawLevel(levelAfter);
+
+  reward.gaugeData = {
+    before: progressBefore,
+    after: leveledUp ? max : progressAfter,
+    max,
+    label: `Lv.${levelBefore}`,
+    segments: leveledUp
+      ? buildExpGaugeSegments(levelBefore, progressBefore, levelAfter, progressAfter)
+      : undefined,
+    subtext: nextDraw
+      ? `NEXT<img class="draw-icon" src="/icons/ui/draw_lightning.png" alt="">Lv.${nextDraw}`
+      : undefined,
+  };
+  reward.gaugeColor = color;
+}
+
+/**
  * 確定済み報酬をゲーム状態に適用
  */
 export function applyRestEventRewards(event: RestEventDef, rewards: ResolvedReward[]): DrawInfos {
@@ -226,20 +260,38 @@ export function applyRestEventRewards(event: RestEventDef, rewards: ResolvedRewa
       case 'gold':
         if (a.amount) addMoney(a.amount);
         break;
-      case 'alchemyExp':
+      case 'alchemyExp': {
         // special: helperLevelUp の場合
         if (event.special === 'helperLevelUp' && a.itemId) {
           upgradeHelper(a.itemId);
           break;
         }
-        if (a.amount) addExp(a.amount);
+        if (a.amount) {
+          const before = get(gameState).alchemyExp;
+          addExp(a.amount);
+          const after = get(gameState).alchemyExp;
+          attachExpGaugeData(reward, 'alchemyExp', 'blue', before, after);
+        }
         break;
-      case 'reputationExp':
-        if (a.amount) reputation = addReputationExp(a.amount) ?? reputation;
+      }
+      case 'reputationExp': {
+        if (a.amount) {
+          const before = get(gameState).reputationExp;
+          reputation = addReputationExp(a.amount) ?? reputation;
+          const after = get(gameState).reputationExp;
+          attachExpGaugeData(reward, 'reputationExp', 'gold', before, after);
+        }
         break;
-      case 'villageExp':
-        if (a.amount) village = addVillageExp(a.amount) ?? village;
+      }
+      case 'villageExp': {
+        if (a.amount) {
+          const before = get(gameState).villageExp;
+          village = addVillageExp(a.amount) ?? village;
+          const after = get(gameState).villageExp;
+          attachExpGaugeData(reward, 'villageExp', 'green', before, after);
+        }
         break;
+      }
     }
   }
 

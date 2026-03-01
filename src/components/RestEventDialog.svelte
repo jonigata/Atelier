@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { RestEventDef, ResolvedReward } from '$lib/data/restEvents';
+  import AnimatedGauge from './common/AnimatedGauge.svelte';
 
   import { onMount } from 'svelte';
 
@@ -8,6 +9,10 @@
   export let onClose: () => void;
 
   let canDismiss = false;
+
+  // ゲージ付きEXP報酬とそれ以外を分離
+  $: gaugeRewards = rewards.filter(r => r.gaugeData);
+  $: normalRewards = rewards.filter(r => !r.gaugeData);
 
   onMount(() => {
     // 動画スキップのキー入力と衝突しないよう少し待つ
@@ -44,19 +49,40 @@
 
     <div class="divider"></div>
 
-    <div class="rewards">
-      {#each rewards as reward}
-        <div class="reward-item" class:gold={reward.type === 'gold'} class:exp={reward.type === 'exp'} class:item={reward.type === 'item'}>
-          <span class="reward-bullet">
-            {#if reward.type === 'gold'}💰
-            {:else if reward.type === 'exp'}📘
-            {:else}📦
-            {/if}
-          </span>
-          <span class="reward-text">{reward.description}</span>
-        </div>
-      {/each}
-    </div>
+    {#if normalRewards.length > 0}
+      <div class="rewards">
+        {#each normalRewards as reward}
+          <div class="reward-item" class:gold={reward.type === 'gold'} class:exp={reward.type === 'exp'} class:item={reward.type === 'item'}>
+            <span class="reward-bullet">
+              {#if reward.type === 'gold'}💰
+              {:else if reward.type === 'exp'}📘
+              {:else}📦
+              {/if}
+            </span>
+            <span class="reward-text">{reward.description}</span>
+          </div>
+        {/each}
+      </div>
+    {/if}
+
+    {#if gaugeRewards.length > 0}
+      <div class="gauge-rewards">
+        {#each gaugeRewards as reward}
+          {#if reward.gaugeData}
+            <AnimatedGauge
+              before={reward.gaugeData.before}
+              after={reward.gaugeData.after}
+              max={reward.gaugeData.max}
+              label={reward.gaugeData.label}
+              text={reward.description}
+              color={reward.gaugeColor ?? 'blue'}
+              segments={reward.gaugeData.segments}
+              subtext={reward.gaugeData.subtext ?? ''}
+            />
+          {/if}
+        {/each}
+      </div>
+    {/if}
 
     <p class="hint">クリック または Enter で続ける</p>
   </div>
@@ -161,6 +187,13 @@
 
   .reward-item.item .reward-text {
     color: #64b5f6;
+  }
+
+  .gauge-rewards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
   }
 
   .hint {
