@@ -49,9 +49,21 @@ export async function endTurn(daysSpent: number): Promise<void> {
     return;
   }
 
+  // 査察前にday28の完了状態を記録
+  const hadDay28Before = state.completedInspections.includes(28);
+
   // 査察シーケンス（DayTransition完了後、朝画面の前に全て実行）
   const gameOver = await processInspectionSequence();
   if (gameOver) return;
+
+  // 仮エンディング: 1月末査察（day 28）を今回完了した場合のみ発動
+  if (!hadDay28Before) {
+    const updatedState = get(gameState);
+    if (updatedState.completedInspections.includes(28)) {
+      setPhase('ending');
+      return;
+    }
+  }
 
   // 朝のフェーズに移行
   await processMorningPhase();

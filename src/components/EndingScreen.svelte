@@ -1,9 +1,21 @@
 <script lang="ts">
   import { gameState, resetGame, alchemyLevel, villageLevel, reputationLevel, scoreBreakdown } from '$lib/stores/game';
+  import { initializeGame } from '$lib/services/gameLoop';
 
   type EndingType = 'true' | 'good' | 'normal' | 'mediocre' | 'fail';
 
   $: isGameOver = $gameState.gameOverReason != null;
+  $: isProvisionalEnding = !isGameOver && $gameState.day <= 336;
+
+  // 仮エンディングのステップ管理（クリックで順に開示）
+  let revealStep = 0;
+  const TOTAL_STEPS = 3; // 0:タイトル+スコア, 1:成績, 2:内訳+ボタン
+
+  function handleRevealClick() {
+    if (revealStep < TOTAL_STEPS - 1) {
+      revealStep++;
+    }
+  }
 
   function getEnding(): { type: EndingType; title: string; description: string } {
     const state = $gameState;
@@ -66,11 +78,84 @@
   $: ending = getEnding();
 
   function handleRestart() {
+    revealStep = 0;
     resetGame();
+    initializeGame();
   }
 </script>
 
-{#if isGameOver}
+{#if isProvisionalEnding}
+<!-- 仮エンディング -->
+<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+<div class="ending-screen provisional" on:click={handleRevealClick}>
+  <div class="content">
+    <h1 class="fade-in">1月末の査察が終了しました</h1>
+
+    <div class="final-score fade-in">
+      <span class="final-score-label">SCORE</span>
+      <span class="final-score-value">{$scoreBreakdown.total.toLocaleString()}</span>
+      <span class="final-score-unit">pt</span>
+    </div>
+
+    {#if revealStep >= 1}
+    <div class="stats fade-in">
+      <h3>{$gameState.day}日目の成績</h3>
+      <div class="stat-grid">
+        <div class="stat highlight">
+          <span class="label">村発展度</span>
+          <span class="value">Lv.{$villageLevel}</span>
+        </div>
+        <div class="stat">
+          <span class="label">錬金術レベル</span>
+          <span class="value">Lv.{$alchemyLevel}</span>
+        </div>
+        <div class="stat">
+          <span class="label">名声</span>
+          <span class="value">Lv.{$reputationLevel}</span>
+        </div>
+        <div class="stat">
+          <span class="label">所持金</span>
+          <span class="value">{$gameState.money.toLocaleString()} G</span>
+        </div>
+        <div class="stat">
+          <span class="label">達成依頼</span>
+          <span class="value">{$gameState.completedQuestCount}件</span>
+        </div>
+        <div class="stat">
+          <span class="label">調合回数</span>
+          <span class="value">{$gameState.stats.totalCraftCount}回</span>
+        </div>
+      </div>
+    </div>
+    {/if}
+
+    {#if revealStep >= 2}
+    <div class="stats fade-in">
+      <div class="score-breakdown">
+        <h4>スコア内訳</h4>
+        <div class="breakdown-grid">
+          <span class="bd-label">所持金</span><span class="bd-value">{$scoreBreakdown.money.toLocaleString()}</span>
+          <span class="bd-label">所持品</span><span class="bd-value">{$scoreBreakdown.inventory.toLocaleString()}</span>
+          <span class="bd-label">レベル</span><span class="bd-value">{$scoreBreakdown.levels.toLocaleString()}</span>
+          <span class="bd-label">依頼達成</span><span class="bd-value">{$scoreBreakdown.quests.toLocaleString()}</span>
+          <span class="bd-label">アルバム</span><span class="bd-value">{$scoreBreakdown.album.toLocaleString()}</span>
+          <span class="bd-label">調合実績</span><span class="bd-value">{$scoreBreakdown.crafting.toLocaleString()}</span>
+          <span class="bd-label">建物・助手</span><span class="bd-value">{$scoreBreakdown.buildings.toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="provisional-note fade-in">体験版はここまでです</p>
+
+    <button class="restart-btn fade-in" on:click|stopPropagation={handleRestart}>
+      最初から
+    </button>
+    {:else}
+    <p class="click-hint">click</p>
+    {/if}
+  </div>
+</div>
+{:else if isGameOver}
 <div class="ending-screen gameover">
   <div class="content">
     <h1>召還されました</h1>
@@ -202,6 +287,10 @@
     justify-content: center;
     padding: 2rem;
     background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
+  }
+
+  .ending-screen.provisional {
+    cursor: pointer;
   }
 
   .ending-screen.true {
@@ -372,6 +461,33 @@
     color: #e0e0f0;
     text-align: right;
     font-variant-numeric: tabular-nums;
+  }
+
+  .provisional-note {
+    color: #a0a0b0;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .click-hint {
+    color: rgba(160, 160, 176, 0.6);
+    font-size: 0.85rem;
+    margin-top: 1rem;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  .fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .restart-btn {
