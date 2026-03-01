@@ -69,8 +69,10 @@ export const QUALITY = {
 // =====================================
 
 export const EXPEDITION = {
-  /** 1日あたりのドロップ数 */
-  DROPS_PER_DAY: 2,
+  /** 1日あたりの基本ドロップ数 */
+  DROPS_PER_DAY: 6,
+  /** 1日あたりのドロップ数のランダム幅（±） */
+  DROPS_PER_DAY_VARIANCE: 2,
 } as const;
 
 // =====================================
