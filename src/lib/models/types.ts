@@ -349,10 +349,20 @@ export interface TutorialProgress {
   pendingDialogue: EventDialogue | null;
 }
 
+// 査察項目スコア（全日付で全項目を記録）
+export interface InspectionScoreSnapshot {
+  album: number;      // discoveredItems.length
+  quests: number;     // completedQuestCount
+  level: number;      // 錬金Lv (calcLevelFromExp(alchemyExp))
+  villageDev: number; // 村発展Lv (calcLevelFromExp(villageExp))
+  reputation: number; // 名声Lv (calcLevelFromExp(reputationExp))
+}
+
 // スコア履歴エントリ（毎朝記録）
 export interface DailyScoreEntry {
   day: number;
   total: number;
+  inspection?: InspectionScoreSnapshot;
 }
 
 // ゲーム状態

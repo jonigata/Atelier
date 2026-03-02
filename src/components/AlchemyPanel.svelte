@@ -341,7 +341,7 @@
           {/each}
           <span class="qty-max">/ 最大 {maxCraftable}個</span>
         </div>
-        <p class="quantity-hint">所要日数: {formatCraftDays(getEffectiveCraftDays(selectedRecipe))} × {craftQuantity}個 = {craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)}日</p>
+        <p class="quantity-hint">所要日数: {formatCraftDays(getEffectiveCraftDays(selectedRecipe))} × {craftQuantity}個 = <span class="days-total" class:multi-day={craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity) >= 2}>{craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)}日</span></p>
         {#if maxWithoutInspection === 0}
           {@const conflictDay = getInspectionConflictForQuantity(1)}
           <div class="inspection-warning">
@@ -512,6 +512,16 @@
     margin-top: 0.5rem;
     font-size: 0.85rem;
     color: #a0a0b0;
+  }
+
+  .days-total {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #ffc107;
+  }
+
+  .days-total.multi-day {
+    color: #ff9800;
   }
 
   .inspection-warning {
