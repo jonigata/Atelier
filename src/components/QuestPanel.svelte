@@ -375,7 +375,7 @@
       {#if $gameState.activeQuests.length === 0}
         <p class="empty">受注中の依頼はありません</p>
       {:else}
-        {#each $gameState.activeQuests as quest}
+        {#each $gameState.activeQuests as quest (quest.id)}
           <ActiveQuestCard {quest} showDeliverButton={true} onDeliver={deliverQuest} onCancel={cancelQuest} />
         {/each}
       {/if}

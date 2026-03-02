@@ -37,7 +37,7 @@
   $: daysLeft = getDaysRemaining(quest);
   $: matchingCount = getMatchingItemsForQuest(quest).length;
   $: canDeliverNow = canDeliver(quest);
-  $: dangerLevel = Math.max(0, 1 - daysLeft / 7);
+  $: dangerLevel = Math.max(0, 1 - daysLeft / quest.deadlineDays);
   $: client = quest.clientId ? getQuestClient(quest.clientId) : undefined;
 </script>
 
@@ -69,7 +69,7 @@
       <div class="days-bar-container">
         <div
           class="days-bar"
-          style="width: {Math.max(0, Math.min(100, (daysLeft / 7) * 100))}%; --danger-level: {dangerLevel}"
+          style="width: {Math.max(0, Math.min(100, (daysLeft / quest.deadlineDays) * 100))}%; --danger-level: {dangerLevel}"
         ></div>
         <span class="days-label">残り{daysLeft}日</span>
       </div>
