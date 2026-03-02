@@ -77,7 +77,13 @@
   </div>
 
   <div class="quest-requirement">
-    <img class="item-icon" src={getItemIcon(quest.requiredItemId)} alt="" on:error={handleIconError} />
+    <img
+      class="item-icon"
+      class:silhouette={!$gameState.craftedItems.includes(quest.requiredItemId)}
+      src={getItemIcon(quest.requiredItemId)}
+      alt=""
+      on:error={handleIconError}
+    />
     <span class="item-name">{itemDef?.name || quest.requiredItemId}</span>
     {#if quest.requiredQuality}
       <span class="quality-req">品質{quest.requiredQuality}↑</span>
@@ -215,9 +221,14 @@
   }
 
   .item-icon {
-    width: 20px;
-    height: 20px;
+    width: 32px;
+    height: 32px;
     object-fit: contain;
+  }
+
+  .item-icon.silhouette {
+    filter: brightness(0);
+    opacity: 0.5;
   }
 
   .item-name {

@@ -313,7 +313,13 @@
             <p class="quest-desc">{quest.description}</p>
             <div class="quest-details">
               <span class="requirement">
-                <img class="item-icon-small" src={getItemIcon(quest.requiredItemId)} alt={itemDef?.name || quest.requiredItemId} on:error={handleIconError} />
+                <img
+                  class="item-icon-small"
+                  class:silhouette={!$gameState.craftedItems.includes(quest.requiredItemId)}
+                  src={getItemIcon(quest.requiredItemId)}
+                  alt={itemDef?.name || quest.requiredItemId}
+                  on:error={handleIconError}
+                />
                 {itemDef?.name || quest.requiredItemId}
                 ×{quest.requiredQuantity}
                 {#if quest.requiredQuality}
@@ -513,9 +519,14 @@
   }
 
   .item-icon-small {
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 36px;
     object-fit: contain;
+  }
+
+  .item-icon-small.silhouette {
+    filter: brightness(0);
+    opacity: 0.5;
   }
 
   .deadline, .progress {
