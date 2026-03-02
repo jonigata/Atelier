@@ -13,7 +13,7 @@ import type {
   RecipeBookDef,
   ItemCategory,
 } from '$lib/models/types';
-import { getBuildingStudyDaysReduce, getBuildingCraftDaysHalveCategories } from '$lib/services/buildingEffects';
+import { getBuildingStudyDaysReduce, getBuildingCraftDaysPercentReduce, getBuildingCraftDaysFixedReduce } from '$lib/services/buildingEffects';
 
 // =====================================================================
 // 一時的な状態（セーブ不要）
@@ -174,14 +174,19 @@ export function getEffectiveCraftDays(recipe: RecipeDef): number {
     days = Math.ceil(days / 2);
   }
 
-  // 施設による半減（カテゴリ限定）
+  // 施設による割合短縮（カテゴリ限定）
   const itemDef = getItem(recipe.resultItemId);
-  const buildingHalveCategories = getBuildingCraftDaysHalveCategories();
-  for (const cat of buildingHalveCategories) {
-    if (!cat || (itemDef && itemDef.category === cat)) {
-      days = Math.ceil(days / 2);
+  const buildingPercentReduces = getBuildingCraftDaysPercentReduce();
+  for (const { category, fraction } of buildingPercentReduces) {
+    if (!category || (itemDef && itemDef.category === category)) {
+      days = Math.ceil(days * (1 - fraction));
       break;
     }
+  }
+
+  // 施設による固定短縮（カテゴリ限定、0.1日単位）
+  if (itemDef) {
+    days -= getBuildingCraftDaysFixedReduce(itemDef.category);
   }
 
   // 固定短縮
