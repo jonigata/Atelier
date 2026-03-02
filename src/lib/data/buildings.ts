@@ -143,13 +143,13 @@ export const buildings: Record<string, BuildingDef> = {
   clinic: {
     id: 'clinic',
     name: '診療所',
-    description: '村の医療施設。休息時の体力回復量が増加する',
+    description: '村の医療施設。最大体力が増加する',
     icon: '🏥',
     maxLevel: 3,
     levels: [
-      { effects: [{ type: 'rest_bonus', value: 25 }], effectDescription: '休息の体力回復量+25' },
-      { effects: [{ type: 'rest_bonus', value: 40 }], effectDescription: '休息の体力回復量+40' },
-      { effects: [{ type: 'rest_bonus', value: 60 }], effectDescription: '休息の体力回復量+60' },
+      { effects: [{ type: 'max_stamina_bonus', value: 25 }], effectDescription: '最大体力+25' },
+      { effects: [{ type: 'max_stamina_bonus', value: 40 }], effectDescription: '最大体力+40' },
+      { effects: [{ type: 'max_stamina_bonus', value: 60 }], effectDescription: '最大体力+60' },
     ],
   },
   meeting_hall: {

@@ -6,7 +6,7 @@ import type {
   DailyScoreEntry,
 } from '$lib/models/types';
 import { removeItemFromInventory } from '$lib/services/inventory';
-import { calcExpForLevel, calcLevelFromExp, calcExpProgress, ALCHEMY, LEVEL } from '$lib/data/balance';
+import { calcExpForLevel, calcLevelFromExp, calcExpProgress, ALCHEMY, LEVEL, STAMINA } from '$lib/data/balance';
 import { getHelper } from '$lib/data/helpers';
 import { getBuilding } from '$lib/data/buildings';
 import { calcScore } from '$lib/services/score';
@@ -236,21 +236,36 @@ function hasDrawLevel(_oldLevel: number, _newLevel: number): boolean {
 
 
 export function addBuilding(facilityId: string): void {
-  gameState.update((state) => ({
-    ...state,
-    buildings: [...state.buildings, { buildingId: facilityId, level: 1 }],
-  }));
+  gameState.update((state) => {
+    const newBuildings = [...state.buildings, { buildingId: facilityId, level: 1 }];
+    return { ...state, buildings: newBuildings, maxStamina: calcMaxStamina(newBuildings) };
+  });
 }
 
 export function upgradeBuilding(buildingId: string): void {
   const def = getBuilding(buildingId);
   const maxLevel = def?.maxLevel ?? 3;
-  gameState.update((state) => ({
-    ...state,
-    buildings: state.buildings.map((b) =>
+  gameState.update((state) => {
+    const newBuildings = state.buildings.map((b) =>
       b.buildingId === buildingId ? { ...b, level: Math.min(b.level + 1, maxLevel) } : b
-    ),
-  }));
+    );
+    return { ...state, buildings: newBuildings, maxStamina: calcMaxStamina(newBuildings) };
+  });
+}
+
+function calcMaxStamina(buildings: GameState['buildings']): number {
+  let bonus = 0;
+  for (const owned of buildings) {
+    const def = getBuilding(owned.buildingId);
+    if (!def) continue;
+    const levelData = def.levels[owned.level - 1];
+    if (levelData) {
+      for (const effect of levelData.effects) {
+        if (effect.type === 'max_stamina_bonus') bonus += effect.value;
+      }
+    }
+  }
+  return STAMINA.INITIAL_MAX + bonus;
 }
 
 export function addHelper(helperId: string): void {
@@ -332,6 +347,13 @@ export function restoreStamina(amount: number): void {
   gameState.update((state) => ({
     ...state,
     stamina: Math.min(state.maxStamina, state.stamina + amount),
+  }));
+}
+
+export function setStamina(value: number): void {
+  gameState.update((state) => ({
+    ...state,
+    stamina: value,
   }));
 }
 

@@ -65,11 +65,11 @@ export function getBuildingStudyDaysReduce(): number {
 }
 
 /**
- * 施設の休息ボーナス合計
+ * 施設の最大体力ボーナス合計
  */
-export function getBuildingRestBonus(): number {
+export function getBuildingMaxStaminaBonus(): number {
   return getAllBuildingEffects()
-    .filter((e) => e.type === 'rest_bonus')
+    .filter((e) => e.type === 'max_stamina_bonus')
     .reduce((sum, e) => sum + e.value, 0);
 }
 

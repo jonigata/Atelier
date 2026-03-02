@@ -1,7 +1,6 @@
 import { get } from 'svelte/store';
-import { addMessage, restoreStamina, skipPresentation } from '$lib/stores/game';
+import { gameState, addMessage, setStamina, skipPresentation } from '$lib/stores/game';
 import { endTurn } from '$lib/services/gameLoop';
-import { getBuildingRestBonus } from '$lib/services/buildingEffects';
 import { selectRestEvent, resolveRestEventRewards, applyRestEventRewards } from '$lib/services/restEvent';
 import { showDrawsForLevelUp } from '$lib/services/drawEvent';
 import type { RestEventDef, ResolvedReward } from '$lib/data/restEvents';
@@ -41,12 +40,10 @@ export async function executeRest(ui: RestSequenceUI): Promise<void> {
 		ui.hideEventDialog();
 	}
 
-	// --- 体力回復 ---
-	const bonus = getBuildingRestBonus();
-	restoreStamina(100 + bonus);
-	addMessage(
-		`休息しました。体力が全回復しました。${bonus > 0 ? `（施設ボーナス+${bonus}）` : ''}`,
-	);
+	// --- 体力回復（全快） ---
+	const state = get(gameState);
+	setStamina(state.maxStamina);
+	addMessage('休息しました。体力が全回復しました。');
 
 	// --- ドロー表示（ムービーの前に実行） ---
 	if (drawInfos.village)

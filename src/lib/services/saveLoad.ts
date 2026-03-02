@@ -1,6 +1,7 @@
 import { get, writable } from 'svelte/store';
 import { gameState } from '$lib/stores/game';
-import { calcLevelFromExp } from '$lib/data/balance';
+import { calcLevelFromExp, STAMINA } from '$lib/data/balance';
+import { getBuilding } from '$lib/data/buildings';
 import type { GameState } from '$lib/models/types';
 
 /** セーブ/ロードインジケータ表示用 */
@@ -106,6 +107,20 @@ function migrateState(state: GameState): void {
   if (!state.scoreHistory) {
     (state as any).scoreHistory = [];
   }
+
+  // maxStamina: 建物ボーナスを反映して再計算
+  let staminaBonus = 0;
+  for (const owned of state.buildings) {
+    const def = getBuilding(owned.buildingId);
+    if (!def) continue;
+    const levelData = def.levels[owned.level - 1];
+    if (levelData) {
+      for (const effect of levelData.effects) {
+        if (effect.type === 'max_stamina_bonus') staminaBonus += effect.value;
+      }
+    }
+  }
+  state.maxStamina = STAMINA.INITIAL_MAX + staminaBonus;
 }
 
 /** 指定スロットを削除 */
