@@ -18,8 +18,8 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     category: 'alchemy',
     narrative: 'workshop_discovery',
     narrativeLines: [
-      '工房の奥を整理していると、前の住人が残した大釜の改良設計図を見つけた',
-      '大釜を改良すれば調合の成功率が上がる。早速取りかかろう',
+      'こつこつ調合を重ねるうち、素材の特性が手に取るように分かるようになってきた',
+      '確実に腕は上がっている。もっともっと、上手くなれるはずだ',
     ],
     conditions: [{ type: 'craft_count', target: 10 }],
     reward: { money: 200, reputationExp: 5 },
@@ -36,7 +36,7 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     narrative: 'village_growth',
     narrativeLines: [
       '村の評判が近隣にも広まり始めた',
-      '熟練の技に見合う高等作業台を完成させた。調合品質がさらに上がるだろう',
+      '「フォンテ村の先生は腕がいい」――そんな噂が聞こえてくるようになった',
     ],
     conditions: [{ type: 'craft_count', target: 50 }],
     reward: { money: 500, reputationExp: 10 },
@@ -111,7 +111,7 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     narrative: 'villager_gift',
     narrativeLines: [
       '村人たちから感謝の品が届いた',
-      '工房の掃除を手伝ってくれた村人が、床下から古い魔法陣の設計図を見つけてくれた',
+      '「先生のおかげで助かってるよ」と口々に言ってくれる。この村に来てよかった',
     ],
     conditions: [{ type: 'quest_count', target: 5 }],
     reward: {
@@ -292,7 +292,7 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     hint: '錬金術<strong>レベル15</strong>に到達しよう',
     category: 'mastery',
     narrative: 'master_gift',
-    narrativeLines: ['師匠から成長を祝う仕送りが届いた。「そろそろ蒸留器の使い方も覚える頃だ」'],
+    narrativeLines: ['師匠から成長を祝う仕送りが届いた。「新しいレシピを同封する。使いこなしてみなさい」'],
     conditions: [{ type: 'level', target: 15 }],
     reward: { money: 300, recipes: ['bomb_01'] },
     priority: 510,
@@ -306,7 +306,7 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     hint: '錬金術<strong>レベル30</strong>に到達しよう',
     category: 'mastery',
     narrative: 'master_teaching',
-    narrativeLines: ['師匠からの手紙「一人前と認めよう。工房の炉も使いこなせるだろう」'],
+    narrativeLines: ['師匠からの手紙「一人前と認めよう。このレシピはあなたにしか託せない」'],
     conditions: [{ type: 'level', target: 30 }],
     reward: { money: 800, reputationExp: 10, recipes: ['ingot_01'] },
     priority: 520,
