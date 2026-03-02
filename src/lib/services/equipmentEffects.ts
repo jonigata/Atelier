@@ -14,6 +14,7 @@ import type {
   ItemCategory,
 } from '$lib/models/types';
 import { getBuildingStudyDaysReduce, getBuildingCraftDaysPercentReduce, getBuildingCraftDaysFixedReduce } from '$lib/services/buildingEffects';
+import { PRODUCT_SUBCATEGORY_MAP } from '$lib/data/categories';
 
 // =====================================================================
 // 一時的な状態（セーブ不要）
@@ -164,6 +165,21 @@ export function getStaminaCostMult(): number {
 // 調合: 日数
 // =====================================================================
 
+/** 施設効果のカテゴリ/サブカテゴリマッチ判定 */
+function matchesBuildingCategory(
+  effect: { itemCategory?: string; productSubcategory?: string },
+  itemCategory: string | undefined,
+  productSubcategory: string | undefined,
+): boolean {
+  if (effect.productSubcategory) {
+    return productSubcategory === effect.productSubcategory;
+  }
+  if (effect.itemCategory) {
+    return itemCategory === effect.itemCategory;
+  }
+  return true; // カテゴリ指定なし = 全対象
+}
+
 /** 調合日数を計算（0.1日単位の内部値を返す） */
 export function getEffectiveCraftDays(recipe: RecipeDef): number {
   let days = recipe.craftDaysTenths;
@@ -174,19 +190,23 @@ export function getEffectiveCraftDays(recipe: RecipeDef): number {
     days = Math.ceil(days / 2);
   }
 
-  // 施設による割合短縮（カテゴリ限定）
+  // 施設による割合短縮（カテゴリ/サブカテゴリ限定）
   const itemDef = getItem(recipe.resultItemId);
+  const subcat = PRODUCT_SUBCATEGORY_MAP[recipe.resultItemId];
   const buildingPercentReduces = getBuildingCraftDaysPercentReduce();
-  for (const { category, fraction } of buildingPercentReduces) {
-    if (!category || (itemDef && itemDef.category === category)) {
-      days = Math.ceil(days * (1 - fraction));
+  for (const r of buildingPercentReduces) {
+    if (matchesBuildingCategory(r, itemDef?.category, subcat)) {
+      days = Math.ceil(days * (1 - r.fraction));
       break;
     }
   }
 
-  // 施設による固定短縮（カテゴリ限定、0.1日単位）
-  if (itemDef) {
-    days -= getBuildingCraftDaysFixedReduce(itemDef.category);
+  // 施設による固定短縮（カテゴリ/サブカテゴリ限定、0.1日単位）
+  const buildingFixedReduces = getBuildingCraftDaysFixedReduce();
+  for (const r of buildingFixedReduces) {
+    if (matchesBuildingCategory(r, itemDef?.category, subcat)) {
+      days -= r.value;
+    }
   }
 
   // 固定短縮

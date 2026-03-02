@@ -157,6 +157,7 @@ export interface BuildingEffect {
   value: number;
   itemId?: string;           // daily_item/periodic_item用
   itemCategory?: ItemCategory; // カテゴリ限定
+  productSubcategory?: string; // product内サブカテゴリ限定（'medicine'等）
   interval?: number;         // periodic_item用（日数間隔）
 }
 
