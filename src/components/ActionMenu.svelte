@@ -8,7 +8,7 @@
   import { recipes } from '$lib/data/recipes';
   import InspectionTracker from './InspectionTracker.svelte';
   import ObjectivesSection from './ObjectivesSection.svelte';
-  import type { ActionType, ActiveQuest } from '$lib/models/types';
+  import type { ActionType, ActiveQuest, QuestDef } from '$lib/models/types';
 
   export let onSelect: (action: ActionType) => void;
 
@@ -20,6 +20,15 @@
       return true;
     });
     return matchingItems.length >= remaining;
+  }
+
+  function canInstantDeliver(quest: QuestDef): boolean {
+    const matchingItems = $gameState.inventory.filter((item) => {
+      if (item.itemId !== quest.requiredItemId) return false;
+      if (quest.requiredQuality && item.quality < quest.requiredQuality) return false;
+      return true;
+    });
+    return matchingItems.length >= quest.requiredQuantity;
   }
 
   function findRecipeForItem(itemId: string): string | null {
@@ -85,6 +94,8 @@
     : {};
 
   $: hasDeliverableQuest = $gameState.activeQuests.some(q => canDeliverQuest(q));
+  $: hasInstantDeliverableQuest = $gameState.availableQuests.some(q => canInstantDeliver(q));
+  $: availableQuestCount = $gameState.availableQuests.length;
 
   $: actionStates = actions.map(action => {
     const unlockedActions = $gameState.tutorialProgress.unlockedActions;
@@ -137,10 +148,20 @@
             {@const returnDay = $gameState.expedition.startDay + $gameState.expedition.duration}
             {@const daysLeft = returnDay - $gameState.day}
             <span class="badge">あと{daysLeft}日</span>
-          {:else if action.type === 'quest' && hasDeliverableQuest}
-            <span class="badge deliverable">納品可能</span>
-          {:else if action.type === 'quest' && $gameState.newQuestCount > 0}
-            <span class="badge new-quest">{$gameState.newQuestCount}件</span>
+          {:else if action.type === 'quest'}
+            <div class="badge-stack">
+              {#if hasDeliverableQuest}
+                <span class="badge deliverable">納品可能</span>
+              {/if}
+              {#if hasInstantDeliverableQuest}
+                <span class="badge instant-deliverable">即納品可</span>
+              {/if}
+              {#if !hasDeliverableQuest && !hasInstantDeliverableQuest && $gameState.newQuestCount > 0}
+                <span class="badge new-quest">{$gameState.newQuestCount}件</span>
+              {:else if !hasDeliverableQuest && !hasInstantDeliverableQuest && availableQuestCount > 0}
+                <span class="badge available-quest">{availableQuestCount}件</span>
+              {/if}
+            </div>
           {/if}
         </button>
       {/if}
@@ -295,13 +316,37 @@
     animation: badgePulse 2s ease-in-out infinite;
   }
 
+  .badge.instant-deliverable {
+    background: #00acc1;
+    color: white;
+  }
+
+  .badge.available-quest {
+    background: #7e57c2;
+    color: white;
+  }
+
+  .badge-stack {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    align-items: flex-end;
+  }
+
+  .badge-stack .badge {
+    position: static;
+  }
+
   .badge.merchant {
     background: #ff9800;
   }
 
   @keyframes badgePulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+    50% { transform: scale(1.1); box-shadow: 0 0 8px 2px rgba(255,255,255,0.3); }
   }
 
   .special-actions {
