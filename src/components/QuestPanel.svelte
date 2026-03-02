@@ -19,7 +19,7 @@
   import { processActionComplete, processAchievementPresentation, showDialogueAndWait } from '$lib/services/presentation';
   import { executeQuestDelivery } from '$lib/services/quest';
   import { checkAchievements } from '$lib/services/achievement';
-  import { showDrawAndWait } from '$lib/services/drawEvent';
+  import { showDrawsForLevelUp } from '$lib/services/drawEvent';
   import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments } from '$lib/data/balance';
   import { get } from 'svelte/store';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
@@ -183,8 +183,8 @@
     }
 
     // ドロー表示（明示的に待つ）
-    if (villageDrawInfo) await showDrawAndWait({ type: 'facility', levelUpInfo: villageDrawInfo });
-    if (reputationDrawInfo) await showDrawAndWait({ type: 'helper', levelUpInfo: reputationDrawInfo });
+    if (villageDrawInfo) await showDrawsForLevelUp('facility', villageDrawInfo);
+    if (reputationDrawInfo) await showDrawsForLevelUp('helper', reputationDrawInfo);
   }
 
   // 残り日数を計算
@@ -299,16 +299,16 @@
           {@const canAccept = $gameState.activeQuests.length < 3}
           {@const client = quest.clientId ? getQuestClient(quest.clientId) : undefined}
           <div class="quest-item">
+            {#if quest.type !== 'deliver'}
+              <span class="quest-type-float">
+                <QuestTypeIcon type={quest.type} showLabel={true} />
+              </span>
+            {/if}
             {#if client}
               <div class="quest-client">{client.name}（{client.title}）</div>
             {/if}
             <div class="quest-header">
               <span class="quest-title">{quest.title}</span>
-              {#if quest.type !== 'deliver'}
-                <span class="quest-type">
-                  <QuestTypeIcon type={quest.type} showLabel={true} />
-                </span>
-              {/if}
             </div>
             <p class="quest-desc">{quest.description}</p>
             <div class="quest-details">
@@ -320,11 +320,16 @@
                   alt={itemDef?.name || quest.requiredItemId}
                   on:error={handleIconError}
                 />
-                {itemDef?.name || quest.requiredItemId}
-                ×{quest.requiredQuantity}
-                {#if quest.requiredQuality}
-                  (品質{quest.requiredQuality}以上)
-                {/if}
+                <span class="requirement-text">
+                  {itemDef?.name || quest.requiredItemId}
+                  ×{quest.requiredQuantity}
+                  {#if quest.requiredQuality}
+                    (品質{quest.requiredQuality}以上)
+                  {/if}
+                  <span class="owned-count" class:enough={$gameState.inventory.filter(item => item.itemId === quest.requiredItemId && (!quest.requiredQuality || item.quality >= quest.requiredQuality)).length >= quest.requiredQuantity}>
+                    所持: {$gameState.inventory.filter(item => item.itemId === quest.requiredItemId && (!quest.requiredQuality || item.quality >= quest.requiredQuality)).length}
+                  </span>
+                </span>
               </span>
             </div>
             <div class="quest-rewards">
@@ -461,26 +466,41 @@
   }
 
   .quest-item {
+    position: relative;
     display: flex;
     flex-direction: column;
     padding: 1rem;
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid #4a4a6a;
     border-radius: 8px;
-    min-height: 200px;
+    gap: 0.15rem;
+  }
+
+  .quest-type-float {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.5rem;
+    padding: 0.15rem 0.4rem;
+    background: rgba(33, 150, 243, 0.3);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: #90caf9;
+    line-height: 1;
+  }
+
+  .quest-type-float :global(.icon) {
+    width: 18px;
+    height: 18px;
   }
 
   .quest-client {
     font-size: 0.8rem;
     color: #a0a0b0;
-    margin-bottom: 0.25rem;
   }
 
   .quest-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
   }
 
   .quest-title {
@@ -489,25 +509,17 @@
     color: #f4e4bc;
   }
 
-  .quest-type {
-    padding: 0.2rem 0.5rem;
-    background: rgba(33, 150, 243, 0.3);
-    border-radius: 4px;
-    font-size: 0.8rem;
-    color: #90caf9;
-  }
 
   .quest-desc {
     color: #a0a0b0;
     font-size: 0.9rem;
-    margin-bottom: 0.75rem;
+    margin: 0;
   }
 
   .quest-details {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    margin-bottom: 0.5rem;
     font-size: 0.9rem;
   }
 
@@ -519,9 +531,24 @@
   }
 
   .item-icon-small {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
     object-fit: contain;
+  }
+
+  .requirement-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .owned-count {
+    font-size: 0.75rem;
+    color: #808090;
+  }
+
+  .owned-count.enough {
+    color: #4caf50;
   }
 
   .item-icon-small.silhouette {
@@ -536,7 +563,7 @@
   .quest-rewards {
     display: flex;
     gap: 1rem;
-    margin-top: auto;
+    margin-top: 0;
     padding-top: 0.5rem;
   }
 
