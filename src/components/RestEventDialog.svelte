@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { RestEventDef, ResolvedReward } from '$lib/data/restEvents';
   import AnimatedGauge from './common/AnimatedGauge.svelte';
+  import StampRush from './common/StampRush.svelte';
 
   import { onMount } from 'svelte';
 
@@ -14,9 +15,18 @@
   $: gaugeRewards = rewards.filter(r => r.gaugeData);
   $: normalRewards = rewards.filter(r => !r.gaugeData);
 
+  // スタンプ演出用：アイテム報酬を抽出
+  $: stampRushItems = normalRewards
+    .filter(r => r.type === 'item' && r.apply.itemId)
+    .map(r => ({ itemId: r.apply.itemId!, quantity: r.apply.count ?? 1 }));
+  let stampRushActive = false;
+
   onMount(() => {
     // 動画スキップのキー入力と衝突しないよう少し待つ
-    const timer = setTimeout(() => { canDismiss = true; }, 300);
+    const timer = setTimeout(() => {
+      canDismiss = true;
+      if (stampRushItems.length > 0) stampRushActive = true;
+    }, 300);
     return () => clearTimeout(timer);
   });
 
@@ -48,6 +58,10 @@
     <p class="narrative">{event.narrative}</p>
 
     <div class="divider"></div>
+
+    {#if stampRushItems.length > 0}
+      <StampRush items={stampRushItems} active={stampRushActive} />
+    {/if}
 
     {#if normalRewards.length > 0}
       <div class="rewards">

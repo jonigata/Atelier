@@ -14,9 +14,10 @@
   const recipeResultItemIds = new Set(Object.values(recipes).map(r => r.resultItemId));
 
   export let onBack: () => void;
+  export let initialTab: 'items' | 'achievements' | 'scores' | 'ranking' = 'items';
 
   // タブ切り替え
-  let activeTab: 'items' | 'achievements' | 'scores' | 'ranking' = 'items';
+  let activeTab: 'items' | 'achievements' | 'scores' | 'ranking' = initialTab;
 
   // スコア推移タブ用
   $: pastGames = typeof window !== 'undefined' ? loadPastGameScores() : [];

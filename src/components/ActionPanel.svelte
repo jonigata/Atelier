@@ -12,6 +12,7 @@
 
   export let action: ActionType;
   export let onBack: (opts?: { skipMilestoneCheck?: boolean }) => void;
+  export let initialAlbumTab: 'items' | 'achievements' | 'scores' | 'ranking' = 'items';
 </script>
 
 {#if action === 'alchemy'}
@@ -25,7 +26,7 @@
 {:else if action === 'inventory'}
   <InventoryPanel {onBack} />
 {:else if action === 'album'}
-  <AlbumPanel {onBack} />
+  <AlbumPanel {onBack} initialTab={initialAlbumTab} />
 {:else if action === 'rest'}
   <RestPanel {onBack} />
 {:else if action === 'study'}

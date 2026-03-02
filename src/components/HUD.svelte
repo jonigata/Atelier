@@ -4,6 +4,8 @@
   import { showConfirmAndWait } from '$lib/stores/confirmDialog';
   import MoneyIndicator from './MoneyIndicator.svelte';
 
+  export let onScoreClick: (() => void) | undefined = undefined;
+
   $: staminaRatio = $gameState.stamina / $gameState.maxStamina;
   $: staminaClass = staminaRatio <= 0.2 ? 'critical' : staminaRatio <= 0.5 ? 'low' : '';
 
@@ -49,11 +51,11 @@
       </div>
     </div>
 
-    <div class="hud-section score-section">
-      <div class="section-icon">⭐</div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="hud-section score-section" class:clickable={!!onScoreClick} on:click={onScoreClick} role={onScoreClick ? 'button' : undefined} tabindex={onScoreClick ? 0 : undefined}>
       <div class="section-content">
-        <span class="score-value">{$totalScore.toLocaleString()} pt</span>
         <span class="score-label">スコア</span>
+        <span class="score-value">☆{$totalScore.toLocaleString()}</span>
       </div>
     </div>
 
@@ -206,6 +208,17 @@
   .score-section .section-content {
     display: flex;
     flex-direction: column;
+  }
+
+  .score-section.clickable {
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 0.2rem 0.4rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .score-section.clickable:hover {
+    background-color: rgba(240, 192, 64, 0.1);
   }
 
   .score-value {

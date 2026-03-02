@@ -36,12 +36,11 @@ export type EquipmentEffect =
   | { type: 'craft_fail_save'; chance: number }
   | { type: 'craft_fail_accumulate'; rate: number }
   | { type: 'craft_combo'; bonusPerCombo: number; maxCombo?: number }
-  | { type: 'craft_quality_variance_mult'; value: number }
   | { type: 'craft_stamina_mult'; value: number }
   | { type: 'craft_days_halve' }
   | { type: 'craft_days_reduce'; value: number; minOriginalDays?: number }
   // === 素材系 ===
-  | { type: 'material_quality_floor'; value: number }
+  | { type: 'material_quality_floor'; value: number; materialCategory?: ItemCategory }
   | { type: 'material_quality_bonus'; value: number }
   | { type: 'material_count_reduce'; value: number; minOriginalCount?: number }
   // === 勉強系 ===

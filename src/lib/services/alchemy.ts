@@ -19,7 +19,6 @@ import {
   getFailAccumulationBonus,
   getCraftQualityBonus,
   getQualityCap,
-  getQualityVarianceMult,
   getComboQualityBonus,
   getStaminaCostMult,
   getEffectiveMaterialQuality,
@@ -443,7 +442,7 @@ export function calculateExpectedQuality(
   }
   // 素材の平均品質（機材効果適用）
   const avgQuality =
-    selectedItems.reduce((sum, item) => sum + getEffectiveMaterialQuality(item.quality), 0) / selectedItems.length;
+    selectedItems.reduce((sum, item) => sum + getEffectiveMaterialQuality(item.quality, getItem(item.itemId)?.category), 0) / selectedItems.length;
 
   const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * QUALITY.LEVEL_BONUS);
 
@@ -451,17 +450,14 @@ export function calculateExpectedQuality(
   const equipQualityBonus = getCraftQualityBonus();
   const comboBonus = getComboQualityBonus();
   const qualityCap = getQualityCap();
-  const varianceMult = getQualityVarianceMult();
 
   // 施設・助手効果
   const villageQualityBonus = getBuildingCraftQualityBonus();
   const helperQualityBonus = getHelperCraftQualityBonus();
 
   const base = Math.floor(avgQuality + levelBonus + equipQualityBonus + comboBonus + villageQualityBonus + helperQualityBonus);
-  const randomMin = Math.round(QUALITY.RANDOM_MIN * varianceMult);
-  const randomMax = Math.round(QUALITY.RANDOM_MAX * varianceMult);
-  const min = Math.max(QUALITY.MIN, base + randomMin);
-  const max = Math.min(qualityCap, base + randomMax);
+  const min = Math.max(QUALITY.MIN, base + QUALITY.RANDOM_MIN);
+  const max = Math.min(qualityCap, base + QUALITY.RANDOM_MAX);
 
   return { min, max, base };
 }
@@ -476,7 +472,7 @@ function calculateQuality(
 ): number {
   // 素材の平均品質（機材効果: 底上げ＋ボーナス適用）
   const avgQuality =
-    selectedItems.reduce((sum, item) => sum + getEffectiveMaterialQuality(item.quality), 0) / selectedItems.length;
+    selectedItems.reduce((sum, item) => sum + getEffectiveMaterialQuality(item.quality, getItem(item.itemId)?.category), 0) / selectedItems.length;
 
   const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * QUALITY.LEVEL_BONUS);
 
@@ -484,11 +480,10 @@ function calculateQuality(
   const equipQualityBonus = getCraftQualityBonus();
   const comboBonus = getComboQualityBonus();
   const qualityCap = getQualityCap();
-  const varianceMult = getQualityVarianceMult();
 
-  // ランダム要素（機材効果でブレ幅を変更）
-  const randomMin = Math.round(QUALITY.RANDOM_MIN * varianceMult);
-  const randomMax = Math.round(QUALITY.RANDOM_MAX * varianceMult);
+  // ランダム要素
+  const randomMin = QUALITY.RANDOM_MIN;
+  const randomMax = QUALITY.RANDOM_MAX;
   const randomRange = randomMax - randomMin + 1;
   const randomFactor = Math.floor(Math.random() * randomRange) + randomMin;
 

@@ -61,12 +61,15 @@ export const equipment: Record<string, EquipmentDef> = {
   refinement_flask: {
     id: 'refinement_flask',
     name: '精製フラスコ',
-    description: '投入する素材の品質が50未満なら自動的に50に底上げ',
+    description: '水・薬草系素材の品質が50未満なら自動的に50に底上げ',
     category: 'material',
     rarity: 'rare',
     price: 600,
-    effectDescription: '低品質素材を品質50に底上げ',
-    effects: [{ type: 'material_quality_floor', value: 50 }],
+    effectDescription: '水・薬草素材を品質50に底上げ',
+    effects: [
+      { type: 'material_quality_floor', value: 50, materialCategory: 'water' },
+      { type: 'material_quality_floor', value: 50, materialCategory: 'herb' },
+    ],
   },
   abundant_jar: {
     id: 'abundant_jar',
@@ -308,12 +311,15 @@ export const equipment: Record<string, EquipmentDef> = {
   polish_cloth: {
     id: 'polish_cloth',
     name: '磨き布',
-    description: '投入する素材の品質が40未満なら自動的に40に底上げ',
+    description: '鉱石・結晶系素材の品質が40未満なら自動的に40に底上げ',
     category: 'material',
     rarity: 'common',
     price: 300,
-    effectDescription: '低品質素材を品質40に底上げ',
-    effects: [{ type: 'material_quality_floor', value: 40 }],
+    effectDescription: '鉱石・結晶素材を品質40に底上げ',
+    effects: [
+      { type: 'material_quality_floor', value: 40, materialCategory: 'ore' },
+      { type: 'material_quality_floor', value: 40, materialCategory: 'crystal' },
+    ],
   },
   quality_drop: {
     id: 'quality_drop',
@@ -547,12 +553,15 @@ export const equipment: Record<string, EquipmentDef> = {
   memo_book: {
     id: 'memo_book',
     name: '安定の手帖',
-    description: '調合結果の品質ブレ幅が半減する。安定した品質になりやすい',
-    category: 'special',
+    description: '植物・木材系素材の品質が40未満なら自動的に40に底上げ',
+    category: 'material',
     rarity: 'common',
     price: 150,
-    effectDescription: '品質のブレ幅半減',
-    effects: [{ type: 'craft_quality_variance_mult', value: 0.5 }],
+    effectDescription: '植物・木材素材を品質40に底上げ',
+    effects: [
+      { type: 'material_quality_floor', value: 40, materialCategory: 'plant' },
+      { type: 'material_quality_floor', value: 40, materialCategory: 'wood' },
+    ],
   },
   exploration_compass: {
     id: 'exploration_compass',

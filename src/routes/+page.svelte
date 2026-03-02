@@ -24,6 +24,12 @@
   import type { ActionType } from '$lib/models/types';
 
   let selectedAction: ActionType | null = null;
+  let initialAlbumTab: 'items' | 'achievements' | 'scores' | 'ranking' = 'items';
+
+  function handleScoreClick() {
+    initialAlbumTab = 'scores';
+    selectedAction = 'album';
+  }
 
   onMount(() => {
     // URLパラメータで本番セーブ削除
@@ -58,6 +64,7 @@
   });
 
   async function handleActionSelect(action: ActionType) {
+    if (action !== 'album') initialAlbumTab = 'items';
     selectedAction = action;
     if (action === 'inventory') {
       markInventoryOpened();
@@ -82,7 +89,7 @@
   {#if $gameState.phase === 'ending'}
     <EndingScreen />
   {:else}
-    <HUD />
+    <HUD onScoreClick={handleScoreClick} />
 
     <main class="main-panel">
       {#if $gameState.phase === 'morning'}
@@ -91,7 +98,7 @@
         {#if selectedAction === null}
           <ActionMenu onSelect={handleActionSelect} />
         {:else}
-          <ActionPanel action={selectedAction} onBack={handleBackToMenu} />
+          <ActionPanel action={selectedAction} onBack={handleBackToMenu} {initialAlbumTab} />
         {/if}
       {/if}
     </main>

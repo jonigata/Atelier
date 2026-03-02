@@ -107,13 +107,6 @@ export function getFailBelowQualityThresholds(): number[] {
     .map((e) => e.failBelowQuality!);
 }
 
-/** 品質ランダム幅の乗数 */
-export function getQualityVarianceMult(): number {
-  const mults = getEffectsOfType('craft_quality_variance_mult');
-  if (mults.length === 0) return 1;
-  return mults.reduce((m, e) => m * e.value, 1);
-}
-
 /** コンボによる品質ボーナス */
 export function getComboQualityBonus(): number {
   const combos = getEffectsOfType('craft_combo');
@@ -131,9 +124,10 @@ export function getComboQualityBonus(): number {
 // 調合: 素材品質の補正
 // =====================================================================
 
-/** 素材品質の底上げ閾値（最も高い値を返す） */
-export function getMaterialQualityFloor(): number {
-  const floors = getEffectsOfType('material_quality_floor');
+/** 素材品質の底上げ閾値（カテゴリに該当するもののうち最も高い値を返す） */
+export function getMaterialQualityFloor(itemCategory?: ItemCategory): number {
+  const floors = getEffectsOfType('material_quality_floor')
+    .filter((e) => !e.materialCategory || e.materialCategory === itemCategory);
   if (floors.length === 0) return 0;
   return Math.max(...floors.map((e) => e.value));
 }
@@ -144,8 +138,8 @@ export function getMaterialQualityBonus(): number {
 }
 
 /** 素材の実効品質を計算（底上げ＋ボーナス適用） */
-export function getEffectiveMaterialQuality(originalQuality: number): number {
-  const floor = getMaterialQualityFloor();
+export function getEffectiveMaterialQuality(originalQuality: number, itemCategory?: ItemCategory): number {
+  const floor = getMaterialQualityFloor(itemCategory);
   const bonus = getMaterialQualityBonus();
   return Math.max(originalQuality, floor) + bonus;
 }
