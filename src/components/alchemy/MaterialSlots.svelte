@@ -46,8 +46,8 @@
   <div class="material-header">
     <h4>素材を選択 ({selectedItems.length}/{totalRequired})</h4>
     <div class="auto-fill-buttons">
-      <button class="auto-fill-btn" on:click={() => onAutoFill('desc')}>▲ 高品質から</button>
-      <button class="auto-fill-btn" on:click={() => onAutoFill('asc')}>▼ 低品質から</button>
+      <button class="auto-fill-btn high" on:click={() => onAutoFill('desc')}>▼ 高品質から</button>
+      <button class="auto-fill-btn low" on:click={() => onAutoFill('asc')}>▲ 低品質から</button>
       {#if selectedItems.length > 0}
         <button class="auto-fill-btn clear" on:click={onClear}>クリア</button>
       {/if}
@@ -119,31 +119,56 @@
   }
 
   .auto-fill-btn {
-    padding: 0.25rem 0.5rem;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid #4a4a6a;
-    border-radius: 4px;
-    color: #a0a0b0;
+    padding: 0.35rem 0.75rem;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: bold;
     white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    transition: all 0.15s ease;
   }
 
-  .auto-fill-btn:hover {
-    background: rgba(201, 169, 89, 0.2);
-    border-color: #c9a959;
+  .auto-fill-btn.high {
+    background: linear-gradient(180deg, rgba(201, 169, 89, 0.3) 0%, rgba(201, 169, 89, 0.12) 100%);
+    border: 1.5px solid #c9a959;
     color: #f4e4bc;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .auto-fill-btn.high:hover {
+    background: linear-gradient(180deg, rgba(201, 169, 89, 0.45) 0%, rgba(201, 169, 89, 0.2) 100%);
+    border-color: #e0c060;
+    color: #fff8e0;
+    box-shadow: 0 2px 6px rgba(201, 169, 89, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .auto-fill-btn.low {
+    background: linear-gradient(180deg, rgba(100, 160, 220, 0.3) 0%, rgba(100, 160, 220, 0.12) 100%);
+    border: 1.5px solid #6a9fd8;
+    color: #c0daf0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .auto-fill-btn.low:hover {
+    background: linear-gradient(180deg, rgba(100, 160, 220, 0.45) 0%, rgba(100, 160, 220, 0.2) 100%);
+    border-color: #80b8f0;
+    color: #e0f0ff;
+    box-shadow: 0 2px 6px rgba(100, 160, 220, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
 
   .auto-fill-btn.clear {
+    background: rgba(255, 100, 100, 0.1);
+    border: 1.5px solid #8a4a4a;
     color: #ff8080;
-    border-color: #5a3a3a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .auto-fill-btn.clear:hover {
-    background: rgba(255, 100, 100, 0.15);
+    background: rgba(255, 100, 100, 0.2);
     border-color: #ff6b6b;
     color: #ff6b6b;
+    box-shadow: 0 2px 6px rgba(255, 100, 100, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
   .ingredient-row {
