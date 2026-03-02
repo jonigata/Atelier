@@ -269,33 +269,55 @@
       max: stateBefore.maxStamina,
       label: '体力',
     };
+
+    // ダイアログ表示 → レベルアップ → ターン終了 を逐次実行
+    runPostCraftSequence();
   }
 
-  function closeCraftResult() {
-    if (!selectedRecipe || !craftResultData) return;
+  // ダイアログの閉じ待ちを Promise で制御するための resolver
+  let craftResultResolver: (() => void) | null = null;
+  let levelUpResolver: (() => void) | null = null;
 
-    // レベルアップがあればダイアログを表示
-    if (craftResultData.alchemyLevelUp) {
-      levelUpData = craftResultData.alchemyLevelUp;
-      craftResultData = null;
-    } else {
-      finishCraft();
+  function closeCraftResult() {
+    if (craftResultResolver) {
+      craftResultResolver();
+      craftResultResolver = null;
     }
   }
 
   function closeLevelUp() {
-    finishCraft();
+    if (levelUpResolver) {
+      levelUpResolver();
+      levelUpResolver = null;
+    }
   }
 
-  async function finishCraft() {
-    if (!selectedRecipe) return;
-    const totalTenths = getEffectiveCraftDays(selectedRecipe) * craftQuantity;
+  /**
+   * 調合後の一連のシーケンスを一つのasync関数で逐次制御する。
+   * 結果ダイアログ → レベルアップダイアログ → ターン終了 → アチーブメント → ドロー
+   */
+  async function runPostCraftSequence() {
+    if (!selectedRecipe || !craftResultData) return;
+    const recipe = selectedRecipe;
+
+    // 1. 調合結果ダイアログが閉じられるのを待つ
+    await new Promise<void>(resolve => { craftResultResolver = resolve; });
+
+    // 2. 結果から必要な情報を取り出す（この後 craftResultData をクリアするため）
+    const repDrawInfo = craftResultData.reputationDrawInfo;
+    const alchemyLevelUp = craftResultData.alchemyLevelUp;
+
+    // 3. アルケミーレベルアップがあればダイアログ表示 → 閉じ待ち
+    if (alchemyLevelUp) {
+      levelUpData = alchemyLevelUp;
+      craftResultData = null;
+      await new Promise<void>(resolve => { levelUpResolver = resolve; });
+    }
+
+    // 4. ターン終了 → アチーブメント → ドロー
+    const totalTenths = getEffectiveCraftDays(recipe) * craftQuantity;
     const days = craftDaysToActual(totalTenths);
 
-    // 調合結果から draw 情報を取得
-    const repDrawInfo = craftResultData?.reputationDrawInfo ?? null;
-
-    // endTurn開始（DayTransition演出がレンダリングされる）
     const turnPromise = endTurn(days);
     // DayTransition暗転開始を待ってからパネルを閉じる
     await new Promise(r => setTimeout(r, 350));
@@ -303,11 +325,9 @@
     levelUpData = null;
     onBack({ skipMilestoneCheck: true });
 
-    // endTurn完了を待つ（朝処理+autoSave完了後にアチーブメントを処理）
     await turnPromise;
     await processActionComplete();
 
-    // ドロー表示（明示的に待つ）
     if (repDrawInfo) {
       await showDrawAndWait({ type: 'helper', levelUpInfo: repDrawInfo });
     }
