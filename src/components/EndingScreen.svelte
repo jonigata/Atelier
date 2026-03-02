@@ -3,6 +3,7 @@
   import { gameState, resetGame, alchemyLevel, villageLevel, reputationLevel, scoreBreakdown } from '$lib/stores/game';
   import { initializeGame } from '$lib/services/gameLoop';
   import { savePastGameScores } from '$lib/services/pastScores';
+  import { clearAutoSave } from '$lib/services/saveLoad';
   import { calcScore } from '$lib/services/score';
   import { get } from 'svelte/store';
   import { getNickname, saveNickname, submitScore } from '$lib/services/ranking';
@@ -28,6 +29,7 @@
         ? (state.completedInspections.includes(28) ? 'provisional' : 'retire')
         : getEnding().type;
     savePastGameScores(state.scoreHistory, endingType, state.day, score.total);
+    clearAutoSave();
     scoreSaved = true;
   });
 
