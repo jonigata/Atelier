@@ -18,6 +18,7 @@ import {
 } from './achievement';
 import { showDrawAndWait } from './drawEvent';
 import { getAchievementById } from '$lib/data/achievements';
+import { autoSave } from '$lib/services/saveLoad';
 import { INSPECTION_DAYS, inspections, getOverallGrade, getGradeForValue, getInspectionReward } from '$lib/data/inspection';
 import type { InspectionGrade } from '$lib/data/inspection';
 import { getItem } from '$lib/data/items';
@@ -176,6 +177,11 @@ export async function processAchievementPresentation(achievementId: string): Pro
   // 7. ドロー表示（明示的に待つ）
   if (drawInfos.villageDrawInfo) await showDrawAndWait({ type: 'facility', levelUpInfo: drawInfos.villageDrawInfo });
   if (drawInfos.reputationDrawInfo) await showDrawAndWait({ type: 'helper', levelUpInfo: drawInfos.reputationDrawInfo });
+
+  // 8. アチーブメント完了後にオートセーブ
+  // endTurn内のautoSaveがprocessActionCompleteより先に実行される場合、
+  // 達成状態が永続化されずリロード後に再発火するのを防ぐ
+  autoSave();
 }
 
 /**

@@ -295,21 +295,22 @@
     // 調合結果から draw 情報を取得
     const repDrawInfo = craftResultData?.reputationDrawInfo ?? null;
 
-    // endTurnのPromiseを保持しつつ、DayTransition暗転を待つ
+    // endTurn開始（DayTransition演出がレンダリングされる）
     const turnPromise = endTurn(days);
+    // DayTransition暗転開始を待ってからパネルを閉じる
     await new Promise(r => setTimeout(r, 350));
     craftResultData = null;
     levelUpData = null;
-    // 画面遷移のみ（マイルストーンチェックはここで自前でawaitする）
     onBack({ skipMilestoneCheck: true });
+
+    // endTurn完了を待つ（朝処理+autoSave完了後にアチーブメントを処理）
+    await turnPromise;
     await processActionComplete();
 
     // ドロー表示（明示的に待つ）
     if (repDrawInfo) {
       await showDrawAndWait({ type: 'helper', levelUpInfo: repDrawInfo });
     }
-
-    await turnPromise;
   }
 </script>
 
