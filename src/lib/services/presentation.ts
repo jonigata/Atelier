@@ -16,7 +16,7 @@ import {
   isStoryAchievement,
   preSelectRandomEquipment,
 } from './achievement';
-import { showDrawAndWait } from './drawEvent';
+import { showDrawsForLevelUp } from './drawEvent';
 import { getAchievementById } from '$lib/data/achievements';
 import { autoSave } from '$lib/services/saveLoad';
 import { INSPECTION_DAYS, inspections, getOverallGrade, getGradeForValue, getInspectionReward } from '$lib/data/inspection';
@@ -175,8 +175,8 @@ export async function processAchievementPresentation(achievementId: string): Pro
   checkNewActiveGoals();
 
   // 7. ドロー表示（明示的に待つ）
-  if (drawInfos.villageDrawInfo) await showDrawAndWait({ type: 'facility', levelUpInfo: drawInfos.villageDrawInfo });
-  if (drawInfos.reputationDrawInfo) await showDrawAndWait({ type: 'helper', levelUpInfo: drawInfos.reputationDrawInfo });
+  if (drawInfos.villageDrawInfo) await showDrawsForLevelUp('facility', drawInfos.villageDrawInfo);
+  if (drawInfos.reputationDrawInfo) await showDrawsForLevelUp('helper', drawInfos.reputationDrawInfo);
 
   // 8. アチーブメント完了後にオートセーブ
   // endTurn内のautoSaveがprocessActionCompleteより先に実行される場合、
@@ -348,7 +348,7 @@ export async function processInspectionSequence(): Promise<boolean> {
       addMessage(`【査察報酬】${rewardDescParts.join('、')}`);
 
       // ドロー表示
-      if (inspRepDrawInfo) await showDrawAndWait({ type: 'helper', levelUpInfo: inspRepDrawInfo });
+      if (inspRepDrawInfo) await showDrawsForLevelUp('helper', inspRepDrawInfo);
     }
 
     // 次の査察日を告知

@@ -17,6 +17,14 @@ export function showDrawAndWait(request: DrawRequest): Promise<void> {
   });
 }
 
+/** レベル差分だけドローを繰り返す（2レベル以上跳んだ場合に対応） */
+export async function showDrawsForLevelUp(type: 'facility' | 'helper', info: LevelUpInfo): Promise<void> {
+  const count = info.newLevel - info.oldLevel;
+  for (let i = 0; i < count; i++) {
+    await showDrawAndWait({ type, levelUpInfo: info });
+  }
+}
+
 /** DrawDialog側から呼ぶ: ドロー完了を通知 */
 export function resolveDraw(): void {
   pendingDraw.set(null);

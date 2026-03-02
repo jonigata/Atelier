@@ -3,7 +3,7 @@ import { addMessage, restoreStamina, skipPresentation } from '$lib/stores/game';
 import { endTurn } from '$lib/services/gameLoop';
 import { getBuildingRestBonus } from '$lib/services/buildingEffects';
 import { selectRestEvent, resolveRestEventRewards, applyRestEventRewards } from '$lib/services/restEvent';
-import { showDrawAndWait } from '$lib/services/drawEvent';
+import { showDrawsForLevelUp } from '$lib/services/drawEvent';
 import type { RestEventDef, ResolvedReward } from '$lib/data/restEvents';
 
 export interface RestSequenceUI {
@@ -50,9 +50,9 @@ export async function executeRest(ui: RestSequenceUI): Promise<void> {
 
 	// --- ドロー表示（ムービーの前に実行） ---
 	if (drawInfos.village)
-		await showDrawAndWait({ type: 'facility', levelUpInfo: drawInfos.village });
+		await showDrawsForLevelUp('facility', drawInfos.village);
 	if (drawInfos.reputation)
-		await showDrawAndWait({ type: 'helper', levelUpInfo: drawInfos.reputation });
+		await showDrawsForLevelUp('helper', drawInfos.reputation);
 
 	if (!get(skipPresentation)) {
 		// 3. ビデオ再生 → 終了まで待機（黒背景の上で再生）
