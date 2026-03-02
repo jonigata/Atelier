@@ -1,5 +1,5 @@
 // アイテムカテゴリ
-export type ItemCategory = 'herb' | 'ore' | 'water' | 'misc' | 'plant' | 'wood' | 'crystal' | 'product';
+export type ItemCategory = 'herb' | 'ore' | 'water' | 'misc' | 'plant' | 'wood' | 'crystal' | 'medicine' | 'material' | 'metal' | 'magic' | 'device' | 'infrastructure';
 
 // アイテム定義（マスタ）
 export interface ItemDef {
@@ -55,7 +55,7 @@ export type EquipmentEffect =
   | { type: 'expedition_drops_mult'; value: number; materialCategory?: ItemCategory }
   | { type: 'expedition_rare_bonus'; value: number }
   // === 経済系 ===
-  | { type: 'sell_price_mult'; value: number; minQuality?: number; itemCategory?: ItemCategory }
+  | { type: 'sell_price_mult'; value: number; minQuality?: number; itemCategory?: ItemCategory; craftedOnly?: boolean }
   | { type: 'buy_price_mult'; value: number }
   | { type: 'quest_money_mult'; value: number }
   | { type: 'quest_reputation_bonus'; value: number }
@@ -157,7 +157,6 @@ export interface BuildingEffect {
   value: number;
   itemId?: string;           // daily_item/periodic_item用
   itemCategory?: ItemCategory; // カテゴリ限定
-  productSubcategory?: string; // product内サブカテゴリ限定（'medicine'等）
   interval?: number;         // periodic_item用（日数間隔）
 }
 

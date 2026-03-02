@@ -6,6 +6,7 @@ import { getItem } from '$lib/data/items';
 import { getAllEquipment } from '$lib/data/equipment';
 import { getHelper } from '$lib/data/helpers';
 import type { GameState } from '$lib/models/types';
+import { isCraftedCategory } from '$lib/data/categories';
 import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments } from '$lib/data/balance';
 
 export interface DrawInfos {
@@ -160,10 +161,10 @@ function resolveSpecialRewards(event: RestEventDef): ResolvedReward[] {
       if (state.inventory.length === 0) {
         return [{ description: '錬金経験値 +30', type: 'exp', apply: { type: 'alchemyExp', amount: 30 } }];
       }
-      // 素材のみ（product以外）を対象にする
+      // 素材のみ（錬成物以外）を対象にする
       const materialItems = state.inventory.filter((item) => {
         const def = getItem(item.itemId);
-        return def && def.category !== 'product';
+        return def && !isCraftedCategory(def.category);
       });
       const targetItems = materialItems.length > 0 ? materialItems : state.inventory;
       const target = pickRandom(targetItems);

@@ -16,6 +16,7 @@
   import { getBargainItems, getPremiumPurchaseItems } from '$lib/services/shopDeals';
   import { getWeek, getDaysLeftInWeek } from '$lib/services/calendar';
   import type { OwnedItem, ItemDef, EquipmentDef } from '$lib/models/types';
+  import { isCraftedCategory } from '$lib/data/categories';
   import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
 
   export let onBack: () => void;
@@ -92,7 +93,7 @@
 
   function getBuyableItems(villageLv: number): ItemDef[] {
     const allMaterials = Object.values(items).filter(
-      (item) => item.category !== 'product'
+      (item) => !isCraftedCategory(item.category)
     );
 
     return allMaterials.filter((item) => {

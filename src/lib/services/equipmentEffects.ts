@@ -14,7 +14,7 @@ import type {
   ItemCategory,
 } from '$lib/models/types';
 import { getBuildingStudyDaysReduce, getBuildingCraftDaysPercentReduce, getBuildingCraftDaysFixedReduce } from '$lib/services/buildingEffects';
-import { PRODUCT_SUBCATEGORY_MAP } from '$lib/data/categories';
+import { isCraftedCategory } from '$lib/data/categories';
 
 // =====================================================================
 // 一時的な状態（セーブ不要）
@@ -165,15 +165,11 @@ export function getStaminaCostMult(): number {
 // 調合: 日数
 // =====================================================================
 
-/** 施設効果のカテゴリ/サブカテゴリマッチ判定 */
+/** 施設効果のカテゴリマッチ判定 */
 function matchesBuildingCategory(
-  effect: { itemCategory?: string; productSubcategory?: string },
+  effect: { itemCategory?: string },
   itemCategory: string | undefined,
-  productSubcategory: string | undefined,
 ): boolean {
-  if (effect.productSubcategory) {
-    return productSubcategory === effect.productSubcategory;
-  }
   if (effect.itemCategory) {
     return itemCategory === effect.itemCategory;
   }
@@ -190,21 +186,20 @@ export function getEffectiveCraftDays(recipe: RecipeDef): number {
     days = Math.ceil(days / 2);
   }
 
-  // 施設による割合短縮（カテゴリ/サブカテゴリ限定）
+  // 施設による割合短縮（カテゴリ限定）
   const itemDef = getItem(recipe.resultItemId);
-  const subcat = PRODUCT_SUBCATEGORY_MAP[recipe.resultItemId];
   const buildingPercentReduces = getBuildingCraftDaysPercentReduce();
   for (const r of buildingPercentReduces) {
-    if (matchesBuildingCategory(r, itemDef?.category, subcat)) {
+    if (matchesBuildingCategory(r, itemDef?.category)) {
       days = Math.ceil(days * (1 - r.fraction));
       break;
     }
   }
 
-  // 施設による固定短縮（カテゴリ/サブカテゴリ限定、0.1日単位）
+  // 施設による固定短縮（カテゴリ限定、0.1日単位）
   const buildingFixedReduces = getBuildingCraftDaysFixedReduce();
   for (const r of buildingFixedReduces) {
-    if (matchesBuildingCategory(r, itemDef?.category, subcat)) {
+    if (matchesBuildingCategory(r, itemDef?.category)) {
       days -= r.value;
     }
   }
@@ -411,10 +406,9 @@ export function getSellPriceMult(item: OwnedItem): number {
   let bonus = 0;
   for (const e of effects) {
     if (e.minQuality && item.quality < e.minQuality) continue;
-    if (e.itemCategory) {
-      const itemDef = getItem(item.itemId);
-      if (itemDef?.category !== e.itemCategory) continue;
-    }
+    const itemDef = getItem(item.itemId);
+    if (e.craftedOnly && !isCraftedCategory(itemDef?.category)) continue;
+    if (e.itemCategory && itemDef?.category !== e.itemCategory) continue;
     bonus += e.value;
   }
 

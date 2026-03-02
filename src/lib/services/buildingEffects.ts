@@ -22,19 +22,19 @@ function getAllBuildingEffects(): BuildingEffect[] {
 /**
  * 施設の調合日数割合短縮を取得
  */
-export function getBuildingCraftDaysPercentReduce(): { itemCategory?: string; productSubcategory?: string; fraction: number }[] {
+export function getBuildingCraftDaysPercentReduce(): { itemCategory?: string; fraction: number }[] {
   return getAllBuildingEffects()
     .filter((e) => e.type === 'craft_days_halve')
-    .map((e) => ({ itemCategory: e.itemCategory, productSubcategory: e.productSubcategory, fraction: e.value || 0.5 }));
+    .map((e) => ({ itemCategory: e.itemCategory, fraction: e.value || 0.5 }));
 }
 
 /**
  * 施設の調合日数固定短縮（0.1日単位）
  */
-export function getBuildingCraftDaysFixedReduce(): { itemCategory?: string; productSubcategory?: string; value: number }[] {
+export function getBuildingCraftDaysFixedReduce(): { itemCategory?: string; value: number }[] {
   return getAllBuildingEffects()
     .filter((e) => e.type === 'craft_days_reduce')
-    .map((e) => ({ itemCategory: e.itemCategory, productSubcategory: e.productSubcategory, value: e.value }));
+    .map((e) => ({ itemCategory: e.itemCategory, value: e.value }));
 }
 
 /**

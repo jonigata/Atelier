@@ -509,7 +509,7 @@ export const equipment: Record<string, EquipmentDef> = {
     rarity: 'common',
     price: 400,
     effectDescription: '完成品の売却価格+50%',
-    effects: [{ type: 'sell_price_mult', value: 0.5, itemCategory: 'product' }],
+    effects: [{ type: 'sell_price_mult', value: 0.5, craftedOnly: true }],
   },
   luxury_wrap: {
     id: 'luxury_wrap',

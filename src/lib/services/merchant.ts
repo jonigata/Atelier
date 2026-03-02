@@ -11,6 +11,7 @@ import { getAllEquipment, getEquipment } from '$lib/data/equipment';
 import { books, getBook } from '$lib/data/books';
 import { items, getItem } from '$lib/data/items';
 import { MERCHANT, calcLevelFromExp } from '$lib/data/balance';
+import { isCraftedCategory } from '$lib/data/categories';
 import type { MerchantLineup, MerchantSlot, GameState } from '$lib/models/types';
 
 /**
@@ -110,8 +111,8 @@ export function generateMerchantLineup(month: number, state: GameState): Merchan
 function getRareMaterialPool(state: GameState): { id: string; basePrice: number }[] {
   return Object.values(items)
     .filter((item) => {
-      // 製品カテゴリは除外
-      if (item.category === 'product') return false;
+      // 錬成物カテゴリは除外
+      if (isCraftedCategory(item.category)) return false;
       // basePrice 80以上をレアとみなす
       if (item.basePrice < 80) return false;
       // レベルによるゲート

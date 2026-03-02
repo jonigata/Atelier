@@ -5,8 +5,7 @@
   import RankingPanel from './RankingPanel.svelte';
   import { loadPastGameScores, loadBestPastGame } from '$lib/services/pastScores';
   import { recipes } from '$lib/data/recipes';
-  import { CATEGORY_NAMES, PRODUCT_SUBCATEGORY_NAMES, PRODUCT_SUBCATEGORY_ORDER, PRODUCT_SUBCATEGORY_MAP } from '$lib/data/categories';
-  import type { ProductSubcategory } from '$lib/data/categories';
+  import { CATEGORY_NAMES, CRAFTED_CATEGORY_ORDER, isCraftedCategory } from '$lib/data/categories';
   import { getAllAchievements } from '$lib/data/achievements';
   import { getAchievementProgress, isStoryAchievement } from '$lib/services/achievement';
   import type { ItemCategory, AchievementCategory, AchievementDef, ItemDef } from '$lib/models/types';
@@ -49,12 +48,12 @@
   const allItems = Object.values(items);
   const totalItemCount = allItems.length;
 
-  // 採取物（product以外）
-  const gatheringItems = allItems.filter(item => item.category !== 'product');
+  // 採取物（錬成物以外）
+  const gatheringItems = allItems.filter(item => !isCraftedCategory(item.category));
   const gatheringCategoryOrder: ItemCategory[] = ['herb', 'ore', 'water', 'plant', 'wood', 'crystal', 'misc'];
 
-  // 錬成物（product）をサブカテゴリ別にグルーピング
-  const craftedItems = allItems.filter(item => item.category === 'product');
+  // 錬成物をカテゴリ別にグルーピング
+  const craftedItems = allItems.filter(item => isCraftedCategory(item.category));
 
   interface ItemGroup {
     key: string;
@@ -70,11 +69,11 @@
     }))
     .filter(g => g.items.length > 0);
 
-  const craftedGroups: ItemGroup[] = PRODUCT_SUBCATEGORY_ORDER
-    .map(sub => ({
-      key: `product_${sub}`,
-      label: PRODUCT_SUBCATEGORY_NAMES[sub],
-      items: craftedItems.filter(item => (PRODUCT_SUBCATEGORY_MAP[item.id] ?? 'material') === sub),
+  const craftedGroups: ItemGroup[] = CRAFTED_CATEGORY_ORDER
+    .map(cat => ({
+      key: cat,
+      label: CATEGORY_NAMES[cat] || cat,
+      items: craftedItems.filter(item => item.category === cat),
     }))
     .filter(g => g.items.length > 0);
 

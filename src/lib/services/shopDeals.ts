@@ -6,6 +6,7 @@
 import { items } from '$lib/data/items';
 import { SHOP_DEALS } from '$lib/data/balance';
 import { getWeek } from '$lib/services/calendar';
+import { isCraftedCategory } from '$lib/data/categories';
 import type { ItemDef } from '$lib/models/types';
 
 /** Mulberry32 seeded PRNG */
@@ -32,7 +33,7 @@ function seededShuffle<T>(arr: T[], rng: () => number): T[] {
 /** 村発展レベルに応じた購入可能素材リスト（ShopPanelと同じロジック） */
 function getBuyableMaterialIds(villageLv: number): string[] {
   const allMaterials = Object.values(items).filter(
-    (item) => item.category !== 'product'
+    (item) => !isCraftedCategory(item.category)
   );
 
   return allMaterials

@@ -91,9 +91,9 @@ export const buildings: Record<string, BuildingDef> = {
     icon: '🏚️',
     maxLevel: 3,
     levels: [
-      { effects: [{ type: 'craft_days_reduce', value: 1, productSubcategory: 'medicine' }], effectDescription: '薬品系の調合日数-0.1日' },
-      { effects: [{ type: 'craft_days_halve', value: 0.25, productSubcategory: 'medicine' }], effectDescription: '薬品系の調合日数-25%' },
-      { effects: [{ type: 'craft_days_halve', value: 0.50, productSubcategory: 'medicine' }], effectDescription: '薬品系の調合日数-50%' },
+      { effects: [{ type: 'craft_days_reduce', value: 1, itemCategory: 'medicine' }], effectDescription: '薬品系の調合日数-0.1日' },
+      { effects: [{ type: 'craft_days_halve', value: 0.25, itemCategory: 'medicine' }], effectDescription: '薬品系の調合日数-25%' },
+      { effects: [{ type: 'craft_days_halve', value: 0.50, itemCategory: 'medicine' }], effectDescription: '薬品系の調合日数-50%' },
     ],
   },
   watermill: {

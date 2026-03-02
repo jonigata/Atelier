@@ -12,6 +12,7 @@ import { removeItemsFromInventory } from '$lib/services/inventory';
 import { calcLevelFromExp, STAMINA, SHOP } from '$lib/data/balance';
 import { craftMultiple, canCraftRecipe } from '$lib/services/alchemy';
 import { getEffectiveStudyDays } from '$lib/services/equipmentEffects';
+import { isCraftedCategory } from '$lib/data/categories';
 import type { GameState, OwnedItem, Expedition, RecipeDef } from '$lib/models/types';
 
 export interface AutoplayLog {
@@ -297,10 +298,10 @@ async function trySellExcess(state: GameState): Promise<boolean> {
     neededItems[quest.requiredItemId] = (neededItems[quest.requiredItemId] ?? 0) + remaining;
   }
 
-  // 売却候補: 完成品（product）のうち依頼に不要な分
+  // 売却候補: 完成品（錬成物）のうち依頼に不要な分
   const products = state.inventory.filter(item => {
     const def = items[item.itemId];
-    return def?.category === 'product';
+    return isCraftedCategory(def?.category);
   });
 
   // アイテムIDごとにグループ化
@@ -624,7 +625,7 @@ function getShopBuyableIds(villageLv: number): string[] {
   }
   // Lv7+: 全素材
   return Object.values(items)
-    .filter(i => i.category !== 'product')
+    .filter(i => !isCraftedCategory(i.category))
     .map(i => i.id);
 }
 
