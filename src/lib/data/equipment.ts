@@ -238,7 +238,7 @@ export const equipment: Record<string, EquipmentDef> = {
   basic_manual: {
     id: 'basic_manual',
     name: '入門教本',
-    description: 'Lv9以下のレシピ習得が即日完了する。Lv10以上には効果なし',
+    description: '教本Lv9以下の勉強が即日完了する',
     category: 'time',
     rarity: 'common',
     price: 400,

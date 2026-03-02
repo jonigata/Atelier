@@ -86,11 +86,16 @@
     showStudyDialog = true;
   }
 
+  // 本に含まれるレシピのレベル範囲を取得
+  function getBookLevelRange(book: RecipeBookDef): { min: number; max: number } {
+    const levels = book.recipeIds.map(id => recipes[id]?.requiredLevel ?? 1);
+    return { min: Math.min(...levels), max: Math.max(...levels) };
+  }
+
   // 機材効果適用済みの勉強日数を取得
   function getStudyDays(book: RecipeBookDef): number {
-    // 本に含まれるレシピの最大レベルを取得
-    const maxLevel = Math.max(...book.recipeIds.map(id => recipes[id]?.requiredLevel ?? 1));
-    return getEffectiveStudyDays(book, maxLevel);
+    const { max } = getBookLevelRange(book);
+    return getEffectiveStudyDays(book, max);
   }
 
   async function handleStudyDialogClose() {
@@ -127,6 +132,7 @@
       <h3>読める本</h3>
       {#each availableBooks as book}
         {@const bookUnlearnedRecipes = book.recipeIds.filter(id => !$gameState.knownRecipes.includes(id))}
+        {@const levelRange = getBookLevelRange(book)}
         <button
           class="recipe-item"
           class:selected={selectedBookId === book.id}
@@ -135,6 +141,7 @@
           <div class="recipe-header">
             <span class="book-icon">📖</span>
             <span class="recipe-name">{book.name}</span>
+            <span class="book-level">Lv{levelRange.min}{levelRange.min !== levelRange.max ? `-${levelRange.max}` : ''}</span>
             <span class="recipe-info">未習得: {bookUnlearnedRecipes.length}個</span>
           </div>
           <div class="book-description">{book.description}</div>
@@ -339,6 +346,16 @@
 
   .recipe-name {
     font-weight: bold;
+  }
+
+  .book-level {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #a0c4ff;
+    background: rgba(160, 196, 255, 0.15);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    white-space: nowrap;
   }
 
   .recipe-info {

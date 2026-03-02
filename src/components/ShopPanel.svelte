@@ -17,6 +17,7 @@
   import { getWeek, getDaysLeftInWeek } from '$lib/services/calendar';
   import type { OwnedItem, ItemDef, EquipmentDef } from '$lib/models/types';
   import { isCraftedCategory } from '$lib/data/categories';
+  import { recipes } from '$lib/data/recipes';
   import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
 
   export let onBack: () => void;
@@ -401,10 +402,13 @@
         <h3 class="section-header">レシピ本</h3>
         {#each buyableBooks as book}
           {@const canBuy = $gameState.money >= book.basePrice}
+          {@const bookLevels = book.recipeIds.map(id => recipes[id]?.requiredLevel ?? 1)}
+          {@const bookMinLv = Math.min(...bookLevels)}
+          {@const bookMaxLv = Math.max(...bookLevels)}
           <div class="shop-item" class:disabled={!canBuy}>
             <span class="book-icon-lg">📖</span>
             <div class="item-info">
-              <span class="item-name">{book.name}</span>
+              <span class="item-name">{book.name} <span class="book-level">Lv{bookMinLv}{bookMinLv !== bookMaxLv ? `-${bookMaxLv}` : ''}</span></span>
               <span class="item-desc">{book.description}</span>
               <span class="item-desc recipe-count">{book.recipeIds.length}種のレシピ収録</span>
             </div>
@@ -737,6 +741,16 @@
   .recipe-count {
     color: #c9a959;
     font-size: 0.8rem;
+  }
+
+  .book-level {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #a0c4ff;
+    background: rgba(160, 196, 255, 0.15);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    white-space: nowrap;
   }
 
   .item-icon {
