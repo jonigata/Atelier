@@ -171,8 +171,6 @@
     gameState.update((s) => ({
       ...s,
       ownedEquipment: [...s.ownedEquipment, slot.id],
-      activeCauldron:
-        equipDef.category === 'cauldron' && !s.activeCauldron ? slot.id : s.activeCauldron,
       shopEquipment: s.shopEquipment.map((sl, i) =>
         i === slotIndex ? { ...sl, purchased: true } : sl,
       ),
@@ -430,7 +428,7 @@
             <div class="equip-card" class:disabled={!canBuy && !slot.purchased && !owned} class:purchased={slot.purchased || owned} class:rare={def.rarity === 'rare'}>
               <div class="equip-img-wrap">
                 <img class="equip-card-icon" src={getEquipmentIcon(def.id)} alt={def.name} />
-                <div class="equip-badge">{def.category === 'cauldron' ? '釜' : '機材'}</div>
+                <div class="equip-badge">機材</div>
                 {#if def.rarity === 'rare'}
                   <span class="equip-rarity-tag">RARE</span>
                 {/if}

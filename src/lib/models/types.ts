@@ -23,7 +23,7 @@ export interface ItemOrigin {
 // =====================================
 
 // 機材カテゴリ
-export type EquipmentCategory = 'cauldron' | 'time' | 'material' | 'economy' | 'special';
+export type EquipmentCategory = 'time' | 'material' | 'economy' | 'special';
 
 // 機材レアリティ
 export type EquipmentRarity = 'common' | 'rare';
@@ -413,7 +413,6 @@ export interface GameState {
 
   // 機材システム
   ownedEquipment: string[];          // 所持している機材IDの配列
-  activeCauldron: string | null;     // 現在セットしている錬金釜ID
   shopEquipment: { id: string; purchased: boolean }[]; // ショップの機材ラインナップ
 
   // 旅商人マルコ

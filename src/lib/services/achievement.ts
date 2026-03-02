@@ -333,8 +333,6 @@ export function claimReward(achievementId: string, pickedEquipment?: EquipmentDe
       gameState.update((s) => ({
         ...s,
         ownedEquipment: [...s.ownedEquipment, picked.id],
-        activeCauldron:
-          picked.category === 'cauldron' && !s.activeCauldron ? picked.id : s.activeCauldron,
       }));
     }
   }

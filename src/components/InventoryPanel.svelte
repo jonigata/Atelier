@@ -175,7 +175,6 @@
 
   // 所持機材
   const EQUIP_CATEGORY_NAMES: Record<string, string> = {
-    cauldron: '錬金釜',
     time: '時間・行動',
     material: '素材・調合',
     economy: '経済・報酬',
@@ -337,7 +336,7 @@
       <h3 class="equipment-header">所持機材 ({ownedEquipmentDefs.length})</h3>
       <div class="equip-grid">
         {#each ownedEquipmentDefs as def}
-          <div class="equip-card" class:active-cauldron={def.id === $gameState.activeCauldron} class:rare={def.rarity === 'rare'}>
+          <div class="equip-card" class:rare={def.rarity === 'rare'}>
             <div class="equip-img-wrap">
               <img class="equip-icon" src={getEquipmentIcon(def.id)} alt={def.name} />
               {#if def.rarity === 'rare'}
@@ -347,9 +346,6 @@
             <div class="equip-info">
               <span class="equip-category-label">{EQUIP_CATEGORY_NAMES[def.category] || def.category}</span>
               <span class="equip-name">{def.name}</span>
-              {#if def.id === $gameState.activeCauldron}
-                <span class="equip-active-badge">使用中</span>
-              {/if}
               <span class="equip-effect">{def.effectDescription}</span>
             </div>
           </div>
@@ -786,11 +782,6 @@
     border-color: rgba(232, 168, 64, 0.3);
   }
 
-  .equip-card.active-cauldron {
-    border-color: #c9a959;
-    background: rgba(201, 169, 89, 0.08);
-  }
-
   .equip-img-wrap {
     position: relative;
     width: 100%;
@@ -838,16 +829,6 @@
     color: #e0e0f0;
     font-size: 0.95rem;
     line-height: 1.2;
-  }
-
-  .equip-active-badge {
-    align-self: flex-start;
-    font-size: 0.65rem;
-    background: #c9a959;
-    color: #1a1a2e;
-    padding: 0.1rem 0.4rem;
-    border-radius: 3px;
-    font-weight: bold;
   }
 
   .equip-effect {

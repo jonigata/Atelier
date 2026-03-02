@@ -148,9 +148,6 @@ export function purchaseMerchantSlot(slotIndex: number): boolean {
       gameState.update((s) => ({
         ...s,
         ownedEquipment: [...s.ownedEquipment, slot.id],
-        // 釜カテゴリかつ未装着なら自動装着
-        activeCauldron:
-          equipDef.category === 'cauldron' && !s.activeCauldron ? slot.id : s.activeCauldron,
       }));
       addMessage(`機材「${equipDef.name}」を購入した！`);
       break;
