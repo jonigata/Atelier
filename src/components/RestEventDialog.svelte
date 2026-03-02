@@ -49,7 +49,15 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="overlay" on:click={handleClick} role="button" tabindex="-1">
-  <div class="dialog" class:rare={isRare}>
+  <div class="dialog" class:rare={isRare} class:has-image={!!event.eventImage}>
+    {#if event.eventImage}
+      <div class="event-image-container">
+        <img class="event-image" src="/images/events/{event.eventImage}.png" alt={event.name} />
+        <div class="image-overlay"></div>
+      </div>
+    {/if}
+
+    <div class="dialog-content">
     <div class="event-header">
       <span class="event-icon">{isRare ? '✨' : '🌙'}</span>
       <h2 class="event-name" class:rare={isRare}>{event.name}</h2>
@@ -99,6 +107,7 @@
     {/if}
 
     <p class="hint">クリック または Enter で続ける</p>
+    </div>
   </div>
 </div>
 
@@ -125,6 +134,40 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     animation: dialogPopIn 0.3s ease-out;
     cursor: default;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .dialog.has-image {
+    padding: 0;
+    max-width: 540px;
+  }
+
+  .dialog.has-image .dialog-content {
+    padding: 1.5rem 2rem 2rem;
+  }
+
+  .event-image-container {
+    position: relative;
+    width: 100%;
+    max-height: 280px;
+    overflow: hidden;
+  }
+
+  .event-image {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(transparent, #1a1a2e);
   }
 
   .dialog.rare {
