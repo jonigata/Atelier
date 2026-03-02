@@ -431,7 +431,17 @@ export function toggleSkipPresentation(): void {
 export function recordDailyScore(): void {
   gameState.update((state) => {
     const score = calcScore(state);
-    const entry: DailyScoreEntry = { day: state.day, total: score.total };
+    const entry: DailyScoreEntry = {
+      day: state.day,
+      total: score.total,
+      inspection: {
+        album: state.discoveredItems.length,
+        quests: state.completedQuestCount,
+        level: calcLevelFromExp(state.alchemyExp),
+        villageDev: calcLevelFromExp(state.villageExp),
+        reputation: calcLevelFromExp(state.reputationExp),
+      },
+    };
 
     // 同日の重複記録を防止
     if (state.scoreHistory.length > 0 &&

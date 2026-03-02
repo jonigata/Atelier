@@ -87,6 +87,51 @@
   // 過去データの表示用フィルタ（表示範囲内にデータがあるもの）
   $: visiblePastGames = pastGames.map((g, i) => ({ game: g, originalIdx: i }))
     .filter(({ game }) => game.dailyScores.some(s => s.day <= xEnd));
+
+  // === 査察項目サブチャート ===
+  let showInspection = false;
+
+  const INS_HEIGHT = 160;
+  const INS_PAD = { top: 12, right: 20, bottom: 28, left: 56 };
+  const insChartW = WIDTH - INS_PAD.left - INS_PAD.right;
+  const insChartH = INS_HEIGHT - INS_PAD.top - INS_PAD.bottom;
+
+  // inspectionデータがあるエントリのみ
+  $: insEntries = currentScores.filter(e => e.day <= xEnd && e.inspection);
+
+  // Y軸最大値
+  $: insYMax = (() => {
+    let max = 1;
+    for (const e of insEntries) {
+      const ins = e.inspection!;
+      max = Math.max(max, ins.album, ins.quests, ins.level, ins.villageDev, ins.reputation);
+    }
+    return Math.ceil(max / 5) * 5 || 5;
+  })();
+
+  $: insSx = (day: number): number => {
+    return INS_PAD.left + ((day - 1) / (xEnd - 1)) * insChartW;
+  };
+
+  $: insSy = (val: number): number => {
+    return INS_PAD.top + insChartH - (val / insYMax) * insChartH;
+  };
+
+  const inspectionKeys = [
+    { key: 'album' as const, label: 'アルバム', color: '#82b1ff' },
+    { key: 'quests' as const, label: '依頼', color: '#81c784' },
+    { key: 'level' as const, label: '錬金Lv', color: '#ffc107' },
+    { key: 'villageDev' as const, label: '村発展Lv', color: '#ce93d8' },
+    { key: 'reputation' as const, label: '名声Lv', color: '#ff9800' },
+  ];
+
+  $: insPolyline = (key: 'album' | 'quests' | 'level' | 'villageDev' | 'reputation'): string => {
+    return insEntries
+      .map(e => `${insSx(e.day)},${insSy(e.inspection![key])}`)
+      .join(' ');
+  };
+
+  $: insYTicks = Array.from({ length: 5 }, (_, i) => Math.round((insYMax / 4) * i));
 </script>
 
 <div class="chart-wrap">
@@ -234,6 +279,61 @@
       {/if}
     {/if}
   </div>
+
+  <!-- 査察項目サブチャート -->
+  {#if insEntries.length >= 2}
+    <button class="inspection-toggle" on:click={() => showInspection = !showInspection}>
+      {showInspection ? '▼' : '▶'} 査察項目の推移
+    </button>
+
+    {#if showInspection}
+      <svg viewBox="0 0 {WIDTH} {INS_HEIGHT}" class="score-chart inspection-chart">
+        <!-- グリッド線 -->
+        {#each insYTicks as tick}
+          <line
+            x1={INS_PAD.left} y1={insSy(tick)}
+            x2={WIDTH - INS_PAD.right} y2={insSy(tick)}
+            stroke="rgba(255,255,255,0.07)" stroke-width="1"
+          />
+          <text
+            x={INS_PAD.left - 6} y={insSy(tick) + 3}
+            fill="#707080" font-size="8" text-anchor="end"
+          >{tick}</text>
+        {/each}
+
+        <!-- 軸 -->
+        <line x1={INS_PAD.left} y1={INS_PAD.top} x2={INS_PAD.left} y2={INS_PAD.top + insChartH}
+          stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+        <line x1={INS_PAD.left} y1={INS_PAD.top + insChartH} x2={WIDTH - INS_PAD.right} y2={INS_PAD.top + insChartH}
+          stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+
+        <!-- 各査察項目の線 -->
+        {#each inspectionKeys as { key, color }}
+          {@const pts = insPolyline(key)}
+          {#if pts.includes(',')}
+            <polyline
+              points={pts}
+              fill="none"
+              stroke={color}
+              stroke-width="1.8"
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              opacity="0.85"
+            />
+          {/if}
+        {/each}
+      </svg>
+
+      <div class="legend inspection-legend">
+        {#each inspectionKeys as { label, color }}
+          <div class="legend-item">
+            <span class="legend-line" style="background: {color}; height: 2px;"></span>
+            <span>{label}</span>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  {/if}
 </div>
 
 <style>
@@ -300,5 +400,33 @@
     display: inline-block;
     width: 20px;
     border-radius: 1px;
+  }
+
+  .inspection-toggle {
+    display: block;
+    margin-top: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    background: none;
+    border: 1px solid #4a4a6a;
+    border-radius: 4px;
+    color: #a0a0b0;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .inspection-toggle:hover {
+    border-color: #c9a959;
+    color: #f4e4bc;
+  }
+
+  .inspection-chart {
+    margin-top: 0.5rem;
+  }
+
+  .inspection-legend {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.75rem;
   }
 </style>
