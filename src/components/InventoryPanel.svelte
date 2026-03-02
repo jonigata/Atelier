@@ -7,8 +7,6 @@
   import { CATEGORY_NAMES, getCategoryName } from '$lib/data/categories';
   import { getEquipment, getEquipmentIcon } from '$lib/data/equipment';
   import { getHelper } from '$lib/data/helpers';
-  import { getAllFacilities } from '$lib/data/facilities';
-  import { isFacilityActive } from '$lib/services/facility';
   import { getBuilding } from '$lib/data/buildings';
   import type { HelperDef, BuildingDef } from '$lib/models/types';
   import ItemCard from './common/ItemCard.svelte';
@@ -194,11 +192,6 @@
     {} as Record<string, EquipmentDef[]>,
   );
 
-  // 施設（有効な永続設備）
-  const allFacilities = getAllFacilities();
-  $: activeFacilities = allFacilities.filter(f => f.type === 'permanent' && isFacilityActive(f.id));
-  $: activeInventoryFacilities = allFacilities.filter(f => f.type === 'inventory' && isFacilityActive(f.id));
-
   // 所持助手
   $: ownedHelperDefs = $gameState.ownedHelpers
     .map((h) => {
@@ -348,42 +341,6 @@
               <span class="equip-name">{def.name}</span>
               <span class="equip-effect">{def.effectDescription}</span>
             </div>
-          </div>
-        {/each}
-      </div>
-    </div>
-  {/if}
-
-  <!-- 施設セクション -->
-  {#if activeFacilities.length > 0 || activeInventoryFacilities.length > 0}
-    <div class="equipment-section">
-      <h3 class="equipment-header">施設 ({activeFacilities.length + activeInventoryFacilities.length})</h3>
-      <div class="facility-list">
-        {#each [...activeFacilities, ...activeInventoryFacilities] as facility}
-          <div class="facility-card">
-            <div class="facility-main">
-              <span class="facility-name">{facility.name}</span>
-              <span class="facility-type-badge" class:inventory={facility.type === 'inventory'}>
-                {facility.type === 'permanent' ? '永続' : '所持'}
-              </span>
-            </div>
-            <p class="facility-desc">{facility.description}</p>
-            {#if facility.effects.length > 0}
-              <div class="facility-effects">
-                {#each facility.effects as effect}
-                  <span class="facility-effect-tag">
-                    {#if effect.type === 'success_rate'}
-                      成功率 +{Math.round(effect.value * 100)}%
-                    {:else if effect.type === 'quality'}
-                      品質 +{effect.value}
-                    {/if}
-                    {#if effect.scope === 'category' && effect.targetCategory}
-                      ({effect.targetCategory}系)
-                    {/if}
-                  </span>
-                {/each}
-              </div>
-            {/if}
           </div>
         {/each}
       </div>
@@ -845,69 +802,6 @@
     color: #8ac4ff;
     padding: 0.1rem 0.4rem;
     border-radius: 3px;
-  }
-
-  /* 施設セクション */
-  .facility-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .facility-card {
-    padding: 0.75rem;
-    background: rgba(76, 175, 80, 0.08);
-    border: 1px solid rgba(76, 175, 80, 0.3);
-    border-radius: 6px;
-  }
-
-  .facility-main {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .facility-name {
-    font-weight: bold;
-    color: #e0e0f0;
-    font-size: 0.95rem;
-  }
-
-  .facility-type-badge {
-    font-size: 0.65rem;
-    font-weight: bold;
-    background: rgba(76, 175, 80, 0.2);
-    color: #81c784;
-    padding: 0.1rem 0.4rem;
-    border-radius: 3px;
-  }
-
-  .facility-type-badge.inventory {
-    background: rgba(100, 180, 255, 0.2);
-    color: #8ac4ff;
-  }
-
-  .facility-desc {
-    font-size: 0.8rem;
-    color: #a0a0b0;
-    margin: 0.25rem 0;
-  }
-
-  .facility-effects {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
-    margin-top: 0.25rem;
-  }
-
-  .facility-effect-tag {
-    padding: 0.1rem 0.4rem;
-    background: rgba(76, 175, 80, 0.15);
-    border: 1px solid rgba(76, 175, 80, 0.4);
-    border-radius: 3px;
-    font-size: 0.75rem;
-    color: #81c784;
   }
 
   .building-level {

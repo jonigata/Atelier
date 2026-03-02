@@ -42,7 +42,6 @@ function createInitialState(): GameState {
     craftedItems: [],
     discoveredItems: ['herb_01', 'water_01'],
     maxQualityByItem: {},
-    facilities: [],
 
     // 機材システム
     ownedEquipment: [],
@@ -400,20 +399,6 @@ export function markItemCrafted(itemId: string): void {
     return {
       ...state,
       craftedItems: [...state.craftedItems, itemId],
-    };
-  });
-}
-
-// =====================================
-// 設備
-// =====================================
-
-export function unlockFacility(facilityId: string): void {
-  gameState.update((state) => {
-    if (state.facilities.includes(facilityId)) return state;
-    return {
-      ...state,
-      facilities: [...state.facilities, facilityId],
     };
   });
 }

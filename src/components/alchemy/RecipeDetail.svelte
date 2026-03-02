@@ -1,6 +1,5 @@
 <script lang="ts">
   import { countAvailableIngredients, calculateSuccessRate } from '$lib/services/alchemy';
-  import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
   import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
   import { gameState } from '$lib/stores/game';
@@ -22,8 +21,6 @@
     return '???';
   }
 
-  $: facilityOk = hasRequiredFacilities(recipe);
-  $: missingFacilities = getMissingFacilities(recipe);
   $: successRate = calculateSuccessRate(recipe, calcLevelFromExp($gameState.alchemyExp));
   $: resultItem = getItem(recipe.resultItemId);
   $: ownedCount = $gameState.inventory.filter(i => i.itemId === recipe.resultItemId).length;
@@ -72,18 +69,6 @@
       </div>
     {/each}
   </div>
-
-  {#if !facilityOk}
-    <div class="facility-section">
-      <h4>不足している設備</h4>
-      {#each missingFacilities as facility}
-        <div class="facility-row">
-          <span class="facility-icon">🔒</span>
-          <span>{facility.name}</span>
-        </div>
-      {/each}
-    </div>
-  {/if}
 
   <div class="unavailable-notice">
     素材が不足しているため調合できません
@@ -225,21 +210,6 @@
 
   .ingredient-count.insufficient {
     color: #ff6b6b;
-  }
-
-  .facility-section {
-    padding: 1rem;
-    background: rgba(255, 152, 0, 0.1);
-    border: 1px solid rgba(255, 152, 0, 0.3);
-    border-radius: 8px;
-  }
-
-  .facility-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #ffb74d;
-    padding: 0.25rem 0;
   }
 
   .unavailable-notice {

@@ -1,20 +1,14 @@
 <script lang="ts">
-  import type { RecipeDef } from '$lib/models/types';
-  import { getFacilityBonuses } from '$lib/services/facility';
   export let successRate: number;
   export let expectedQuality: { min: number; max: number } | null;
   export let craftQuantity: number;
   export let daysRequired: number;
-  export let recipe: RecipeDef;
   export let staminaCost: number;
   export let totalStaminaCost: number;
   export let currentStamina: number;
   export let fatiguePenalty: number;
   export let fatigueLabel: string | null;
   export let onCraft: () => void;
-
-  $: bonuses = getFacilityBonuses(recipe);
-  $: hasBonuses = bonuses.successRateBonus > 0 || bonuses.qualityBonus > 0;
 
   // 調合後の体力
   $: afterStamina = Math.max(0, currentStamina - totalStaminaCost);
@@ -54,17 +48,6 @@
       </div>
     {/if}
   </div>
-
-  {#if hasBonuses}
-    <div class="facility-bonuses">
-      {#if bonuses.successRateBonus > 0}
-        <span class="bonus-tag">成功率 +{Math.round(bonuses.successRateBonus * 100)}%</span>
-      {/if}
-      {#if bonuses.qualityBonus > 0}
-        <span class="bonus-tag">品質 +{bonuses.qualityBonus}</span>
-      {/if}
-    </div>
-  {/if}
 
   <button class="craft-btn" on:click={onCraft}>
     {craftQuantity}個 調合する ({daysRequired}日)
@@ -142,22 +125,6 @@
 
   .quality {
     color: #82b1ff;
-  }
-
-  .facility-bonuses {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .bonus-tag {
-    padding: 0.2rem 0.6rem;
-    background: rgba(76, 175, 80, 0.2);
-    border: 1px solid #4caf50;
-    border-radius: 4px;
-    color: #81c784;
-    font-size: 0.8rem;
   }
 
   .stamina-info {

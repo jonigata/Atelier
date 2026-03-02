@@ -236,9 +236,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       { type: 'day', target: 140, comparison: '>=' },
       { type: 'craft_count', target: 30 },
     ],
-    reward: {
-      facilities: ['reinforced_cauldron'],
-    },
+    reward: {},
     prerequisite: ['ach_craft_10'],
     priority: 735,
   },

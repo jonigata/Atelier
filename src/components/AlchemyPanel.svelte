@@ -8,7 +8,6 @@
   import { showDrawAndWait } from '$lib/services/drawEvent';
   import { recipes } from '$lib/data/recipes';
   import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient, calculateStaminaCost, calculateFatiguePenalty, getFatigueLabel, getInspectionConflict } from '$lib/services/alchemy';
-  import { hasRequiredFacilities, getMissingFacilities } from '$lib/services/facility';
   import { calcExpForLevel, calcLevelFromExp, calcExpProgress, buildExpGaugeSegments } from '$lib/data/balance';
   import { getEffectiveCraftDays, getEffectiveIngredientCount, craftDaysToActual, formatCraftDays } from '$lib/services/equipmentEffects';
   import type { RecipeDef, OwnedItem, Ingredient, GaugeData } from '$lib/models/types';
@@ -21,12 +20,10 @@
   import CraftPreview from './alchemy/CraftPreview.svelte';
   import CraftResultDialog from './alchemy/CraftResultDialog.svelte';
   import LevelUpDialog from './LevelUpDialog.svelte';
-  import FacilityInfo from './alchemy/FacilityInfo.svelte';
   import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
 
   export let onBack: (opts?: { skipMilestoneCheck?: boolean }) => void;
 
-  let showFacilities = false;
   let selectedRecipe: RecipeDef | null = null;
 
   // 依頼からのジャンプ: レシピを自動選択
@@ -52,8 +49,7 @@
 
   // 選択中のレシピが調合可能か
   $: canCraftSelected = selectedRecipe
-    ? hasRequiredFacilities(selectedRecipe) &&
-      selectedRecipe.ingredients.every((ing) => countAvailableIngredients(ing) >= ing.quantity)
+    ? selectedRecipe.ingredients.every((ing) => countAvailableIngredients(ing) >= ing.quantity)
     : false;
 
   // 現在のレシピで作成可能な最大個数（機材効果適用済み）
@@ -322,15 +318,7 @@
   <h2>⚗️ 調合 <ActiveEquipmentIcons prefixes={['craft_', 'material_', 'all_probability']} /></h2>
 
   {#if !selectedRecipe}
-    <div class="tab-bar">
-      <button class="tab" class:active={!showFacilities} on:click={() => showFacilities = false}>レシピ</button>
-      <button class="tab" class:active={showFacilities} on:click={() => showFacilities = true}>設備・機材</button>
-    </div>
-    {#if showFacilities}
-      <FacilityInfo />
-    {:else}
-      <RecipeList recipes={availableRecipes} onSelect={selectRecipe} />
-    {/if}
+    <RecipeList recipes={availableRecipes} onSelect={selectRecipe} />
   {:else if !canCraftSelected}
     <RecipeDetail recipe={selectedRecipe} onBack={backToRecipeList} />
   {:else}
@@ -390,7 +378,6 @@
             {expectedQuality}
             {craftQuantity}
             daysRequired={craftDaysRequired}
-            recipe={selectedRecipe}
             {staminaCost}
             {totalStaminaCost}
             currentStamina={$gameState.stamina}
@@ -525,32 +512,6 @@
     margin-top: 0.5rem;
     font-size: 0.85rem;
     color: #a0a0b0;
-  }
-
-  .tab-bar {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .tab {
-    padding: 0.5rem 1.25rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #4a4a6a;
-    border-radius: 6px;
-    color: #a0a0b0;
-    cursor: pointer;
-    font-size: 0.9rem;
-  }
-
-  .tab.active {
-    background: rgba(201, 169, 89, 0.2);
-    border-color: #c9a959;
-    color: #f4e4bc;
-  }
-
-  .tab:hover:not(.active) {
-    background: rgba(255, 255, 255, 0.1);
   }
 
   .inspection-warning {

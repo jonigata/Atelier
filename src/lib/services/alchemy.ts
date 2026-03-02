@@ -13,7 +13,6 @@ import { getItem } from '$lib/data/items';
 import { INSPECTION_DAYS } from '$lib/data/inspection';
 import { removeItemsFromInventory } from '$lib/services/inventory';
 import { ALCHEMY, CRAFT_SUCCESS, QUALITY, STAMINA, calcLevelFromExp } from '$lib/data/balance';
-import { getFacilityBonuses, hasRequiredFacilities } from '$lib/services/facility';
 import { craftedFlavors, pickRandom } from '$lib/data/flavorTexts';
 import {
   getCraftSuccessBonus,
@@ -111,8 +110,6 @@ export function canCraftRecipe(recipeId: string): boolean {
   const recipe = getRecipe(recipeId);
   if (!recipe) return false;
   if (!state.knownRecipes.includes(recipeId)) return false;
-  if (!hasRequiredFacilities(recipe)) return false;
-
   // 各素材の必要数をチェック（機材効果で軽減あり）
   for (const ingredient of recipe.ingredients) {
     const effectiveQty = getEffectiveIngredientCount(ingredient.quantity);
@@ -416,7 +413,6 @@ export function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number, st
   const levelMod = levelDiff >= 0
     ? levelDiff * CRAFT_SUCCESS.LEVEL_BONUS
     : levelDiff * CRAFT_SUCCESS.LEVEL_DEFICIT_PENALTY;
-  const { successRateBonus } = getFacilityBonuses(recipe);
   const fatiguePenalty = stamina !== undefined ? calculateFatiguePenalty(stamina) : 0;
 
   // 機材効果
@@ -430,7 +426,7 @@ export function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number, st
 
   return Math.max(0.01, Math.min(
     CRAFT_SUCCESS.MAX_RATE,
-    baserate + levelMod + successRateBonus + equipBonus + accumBonus + probBonus + villageBonus + helperBonus - fatiguePenalty
+    baserate + levelMod + equipBonus + accumBonus + probBonus + villageBonus + helperBonus - fatiguePenalty
   ));
 }
 
@@ -450,7 +446,6 @@ export function calculateExpectedQuality(
     selectedItems.reduce((sum, item) => sum + getEffectiveMaterialQuality(item.quality), 0) / selectedItems.length;
 
   const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * QUALITY.LEVEL_BONUS);
-  const { qualityBonus } = getFacilityBonuses(recipe);
 
   // 機材効果
   const equipQualityBonus = getCraftQualityBonus();
@@ -462,7 +457,7 @@ export function calculateExpectedQuality(
   const villageQualityBonus = getBuildingCraftQualityBonus();
   const helperQualityBonus = getHelperCraftQualityBonus();
 
-  const base = Math.floor(avgQuality + levelBonus + qualityBonus + equipQualityBonus + comboBonus + villageQualityBonus + helperQualityBonus);
+  const base = Math.floor(avgQuality + levelBonus + equipQualityBonus + comboBonus + villageQualityBonus + helperQualityBonus);
   const randomMin = Math.round(QUALITY.RANDOM_MIN * varianceMult);
   const randomMax = Math.round(QUALITY.RANDOM_MAX * varianceMult);
   const min = Math.max(QUALITY.MIN, base + randomMin);
@@ -484,7 +479,6 @@ function calculateQuality(
     selectedItems.reduce((sum, item) => sum + getEffectiveMaterialQuality(item.quality), 0) / selectedItems.length;
 
   const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * QUALITY.LEVEL_BONUS);
-  const { qualityBonus } = getFacilityBonuses(recipe);
 
   // 機材効果
   const equipQualityBonus = getCraftQualityBonus();
@@ -502,6 +496,6 @@ function calculateQuality(
   const villageQualityBonus = getBuildingCraftQualityBonus();
   const helperQualityBonus = getHelperCraftQualityBonus();
 
-  const quality = Math.floor(avgQuality + levelBonus + qualityBonus + equipQualityBonus + comboBonus + villageQualityBonus + helperQualityBonus + randomFactor);
+  const quality = Math.floor(avgQuality + levelBonus + equipQualityBonus + comboBonus + villageQualityBonus + helperQualityBonus + randomFactor);
   return Math.max(1, Math.min(qualityCap, quality));
 }

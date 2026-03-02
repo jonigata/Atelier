@@ -7,7 +7,6 @@ import {
   addExp,
   addVillageExp,
   learnRecipe,
-  unlockFacility,
 } from '$lib/stores/game';
 import type { LevelUpInfo } from '$lib/stores/game';
 import { calcExpForLevel, calcLevelFromExp, calcExpProgress, buildExpGaugeSegments } from '$lib/data/balance';
@@ -21,7 +20,6 @@ import {
 } from '$lib/data/achievements';
 import { items } from '$lib/data/items';
 import { recipes } from '$lib/data/recipes';
-import { getFacility } from '$lib/data/facilities';
 import { getEquipmentByRarity, getEquipment, getEquipmentIcon } from '$lib/data/equipment';
 import { showGoalActiveToast, actionLabels } from '$lib/stores/toast';
 import type {
@@ -319,12 +317,6 @@ export function claimReward(achievementId: string, pickedEquipment?: EquipmentDe
     }
   }
 
-  // 設備アンロック
-  if (reward.facilities) {
-    for (const facilityId of reward.facilities) {
-      unlockFacility(facilityId);
-    }
-  }
 
   // ランダムコモン機材
   if (reward.randomCommonEquipment) {
@@ -444,14 +436,6 @@ function getDetailedRewards(achievement: AchievementDef, pickedEquipment?: Equip
       const recipeDef = recipes[recipeId];
       const recipeName = recipeDef ? recipeDef.name : recipeId;
       details.push(`レシピ「${recipeName}」`);
-    }
-  }
-
-  if (reward.facilities) {
-    for (const facilityId of reward.facilities) {
-      const facility = getFacility(facilityId);
-      const name = facility ? facility.name : facilityId;
-      details.push(`設備「${name}」解放`);
     }
   }
 
@@ -580,17 +564,6 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
         text: `レシピ「${recipeName}」`,
         itemId: recipeDef?.resultItemId,
         type: 'recipe',
-      });
-    }
-  }
-
-  if (reward.facilities) {
-    for (const facilityId of reward.facilities) {
-      const facility = getFacility(facilityId);
-      const name = facility ? facility.name : facilityId;
-      structured.push({
-        text: `設備「${name}」解放`,
-        type: 'unlock',
       });
     }
   }
