@@ -36,10 +36,10 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     narrative: 'workshop_discovery',
     narrativeCharacter: { name: 'コレット', title: '駆け出し錬金術師' },
     narrativeLines: [
-      '工房に運び込まれた荷物を整理した',
-      '師匠が持たせてくれた道具と素材……それに、何冊かの教本',
-      'この教本があれば、基礎の復習から始められそうだ',
-      'まずはこれで、やれるだけやってみよう',
+      'よいしょっと……。荷物、全部運び込めたかな',
+      '師匠が持たせてくれた道具と素材……それに、何冊かの教本。ありがたいなぁ',
+      'うん、この教本があれば基礎の復習もバッチリだ！',
+      'よーし……まずはここから、わたしの錬金術、始めよう！',
     ],
     conditions: [{ type: 'inventory_opened', target: 1 }],
     reward: {

@@ -209,7 +209,7 @@
         } else {
           addMessage(`助手「${def.name}」は既にLv.MAX`);
         }
-        if (currentLevel < def.maxLevel && def.greetings[currentLevel]) {
+        if (currentLevel > 0 && currentLevel < def.maxLevel && def.greetings[currentLevel]) {
           pendingGreeting = {
             characterName: def.name,
             characterTitle: def.species,

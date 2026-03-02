@@ -84,6 +84,8 @@
     ? Object.fromEntries(nextInspection.criteria.filter(c => c.getExpValue).map(c => [c.key, c.getExpValue!($gameState)]))
     : {};
 
+  $: hasDeliverableQuest = $gameState.activeQuests.some(q => canDeliverQuest(q));
+
   $: actionStates = actions.map(action => {
     const unlockedActions = $gameState.tutorialProgress.unlockedActions;
     const isLocked = !unlockedActions.includes(action.type);
@@ -135,6 +137,8 @@
             {@const returnDay = $gameState.expedition.startDay + $gameState.expedition.duration}
             {@const daysLeft = returnDay - $gameState.day}
             <span class="badge">あと{daysLeft}日</span>
+          {:else if action.type === 'quest' && hasDeliverableQuest}
+            <span class="badge deliverable">納品可能</span>
           {:else if action.type === 'quest' && $gameState.newQuestCount > 0}
             <span class="badge new-quest">{$gameState.newQuestCount}件</span>
           {/if}
@@ -277,6 +281,12 @@
     font-size: 0.7rem;
     font-weight: bold;
     border-radius: 4px;
+  }
+
+  .badge.deliverable {
+    background: #4caf50;
+    color: white;
+    animation: badgePulse 2s ease-in-out infinite;
   }
 
   .badge.new-quest {

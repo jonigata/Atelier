@@ -92,8 +92,8 @@ export const buildings: Record<string, BuildingDef> = {
     maxLevel: 3,
     levels: [
       { effects: [{ type: 'craft_days_halve', value: 0, itemCategory: 'product' }], effectDescription: '薬品系の調合日数半減' },
-      { effects: [{ type: 'craft_days_halve', value: 0, itemCategory: 'product' }, { type: 'craft_quality', value: 3 }], effectDescription: '薬品系の調合日数半減、品質+3' },
-      { effects: [{ type: 'craft_days_halve', value: 0, itemCategory: 'product' }, { type: 'craft_quality', value: 5 }], effectDescription: '薬品系の調合日数半減、品質+5' },
+      { effects: [{ type: 'craft_days_halve', value: 0, itemCategory: 'product' }], effectDescription: '薬品系の調合日数半減' },
+      { effects: [{ type: 'craft_days_halve', value: 0, itemCategory: 'product' }], effectDescription: '薬品系の調合日数半減' },
     ],
   },
   watermill: {
@@ -103,9 +103,9 @@ export const buildings: Record<string, BuildingDef> = {
     icon: '🎡',
     maxLevel: 3,
     levels: [
-      { effects: [{ type: 'craft_quality', value: 5 }, { type: 'craft_success', value: 0.03 }], effectDescription: '全調合品質+5、成功率+3%' },
-      { effects: [{ type: 'craft_quality', value: 8 }, { type: 'craft_success', value: 0.05 }], effectDescription: '全調合品質+8、成功率+5%' },
-      { effects: [{ type: 'craft_quality', value: 12 }, { type: 'craft_success', value: 0.08 }], effectDescription: '全調合品質+12、成功率+8%' },
+      { effects: [{ type: 'craft_quality', value: 5 }], effectDescription: '全調合品質+5' },
+      { effects: [{ type: 'craft_quality', value: 8 }], effectDescription: '全調合品質+8' },
+      { effects: [{ type: 'craft_quality', value: 12 }], effectDescription: '全調合品質+12' },
     ],
   },
 
