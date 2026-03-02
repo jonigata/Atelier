@@ -140,7 +140,7 @@
 
   .dialog.has-image {
     padding: 0;
-    max-width: 540px;
+    max-width: 900px;
   }
 
   .dialog.has-image .dialog-content {
@@ -150,13 +150,13 @@
   .event-image-container {
     position: relative;
     width: 100%;
-    max-height: 280px;
+    max-height: 440px;
     overflow: hidden;
   }
 
   .event-image {
     width: 100%;
-    height: 280px;
+    height: 440px;
     object-fit: cover;
     display: block;
   }
