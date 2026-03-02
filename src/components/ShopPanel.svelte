@@ -13,6 +13,7 @@
   import { SHOP, SHOP_DEALS } from '$lib/data/balance';
   import { shopFlavors, pickRandom } from '$lib/data/flavorTexts';
   import { getSellPriceMult, getBuyPriceMult, recordSell } from '$lib/services/equipmentEffects';
+  import { getHelperBuyPriceMult, getHelperSellPriceMult } from '$lib/services/helperEffects';
   import { getBargainItems, getPremiumPurchaseItems } from '$lib/services/shopDeals';
   import { getWeek, getDaysLeftInWeek } from '$lib/services/calendar';
   import type { OwnedItem, ItemDef, EquipmentDef } from '$lib/models/types';
@@ -121,7 +122,7 @@
   }
 
   function buyItemMultiple(item: ItemDef, count: number, bargainRate: number = 1) {
-    const buyMult = getBuyPriceMult();
+    const buyMult = getBuyPriceMult() * getHelperBuyPriceMult();
     const unitPrice = Math.max(1, Math.floor(item.basePrice * buyMult * bargainRate));
     const totalCost = unitPrice * count;
     if ($gameState.money < totalCost) {
@@ -202,7 +203,7 @@
     // 売却価格 = 基本価格 × (品質 / 50) × 売却係数 × 機材効果 × 高価買取
     const basePrice = Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
     const premiumMult = premiumItemIds.includes(item.itemId) ? SHOP_DEALS.PREMIUM_MULTIPLIER : 1;
-    const price = Math.max(1, Math.floor(basePrice * getSellPriceMult(item) * premiumMult));
+    const price = Math.max(1, Math.floor(basePrice * getSellPriceMult(item) * getHelperSellPriceMult() * premiumMult));
 
     // インベントリから削除
     gameState.update((state) => ({
@@ -227,7 +228,7 @@
     const premiumMult = premiumItemIds.includes(targets[0].itemId) ? SHOP_DEALS.PREMIUM_MULTIPLIER : 1;
     for (const item of targets) {
       const basePrice = Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
-      const price = Math.max(1, Math.floor(basePrice * getSellPriceMult(item) * premiumMult));
+      const price = Math.max(1, Math.floor(basePrice * getSellPriceMult(item) * getHelperSellPriceMult() * premiumMult));
       gameState.update((state) => ({
         ...state,
         inventory: removeItemFromInventory(state.inventory, item.itemId, item.quality),
@@ -289,7 +290,7 @@
     if (!def) return 0;
     const basePrice = Math.floor(def.basePrice * (item.quality / 50) * SHOP.SELL_PRICE_RATE);
     const premiumMult = premiumItemIds.includes(item.itemId) ? SHOP_DEALS.PREMIUM_MULTIPLIER : 1;
-    return Math.max(1, Math.floor(basePrice * getSellPriceMult(item) * premiumMult));
+    return Math.max(1, Math.floor(basePrice * getSellPriceMult(item) * getHelperSellPriceMult() * premiumMult));
   }
 </script>
 
@@ -356,7 +357,7 @@
     <div class="item-list">
       {#each buyableItems as item}
         {@const isBargain = bargainItemIds.includes(item.id)}
-        {@const buyMult = getBuyPriceMult()}
+        {@const buyMult = getBuyPriceMult() * getHelperBuyPriceMult()}
         {@const normalPrice = Math.max(1, Math.floor(item.basePrice * buyMult))}
         {@const displayPrice = isBargain ? Math.max(1, Math.floor(normalPrice * SHOP_DEALS.BARGAIN_DISCOUNT)) : normalPrice}
         {@const canBuy = $gameState.money >= displayPrice}

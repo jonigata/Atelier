@@ -33,7 +33,7 @@ import {
   getEffectiveIngredientCount,
 } from '$lib/services/equipmentEffects';
 import { getBuildingCraftSuccessBonus, getBuildingCraftQualityBonus } from '$lib/services/buildingEffects';
-import { getHelperCraftSuccessBonus, getHelperCraftQualityBonus } from '$lib/services/helperEffects';
+import { getHelperCraftSuccessBonus, getHelperCraftQualityBonus, getHelperStaminaCostReduction } from '$lib/services/helperEffects';
 import type { OwnedItem, RecipeDef, Ingredient } from '$lib/models/types';
 
 export interface CraftMultipleResult {
@@ -365,7 +365,8 @@ function consumeItems(items: OwnedItem[]): void {
  */
 export function calculateStaminaCost(recipe: RecipeDef): number {
   const base = STAMINA.CRAFT_BASE_COST + recipe.difficulty * STAMINA.CRAFT_DIFFICULTY_COST;
-  return Math.max(1, Math.round(base * getStaminaCostMult()));
+  const helperReduction = getHelperStaminaCostReduction();
+  return Math.max(1, Math.round(base * getStaminaCostMult()) - helperReduction);
 }
 
 /**
