@@ -352,7 +352,7 @@
       <div class="quantity-section">
         <h4>作成個数</h4>
         <div class="quantity-selector">
-          {#each [1, 2, 3, 4, 5] as n}
+          {#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as n}
             <button
               class="qty-num-btn"
               class:selected={craftQuantity === n}
@@ -368,7 +368,7 @@
           <div class="inspection-warning">
             {conflictDay}日目に査察があるため、調合できません
           </div>
-        {:else if maxWithoutInspection < maxCraftable && maxWithoutInspection < 5}
+        {:else if maxWithoutInspection < maxCraftable && maxWithoutInspection < 10}
           {@const conflictDay = getInspectionConflictForQuantity(maxWithoutInspection + 1)}
           <div class="inspection-warning">
             {conflictDay}日目に査察があるため、{maxWithoutInspection + 1}個以上は調合できません
