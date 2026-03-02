@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
+  import { dev } from '$app/environment';
   import { gameState, addMessage, skipPresentation } from '$lib/stores/game';
   import { resolveDialogue } from '$lib/services/presentation';
   import { skipOpening } from '$lib/services/gameLoop';
@@ -363,7 +364,7 @@
             {#if dialogue.lines.length > 1 || hasRewards}
               <button class="skip-button" on:click={skipDialogue}>スキップ</button>
             {/if}
-            {#if isOpeningEvent}
+            {#if dev && isOpeningEvent}
               <button class="skip-opening-button" on:click={handleSkipOpening}>全スキップ</button>
             {/if}
           </div>
