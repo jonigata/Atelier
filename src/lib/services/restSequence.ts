@@ -23,7 +23,7 @@ export interface RestSequenceUI {
  * 「休息する」ボタンから次の日の朝まで、全シーケンスを順序制御する。
  *
  * 画面遷移:
- *   黒背景ON → ダイアログ → ビデオ → 黒背景維持 → endTurn
+ *   黒背景ON → ダイアログ → ドロー → ビデオ → 黒背景維持 → endTurn
  *   → DayTransition(z-1100) が上に乗る → leave() で RestPanel unmount
  */
 export async function executeRest(ui: RestSequenceUI): Promise<void> {
@@ -39,10 +39,6 @@ export async function executeRest(ui: RestSequenceUI): Promise<void> {
 		// 2. イベントダイアログ表示 → ユーザーが閉じるまで待機
 		await ui.showEventDialog(event, rewards);
 		ui.hideEventDialog();
-
-		// 3. ビデオ再生 → 終了まで待機（黒背景の上で再生）
-		await ui.playVideo();
-		// ビデオ終了後も黒背景は維持 → DayTransition までつなぐ
 	}
 
 	// --- 体力回復 ---
@@ -52,11 +48,17 @@ export async function executeRest(ui: RestSequenceUI): Promise<void> {
 		`休息しました。体力が全回復しました。${bonus > 0 ? `（施設ボーナス+${bonus}）` : ''}`,
 	);
 
-	// --- ドロー表示（日をまたぐ前に実行） ---
+	// --- ドロー表示（ムービーの前に実行） ---
 	if (drawInfos.village)
 		await showDrawAndWait({ type: 'facility', levelUpInfo: drawInfos.village });
 	if (drawInfos.reputation)
 		await showDrawAndWait({ type: 'helper', levelUpInfo: drawInfos.reputation });
+
+	if (!get(skipPresentation)) {
+		// 3. ビデオ再生 → 終了まで待機（黒背景の上で再生）
+		await ui.playVideo();
+		// ビデオ終了後も黒背景は維持 → DayTransition までつなぐ
+	}
 
 	// --- ターン終了（DayTransition が z-1100 で画面を覆う） ---
 	const turnPromise = endTurn(1);
