@@ -293,37 +293,40 @@
 </script>
 
 <div class="shop-panel">
-  <button class="back-btn" on:click={onBack}>← 戻る</button>
-  <h2>🏪 ショップ <ActiveEquipmentIcons prefixes={['sell_', 'buy_']} /></h2>
+  <div class="shop-header">
+    <button class="back-btn" on:click={onBack}>← 戻る</button>
+    <h2>🏪 ショップ <ActiveEquipmentIcons prefixes={['sell_', 'buy_']} /></h2>
 
-  <div class="money-display">
-    所持金: <span class="amount">{$gameState.money.toLocaleString()}G</span>
+    <div class="money-display">
+      所持金: <span class="amount">{$gameState.money.toLocaleString()}G</span>
+    </div>
+
+    <div class="tabs">
+      <button
+        class="tab"
+        class:active={activeTab === 'buy'}
+        on:click={() => (activeTab = 'buy')}
+      >
+        購入
+      </button>
+      <button
+        class="tab"
+        class:active={activeTab === 'sell'}
+        on:click={() => (activeTab = 'sell')}
+      >
+        売却
+      </button>
+      <button
+        class="tab"
+        class:active={activeTab === 'parttime'}
+        on:click={() => (activeTab = 'parttime')}
+      >
+        アルバイト
+      </button>
+    </div>
   </div>
 
-  <div class="tabs">
-    <button
-      class="tab"
-      class:active={activeTab === 'buy'}
-      on:click={() => (activeTab = 'buy')}
-    >
-      購入
-    </button>
-    <button
-      class="tab"
-      class:active={activeTab === 'sell'}
-      on:click={() => (activeTab = 'sell')}
-    >
-      売却
-    </button>
-    <button
-      class="tab"
-      class:active={activeTab === 'parttime'}
-      on:click={() => (activeTab = 'parttime')}
-    >
-      アルバイト
-    </button>
-  </div>
-
+  <div class="shop-content">
   {#if showDealsTalk && dealsTalkText}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -533,11 +536,27 @@
     </div>
   {/if}
 
+  </div>
 </div>
 
 <style>
   .shop-panel {
-    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .shop-header {
+    flex-shrink: 0;
+    padding: 1.5rem 1.5rem 0.5rem;
+  }
+
+  .shop-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 1.5rem 1.5rem;
   }
 
   .back-btn {
@@ -589,7 +608,7 @@
   .tabs {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
   }
 
   .tab {
