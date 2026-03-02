@@ -356,7 +356,7 @@
               >
                 受注する
               </button>
-              {#if canFulfill(quest) && canAccept}
+              {#if canFulfill(quest) && canAccept && $gameState.tutorialProgress.unlockedActions.includes('shop')}
                 <button
                   class="instant-deliver-btn"
                   on:click={() => instantDeliver(quest)}

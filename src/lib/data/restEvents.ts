@@ -78,8 +78,8 @@ export const restEvents: RestEventDef[] = [
   },
   {
     id: 'liene_gift',
-    name: 'リエネの差し入れ',
-    narrative: '「べ、別にあんたが倒れたら村が困るからよ」リエネが焼き菓子と薬草茶を持ってきてくれた。',
+    name: 'リーネの差し入れ',
+    narrative: '「べ、別にあんたが倒れたら村が困るからよ」リーネが焼き菓子と薬草茶を持ってきてくれた。',
     weight: 5,
     eventImage: 'rest_liene_gift',
     rewards: [
@@ -346,8 +346,8 @@ export const restEvents: RestEventDef[] = [
   },
   {
     id: 'liene_herb_notes',
-    name: 'リエネの薬草学',
-    narrative: 'リエネが「おばあちゃんの薬草ノート」を見せてくれた。普段は絶対見せないのに。「……一回だけよ」 そこには貴重な知識が詰まっていた。',
+    name: 'リーネの薬草学',
+    narrative: 'リーネが「おばあちゃんの薬草ノート」を見せてくれた。普段は絶対見せないのに。「……一回だけよ」 そこには貴重な知識が詰まっていた。',
     weight: 1,
     eventImage: 'rest_liene_herb_notes',
     rewards: [

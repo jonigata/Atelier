@@ -94,7 +94,8 @@
     : {};
 
   $: hasDeliverableQuest = $gameState.activeQuests.some(q => canDeliverQuest(q));
-  $: hasInstantDeliverableQuest = $gameState.availableQuests.some(q => canInstantDeliver(q));
+  $: shopUnlocked = $gameState.tutorialProgress.unlockedActions.includes('shop');
+  $: hasInstantDeliverableQuest = shopUnlocked && $gameState.availableQuests.some(q => canInstantDeliver(q));
   $: availableQuestCount = $gameState.availableQuests.length;
 
   $: actionStates = actions.map(action => {
