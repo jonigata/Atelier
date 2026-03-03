@@ -28,6 +28,10 @@ import type { EventDialogue } from '$lib/models/types';
 // 日数表示の完了を待つための resolver
 let dayTransitionResolver: (() => void) | null = null;
 
+// DayTransition完了時に同期的に実行するコールバック
+// （Svelteのvisible=falseと同一フラッシュでバッチ処理するため）
+let dayTransitionSyncCallback: (() => void) | null = null;
+
 // ダイアログ完了を待つための resolver
 let dialogueResolver: (() => void) | null = null;
 
@@ -39,6 +43,11 @@ let inspectionCutsceneResolver: (() => void) | null = null;
  * DayTransition.svelte から呼ばれる
  */
 export function resolveDayTransition(): void {
+  // 同期コールバックを先に実行（visible=falseと同じフラッシュで処理される）
+  if (dayTransitionSyncCallback) {
+    dayTransitionSyncCallback();
+    dayTransitionSyncCallback = null;
+  }
   clearDayTransition();
   if (dayTransitionResolver) {
     dayTransitionResolver();
@@ -60,13 +69,17 @@ export function resolveDialogue(): void {
 
 /**
  * 日数表示が終わるまで待つ
+ * @param onResolveSync DayTransition完了時にvisible=falseと同期的に実行されるコールバック。
+ *                      Svelteの同一フラッシュでバッチ処理されるため、画面のちらつきを防げる。
  */
-async function waitForDayTransition(): Promise<void> {
+export async function waitForDayTransition(onResolveSync?: () => void): Promise<void> {
   const state = get(gameState);
   if (!state.pendingDayTransition) {
+    onResolveSync?.();
     return;
   }
 
+  dayTransitionSyncCallback = onResolveSync ?? null;
   return new Promise((resolve) => {
     dayTransitionResolver = resolve;
   });

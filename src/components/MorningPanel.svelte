@@ -13,7 +13,8 @@
            class:quest={event.type === 'new_quest'}
            class:expired={event.type === 'quest_expired'}
            class:merchant-arrival={event.type === 'merchant_arrival'}
-           class:merchant-departure={event.type === 'merchant_departure'}>
+           class:merchant-departure={event.type === 'merchant_departure'}
+           class:quiet={event.type === 'quiet_morning'}>
         {#if event.type === 'expedition_return'}
           <span class="icon">📦</span>
         {:else if event.type === 'new_quest'}
@@ -24,6 +25,8 @@
           <span class="icon">🐪</span>
         {:else if event.type === 'merchant_departure'}
           <span class="icon">👋</span>
+        {:else if event.type === 'quiet_morning'}
+          <span class="icon">☀️</span>
         {/if}
         <span class="text">{event.message}</span>
       </div>
@@ -92,6 +95,10 @@
 
   .event.merchant-departure {
     border-left: 3px solid #9e9e9e;
+  }
+
+  .event.quiet {
+    border-left: 3px solid #a0c4ff;
   }
 
   .icon {

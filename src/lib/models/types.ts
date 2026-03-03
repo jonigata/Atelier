@@ -295,7 +295,8 @@ export type MorningEvent =
   | { type: 'new_quest'; message: string }
   | { type: 'quest_expired'; message: string }
   | { type: 'merchant_arrival'; message: string }
-  | { type: 'merchant_departure'; message: string };
+  | { type: 'merchant_departure'; message: string }
+  | { type: 'quiet_morning'; message: string };
 
 // チュートリアル会話
 // ゲージアニメーションのセグメント（レベルアップ時の繰り返し表示用）

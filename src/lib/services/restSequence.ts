@@ -58,11 +58,11 @@ export async function executeRest(ui: RestSequenceUI): Promise<void> {
 	}
 
 	// --- ターン終了（DayTransition が z-1100 で画面を覆う） ---
-	const turnPromise = endTurn(1);
-	await new Promise((r) => setTimeout(r, 350));
+	// rest-backdrop(z-1000)をDayTransition完了まで維持し、
+	// フェードイン中に背景が透けるのを防ぐ
+	await endTurn(1);
 
-	// DayTransition が描画されているので RestPanel unmount してもフラッシュしない
+	// endTurn内でDayTransition完了→setPhase('morning')済み
+	// RestPanelはphase変更で既にアンマウントされているが、念のためleave
 	ui.leave();
-
-	await turnPromise;
 }

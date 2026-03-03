@@ -20,7 +20,7 @@ import { getAvailableQuestTemplates, questTemplates } from '$lib/data/quests';
 import { EXPEDITION, calcLevelFromExp } from '$lib/data/balance';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import { processAutoCompleteAchievements } from '$lib/services/presentation';
-import { processMorningAchievements, processInspectionSequence } from '$lib/services/presentation';
+import { processMorningAchievements, processInspectionSequence, waitForDayTransition } from '$lib/services/presentation';
 import { processBuildingMorningItems } from '$lib/services/buildingEffects';
 import { processHelperMorningStamina } from '$lib/services/helperEffects';
 import { checkMerchantEvents } from '$lib/services/merchant';
@@ -155,13 +155,17 @@ async function processMorningPhase(): Promise<void> {
   // 7. 朝発動アチーブメント（triggerOnMorning）
   await processMorningAchievements();
 
-  // イベントがあればmorning画面を表示、なければ直接actionへ
+  // イベントが無い日もフォールバックで朝メニューを表示
   const updatedState = get(gameState);
-  if (updatedState.morningEvents.length > 0) {
-    setPhase('morning');
-  } else {
-    startActionPhase();
+  if (updatedState.morningEvents.length === 0) {
+    addMorningEvent({ type: 'quiet_morning', message: '穏やかな朝です。' });
   }
+
+  // DayTransition演出の完了を待ち、オーバーレイ消去と同一Svelteフラッシュで
+  // フェーズを切り替える（ちらつき防止）
+  await waitForDayTransition(() => {
+    setPhase('morning');
+  });
 
   // 朝処理完了後にオートセーブ（イベント・フェーズ確定済み）
   autoSave();
