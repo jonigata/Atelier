@@ -299,7 +299,8 @@
             {@const isNew = choice.currentLevel === 0}
             {@const isMaxed = choice.currentLevel >= choice.def.maxLevel}
             {@const nextLevel = isNew ? 1 : choice.currentLevel + 1}
-            {@const effectDesc = isMaxed ? choice.def.levels[choice.def.maxLevel - 1].effectDescription : choice.def.levels[Math.max(0, nextLevel - 1)].effectDescription}
+            {@const nextEffectDesc = isMaxed ? choice.def.levels[choice.def.maxLevel - 1].effectDescription : choice.def.levels[Math.max(0, nextLevel - 1)].effectDescription}
+            {@const currentEffectDesc = choice.currentLevel > 0 ? choice.def.levels[choice.currentLevel - 1].effectDescription : ''}
             <div
               class="card-wrapper"
               class:slide-in={showCards}
@@ -329,13 +330,15 @@
                     <span class="card-name">{choice.def.name}</span>
                     {#if isNew}
                       <span class="card-level new">NEW</span>
-                      <span class="card-effect-overlay">{effectDesc}</span>
+                      <span class="card-effect-overlay">{nextEffectDesc}</span>
                     {:else if isMaxed}
                       <span class="card-level max">Lv.MAX</span>
                       <span class="card-effect-overlay dimmed">これ以上強化できない</span>
                     {:else}
                       <span class="card-level upgrade">Lv.{choice.currentLevel} → Lv.{nextLevel}</span>
-                      <span class="card-effect-overlay">{effectDesc}</span>
+                      <span class="card-effect-overlay">{currentEffectDesc}</span>
+                      <span class="card-effect-arrow">→</span>
+                      <span class="card-effect-overlay upgrade-next">{nextEffectDesc}</span>
                     {/if}
                   </div>
                 </div>
@@ -385,7 +388,9 @@
                       <span class="card-effect-overlay dimmed">これ以上成長できない</span>
                     {:else}
                       <span class="card-level upgrade">Lv.{choice.currentLevel} → Lv.{nextLevel}</span>
-                      <span class="card-effect-overlay">{choice.def.levelEffects[nextLevel - 1].description}</span>
+                      <span class="card-effect-overlay">{choice.def.levelEffects[choice.currentLevel - 1].description}</span>
+                      <span class="card-effect-arrow">→</span>
+                      <span class="card-effect-overlay upgrade-next">{choice.def.levelEffects[nextLevel - 1].description}</span>
                     {/if}
                   </div>
                 </div>
@@ -662,6 +667,16 @@
 
   .card-effect-overlay.dimmed {
     color: #808090;
+  }
+
+  .card-effect-arrow {
+    font-size: 0.7rem;
+    color: #c9a959;
+    line-height: 1;
+  }
+
+  .card-effect-overlay.upgrade-next {
+    color: #90ee90;
   }
 
   .card-name {
