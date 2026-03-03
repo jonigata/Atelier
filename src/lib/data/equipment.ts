@@ -293,12 +293,12 @@ export const equipment: Record<string, EquipmentDef> = {
   },
   cloudy_mirror: {
     id: 'cloudy_mirror',
-    name: '慈悲の手拭い',
-    description: '調合失敗時、素材が消費されない（成功率の蓄積はなし）',
+    name: '慈悲の手鏡',
+    description: '調合失敗時、素材が消費されない',
     category: 'material',
     rarity: 'common',
     price: 350,
-    effectDescription: '失敗時素材保全（蓄積なし）',
+    effectDescription: '失敗時素材保全',
     effects: [{ type: 'craft_fail_save', chance: 1.0 }],
   },
   basic_filter: {
