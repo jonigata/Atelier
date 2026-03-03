@@ -21,8 +21,10 @@
   });
 
   $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_q1_goal_reminder');
-  $: nextInspectionDay = INSPECTION_DAYS.find((d) => d >= displayDay) ?? null;
-  $: daysUntilInspection = nextInspectionDay !== null ? nextInspectionDay - displayDay + 1 : null;
+  // 未処理の査察が控えている場合（査察シーケンスがこの直後に再生される）はカウントダウンを出さない
+  $: hasPendingInspection = INSPECTION_DAYS.some(d => d < displayDay && d !== 336 && !$gameState.completedInspections.includes(d));
+  $: nextInspectionDay = hasPendingInspection ? null : (INSPECTION_DAYS.find((d) => d >= displayDay) ?? null);
+  $: daysUntilInspection = nextInspectionDay !== null ? nextInspectionDay - displayDay : null;
   $: inspectionUrgency = daysUntilInspection !== null
     ? daysUntilInspection <= 7 ? 'red' : daysUntilInspection <= 21 ? 'yellow' : 'green'
     : 'green';

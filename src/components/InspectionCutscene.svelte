@@ -1,6 +1,7 @@
 <script lang="ts">
   import { gameState, skipPresentation } from '$lib/stores/game';
   import { resolveInspectionCutscene } from '$lib/services/presentation';
+  import { playInspectionFanfare } from '$lib/stores/bgm';
   import PopIn from './common/PopIn.svelte';
   import StampRush from './common/StampRush.svelte';
   import type { InspectionCutsceneData } from '$lib/models/types';
@@ -20,22 +21,6 @@
   let gradeStamped = false;
   let videoEl: HTMLVideoElement | null = null;
 
-  // ファンファーレ再生
-  let fanfareAudio: HTMLAudioElement | null = null;
-
-  function playFanfare(grade: string) {
-    const file = `/bgm/rank_${grade.toLowerCase()}.mp3`;
-    fanfareAudio = new Audio(file);
-    fanfareAudio.volume = 0.5;
-    fanfareAudio.play().catch(() => {});
-  }
-
-  function stopFanfare() {
-    if (fanfareAudio) {
-      fanfareAudio.pause();
-      fanfareAudio = null;
-    }
-  }
 
   // パーティクル（座標はコンテナ内の%）
   interface Particle {
@@ -154,9 +139,9 @@
     t += 150;
     after(t, () => {
       gradeStamped = true;
-      // ファンファーレ再生
+      // ファンファーレ再生（BGMを停止し、査察終了まで流し続ける）
       if (data) {
-        playFanfare(data.overallGrade);
+        playInspectionFanfare(data.overallGrade);
       }
       // 等級に応じた祝福エフェクト
       if (data && data.passed) {
@@ -279,7 +264,8 @@
   }
 
   function finish() {
-    stopFanfare();
+    // ファンファーレは査察シーケンス全体を通して流し続けるので、ここでは停止しない
+    // （presentation.ts の processInspectionSequence 終了時に停止される）
     visible = false;
     phase = 'idle';
     particles = [];

@@ -24,7 +24,7 @@ export function selectBgmTrack(state: GameState): BgmTrack {
   }
 
   const nextInspDay = INSPECTION_DAYS.find((d) => d >= state.day) ?? null;
-  if (nextInspDay !== null && nextInspDay - state.day + 1 <= 7) {
+  if (nextInspDay !== null && nextInspDay - state.day <= 7) {
     return 'wait_for_inspection';
   }
 

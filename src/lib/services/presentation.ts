@@ -19,6 +19,7 @@ import {
 import { showDrawsForLevelUp } from './drawEvent';
 import { getAchievementById } from '$lib/data/achievements';
 import { autoSave } from '$lib/services/saveLoad';
+import { stopInspectionFanfare } from '$lib/stores/bgm';
 import { INSPECTION_DAYS, inspections, getOverallGrade, getGradeForValue, getInspectionReward } from '$lib/data/inspection';
 import type { InspectionGrade } from '$lib/data/inspection';
 import { getItem } from '$lib/data/items';
@@ -415,6 +416,7 @@ export async function processInspectionSequence(): Promise<boolean> {
 
     // 不合格ならゲームオーバー
     if (!passed) {
+      stopInspectionFanfare();
       gameState.update((s) => ({
         ...s,
         inspectionBackdrop: false,
@@ -424,6 +426,9 @@ export async function processInspectionSequence(): Promise<boolean> {
       return true; // 中断
     }
   }
+
+  // ファンファーレ停止 → BGM再開
+  stopInspectionFanfare();
 
   // 黒オーバーレイOFF
   gameState.update((s) => ({ ...s, inspectionBackdrop: false }));
