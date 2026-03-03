@@ -69,8 +69,10 @@ export function getAllProbabilityBonus(): number {
 // =====================================================================
 
 /** 機材による成功率ボーナス */
-export function getCraftSuccessBonus(): number {
-  return getEffectsOfType('craft_success_bonus').reduce((sum, e) => sum + e.value, 0);
+export function getCraftSuccessBonus(itemCategory?: string): number {
+  return getEffectsOfType('craft_success_bonus')
+    .filter((e) => !e.itemCategory || e.itemCategory === itemCategory)
+    .reduce((sum, e) => sum + e.value, 0);
 }
 
 /** 失敗蓄積による成功率ボーナス */

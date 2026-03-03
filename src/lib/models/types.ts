@@ -48,7 +48,7 @@ export type EquipmentEffect =
   | { type: 'study_instant'; maxLevel?: number }
   // === 行動系 ===
   | { type: 'action_extra'; frequency: number; staminaMult: number }
-  | { type: 'craft_success_bonus'; value: number }
+  | { type: 'craft_success_bonus'; value: number; itemCategory?: ItemCategory }
   | { type: 'craft_quality_bonus'; value: number }
   // === 採取系 ===
   | { type: 'expedition_drops_mult'; value: number; materialCategory?: ItemCategory }

@@ -416,7 +416,8 @@ export function calculateSuccessRate(recipe: RecipeDef, alchemyLevel: number, st
   const fatiguePenalty = stamina !== undefined ? calculateFatiguePenalty(stamina) : 0;
 
   // 機材効果
-  const equipBonus = getCraftSuccessBonus();
+  const itemDef = getItem(recipe.resultItemId);
+  const equipBonus = getCraftSuccessBonus(itemDef?.category);
   const accumBonus = getFailAccumulationBonus(recipe.id);
   const probBonus = getAllProbabilityBonus();
 

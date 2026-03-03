@@ -188,12 +188,12 @@ export const equipment: Record<string, EquipmentDef> = {
   potion_timer: {
     id: 'potion_timer',
     name: '薬品タイマー',
-    description: '調合日数を1日短縮する',
+    description: '薬品系アイテムの調合成功率が15%上昇する',
     category: 'time',
     rarity: 'common',
     price: 350,
-    effectDescription: '調合日数-1日',
-    effects: [{ type: 'craft_days_reduce', value: 10 }],
+    effectDescription: '薬品系の成功率+15%',
+    effects: [{ type: 'craft_success_bonus', value: 0.15, itemCategory: 'medicine' }],
   },
   quick_sand_watch: {
     id: 'quick_sand_watch',
