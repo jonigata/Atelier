@@ -275,7 +275,11 @@
     <div class="tracker-meta">
       <span class="met-count" class:complete={allMet} class:met-up={metCountUpAnim}
         on:animationend={() => handleMetCountUpEnd()}>
-        全ての項目をCランク以上にしよう 達成項目 {metCount}/{inspection.criteria.length}
+        {#if allMet}
+          <span class="clear-badge">CLEAR</span>
+        {:else}
+          全ての項目をCランク以上にしよう 達成項目 {metCount}/{inspection.criteria.length}
+        {/if}
       </span>
       <span class="days-until {urgency}">あと{daysUntil}日</span>
     </div>
@@ -651,6 +655,20 @@
 
   .met-count.complete {
     color: #81c784;
+  }
+
+  .clear-badge {
+    display: inline-block;
+    padding: 0.1rem 0.6rem;
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.4), rgba(129, 199, 132, 0.3));
+    border: 1.5px solid #81c784;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #a5d6a7;
+    letter-spacing: 0.15em;
+    text-shadow: 0 0 8px rgba(129, 199, 132, 0.5);
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
   }
 
   .days-until {

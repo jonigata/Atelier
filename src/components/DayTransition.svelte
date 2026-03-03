@@ -22,7 +22,7 @@
 
   $: inspectionKnown = $gameState.achievementProgress.completed.includes('ach_q1_goal_reminder');
   $: nextInspectionDay = INSPECTION_DAYS.find((d) => d >= displayDay) ?? null;
-  $: daysUntilInspection = nextInspectionDay !== null ? nextInspectionDay - displayDay : null;
+  $: daysUntilInspection = nextInspectionDay !== null ? nextInspectionDay - displayDay + 1 : null;
   $: inspectionUrgency = daysUntilInspection !== null
     ? daysUntilInspection <= 7 ? 'red' : daysUntilInspection <= 21 ? 'yellow' : 'green'
     : 'green';
