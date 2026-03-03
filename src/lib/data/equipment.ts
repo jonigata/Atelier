@@ -248,12 +248,15 @@ export const equipment: Record<string, EquipmentDef> = {
   reading_glass: {
     id: 'reading_glass',
     name: '拡大鏡',
-    description: 'レシピ習得にかかる日数が1日短縮される',
-    category: 'time',
+    description: '装置・加工素材系アイテムの調合品質が+15される',
+    category: 'material',
     rarity: 'common',
     price: 150,
-    effectDescription: '勉強日数-1日',
-    effects: [{ type: 'study_days_reduce', value: 1 }],
+    effectDescription: '装置・加工素材の品質+15',
+    effects: [
+      { type: 'craft_quality_bonus', value: 15, itemCategory: 'device' },
+      { type: 'craft_quality_bonus', value: 15, itemCategory: 'material' },
+    ],
   },
 
   // === コモン素材・調合補助系 === 12個
@@ -281,12 +284,12 @@ export const equipment: Record<string, EquipmentDef> = {
   herb_swap_pouch: {
     id: 'herb_swap_pouch',
     name: '守りの薬袋',
-    description: '調合失敗時、50%の確率で素材が消費されない',
+    description: '薬草系素材の品質が40未満なら自動的に40に底上げされる',
     category: 'material',
     rarity: 'common',
     price: 250,
-    effectDescription: '失敗時50%で素材保全',
-    effects: [{ type: 'craft_fail_save', chance: 0.50 }],
+    effectDescription: '薬草素材を品質40に底上げ',
+    effects: [{ type: 'material_quality_floor', value: 40, materialCategory: 'herb' }],
   },
   cloudy_mirror: {
     id: 'cloudy_mirror',

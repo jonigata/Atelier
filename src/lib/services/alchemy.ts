@@ -449,7 +449,8 @@ export function calculateExpectedQuality(
   const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * QUALITY.LEVEL_BONUS);
 
   // 機材効果
-  const equipQualityBonus = getCraftQualityBonus();
+  const resultCategory = getItem(recipe.resultItemId)?.category;
+  const equipQualityBonus = getCraftQualityBonus(resultCategory);
   const comboBonus = getComboQualityBonus();
   const qualityCap = getQualityCap();
 
@@ -479,7 +480,8 @@ function calculateQuality(
   const levelBonus = Math.max(0, (alchemyLevel - recipe.requiredLevel) * QUALITY.LEVEL_BONUS);
 
   // 機材効果
-  const equipQualityBonus = getCraftQualityBonus();
+  const resultCategory = getItem(recipe.resultItemId)?.category;
+  const equipQualityBonus = getCraftQualityBonus(resultCategory);
   const comboBonus = getComboQualityBonus();
   const qualityCap = getQualityCap();
 

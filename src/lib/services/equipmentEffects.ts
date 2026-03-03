@@ -91,8 +91,10 @@ export function getFailAccumulationBonus(recipeId: string): number {
 // =====================================================================
 
 /** 機材による品質ボーナス */
-export function getCraftQualityBonus(): number {
-  return getEffectsOfType('craft_quality_bonus').reduce((sum, e) => sum + e.value, 0);
+export function getCraftQualityBonus(itemCategory?: string): number {
+  return getEffectsOfType('craft_quality_bonus')
+    .filter((e) => !e.itemCategory || e.itemCategory === itemCategory)
+    .reduce((sum, e) => sum + e.value, 0);
 }
 
 /** 品質上限（デフォルト100） */
