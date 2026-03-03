@@ -20,6 +20,23 @@
   let gradeStamped = false;
   let videoEl: HTMLVideoElement | null = null;
 
+  // ファンファーレ再生
+  let fanfareAudio: HTMLAudioElement | null = null;
+
+  function playFanfare(grade: string) {
+    const file = `/bgm/rank_${grade.toLowerCase()}.mp3`;
+    fanfareAudio = new Audio(file);
+    fanfareAudio.volume = 0.5;
+    fanfareAudio.play().catch(() => {});
+  }
+
+  function stopFanfare() {
+    if (fanfareAudio) {
+      fanfareAudio.pause();
+      fanfareAudio = null;
+    }
+  }
+
   // パーティクル（座標はコンテナ内の%）
   interface Particle {
     id: number;
@@ -137,6 +154,10 @@
     t += 150;
     after(t, () => {
       gradeStamped = true;
+      // ファンファーレ再生
+      if (data) {
+        playFanfare(data.overallGrade);
+      }
       // 等級に応じた祝福エフェクト
       if (data && data.passed) {
         spawnCelebration(data.overallGrade);
@@ -258,6 +279,7 @@
   }
 
   function finish() {
+    stopFanfare();
     visible = false;
     phase = 'idle';
     particles = [];
