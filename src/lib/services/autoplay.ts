@@ -11,7 +11,7 @@ import { books, getShopBooks } from '$lib/data/books';
 import { removeItemsFromInventory } from '$lib/services/inventory';
 import { calcLevelFromExp, STAMINA, SHOP } from '$lib/data/balance';
 import { craftMultiple, canCraftRecipe } from '$lib/services/alchemy';
-import { getEffectiveStudyDays } from '$lib/services/equipmentEffects';
+import { getEffectiveStudyDays, getEffectiveCraftDays, craftDaysToActual } from '$lib/services/equipmentEffects';
 import { isCraftedCategory } from '$lib/data/categories';
 import type { GameState, OwnedItem, Expedition, RecipeDef } from '$lib/models/types';
 
@@ -802,14 +802,18 @@ async function tryCraftBest(state: GameState, remainingDays: number): Promise<bo
   const itemDef = items[bestRecipe.resultItemId];
   const name = itemDef?.name ?? bestRecipe.name;
 
+  // 機材効果適用済みの実日数を計算
+  const totalTenths = getEffectiveCraftDays(bestRecipe) * quantity;
+  const craftDays = craftDaysToActual(totalTenths);
+
   if (result.successCount > 0) {
-    log('craft', 'success', `${name} x${result.successCount}${result.duplicatedCount > 0 ? `(+複製${result.duplicatedCount})` : ''} +${result.totalExpGained}Exp (${bestRecipe.craftDaysTenths}日)`, bestRecipe.craftDaysTenths);
+    log('craft', 'success', `${name} x${result.successCount}${result.duplicatedCount > 0 ? `(+複製${result.duplicatedCount})` : ''} +${result.totalExpGained}Exp (${craftDays}日)`, craftDays);
   } else {
-    log('craft', 'error', `${name}の調合に失敗 +${result.totalExpGained}Exp`, bestRecipe.craftDaysTenths);
+    log('craft', 'error', `${name}の調合に失敗 +${result.totalExpGained}Exp`, craftDays);
   }
 
   await processActionComplete();
-  await endTurn(bestRecipe.craftDaysTenths);
+  await endTurn(craftDays);
   return true;
 }
 

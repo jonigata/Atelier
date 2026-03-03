@@ -38,7 +38,40 @@ import skipDataJson from '$lib/data/skipData.json';
  * 行動後に呼び出され、時間を進めて朝のフェーズに移行する
  */
 export async function endTurn(daysSpent: number): Promise<void> {
-  if (daysSpent > 0) {
+  // 複数日行動の場合、中間日の朝処理を1日ずつ実行
+  // （依頼交換・マルコ来訪・施設アイテム・助手回復などを漏らさない）
+  if (daysSpent > 1) {
+    const startDay = get(gameState).day;
+
+    for (let d = 1; d < daysSpent; d++) {
+      // 日付だけ進める（DayTransition演出なし）
+      gameState.update((state) => ({
+        ...state,
+        day: startDay + d,
+      }));
+
+      const state = get(gameState);
+      if (state.day > 336) {
+        // 終了演出用にDayTransitionをセット
+        gameState.update((s) => ({
+          ...s,
+          pendingDayTransition: { toDay: s.day, daysAdvanced: daysSpent },
+        }));
+        setPhase('ending');
+        addMessage('1年が経過しました。最終評価を行います...');
+        return;
+      }
+
+      processIntermediateMorning();
+    }
+
+    // 最終日: DayTransition演出付きで残り1日を進める
+    gameState.update((state) => ({
+      ...state,
+      day: startDay + daysSpent,
+      pendingDayTransition: { toDay: startDay + daysSpent, daysAdvanced: daysSpent },
+    }));
+  } else if (daysSpent > 0) {
     advanceDay(daysSpent);
   }
 
@@ -69,6 +102,24 @@ export async function endTurn(daysSpent: number): Promise<void> {
 
   // 朝のフェーズに移行
   await processMorningPhase();
+}
+
+/**
+ * 中間日の軽量朝処理（複数日行動の途中日用）
+ * UI演出・アチーブメント・オートセーブは省略し、状態更新のみ行う
+ */
+function processIntermediateMorning(): void {
+  recordDailyScore();
+
+  const state = get(gameState);
+  addMessage(`--- ${state.day}日目 ---`);
+
+  checkExpeditionReturn();
+  checkQuestDeadlines();
+  generateNewQuests();
+  checkMerchantEvents();
+  processBuildingMorningItems();
+  processHelperMorningStamina();
 }
 
 /**
