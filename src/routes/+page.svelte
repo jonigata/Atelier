@@ -5,6 +5,7 @@
   import { autoLoad, clearAutoSave, saveIndicator } from '$lib/services/saveLoad';
   import { initializeActiveGoalTracking } from '$lib/services/achievement';
   import { processActionComplete } from '$lib/services/presentation';
+  import { initBgm } from '$lib/stores/bgm';
   import HUD from '../components/HUD.svelte';
   import MessageLog from '../components/MessageLog.svelte';
   import MorningPanel from '../components/MorningPanel.svelte';
@@ -50,6 +51,9 @@
       skipPresentation.set(true);
     }
 
+    // BGM再生
+    const cleanupBgm = initBgm();
+
     // ブラウザの戻る/進むナビゲーションを全て防止
     // (マウスサイドボタン、ブラウザボタン、Alt+←等すべて対応)
     history.pushState(null, '', location.href);
@@ -60,6 +64,7 @@
 
     return () => {
       window.removeEventListener('popstate', preventNav);
+      cleanupBgm();
     };
   });
 

@@ -2,6 +2,7 @@
   import { gameState, setPhase, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel, totalScore, skipPresentation, toggleSkipPresentation } from '$lib/stores/game';
   import { calcExpForLevel, calcExpProgress } from '$lib/data/balance';
   import { showConfirmAndWait } from '$lib/stores/confirmDialog';
+  import { bgmEnabled } from '$lib/stores/bgm';
   import MoneyIndicator from './MoneyIndicator.svelte';
 
   export let onScoreClick: (() => void) | undefined = undefined;
@@ -25,7 +26,15 @@
   <div class="hud-row main-row">
     <div class="hud-section skip-section">
       <button class="retire-btn" on:click={handleRetire}>リタイア</button>
-      <label class="skip-checkbox">
+      <label class="hud-toggle">
+        <input
+          type="checkbox"
+          checked={$bgmEnabled}
+          on:change={() => bgmEnabled.update(v => !v)}
+        />
+        <span>BGM</span>
+      </label>
+      <label class="hud-toggle">
         <input
           type="checkbox"
           checked={$skipPresentation}
@@ -132,6 +141,7 @@
   .skip-section {
     margin-left: auto;
     order: 999;
+    gap: 0.3rem;
   }
 
   .retire-btn {
@@ -151,28 +161,53 @@
     background-color: rgba(224, 112, 80, 0.1);
   }
 
-  .skip-checkbox {
+  .hud-toggle {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
     cursor: pointer;
-    font-size: 0.85rem;
-    color: #c9a959;
+    font-size: 0.75rem;
+    color: #a08060;
     user-select: none;
-    padding: 0.25rem 0.5rem;
+    padding: 0.15rem 0.3rem;
     border-radius: 4px;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  .skip-checkbox:hover {
+  .hud-toggle:has(input:checked) {
+    color: #c9a959;
+  }
+
+  .hud-toggle:hover {
     background-color: rgba(201, 169, 89, 0.1);
   }
 
-  .skip-checkbox input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
+  .hud-toggle input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
     cursor: pointer;
-    accent-color: #c9a959;
+    border: 1px solid rgba(160, 128, 96, 0.5);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.3);
+    position: relative;
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+
+  .hud-toggle input[type="checkbox"]:checked {
+    border-color: #c9a959;
+    background: rgba(201, 169, 89, 0.25);
+  }
+
+  .hud-toggle input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -1px;
+    left: 1px;
+    font-size: 12px;
+    color: #c9a959;
+    line-height: 14px;
   }
 
   .section-icon {
