@@ -421,9 +421,17 @@ export interface GameState {
   gameOverReason: string | null;   // ゲームオーバー理由（null=通常）
   pendingInspectionCutscene: InspectionCutsceneData | null;  // 査察カットシーン用
   inspectionBackdrop: boolean;  // 査察シーケンス中の黒オーバーレイ
+  pendingExpeditionReturn: ExpeditionReturnData | null;  // 派遣帰還演出用
 
   // スコア履歴（毎朝記録）
   scoreHistory: DailyScoreEntry[];
+}
+
+// 派遣帰還演出用データ
+export interface ExpeditionReturnData {
+  areaId: string;
+  areaName: string;
+  items: OwnedItem[];
 }
 
 // 査察カットシーン用データ

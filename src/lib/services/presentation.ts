@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { gameState, clearDayTransition, setPhase, addMessage, addItem, addMoney, addReputationExp } from '$lib/stores/game';
+import { gameState, clearDayTransition, setPhase, addMessage, addItem, addMoney, addReputationExp, setPendingExpeditionReturn } from '$lib/stores/game';
 import { generateNewQuests } from '$lib/services/gameLoop';
 import { setEventDialogue } from '$lib/stores/tutorial';
 import {
@@ -22,7 +22,7 @@ import { autoSave } from '$lib/services/saveLoad';
 import { INSPECTION_DAYS, inspections, getOverallGrade, getGradeForValue, getInspectionReward } from '$lib/data/inspection';
 import type { InspectionGrade } from '$lib/data/inspection';
 import { getItem } from '$lib/data/items';
-import type { EquipmentDef, NarrativeLine, InspectionCutsceneData } from '$lib/models/types';
+import type { EquipmentDef, NarrativeLine, InspectionCutsceneData, ExpeditionReturnData } from '$lib/models/types';
 import type { EventDialogue } from '$lib/models/types';
 
 // 日数表示の完了を待つための resolver
@@ -37,6 +37,9 @@ let dialogueResolver: (() => void) | null = null;
 
 // 査察カットシーン完了を待つための resolver
 let inspectionCutsceneResolver: (() => void) | null = null;
+
+// 派遣帰還ダイアログ完了を待つための resolver
+let expeditionReturnResolver: (() => void) | null = null;
 
 /**
  * 日数表示の完了を待つ
@@ -116,6 +119,29 @@ export async function showDialogueAndWait(dialogue: EventDialogue): Promise<void
 
   return new Promise((resolve) => {
     dialogueResolver = resolve;
+  });
+}
+
+/**
+ * 派遣帰還ダイアログの完了を待つ
+ * ExpeditionReturnDialog.svelte から呼ばれる
+ */
+export function resolveExpeditionReturn(): void {
+  setPendingExpeditionReturn(null);
+  if (expeditionReturnResolver) {
+    expeditionReturnResolver();
+    expeditionReturnResolver = null;
+  }
+}
+
+/**
+ * 派遣帰還ダイアログを表示して閉じるまで待つ
+ */
+export async function showExpeditionReturnAndWait(data: ExpeditionReturnData): Promise<void> {
+  setPendingExpeditionReturn(data);
+
+  return new Promise((resolve) => {
+    expeditionReturnResolver = resolve;
   });
 }
 
