@@ -11,8 +11,11 @@
 
   let canDismiss = false;
 
-  // ゲージ付きEXP報酬とそれ以外を分離
-  $: gaugeRewards = rewards.filter(r => r.gaugeData);
+  // ゲージ付きEXP報酬とそれ以外を分離（HUDと同じ順序: 錬金術→名声→村発展）
+  const expOrder: Record<string, number> = { alchemyExp: 0, reputationExp: 1, villageExp: 2 };
+  $: gaugeRewards = rewards.filter(r => r.gaugeData).sort((a, b) =>
+    (expOrder[a.apply.type] ?? 99) - (expOrder[b.apply.type] ?? 99)
+  );
   $: normalRewards = rewards.filter(r => !r.gaugeData);
 
   // スタンプ演出用：アイテム報酬を抽出
