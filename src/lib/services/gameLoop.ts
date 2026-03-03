@@ -169,11 +169,8 @@ async function processMorningPhase(): Promise<void> {
   });
 
   // 8. 派遣帰還演出（DayTransition後に表示）
-  console.log('[DEBUG gameLoop] expeditionReturn:', expeditionReturn);
   if (expeditionReturn) {
-    console.log('[DEBUG gameLoop] calling showExpeditionReturnAndWait');
     await showExpeditionReturnAndWait(expeditionReturn);
-    console.log('[DEBUG gameLoop] showExpeditionReturnAndWait resolved');
   }
 
   // 朝処理完了後にオートセーブ（イベント・フェーズ確定済み）

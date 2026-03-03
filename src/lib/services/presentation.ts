@@ -127,8 +127,6 @@ export async function showDialogueAndWait(dialogue: EventDialogue): Promise<void
  * ExpeditionReturnDialog.svelte から呼ばれる
  */
 export function resolveExpeditionReturn(): void {
-  console.log('[DEBUG presentation] resolveExpeditionReturn called');
-  console.trace();
   setPendingExpeditionReturn(null);
   if (expeditionReturnResolver) {
     expeditionReturnResolver();
@@ -140,7 +138,6 @@ export function resolveExpeditionReturn(): void {
  * 派遣帰還ダイアログを表示して閉じるまで待つ
  */
 export async function showExpeditionReturnAndWait(data: ExpeditionReturnData): Promise<void> {
-  console.log('[DEBUG presentation] showExpeditionReturnAndWait called', data);
   setPendingExpeditionReturn(data);
 
   return new Promise((resolve) => {
