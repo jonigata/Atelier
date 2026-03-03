@@ -18,7 +18,7 @@
 
   // X軸: 左端=1日目, 右端=xEnd日目
   $: xEnd = scaleMode === 'full'
-    ? Math.max(336, ...pastGames.map(g => g.finalDay), bestGame?.finalDay ?? 0)
+    ? Math.max(29, ...pastGames.map(g => g.finalDay), bestGame?.finalDay ?? 0)
     : Math.max(currentDay, 2); // 最低2日で0除算回避
 
   // Y軸はBESTを基準に計算（常にBESTが収まるスケール）

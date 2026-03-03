@@ -85,7 +85,7 @@
   }
   $: nextInspection = getNextInspection($gameState.day);
   $: nextInspectionDay = INSPECTION_DAYS.find((d) => d >= $gameState.day) ?? null;
-  $: daysUntilInspection = nextInspectionDay !== null ? nextInspectionDay - $gameState.day + 1 : null;
+  $: daysUntilInspection = nextInspectionDay !== null ? nextInspectionDay - $gameState.day : null;
   $: inspectionValues = nextInspection
     ? Object.fromEntries(nextInspection.criteria.map(c => [c.key, c.getValue($gameState)]))
     : {};

@@ -8,6 +8,10 @@ let audio: HTMLAudioElement | null = null;
 let currentTrack: BgmTrack | null = null;
 const FADE_MS = 600;
 
+// ファンファーレ再生中はBGMを抑制
+let bgmSuppressed = false;
+let fanfareAudio: HTMLAudioElement | null = null;
+
 function crossfadeTo(track: BgmTrack) {
   if (track === currentTrack) return;
   const file = getTrackFile(track);
@@ -20,7 +24,7 @@ function crossfadeTo(track: BgmTrack) {
   audio = next;
   currentTrack = track;
 
-  if (!get(bgmEnabled)) return;
+  if (!get(bgmEnabled) || bgmSuppressed) return;
 
   next.play().catch(() => {});
 
@@ -38,6 +42,47 @@ function crossfadeTo(track: BgmTrack) {
       prev?.pause();
     }
   }, interval);
+}
+
+/**
+ * 査察ランクファンファーレを再生（BGMを一時停止）
+ * 尺が足りなくなったら自動的にBGMに戻る
+ */
+export function playInspectionFanfare(grade: string) {
+  stopInspectionFanfare();
+
+  // BGMを抑制
+  bgmSuppressed = true;
+  if (audio) audio.pause();
+
+  const file = `/bgm/rank_${grade.toLowerCase()}.mp3`;
+  fanfareAudio = new Audio(file);
+  fanfareAudio.volume = 0.5;
+  fanfareAudio.addEventListener('ended', () => {
+    // 尺が足りなくなったら通常BGMに戻す
+    fanfareAudio = null;
+    unsuppressBgm();
+  });
+  fanfareAudio.play().catch(() => {});
+}
+
+/**
+ * ファンファーレを停止してBGMを再開
+ */
+export function stopInspectionFanfare() {
+  if (fanfareAudio) {
+    fanfareAudio.pause();
+    fanfareAudio = null;
+  }
+  unsuppressBgm();
+}
+
+function unsuppressBgm() {
+  if (!bgmSuppressed) return;
+  bgmSuppressed = false;
+  if (audio && get(bgmEnabled)) {
+    audio.play().catch(() => {});
+  }
 }
 
 export function initBgm() {
@@ -61,7 +106,7 @@ export function initBgm() {
   document.addEventListener('keydown', tryPlay);
 
   const unsubEnabled = bgmEnabled.subscribe((enabled) => {
-    if (!audio) return;
+    if (!audio || bgmSuppressed) return;
     if (enabled) {
       audio.play().catch(() => {});
     } else {
