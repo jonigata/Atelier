@@ -84,6 +84,7 @@ function createInitialState(): GameState {
     gameOverReason: null,
     pendingInspectionCutscene: null,
     inspectionBackdrop: false,
+    pendingExpeditionReturn: null,
 
     scoreHistory: [],
   };
@@ -337,6 +338,10 @@ export function clearDayTransition(): void {
 
 export function setExpedition(expedition: GameState['expedition']): void {
   gameState.update((state) => ({ ...state, expedition }));
+}
+
+export function setPendingExpeditionReturn(data: GameState['pendingExpeditionReturn']): void {
+  gameState.update((state) => ({ ...state, pendingExpeditionReturn: data }));
 }
 
 // =====================================

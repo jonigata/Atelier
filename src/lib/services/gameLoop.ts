@@ -20,7 +20,7 @@ import { getAvailableQuestTemplates, questTemplates } from '$lib/data/quests';
 import { EXPEDITION, calcLevelFromExp } from '$lib/data/balance';
 import { initializeActiveGoalTracking } from '$lib/services/achievement';
 import { processAutoCompleteAchievements } from '$lib/services/presentation';
-import { processMorningAchievements, processInspectionSequence, waitForDayTransition } from '$lib/services/presentation';
+import { processMorningAchievements, processInspectionSequence, waitForDayTransition, showExpeditionReturnAndWait } from '$lib/services/presentation';
 import { processBuildingMorningItems } from '$lib/services/buildingEffects';
 import { processHelperMorningStamina } from '$lib/services/helperEffects';
 import { checkMerchantEvents } from '$lib/services/merchant';
@@ -29,7 +29,7 @@ import { getExpeditionDropsMult, getExpeditionRareBonus } from '$lib/services/eq
 import { getBuildingExpeditionBonus } from '$lib/services/buildingEffects';
 import { getHelperExpeditionDropBonus, getHelperExpeditionRareBonus } from '$lib/services/helperEffects';
 import { getItem as getItemDef } from '$lib/data/items';
-import type { OwnedItem, MorningEvent, GameState } from '$lib/models/types';
+import type { OwnedItem, MorningEvent, GameState, ExpeditionReturnData } from '$lib/models/types';
 import { autoSave } from '$lib/services/saveLoad';
 import skipDataJson from '$lib/data/skipData.json';
 
@@ -140,7 +140,7 @@ async function processMorningPhase(): Promise<void> {
   addMessage(`--- ${state.day}日目の朝 ---`);
 
   // 1. 採取隊の帰還チェック
-  checkExpeditionReturn();
+  const expeditionReturn = checkExpeditionReturn();
 
   // 2. 依頼の期限チェック
   checkQuestDeadlines();
@@ -168,21 +168,30 @@ async function processMorningPhase(): Promise<void> {
     setPhase(hasMorningEvents ? 'morning' : 'action');
   });
 
+  // 8. 派遣帰還演出（DayTransition後に表示）
+  console.log('[DEBUG gameLoop] expeditionReturn:', expeditionReturn);
+  if (expeditionReturn) {
+    console.log('[DEBUG gameLoop] calling showExpeditionReturnAndWait');
+    await showExpeditionReturnAndWait(expeditionReturn);
+    console.log('[DEBUG gameLoop] showExpeditionReturnAndWait resolved');
+  }
+
   // 朝処理完了後にオートセーブ（イベント・フェーズ確定済み）
   autoSave();
 }
 
 /**
  * 採取隊の帰還処理
+ * @returns 帰還データ（帰還があった場合）。演出表示用。
  */
-function checkExpeditionReturn(): void {
+function checkExpeditionReturn(): ExpeditionReturnData | null {
   const state = get(gameState);
-  if (!state.expedition) return;
+  if (!state.expedition) return null;
 
   const returnDay = state.expedition.startDay + state.expedition.duration;
   if (state.day >= returnDay) {
     const area = getArea(state.expedition.areaId);
-    if (!area) return;
+    if (!area) return null;
 
     // ドロップアイテムを計算
     const items = calculateExpeditionDrops(
@@ -218,7 +227,10 @@ function checkExpeditionReturn(): void {
 
     // 採取隊をクリア
     setExpedition(null);
+
+    return { areaId: area.id, areaName: area.name, items };
   }
+  return null;
 }
 
 /**

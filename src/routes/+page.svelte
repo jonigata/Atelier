@@ -17,6 +17,7 @@
   import DayTransition from '../components/DayTransition.svelte';
   import InspectionCutscene from '../components/InspectionCutscene.svelte';
   import DrawDialog from '../components/DrawDialog.svelte';
+  import ExpeditionReturnDialog from '../components/ExpeditionReturnDialog.svelte';
   import DebugPanel from '../components/DebugPanel.svelte';
   import SaveLoadSidebar from '../components/SaveLoadSidebar.svelte';
   import ToastContainer from '../components/ToastContainer.svelte';
@@ -126,6 +127,9 @@
 
   <!-- 確認ダイアログ -->
   <ConfirmDialog />
+
+  <!-- 派遣帰還ダイアログ -->
+  <ExpeditionReturnDialog />
 
   <!-- イベントダイアログ（最前面） -->
   <EventDialog />
