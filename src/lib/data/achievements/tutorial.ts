@@ -208,7 +208,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     narrativeCharacter: { name: 'コレット', title: '駆け出し錬金術師' },
     narrativeLines: [
       '28日目までに、アルバムに13種類以上登録して……',
-      'それと依頼を11件以上。……がんばらなくちゃ',
+      'それと依頼を13件以上。……がんばらなくちゃ',
     ],
     conditions: [],
     reward: {},

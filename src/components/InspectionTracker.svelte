@@ -175,7 +175,8 @@
 
   // ── 星 (quests) ──
   // S基準の数だけ星を並べ、達成分だけ色付き。等級ゾーンで色が変わる
-  function getStarColor(starIndex: number, criterion: InspectionCriterion): string {
+  function getStarColor(starIndex: number, criterion: InspectionCriterion, grade: InspectionGrade): string {
+    if (grade === 'D') return '#606068'; // 鉄
     const i = starIndex + 1; // 1-based
     if (i <= criterion.thresholds.C) return '#b87333'; // 銅（合格ライン）
     if (i <= criterion.thresholds.B) return '#c0c0c0'; // 銀
@@ -183,7 +184,8 @@
     return 'url(#rainbow-grad)'; // 虹
   }
 
-  function getStarStroke(starIndex: number, criterion: InspectionCriterion): string {
+  function getStarStroke(starIndex: number, criterion: InspectionCriterion, grade: InspectionGrade): string {
+    if (grade === 'D') return '#48484e'; // 鉄
     const i = starIndex + 1;
     if (i <= criterion.thresholds.C) return '#8b5a2b'; // 銅
     if (i <= criterion.thresholds.B) return '#909090'; // 銀
@@ -233,12 +235,31 @@
   }
 
   // ── アルバム (album) ──
-  const ALBUM_TILES = 24;
+  function getAlbumGridCols(total: number): number {
+    if (total <= 6) return total;
+    if (total <= 24) return 6;
+    if (total <= 48) return 8;
+    if (total <= 72) return 10;
+    return 12;
+  }
 
-  function getAlbumTileColor(tileIndex: number, litCount: number, grade: InspectionGrade): string {
+  function getAlbumGap(total: number): number {
+    if (total <= 24) return 3;
+    if (total <= 48) return 2;
+    return 1;
+  }
+
+  function getAlbumTileColor(tileIndex: number, litCount: number, criterion: InspectionCriterion, tileCount: number, grade: InspectionGrade): string {
     if (tileIndex >= litCount) return 'rgba(255,255,255,0.04)';
+    if (grade === 'D') return '#606068'; // 鉄
     if (grade === 'S') return rainbowPalette[tileIndex % rainbowPalette.length];
-    return gradeColors[grade];
+    const boundC = getAlbumGradeBoundary(criterion, 'C', tileCount);
+    const boundB = getAlbumGradeBoundary(criterion, 'B', tileCount);
+    const boundA = getAlbumGradeBoundary(criterion, 'A', tileCount);
+    if (tileIndex < boundC) return '#b87333'; // 銅
+    if (tileIndex < boundB) return '#c0c0c0'; // 銀
+    if (tileIndex < boundA) return '#ffd700'; // 金
+    return 'url(#rainbow-grad)'; // 虹（S圏）
   }
 
   const rainbowPalette = ['#ff6b6b', '#ffa94d', '#ffd700', '#69db7c', '#74c0fc', '#b197fc', '#da77f2'];
@@ -398,8 +419,8 @@
                   style="margin-left: {i === 0 ? 0 : overlap}px; z-index: {i}"
                 >
                   <path d="M12 2 L15.09 8.26 L22 9.27 L17 14.14 L18.18 21.02 L12 17.77 L5.82 21.02 L7 14.14 L2 9.27 L8.91 8.26 Z"
-                    fill={lit ? getStarColor(i, criterion) : 'rgba(255,255,255,0.06)'}
-                    stroke={lit ? getStarStroke(i, criterion) : 'rgba(255,255,255,0.1)'}
+                    fill={lit ? getStarColor(i, criterion, info.grade) : 'rgba(255,255,255,0.06)'}
+                    stroke={lit ? getStarStroke(i, criterion, info.grade) : 'rgba(255,255,255,0.1)'}
                     stroke-width="0.8"
                   />
                 </svg>
@@ -493,12 +514,13 @@
 
         {:else if criterion.key === 'album'}
           <!-- ═══ アルバム: タイルグリッド + 等級境界線 ═══ -->
-          {@const tileCount = Math.min(criterion.thresholds.S, ALBUM_TILES)}
+          {@const tileCount = criterion.thresholds.S}
           {@const litCount = Math.round(info.progress * tileCount)}
-          {@const cols = tileCount <= 6 ? tileCount : 6}
+          {@const cols = getAlbumGridCols(tileCount)}
+          {@const gap = getAlbumGap(tileCount)}
           <div class="criterion-card album-card" style="{cardStyle(info.grade, info.met)}">
             <div class="criterion-visual">
-              <div class="album-grid" style="grid-template-columns: repeat({cols}, 1fr)">
+              <div class="album-grid" style="grid-template-columns: repeat({cols}, 1fr); gap: {gap}px; max-width: {tileCount > 24 ? 160 : 130}px; --album-gap: {gap}; --album-radius: {tileCount > 48 ? 1 : tileCount > 24 ? 2 : 3}px">
                 {#each Array(tileCount) as _, i}
                   {@const isBoundaryC = i === getAlbumGradeBoundary(criterion, 'C', tileCount) - 1}
                   {@const isBoundaryB = i === getAlbumGradeBoundary(criterion, 'B', tileCount) - 1}
@@ -509,11 +531,11 @@
                     class:boundary-c={isBoundaryC}
                     class:boundary-b={isBoundaryB}
                     class:boundary-a={isBoundaryA}
-                    style="background: {getAlbumTileColor(i, litCount, info.grade)};
-                           {i < litCount && info.grade !== 'S' ? `box-shadow: inset 0 0 4px ${gradeColors[info.grade]}44` : ''}
+                    style="background: {getAlbumTileColor(i, litCount, criterion, tileCount, info.grade)};
+                           {i < litCount && info.grade !== 'S' ? `box-shadow: inset 0 0 4px ${getAlbumTileColor(i, litCount, criterion, tileCount, info.grade)}44` : ''}
                            {i < litCount && info.grade === 'S' ? `box-shadow: 0 0 4px ${rainbowPalette[i % rainbowPalette.length]}66` : ''}"
                   >
-                    {#if i < litCount}
+                    {#if i < litCount && tileCount <= 24}
                       <svg viewBox="0 0 12 12" class="tile-icon">
                         <circle cx="6" cy="4" r="2.5" fill="rgba(0,0,0,0.3)"/>
                         <rect x="2" y="7" width="8" height="4" rx="1" fill="rgba(0,0,0,0.2)"/>
@@ -928,7 +950,7 @@
 
   .album-tile {
     aspect-ratio: 1;
-    border-radius: 3px;
+    border-radius: var(--album-radius, 3px);
     border: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     align-items: center;
@@ -951,7 +973,7 @@
   .album-tile.boundary-a::after {
     content: '';
     position: absolute;
-    right: -3px;
+    right: calc(var(--album-gap, 3) * -1px);
     top: -2px;
     width: 2px;
     height: 130%;
