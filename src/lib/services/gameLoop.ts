@@ -73,6 +73,11 @@ export async function endTurn(daysSpent: number): Promise<void> {
     }));
   } else if (daysSpent > 0) {
     advanceDay(daysSpent);
+  } else {
+    // daysSpent === 0: 日数が経過しない行動（即日勉強など）
+    // 朝フェーズをスキップしてそのままアクションフェーズに戻す
+    setPhase('action');
+    return;
   }
 
   const state = get(gameState);
@@ -157,8 +162,10 @@ async function processMorningPhase(): Promise<void> {
 
   // DayTransition演出の完了を待ち、オーバーレイ消去と同一Svelteフラッシュで
   // フェーズを切り替える（ちらつき防止）
+  const hasMorningEvents = get(gameState).morningEvents.length > 0;
   await waitForDayTransition(() => {
-    setPhase('morning');
+    // 朝イベントがなければ朝メニューをスキップして直接アクションフェーズへ
+    setPhase(hasMorningEvents ? 'morning' : 'action');
   });
 
   // 朝処理完了後にオートセーブ（イベント・フェーズ確定済み）
