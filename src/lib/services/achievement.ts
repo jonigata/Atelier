@@ -487,17 +487,17 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
     }
   }
 
-  if (reward.reputationExp) {
-    const levelBefore = calcLevelFromExp(state.reputationExp);
-    const before = calcExpProgress(state.reputationExp);
+  if (reward.exp) {
+    const levelBefore = calcLevelFromExp(state.alchemyExp);
+    const before = calcExpProgress(state.alchemyExp);
     const max = calcExpForLevel(levelBefore);
-    const totalAfter = state.reputationExp + reward.reputationExp;
+    const totalAfter = state.alchemyExp + reward.exp;
     const levelAfter = calcLevelFromExp(totalAfter);
     const progressAfter = calcExpProgress(totalAfter);
     const leveledUp = levelAfter > levelBefore;
     structured.push({
-      text: `名声Exp +${reward.reputationExp}`,
-      type: 'reputation',
+      text: `経験値 +${reward.exp}`,
+      type: 'exp',
       gaugeData: {
         before,
         after: leveledUp ? max : progressAfter,
@@ -510,17 +510,17 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
     });
   }
 
-  if (reward.exp) {
-    const levelBefore = calcLevelFromExp(state.alchemyExp);
-    const before = calcExpProgress(state.alchemyExp);
+  if (reward.reputationExp) {
+    const levelBefore = calcLevelFromExp(state.reputationExp);
+    const before = calcExpProgress(state.reputationExp);
     const max = calcExpForLevel(levelBefore);
-    const totalAfter = state.alchemyExp + reward.exp;
+    const totalAfter = state.reputationExp + reward.reputationExp;
     const levelAfter = calcLevelFromExp(totalAfter);
     const progressAfter = calcExpProgress(totalAfter);
     const leveledUp = levelAfter > levelBefore;
     structured.push({
-      text: `経験値 +${reward.exp}`,
-      type: 'exp',
+      text: `名声Exp +${reward.reputationExp}`,
+      type: 'reputation',
       gaugeData: {
         before,
         after: leveledUp ? max : progressAfter,

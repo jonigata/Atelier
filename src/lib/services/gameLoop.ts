@@ -155,12 +155,6 @@ async function processMorningPhase(): Promise<void> {
   // 7. 朝発動アチーブメント（triggerOnMorning）
   await processMorningAchievements();
 
-  // イベントが無い日もフォールバックで朝メニューを表示
-  const updatedState = get(gameState);
-  if (updatedState.morningEvents.length === 0) {
-    addMorningEvent({ type: 'quiet_morning', message: '穏やかな朝です。' });
-  }
-
   // DayTransition演出の完了を待ち、オーバーレイ消去と同一Svelteフラッシュで
   // フェーズを切り替える（ちらつき防止）
   await waitForDayTransition(() => {

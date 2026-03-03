@@ -70,12 +70,12 @@
 
     <div class="hud-section stats-section">
       <div class="stat-item">
-        <span class="stat-label">村発展</span>
+        <span class="stat-label">錬金術</span>
         <div class="stat-value-row">
-          <span class="stat-value village">Lv.{$villageLevel}</span>
+          <span class="stat-value">Lv.{$alchemyLevel}</span>
         </div>
         <div class="exp-bar">
-          <div class="exp-fill village-fill" style="width: {Math.min(100, (calcExpProgress($gameState.villageExp) / calcExpForLevel($villageLevel)) * 100)}%"></div>
+          <div class="exp-fill" style="width: {Math.min(100, (calcExpProgress($gameState.alchemyExp) / $expForNextLevel) * 100)}%"></div>
         </div>
       </div>
       <div class="stat-item">
@@ -88,12 +88,12 @@
         </div>
       </div>
       <div class="stat-item">
-        <span class="stat-label">錬金術</span>
+        <span class="stat-label">村発展</span>
         <div class="stat-value-row">
-          <span class="stat-value">Lv.{$alchemyLevel}</span>
+          <span class="stat-value village">Lv.{$villageLevel}</span>
         </div>
         <div class="exp-bar">
-          <div class="exp-fill" style="width: {Math.min(100, (calcExpProgress($gameState.alchemyExp) / $expForNextLevel) * 100)}%"></div>
+          <div class="exp-fill village-fill" style="width: {Math.min(100, (calcExpProgress($gameState.villageExp) / calcExpForLevel($villageLevel)) * 100)}%"></div>
         </div>
       </div>
     </div>
