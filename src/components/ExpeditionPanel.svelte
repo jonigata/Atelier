@@ -1,5 +1,7 @@
 <script lang="ts">
   import { gameState, addMessage, addMoney, setExpedition } from '$lib/stores/game';
+  import { showDialogueAndWait } from '$lib/services/presentation';
+  import { incrementExpeditionCount } from '$lib/stores/stats';
   import { getAllAreas } from '$lib/data/areas';
   import { getItem } from '$lib/data/items';
   import type { AreaDef } from '$lib/models/types';
@@ -43,18 +45,42 @@
     selectedArea = area;
   }
 
-  function dispatch() {
+  const departureLines: { ren: string; fee: string }[] = [
+    { ren: '任せておけ。いい素材を持って帰る', fee: 'いってきまーす！ いいもの見つけてくるね！' },
+    { ren: '了解した。期待していろ', fee: 'わくわくする〜！ お土産楽しみにしててね！' },
+    { ren: '……行ってくる', fee: 'レンがやる気だ！ あたしも頑張るよー！' },
+  ];
+
+  async function dispatch() {
     if (!selectedArea || !canAfford) return;
+
+    const area = selectedArea;
+    const duration = selectedDuration;
 
     addMoney(-totalCost);
     setExpedition({
-      areaId: selectedArea.id,
+      areaId: area.id,
       startDay: $gameState.day,
-      duration: selectedDuration,
+      duration,
     });
+    incrementExpeditionCount();
     addMessage(
-      `採取隊を「${selectedArea.name}」に派遣しました（${selectedDuration}日間、費用: ${totalCost}G）`
+      `採取隊を「${area.name}」に派遣しました（${duration}日間、費用: ${totalCost}G）`
     );
+
+    const lines = departureLines[Math.floor(Math.random() * departureLines.length)];
+    await showDialogueAndWait({
+      characterName: 'レン',
+      characterTitle: '冒険者',
+      characterFaceId: 'ren',
+      eventImage: '/images/events/expedition_dispatch.png',
+      lines: [
+        { text: `「${area.name}」か。${duration}日で戻る`, expression: 'determined' },
+        { text: lines.ren, expression: 'neutral' },
+        { text: `フィー「${lines.fee}」`, expression: 'neutral' },
+      ],
+    });
+
     onBack();
   }
 </script>

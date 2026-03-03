@@ -112,6 +112,7 @@ export async function endTurn(daysSpent: number): Promise<void> {
 /**
  * 中間日の軽量朝処理（複数日行動の途中日用）
  * UI演出・アチーブメント・オートセーブは省略し、状態更新のみ行う
+ * 採取隊帰還は最終日のprocessMorningPhaseで一括処理する
  */
 function processIntermediateMorning(): void {
   recordDailyScore();
@@ -119,7 +120,6 @@ function processIntermediateMorning(): void {
   const state = get(gameState);
   addMessage(`--- ${state.day}日目 ---`);
 
-  checkExpeditionReturn();
   checkQuestDeadlines();
   generateNewQuests();
   checkMerchantEvents();
