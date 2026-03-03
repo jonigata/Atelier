@@ -309,7 +309,7 @@ export function craftBatch(recipeId: string, allSelectedItems: OwnedItem[], quan
   if ('error' in check) return check.error;
   const { recipe } = check;
 
-  const itemsPerCraft = recipe.ingredients.reduce((sum, ing) => sum + ing.quantity, 0);
+  const itemsPerCraft = recipe.ingredients.reduce((sum, ing) => sum + getEffectiveIngredientCount(ing.quantity), 0);
   const allBatchItems: OwnedItem[][] = [];
   for (let i = 0; i < quantity; i++) {
     const startIdx = i * itemsPerCraft;
@@ -375,8 +375,11 @@ export function calculateStaminaCost(recipe: RecipeDef): number {
  */
 export function getInspectionConflict(currentDay: number, daysRequired: number): number | null {
   if (daysRequired <= 1) return null;
+  // 調合完了日 = currentDay + daysRequired - 1
+  // 査察は inspDay を過ぎた朝（inspDay+1日目）に発動するため、
+  // 調合が inspDay 当日に完了する分にはコンフリクトしない
   for (const inspDay of INSPECTION_DAYS) {
-    if (inspDay > currentDay && inspDay < currentDay + daysRequired) {
+    if (inspDay > currentDay && inspDay + 1 < currentDay + daysRequired) {
       return inspDay;
     }
   }

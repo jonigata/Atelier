@@ -49,7 +49,7 @@
 
   // 選択中のレシピが調合可能か
   $: canCraftSelected = selectedRecipe
-    ? selectedRecipe.ingredients.every((ing) => countAvailableIngredients(ing) >= ing.quantity)
+    ? selectedRecipe.ingredients.every((ing) => countAvailableIngredients(ing) >= getEffectiveIngredientCount(ing.quantity))
     : false;
 
   // 現在のレシピで作成可能な最大個数（機材効果適用済み）
