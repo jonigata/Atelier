@@ -1,47 +1,25 @@
 <script lang="ts">
-  import { gameState, setPhase, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel, totalScore, skipPresentation, toggleSkipPresentation } from '$lib/stores/game';
+  import { gameState, daysRemaining, expForNextLevel, alchemyLevel, villageLevel, reputationLevel, totalScore } from '$lib/stores/game';
   import { calcExpForLevel, calcExpProgress } from '$lib/data/balance';
-  import { showConfirmAndWait } from '$lib/stores/confirmDialog';
-  import { bgmEnabled } from '$lib/stores/bgm';
   import MoneyIndicator from './MoneyIndicator.svelte';
+  import ConfigDialog from './ConfigDialog.svelte';
 
   export let onScoreClick: (() => void) | undefined = undefined;
 
+  let showConfig = false;
+
   $: staminaRatio = $gameState.stamina / $gameState.maxStamina;
   $: staminaClass = staminaRatio <= 0.2 ? 'critical' : staminaRatio <= 0.5 ? 'low' : '';
-
-  async function handleRetire() {
-    const ok = await showConfirmAndWait({
-      message: 'リタイアしてゲームを終了しますか？\n現在のスコアでエンディングになります。',
-      confirmLabel: 'リタイアする',
-      cancelLabel: 'キャンセル',
-    });
-    if (ok) {
-      setPhase('ending');
-    }
-  }
 </script>
 
 <div class="hud">
   <div class="hud-row main-row">
-    <div class="hud-section skip-section">
-      <button class="retire-btn" on:click={handleRetire}>リタイア</button>
-      <label class="hud-toggle">
-        <input
-          type="checkbox"
-          checked={$bgmEnabled}
-          on:change={() => bgmEnabled.update(v => !v)}
-        />
-        <span>BGM</span>
-      </label>
-      <label class="hud-toggle">
-        <input
-          type="checkbox"
-          checked={$skipPresentation}
-          on:change={toggleSkipPresentation}
-        />
-        <span>演出スキップ</span>
-      </label>
+    <div class="hud-section config-section">
+      <button class="config-btn" on:click={() => showConfig = true} title="設定">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.48.48 0 0 0 .12.61l2.03 1.58c-.05.3-.07.63-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
+        </svg>
+      </button>
     </div>
 
     <div class="hud-section time-section">
@@ -111,6 +89,10 @@
 
 </div>
 
+{#if showConfig}
+  <ConfigDialog on:close={() => showConfig = false} />
+{/if}
+
 <style>
   .hud {
     display: flex;
@@ -138,76 +120,28 @@
     gap: 0.5rem;
   }
 
-  .skip-section {
+  .config-section {
     margin-left: auto;
     order: 999;
-    gap: 0.3rem;
   }
 
-  .retire-btn {
-    font-size: 0.8rem;
-    color: #a08060;
+  .config-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: 1px solid rgba(160, 128, 96, 0.4);
     border-radius: 4px;
-    padding: 0.2rem 0.5rem;
+    color: #a08060;
     cursor: pointer;
+    padding: 0.25rem;
     transition: color 0.2s, border-color 0.2s, background-color 0.2s;
   }
 
-  .retire-btn:hover {
-    color: #e07050;
-    border-color: rgba(224, 112, 80, 0.6);
-    background-color: rgba(224, 112, 80, 0.1);
-  }
-
-  .hud-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    cursor: pointer;
-    font-size: 0.75rem;
-    color: #a08060;
-    user-select: none;
-    padding: 0.15rem 0.3rem;
-    border-radius: 4px;
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
-
-  .hud-toggle:has(input:checked) {
+  .config-btn:hover {
     color: #c9a959;
-  }
-
-  .hud-toggle:hover {
+    border-color: rgba(201, 169, 89, 0.6);
     background-color: rgba(201, 169, 89, 0.1);
-  }
-
-  .hud-toggle input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
-    cursor: pointer;
-    border: 1px solid rgba(160, 128, 96, 0.5);
-    border-radius: 3px;
-    background: rgba(0, 0, 0, 0.3);
-    position: relative;
-    transition: border-color 0.2s, background-color 0.2s;
-  }
-
-  .hud-toggle input[type="checkbox"]:checked {
-    border-color: #c9a959;
-    background: rgba(201, 169, 89, 0.25);
-  }
-
-  .hud-toggle input[type="checkbox"]:checked::after {
-    content: '✓';
-    position: absolute;
-    top: -1px;
-    left: 1px;
-    font-size: 12px;
-    color: #c9a959;
-    line-height: 14px;
   }
 
   .section-icon {
