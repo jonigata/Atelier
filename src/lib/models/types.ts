@@ -389,6 +389,7 @@ export interface GameState {
   selectedQuestId: string | null; // 依頼画面で選択中の依頼ID
 
   expedition: Expedition | null;
+  unlockedAreas: string[];       // アンロック済みの採取エリアID
 
   craftedItems: string[];
   discoveredItems: string[];
@@ -498,6 +499,7 @@ export interface AchievementReward {
   villageExp?: number;         // 村発展度経験値
   recipes?: string[];
   unlocks?: ActionType[];  // アクションアンロック
+  unlockAreas?: string[];  // 採取エリアアンロック
   randomCommonEquipment?: number;  // ランダムコモン機材の付与数
   originLabel?: string;    // 報酬アイテムの入手元ラベル（省略時はアチーブメントtitle）
 }

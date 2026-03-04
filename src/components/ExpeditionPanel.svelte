@@ -104,18 +104,29 @@
       <h3>派遣先を選択</h3>
       <div class="area-list">
         {#each areas as area}
-          <button
-            class="area-item"
-            class:selected={selectedArea?.id === area.id}
-            on:click={() => selectArea(area)}
-            style="background-image: url(/images/areas/{area.id}.png); background-position: {areaBgPosition[area.id] ?? 'center'}"
-          >
-            <div class="area-info">
-              <span class="area-name">{area.name}</span>
-              <span class="area-drops">{getMainDropNames(area)}</span>
-            </div>
-            <span class="area-cost">{area.costPerDay}G/日</span>
-          </button>
+          {@const locked = !$gameState.unlockedAreas.includes(area.id)}
+          {#if locked}
+            <button class="area-item locked" disabled>
+              <div class="area-info">
+                <span class="area-name">？？？</span>
+                <span class="area-drops">未開放の採取地</span>
+              </div>
+              <span class="area-cost">---</span>
+            </button>
+          {:else}
+            <button
+              class="area-item"
+              class:selected={selectedArea?.id === area.id}
+              on:click={() => selectArea(area)}
+              style="background-image: url(/images/areas/{area.id}.png); background-position: {areaBgPosition[area.id] ?? 'center'}"
+            >
+              <div class="area-info">
+                <span class="area-name">{area.name}</span>
+                <span class="area-drops">{getMainDropNames(area)}</span>
+              </div>
+              <span class="area-cost">{area.costPerDay}G/日</span>
+            </button>
+          {/if}
         {/each}
       </div>
     </div>
@@ -262,6 +273,22 @@
 
   .area-item:hover::before {
     background: linear-gradient(to right, rgba(30, 25, 10, 0.85) 0%, rgba(30, 25, 10, 0.35) 35%, transparent 60%);
+  }
+
+  .area-item.locked {
+    cursor: default;
+    opacity: 0.45;
+    border-color: #3a3a4a;
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+
+  .area-item.locked .area-name {
+    color: #888;
+  }
+
+  .area-item.locked .area-cost {
+    color: #666;
+    border-color: rgba(100, 100, 100, 0.3);
   }
 
   .area-item.selected {

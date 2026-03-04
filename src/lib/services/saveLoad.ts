@@ -108,6 +108,11 @@ function migrateState(state: GameState): void {
     (state as any).scoreHistory = [];
   }
 
+  // unlockedAreas: 旧セーブデータに存在しない場合の補完
+  if (!state.unlockedAreas) {
+    (state as any).unlockedAreas = ['lake'];
+  }
+
   // maxStamina: 建物ボーナスを反映して再計算
   let staminaBonus = 0;
   for (const owned of state.buildings) {

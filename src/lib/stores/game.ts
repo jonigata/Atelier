@@ -38,6 +38,7 @@ function createInitialState(): GameState {
     selectedQuestId: null,
 
     expedition: null,
+    unlockedAreas: ['lake'],
 
     craftedItems: [],
     discoveredItems: ['herb_01', 'water_01'],

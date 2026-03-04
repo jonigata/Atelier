@@ -579,12 +579,12 @@ export const equipment: Record<string, EquipmentDef> = {
   storage_shelf: {
     id: 'storage_shelf',
     name: '整理棚',
-    description: 'インベントリの所持枠が10個分拡張される',
+    description: '整理された工房は無駄な動きが減り、調合の疲労が軽くなる',
     category: 'special',
     rarity: 'common',
     price: 300,
-    effectDescription: '所持枠+10',
-    effects: [{ type: 'inventory_expand', value: 10 }],
+    effectDescription: '調合の体力消費-15%',
+    effects: [{ type: 'craft_stamina_mult', value: 0.85 }],
   },
   lucky_coin: {
     id: 'lucky_coin',

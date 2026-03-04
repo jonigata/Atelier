@@ -20,6 +20,7 @@ import {
 } from '$lib/data/achievements';
 import { items } from '$lib/data/items';
 import { recipes } from '$lib/data/recipes';
+import { getArea } from '$lib/data/areas';
 import { getEquipmentByRarity, getEquipment, getEquipmentIcon } from '$lib/data/equipment';
 import { showGoalActiveToast, actionLabels } from '$lib/stores/toast';
 import type {
@@ -329,6 +330,14 @@ export function claimReward(achievementId: string, pickedEquipment?: EquipmentDe
     }
   }
 
+  // エリアアンロック
+  if (reward.unlockAreas) {
+    gameState.update((s) => ({
+      ...s,
+      unlockedAreas: [...new Set([...s.unlockedAreas, ...reward.unlockAreas!])],
+    }));
+  }
+
   // アクションアンロック（機材取得の後）
   if (reward.unlocks) {
     for (const action of reward.unlocks) {
@@ -446,6 +455,13 @@ function getDetailedRewards(achievement: AchievementDef, pickedEquipment?: Equip
   } else if (reward.randomCommonEquipment) {
     const count = reward.randomCommonEquipment;
     details.push(`コモン機材 x${count}（ランダム）`);
+  }
+
+  if (reward.unlockAreas) {
+    for (const areaId of reward.unlockAreas) {
+      const area = getArea(areaId);
+      details.push(`採取地「${area?.name ?? areaId}」解放`);
+    }
   }
 
   if (reward.unlocks) {
@@ -583,6 +599,16 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
       text: `コモン機材 x${count}（ランダム）`,
       type: 'unlock',
     });
+  }
+
+  if (reward.unlockAreas) {
+    for (const areaId of reward.unlockAreas) {
+      const area = getArea(areaId);
+      structured.push({
+        text: `採取地「${area?.name ?? areaId}」解放`,
+        type: 'unlock',
+      });
+    }
   }
 
   if (reward.unlocks) {
