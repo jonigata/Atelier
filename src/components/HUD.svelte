@@ -23,24 +23,20 @@
     </div>
 
     <div class="hud-section time-section">
-      <div class="section-icon">📅</div>
-      <div class="section-content">
+      <div class="stacked">
         <span class="day-display">{$gameState.day}日目</span>
-        <span class="remaining">残り {$daysRemaining}日</span>
+        <span class="remaining">残り{$daysRemaining}日</span>
       </div>
     </div>
 
     <div class="hud-section money-section">
-      <div class="section-icon">💰</div>
-      <div class="section-content">
-        <span class="money-value">{$gameState.money.toLocaleString()} G</span>
-        <MoneyIndicator />
-      </div>
+      <span class="money-value">{$gameState.money.toLocaleString()} G</span>
+      <MoneyIndicator />
     </div>
 
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="hud-section score-section" class:clickable={!!onScoreClick} on:click={onScoreClick} role={onScoreClick ? 'button' : undefined} tabindex={onScoreClick ? 0 : undefined}>
-      <div class="section-content">
+      <div class="stacked">
         <span class="score-label">スコア</span>
         <span class="score-value">☆{$totalScore.toLocaleString()}</span>
       </div>
@@ -48,8 +44,8 @@
 
     <div class="hud-section stats-section">
       <div class="stat-item">
-        <span class="stat-label">錬金術</span>
-        <div class="stat-value-row">
+        <div class="stat-header">
+          <span class="stat-label">錬金術</span>
           <span class="stat-value">Lv.{$alchemyLevel}</span>
         </div>
         <div class="exp-bar">
@@ -57,8 +53,8 @@
         </div>
       </div>
       <div class="stat-item">
-        <span class="stat-label">名声</span>
-        <div class="stat-value-row">
+        <div class="stat-header">
+          <span class="stat-label">名声</span>
           <span class="stat-value reputation">Lv.{$reputationLevel}</span>
         </div>
         <div class="exp-bar">
@@ -66,8 +62,8 @@
         </div>
       </div>
       <div class="stat-item">
-        <span class="stat-label">村発展</span>
-        <div class="stat-value-row">
+        <div class="stat-header">
+          <span class="stat-label">村発展</span>
           <span class="stat-value village">Lv.{$villageLevel}</span>
         </div>
         <div class="exp-bar">
@@ -78,8 +74,10 @@
 
     <div class="hud-section character-section">
       <div class="stat-item stamina {staminaClass}">
-        <span class="stat-label">体力</span>
-        <span class="stat-value">{$gameState.stamina}/{$gameState.maxStamina}</span>
+        <div class="stat-header">
+          <span class="stat-label">体力</span>
+          <span class="stat-value">{$gameState.stamina}/{$gameState.maxStamina}</span>
+        </div>
         <div class="stamina-bar">
           <div class="stamina-fill" style="width: {staminaRatio * 100}%"></div>
         </div>
@@ -106,18 +104,14 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-  }
-
-  .main-row {
-    gap: 1rem;
+    gap: 0.4rem 1rem;
+    padding: 0.4rem 0.75rem;
   }
 
   .hud-section {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.35rem;
   }
 
   .config-section {
@@ -144,45 +138,46 @@
     background-color: rgba(201, 169, 89, 0.1);
   }
 
-  .section-icon {
-    font-size: 1rem;
-    opacity: 0.9;
-  }
-
-  .section-content {
+  .stacked {
     display: flex;
     flex-direction: column;
   }
 
+  .time-section .stacked {
+    line-height: 1.3;
+  }
+
   .time-section .day-display {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: bold;
   }
 
   .time-section .remaining {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: #a89060;
   }
 
-  .money-section .section-content {
+  .score-section .stacked {
+    line-height: 1.05;
+  }
+
+  .money-section {
     position: relative;
+    min-width: 5.5rem;
+    justify-content: flex-end;
   }
 
   .money-section .money-value {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: bold;
     color: #ffd700;
-  }
-
-  .score-section .section-content {
-    display: flex;
-    flex-direction: column;
+    text-align: right;
   }
 
   .score-section.clickable {
     cursor: pointer;
     border-radius: 4px;
-    padding: 0.2rem 0.4rem;
+    padding: 0.15rem 0.3rem;
     transition: background-color 0.2s ease;
   }
 
@@ -190,21 +185,36 @@
     background-color: rgba(240, 192, 64, 0.1);
   }
 
+  .score-section {
+    min-width: 4.5rem;
+  }
+
+  .score-section .stacked {
+    align-items: flex-end;
+  }
+
   .score-value {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: bold;
     color: #f0c040;
   }
 
   .score-label {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     color: #a89060;
   }
 
-  .stats-section,
+  .stats-section {
+    display: flex;
+    flex: 2;
+    gap: 0.75rem;
+    padding-left: 0.75rem;
+    border-left: 1px solid rgba(139, 105, 20, 0.5);
+  }
+
   .character-section {
     display: flex;
-    gap: 1rem;
+    flex: 1;
     padding-left: 0.75rem;
     border-left: 1px solid rgba(139, 105, 20, 0.5);
   }
@@ -213,17 +223,24 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.1rem;
-    min-width: 4rem;
+    gap: 0.15rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .stat-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
   }
 
   .stat-label {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
     color: #c9a959;
   }
 
   .stat-value {
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     font-weight: bold;
   }
 
@@ -231,16 +248,10 @@
     color: #81c784;
   }
 
-  .stat-value-row {
-    display: flex;
-    align-items: baseline;
-    gap: 0.3rem;
-  }
-
   .exp-bar,
   .stamina-bar {
-    width: 65px;
-    height: 4px;
+    width: 100%;
+    height: 5px;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 2px;
     overflow: hidden;
@@ -295,19 +306,13 @@
   }
 
   @media (max-width: 600px) {
-    .hud-row {
-      padding: 0.4rem 0.75rem;
+    .stats-section {
+      padding-left: 0.5rem;
+      gap: 0.5rem;
     }
 
-    .stats-section,
     .character-section {
       padding-left: 0.5rem;
-      gap: 0.75rem;
-    }
-
-    .exp-bar,
-    .stamina-bar {
-      width: 40px;
     }
   }
 </style>
