@@ -556,14 +556,14 @@ export const equipment: Record<string, EquipmentDef> = {
   memo_book: {
     id: 'memo_book',
     name: '安定の手帖',
-    description: '植物・木材系素材の品質が40未満なら自動的に40に底上げ',
+    description: '植物・木材系素材の品質が50未満なら自動的に50に底上げ',
     category: 'material',
     rarity: 'common',
     price: 150,
-    effectDescription: '植物・木材素材を品質40に底上げ',
+    effectDescription: '植物・木材素材を品質50に底上げ',
     effects: [
-      { type: 'material_quality_floor', value: 40, materialCategory: 'plant' },
-      { type: 'material_quality_floor', value: 40, materialCategory: 'wood' },
+      { type: 'material_quality_floor', value: 50, materialCategory: 'plant' },
+      { type: 'material_quality_floor', value: 50, materialCategory: 'wood' },
     ],
   },
   exploration_compass: {
