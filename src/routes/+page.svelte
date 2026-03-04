@@ -22,6 +22,7 @@
   import SaveLoadSidebar from '../components/SaveLoadSidebar.svelte';
   import ToastContainer from '../components/ToastContainer.svelte';
   import TalkBanner from '../components/TalkBanner.svelte';
+  import { initZoom } from '$lib/services/zoomController';
   import { dev } from '$app/environment';
   import type { ActionType } from '$lib/models/types';
 
@@ -55,6 +56,9 @@
       skipPresentation.set(true);
     }
 
+    // zoom スケーリング
+    const cleanupZoom = initZoom();
+
     // BGM再生
     const cleanupBgm = initBgm();
 
@@ -69,6 +73,7 @@
     return () => {
       window.removeEventListener('popstate', preventNav);
       cleanupBgm();
+      cleanupZoom();
     };
   });
 
@@ -167,7 +172,7 @@
   }
 
   .game-container {
-    height: 100vh;
+    height: var(--app-height, 100vh);
     display: flex;
     flex-direction: column;
     background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
