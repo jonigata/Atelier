@@ -4,8 +4,10 @@
   import { items } from '$lib/data/items';
   import { recipes } from '$lib/data/recipes';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
-  import AchievementCategoryIcon from './common/AchievementCategoryIcon.svelte';
+  import ContinueMarker from './common/ContinueMarker.svelte';
   import type { AchievementDef, AchievementCondition, ActiveQuest } from '$lib/models/types';
+
+  let selectedGoal: AchievementDef | null = null;
 
   export let onQuestClick: (quest: ActiveQuest) => void;
   export let questsFirst: boolean = false;
@@ -142,20 +144,19 @@
             {#each activeGoals as goal}
               {@const progressPercent = getAchievementProgress(goal.id)}
               {@const condDetails = getConditionDetails(goal)}
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
-                class="objective-item achievement"
+                class="objective-item achievement clickable"
                 class:important={goal.important}
+                on:click={() => selectedGoal = goal}
               >
-                <div class="objective-main">
-                  <div class="objective-icon">
-                    <AchievementCategoryIcon category={goal.category} size="medium" />
+                <div class="objective-bg-icon" style="background-image: url('/icons/achievements/{goal.category}.png')"></div>
+                <div class="objective-content">
+                  <div class="objective-header">
+                    <span class="objective-title">{goal.title}</span>
                   </div>
-                  <div class="objective-content">
-                    <div class="objective-header">
-                      <span class="objective-title">{goal.title}</span>
-                    </div>
-                    <div class="objective-hint">{@html goal.hint}</div>
-                  </div>
+                  <div class="objective-hint">{@html goal.hint}</div>
                 </div>
                 <div class="detail-conditions">
                   {#each condDetails as cond}
@@ -164,12 +165,6 @@
                       <span class="condition-label">{cond.label}</span>
                       <span class="condition-value">{cond.current} / {cond.target}</span>
                     </div>
-                  {/each}
-                </div>
-                <div class="objective-rewards">
-                  <span class="reward-label">報酬:</span>
-                  {#each getRewardSummary(goal) as reward}
-                    <span class="reward-item">{reward}</span>
                   {/each}
                 </div>
                 {#if progressPercent > 0}
@@ -190,20 +185,19 @@
             {#each activeGoals as goal}
               {@const progressPercent = getAchievementProgress(goal.id)}
               {@const condDetails = getConditionDetails(goal)}
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
-                class="objective-item achievement"
+                class="objective-item achievement clickable"
                 class:important={goal.important}
+                on:click={() => selectedGoal = goal}
               >
-                <div class="objective-main">
-                  <div class="objective-icon">
-                    <AchievementCategoryIcon category={goal.category} size="medium" />
+                <div class="objective-bg-icon" style="background-image: url('/icons/achievements/{goal.category}.png')"></div>
+                <div class="objective-content">
+                  <div class="objective-header">
+                    <span class="objective-title">{goal.title}</span>
                   </div>
-                  <div class="objective-content">
-                    <div class="objective-header">
-                      <span class="objective-title">{goal.title}</span>
-                    </div>
-                    <div class="objective-hint">{@html goal.hint}</div>
-                  </div>
+                  <div class="objective-hint">{@html goal.hint}</div>
                 </div>
                 <div class="detail-conditions">
                   {#each condDetails as cond}
@@ -212,12 +206,6 @@
                       <span class="condition-label">{cond.label}</span>
                       <span class="condition-value">{cond.current} / {cond.target}</span>
                     </div>
-                  {/each}
-                </div>
-                <div class="objective-rewards">
-                  <span class="reward-label">報酬:</span>
-                  {#each getRewardSummary(goal) as reward}
-                    <span class="reward-item">{reward}</span>
                   {/each}
                 </div>
                 {#if progressPercent > 0}
@@ -242,6 +230,38 @@
         </div>
       {/if}
     {/if}
+  </div>
+{/if}
+
+{#if selectedGoal}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div class="goal-dialog-overlay" on:click={() => selectedGoal = null}>
+    <div class="goal-dialog">
+      <div class="goal-dialog-title">{selectedGoal.title}</div>
+      <div class="goal-dialog-hint">{@html selectedGoal.hint}</div>
+      <div class="goal-dialog-section">
+        <div class="goal-dialog-label">達成条件</div>
+        {#each getConditionDetails(selectedGoal) as cond}
+          <div class="condition-row" class:met={cond.met}>
+            <span class="condition-check">{cond.met ? '✓' : '○'}</span>
+            <span class="condition-label">{cond.label}</span>
+            <span class="condition-value">{cond.current} / {cond.target}</span>
+          </div>
+        {/each}
+      </div>
+      <div class="goal-dialog-section">
+        <div class="goal-dialog-label">報酬</div>
+        <div class="goal-dialog-rewards">
+          {#each getRewardSummary(selectedGoal) as reward}
+            <span class="reward-item">{reward}</span>
+          {/each}
+        </div>
+      </div>
+      <div class="goal-dialog-footer">
+        <ContinueMarker />
+      </div>
+    </div>
   </div>
 {/if}
 
@@ -282,7 +302,9 @@
   }
 
   .objective-item {
-    padding: 0.75rem 1rem;
+    position: relative;
+    overflow: hidden;
+    padding: 0.4rem 0.6rem;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid #3a3a5a;
     border-radius: 6px;
@@ -290,6 +312,16 @@
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+  }
+
+  .objective-bg-icon {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.1;
+    pointer-events: none;
   }
 
   .objective-item.achievement {
@@ -301,15 +333,6 @@
     border-left: 4px solid #c9a959;
     background: linear-gradient(135deg, rgba(201, 169, 89, 0.15) 0%, rgba(201, 169, 89, 0.05) 100%);
     box-shadow: 0 0 8px rgba(201, 169, 89, 0.2);
-  }
-
-  .objective-main {
-    display: flex;
-    gap: 0.75rem;
-  }
-
-  .objective-icon {
-    flex-shrink: 0;
   }
 
   .objective-content {
@@ -332,7 +355,7 @@
 
   .objective-hint {
     color: #a0a0b0;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 
   .objective-hint :global(strong) {
@@ -354,18 +377,6 @@
     transition: width 0.3s ease;
   }
 
-  .reward-label {
-    color: #808090;
-    font-size: 0.8rem;
-  }
-
-  .objective-rewards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    font-size: 0.85rem;
-  }
-
   .reward-item {
     color: #c9a959;
   }
@@ -374,7 +385,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.25rem 0.75rem;
-    font-size: 0.8rem;
+    font-size: 0.6rem;
   }
 
   .condition-row {
@@ -394,5 +405,80 @@
 
   .condition-value {
     font-variant-numeric: tabular-nums;
+  }
+
+  .objective-item.clickable {
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .objective-item.clickable:active {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .goal-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .goal-dialog {
+    background: #1a1a2e;
+    border: 1px solid #4a4a6a;
+    border-radius: 8px;
+    padding: 1.5rem;
+    max-width: 400px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .goal-dialog-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #e0e0f0;
+  }
+
+  .goal-dialog-hint {
+    color: #a0a0b0;
+    font-size: 0.9rem;
+  }
+
+  .goal-dialog-hint :global(strong) {
+    color: #6cc4e0;
+    font-weight: bold;
+  }
+
+  .goal-dialog-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .goal-dialog-label {
+    color: #808090;
+    font-size: 0.8rem;
+    border-bottom: 1px solid #3a3a5a;
+    padding-bottom: 0.2rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .goal-dialog-rewards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .goal-dialog-footer {
+    text-align: center;
+    margin-top: 0.5rem;
   }
 </style>
