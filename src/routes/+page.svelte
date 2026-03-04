@@ -28,6 +28,9 @@
   let selectedAction: ActionType | null = null;
   let initialAlbumTab: 'items' | 'achievements' | 'scores' | 'ranking' = 'items';
 
+  // エンディングに移行したらselectedActionをリセット（リタイア→再開時に前の画面が残る問題を防止）
+  $: if ($gameState.phase === 'ending') selectedAction = null;
+
   function handleScoreClick() {
     initialAlbumTab = 'scores';
     selectedAction = 'album';
