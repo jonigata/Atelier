@@ -128,7 +128,9 @@
 
     const structuredRewards: RewardDisplay[] = [
       { text: `${finalMoney.toLocaleString()} G`, type: 'money' },
-      {
+    ];
+    if (finalReputation > 0) {
+      structuredRewards.push({
         text: `名声Exp +${finalReputation}`,
         type: 'reputation',
         gaugeData: {
@@ -140,8 +142,10 @@
             ? buildExpGaugeSegments(repLevelBefore, repExpBefore, repLevelAfter, repProgressAfter)
             : undefined,
         },
-      },
-      {
+      });
+    }
+    if (finalDevelopment > 0) {
+      structuredRewards.push({
         text: `村発展Exp +${finalDevelopment}`,
         type: 'villageDevelopment',
         gaugeData: {
@@ -153,8 +157,8 @@
             ? buildExpGaugeSegments(vilLevelBefore, vilExpBefore, vilLevelAfter, vilProgressAfter)
             : undefined,
         },
-      },
-    ];
+      });
+    }
 
     const client = quest.clientId ? getQuestClient(quest.clientId) : undefined;
     // 採取隊派遣中はレン・フィーが遠征で不在 → 書き置きとして表示
@@ -170,9 +174,10 @@
       achievementTitle: quest.title,
       structuredRewards,
     };
-    addMessage(
-      `依頼「${quest.title}」を達成しました！ 報酬: ${finalMoney}G, 名声+${finalReputation}, 村発展+${finalDevelopment}`
-    );
+    const rewardParts = [`${finalMoney}G`];
+    if (finalReputation > 0) rewardParts.push(`名声+${finalReputation}`);
+    if (finalDevelopment > 0) rewardParts.push(`村発展+${finalDevelopment}`);
+    addMessage(`依頼「${quest.title}」を達成しました！ 報酬: ${rewardParts.join(', ')}`);
 
     // 納品ダイアログ → 閉じた後にアチーブメントを明示的にチェック
     await showDialogueAndWait(dialogue);
