@@ -161,6 +161,10 @@
 <ToastContainer />
 
 <style>
+  :global(html) {
+    font-size: 30px;
+  }
+
   :global(body) {
     margin: 0;
     padding: 0;

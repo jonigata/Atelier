@@ -133,11 +133,15 @@
     <div class="actions">
       {#each actionStates as action}
         {#if action.isLocked}
-          <div class="action-btn locked">
+          <div class="action-wrapper">
+          <button class="action-btn locked" disabled>
             <img class="lock-icon" src="/icons/actions/locked.png" alt="ロック中" />
             <span class="lock-label">???</span>
+          </button>
+          <span class="description">&nbsp;</span>
           </div>
         {:else}
+          <div class="action-wrapper">
           <button
             class="action-btn"
             class:newly-unlocked={action.isNewlyUnlocked}
@@ -146,7 +150,6 @@
             style="background-image: url({getActionBanner(action.type)})"
           >
             <span class="label">{action.label}</span>
-            <span class="description">{action.description}</span>
             {#if action.type === 'expedition' && $gameState.expedition !== null}
               {@const returnDay = $gameState.expedition.startDay + $gameState.expedition.duration}
               {@const daysLeft = returnDay - $gameState.day}
@@ -167,6 +170,8 @@
               </div>
             {/if}
           </button>
+          <span class="description">{action.description}</span>
+          </div>
         {/if}
       {/each}
     </div>
@@ -188,8 +193,8 @@
 
   .actions {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 0.5rem;
   }
 
   .action-btn {
@@ -228,6 +233,7 @@
     background-image: none !important;
     border: 2px dashed #3a3a5a;
     cursor: not-allowed;
+    flex: 0 0 auto;
   }
 
   .lock-icon {
@@ -279,21 +285,24 @@
        2px  4px 20px rgba(0, 0, 0, 0.6);
   }
 
+  .action-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .action-wrapper > .action-btn {
+    flex: 0 0 auto;
+  }
+
   .description {
-    font-size: 0.7rem;
+    font-size: 0.55rem;
     line-height: 1.2;
-    color: #ddd;
-    text-shadow:
-      -1px -1px 0 rgba(20, 20, 40, 0.95),
-       1px -1px 0 rgba(20, 20, 40, 0.95),
-      -1px  1px 0 rgba(20, 20, 40, 0.95),
-       1px  1px 0 rgba(20, 20, 40, 0.95),
-       0   -1px 0 rgba(20, 20, 40, 0.95),
-       0    1px 0 rgba(20, 20, 40, 0.95),
-      -1px  0   0 rgba(20, 20, 40, 0.95),
-       1px  0   0 rgba(20, 20, 40, 0.95),
-       2px  4px 8px rgba(0, 0, 0, 0.9),
-       1px  3px 16px rgba(0, 0, 0, 0.6);
+    color: #aaa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    padding: 0.15rem 0;
   }
 
   .badge {
