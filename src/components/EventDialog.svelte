@@ -704,7 +704,8 @@
     width: min(400px, 80vw);
     height: auto;
     max-height: 200px;
-    border-radius: 10px;
+    object-fit: cover;
+    border-radius: 8px;
     filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.6));
   }
 

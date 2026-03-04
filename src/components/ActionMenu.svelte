@@ -203,6 +203,7 @@
     background-position: center;
     border: 2px solid #4a4a6a;
     border-radius: 8px;
+    overflow: hidden;
     color: #e0e0f0;
     cursor: pointer;
     transition: all 0.2s;
