@@ -105,7 +105,7 @@ export function initBgm() {
   audio.volume = 0.3;
 
   const tryPlay = () => {
-    if (!audio) return;
+    if (!audio || !get(bgmEnabled)) return;
     audio.play().then(() => {
       document.removeEventListener('click', tryPlay);
       document.removeEventListener('keydown', tryPlay);
