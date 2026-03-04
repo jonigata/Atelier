@@ -8,6 +8,7 @@
   import type { AchievementDef, AchievementCondition, ActiveQuest } from '$lib/models/types';
 
   export let onQuestClick: (quest: ActiveQuest) => void;
+  export let questsFirst: boolean = false;
 
   const conditionLabels: Record<string, string> = {
     level: '錬金レベル',
@@ -122,63 +123,124 @@
 
 {#if activeGoals.length > 0 || $gameState.activeQuests.length > 0}
   <div class="objectives-section">
-    {#if activeGoals.length > 0}
-      <div class="objectives-group">
-        <h5>現在の目標</h5>
-        <div class="goal-grid">
-          {#each activeGoals as goal}
-            {@const progressPercent = getAchievementProgress(goal.id)}
-            {@const condDetails = getConditionDetails(goal)}
-            <div
-              class="objective-item achievement"
-              class:important={goal.important}
-            >
-              <div class="objective-main">
-                <div class="objective-icon">
-                  <AchievementCategoryIcon category={goal.category} size="medium" />
-                </div>
-                <div class="objective-content">
-                  <div class="objective-header">
-                    <span class="objective-title">{goal.title}</span>
-                  </div>
-                  <div class="objective-hint">{@html goal.hint}</div>
-                </div>
-              </div>
-              <div class="detail-conditions">
-                {#each condDetails as cond}
-                  <div class="condition-row" class:met={cond.met}>
-                    <span class="condition-check">{cond.met ? '✓' : '○'}</span>
-                    <span class="condition-label">{cond.label}</span>
-                    <span class="condition-value">{cond.current} / {cond.target}</span>
-                  </div>
-                {/each}
-              </div>
-              <div class="objective-rewards">
-                <span class="reward-label">報酬:</span>
-                {#each getRewardSummary(goal) as reward}
-                  <span class="reward-item">{reward}</span>
-                {/each}
-              </div>
-              {#if progressPercent > 0}
-                <div class="progress-bar">
-                  <div class="progress-fill" style="width: {progressPercent}%"></div>
-                </div>
-              {/if}
-            </div>
-          {/each}
+    {#if questsFirst}
+      {#if $gameState.activeQuests.length > 0}
+        <div class="objectives-group">
+          <h5>受注中の依頼</h5>
+          <div class="quest-grid">
+            {#each $gameState.activeQuests as quest}
+              <ActiveQuestCard {quest} onClick={onQuestClick} />
+            {/each}
+          </div>
         </div>
-      </div>
-    {/if}
+      {/if}
 
-    {#if $gameState.activeQuests.length > 0}
-      <div class="objectives-group">
-        <h5>受注中の依頼</h5>
-        <div class="quest-grid">
-          {#each $gameState.activeQuests as quest}
-            <ActiveQuestCard {quest} onClick={onQuestClick} />
-          {/each}
+      {#if activeGoals.length > 0}
+        <div class="objectives-group">
+          <h5>現在の目標</h5>
+          <div class="goal-grid">
+            {#each activeGoals as goal}
+              {@const progressPercent = getAchievementProgress(goal.id)}
+              {@const condDetails = getConditionDetails(goal)}
+              <div
+                class="objective-item achievement"
+                class:important={goal.important}
+              >
+                <div class="objective-main">
+                  <div class="objective-icon">
+                    <AchievementCategoryIcon category={goal.category} size="medium" />
+                  </div>
+                  <div class="objective-content">
+                    <div class="objective-header">
+                      <span class="objective-title">{goal.title}</span>
+                    </div>
+                    <div class="objective-hint">{@html goal.hint}</div>
+                  </div>
+                </div>
+                <div class="detail-conditions">
+                  {#each condDetails as cond}
+                    <div class="condition-row" class:met={cond.met}>
+                      <span class="condition-check">{cond.met ? '✓' : '○'}</span>
+                      <span class="condition-label">{cond.label}</span>
+                      <span class="condition-value">{cond.current} / {cond.target}</span>
+                    </div>
+                  {/each}
+                </div>
+                <div class="objective-rewards">
+                  <span class="reward-label">報酬:</span>
+                  {#each getRewardSummary(goal) as reward}
+                    <span class="reward-item">{reward}</span>
+                  {/each}
+                </div>
+                {#if progressPercent > 0}
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: {progressPercent}%"></div>
+                  </div>
+                {/if}
+              </div>
+            {/each}
+          </div>
         </div>
-      </div>
+      {/if}
+    {:else}
+      {#if activeGoals.length > 0}
+        <div class="objectives-group">
+          <h5>現在の目標</h5>
+          <div class="goal-grid">
+            {#each activeGoals as goal}
+              {@const progressPercent = getAchievementProgress(goal.id)}
+              {@const condDetails = getConditionDetails(goal)}
+              <div
+                class="objective-item achievement"
+                class:important={goal.important}
+              >
+                <div class="objective-main">
+                  <div class="objective-icon">
+                    <AchievementCategoryIcon category={goal.category} size="medium" />
+                  </div>
+                  <div class="objective-content">
+                    <div class="objective-header">
+                      <span class="objective-title">{goal.title}</span>
+                    </div>
+                    <div class="objective-hint">{@html goal.hint}</div>
+                  </div>
+                </div>
+                <div class="detail-conditions">
+                  {#each condDetails as cond}
+                    <div class="condition-row" class:met={cond.met}>
+                      <span class="condition-check">{cond.met ? '✓' : '○'}</span>
+                      <span class="condition-label">{cond.label}</span>
+                      <span class="condition-value">{cond.current} / {cond.target}</span>
+                    </div>
+                  {/each}
+                </div>
+                <div class="objective-rewards">
+                  <span class="reward-label">報酬:</span>
+                  {#each getRewardSummary(goal) as reward}
+                    <span class="reward-item">{reward}</span>
+                  {/each}
+                </div>
+                {#if progressPercent > 0}
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: {progressPercent}%"></div>
+                  </div>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/if}
+
+      {#if $gameState.activeQuests.length > 0}
+        <div class="objectives-group">
+          <h5>受注中の依頼</h5>
+          <div class="quest-grid">
+            {#each $gameState.activeQuests as quest}
+              <ActiveQuestCard {quest} onClick={onQuestClick} />
+            {/each}
+          </div>
+        </div>
+      {/if}
     {/if}
   </div>
 {/if}
@@ -186,6 +248,7 @@
 <style>
   .objectives-section {
     margin-top: 1.5rem;
+    margin-bottom: 1rem;
     padding-top: 1.5rem;
     border-top: 1px solid #3a3a5a;
     display: flex;

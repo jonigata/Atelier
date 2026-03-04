@@ -3,10 +3,10 @@
   import { afterUpdate } from 'svelte';
 
   let logContainer: HTMLDivElement;
-  let isExpanded = false;
+  let isOpen = false;
 
   afterUpdate(() => {
-    if (logContainer) {
+    if (logContainer && isOpen) {
       logContainer.scrollTop = logContainer.scrollHeight;
     }
   });
@@ -86,87 +86,155 @@
     return 'info';
   }
 
-  function toggleExpanded() {
-    isExpanded = !isExpanded;
+  function toggleOpen() {
+    isOpen = !isOpen;
+  }
+
+  function handleOverlayClick() {
+    isOpen = false;
   }
 </script>
 
-<div class="message-log-wrapper" class:expanded={isExpanded}>
-  <div class="log-header">
-    <span class="log-title">メッセージログ</span>
-    <button class="toggle-btn" on:click={toggleExpanded}>
-      {isExpanded ? '▼ 縮小' : '▲ 展開'}
-    </button>
-  </div>
-  <div class="message-log" bind:this={logContainer}>
-    {#each groupedMessages as grouped, i}
-      {@const type = getMessageType(grouped.text)}
-      <div
-        class="message {type}"
-        class:latest={i === groupedMessages.length - 1}
-      >
-        <span class="message-bullet"></span>
-        <span class="message-text">
-          {grouped.text}
-          {#if grouped.count > 1}
-            <span class="batch-badge">×{grouped.count}</span>
-          {/if}
-        </span>
+<button class="log-toggle-btn" on:click={toggleOpen} title="メッセージログ">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+    <polyline points="14 2 14 8 20 8" />
+    <line x1="16" y1="13" x2="8" y2="13" />
+    <line x1="16" y1="17" x2="8" y2="17" />
+    <polyline points="10 9 9 9 8 9" />
+  </svg>
+  {#if groupedMessages.length > 0}
+    <span class="log-count">{groupedMessages.length}</span>
+  {/if}
+</button>
+
+{#if isOpen}
+  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+  <div class="log-overlay" on:click={handleOverlayClick}>
+    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+    <div class="log-panel" on:click|stopPropagation>
+      <div class="log-header">
+        <span class="log-title">メッセージログ</span>
+        <button class="close-btn" on:click={() => isOpen = false}>✕</button>
       </div>
-    {/each}
-    {#if groupedMessages.length === 0}
-      <div class="no-messages">まだメッセージがありません</div>
-    {/if}
+      <div class="message-log" bind:this={logContainer}>
+        {#each groupedMessages as grouped, i}
+          {@const type = getMessageType(grouped.text)}
+          <div
+            class="message {type}"
+            class:latest={i === groupedMessages.length - 1}
+          >
+            <span class="message-bullet"></span>
+            <span class="message-text">
+              {grouped.text}
+              {#if grouped.count > 1}
+                <span class="batch-badge">×{grouped.count}</span>
+              {/if}
+            </span>
+          </div>
+        {/each}
+        {#if groupedMessages.length === 0}
+          <div class="no-messages">まだメッセージがありません</div>
+        {/if}
+      </div>
+    </div>
   </div>
-</div>
+{/if}
 
 <style>
-  .message-log-wrapper {
+  .log-toggle-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.5rem;
+    background: rgba(26, 26, 46, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid #3a3a5a;
+    border-radius: 6px;
+    color: #808090;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .log-toggle-btn:hover {
+    background: rgba(42, 42, 74, 0.9);
+    color: #a0a0b0;
+    border-color: #5a5a7a;
+  }
+
+  .log-count {
+    font-size: 0.7rem;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    min-width: 1.2em;
+    text-align: center;
+  }
+
+  .log-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 3rem;
+  }
+
+  .log-panel {
+    width: min(90vw, 600px);
+    max-height: 60vh;
     background: #1a1a2e;
-    border-top: 2px solid #4a4a6a;
+    border: 1px solid #3a3a5a;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   }
 
   .log-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.4rem 0.75rem;
+    padding: 0.6rem 0.75rem;
     background: rgba(0, 0, 0, 0.3);
     border-bottom: 1px solid #2a2a4a;
   }
 
   .log-title {
-    font-size: 0.8rem;
-    color: #808090;
+    font-size: 0.85rem;
+    color: #a0a0b0;
+    font-weight: bold;
   }
 
-  .toggle-btn {
+  .close-btn {
     padding: 0.2rem 0.5rem;
     background: transparent;
-    border: 1px solid #4a4a6a;
-    border-radius: 3px;
+    border: none;
     color: #808090;
-    font-size: 0.75rem;
+    font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: color 0.2s;
   }
 
-  .toggle-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #a0a0b0;
+  .close-btn:hover {
+    color: #e0e0f0;
   }
 
   .message-log {
-    height: 80px;
+    flex: 1;
     overflow-y: auto;
     padding: 0.5rem 0.75rem;
     font-size: 0.85rem;
     color: #b0b0c0;
-    transition: height 0.3s ease;
-  }
-
-  .message-log-wrapper.expanded .message-log {
-    height: 200px;
   }
 
   .message {

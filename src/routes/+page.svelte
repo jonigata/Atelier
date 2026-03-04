@@ -106,6 +106,7 @@
     <HUD onScoreClick={handleScoreClick} />
 
     <main class="main-panel">
+      <MessageLog />
       {#if $gameState.phase === 'morning'}
         <MorningPanel />
       {:else if $gameState.phase === 'action'}
@@ -120,8 +121,6 @@
     {#if $gameState.phase === 'action' && selectedAction === null}
       <TalkBanner />
     {/if}
-
-    <MessageLog />
   {/if}
 
   <!-- 日数経過フィードバック -->
@@ -185,6 +184,9 @@
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
   }
 
   .save-indicator {

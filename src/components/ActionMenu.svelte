@@ -111,77 +111,79 @@
   {#if inspectionKnown && nextInspection && daysUntilInspection !== null}
     <InspectionTracker inspection={nextInspection} values={inspectionValues} expValues={inspectionExpValues} daysUntil={daysUntilInspection} firstReveal={inspectionFirstReveal} />
   {/if}
-  <h3>行動を選択してください</h3>
 
-  {#if merchantInTown}
-    <div class="special-actions">
-      <button
-        class="action-btn merchant-btn"
-        on:click={() => onSelect('traveling_merchant')}
-      >
-        <img class="icon" src="/images/characters/marco/marco-face-smug.png" alt="マルコ" />
-        <div class="merchant-info">
-          <span class="label">旅商人マルコ <span class="merchant-days">あと{merchantDaysLeft}日</span></span>
-          <span class="description">マルコの行商を覗く</span>
-        </div>
-      </button>
-    </div>
-  {/if}
+  <div class="actions-bottom">
+    <ObjectivesSection onQuestClick={handleQuestClick} questsFirst={true} />
 
-  <div class="actions">
-    {#each actionStates as action}
-      {#if action.isLocked}
-        <div class="action-btn locked">
-          <img class="lock-icon" src="/icons/actions/locked.png" alt="ロック中" />
-          <span class="lock-label">???</span>
-        </div>
-      {:else}
+    {#if merchantInTown}
+      <div class="special-actions">
         <button
-          class="action-btn"
-          class:newly-unlocked={action.isNewlyUnlocked}
-          on:click={() => onSelect(action.type)}
-          disabled={action.type === 'expedition' && $gameState.expedition !== null}
-          style="background-image: url({getActionBanner(action.type)})"
+          class="action-btn merchant-btn"
+          on:click={() => onSelect('traveling_merchant')}
         >
-          <span class="label">{action.label}</span>
-          <span class="description">{action.description}</span>
-          {#if action.type === 'expedition' && $gameState.expedition !== null}
-            {@const returnDay = $gameState.expedition.startDay + $gameState.expedition.duration}
-            {@const daysLeft = returnDay - $gameState.day}
-            <span class="badge">あと{daysLeft}日</span>
-          {:else if action.type === 'quest'}
-            <div class="badge-stack">
-              {#if hasDeliverableQuest}
-                <span class="badge deliverable">納品可能</span>
-              {/if}
-              {#if hasInstantDeliverableQuest}
-                <span class="badge instant-deliverable">即納品可</span>
-              {/if}
-              {#if !hasDeliverableQuest && !hasInstantDeliverableQuest && $gameState.newQuestCount > 0}
-                <span class="badge new-quest">{$gameState.newQuestCount}件</span>
-              {:else if !hasDeliverableQuest && !hasInstantDeliverableQuest && availableQuestCount > 0}
-                <span class="badge available-quest">{availableQuestCount}件</span>
-              {/if}
-            </div>
-          {/if}
+          <img class="icon" src="/images/characters/marco/marco-face-smug.png" alt="マルコ" />
+          <div class="merchant-info">
+            <span class="label">旅商人マルコ <span class="merchant-days">あと{merchantDaysLeft}日</span></span>
+            <span class="description">マルコの行商を覗く</span>
+          </div>
         </button>
-      {/if}
-    {/each}
-  </div>
+      </div>
+    {/if}
 
-  <ObjectivesSection onQuestClick={handleQuestClick} />
+    <div class="actions">
+      {#each actionStates as action}
+        {#if action.isLocked}
+          <div class="action-btn locked">
+            <img class="lock-icon" src="/icons/actions/locked.png" alt="ロック中" />
+            <span class="lock-label">???</span>
+          </div>
+        {:else}
+          <button
+            class="action-btn"
+            class:newly-unlocked={action.isNewlyUnlocked}
+            on:click={() => onSelect(action.type)}
+            disabled={action.type === 'expedition' && $gameState.expedition !== null}
+            style="background-image: url({getActionBanner(action.type)})"
+          >
+            <span class="label">{action.label}</span>
+            <span class="description">{action.description}</span>
+            {#if action.type === 'expedition' && $gameState.expedition !== null}
+              {@const returnDay = $gameState.expedition.startDay + $gameState.expedition.duration}
+              {@const daysLeft = returnDay - $gameState.day}
+              <span class="badge">あと{daysLeft}日</span>
+            {:else if action.type === 'quest'}
+              <div class="badge-stack">
+                {#if hasDeliverableQuest}
+                  <span class="badge deliverable">納品可能</span>
+                {/if}
+                {#if hasInstantDeliverableQuest}
+                  <span class="badge instant-deliverable">即納品可</span>
+                {/if}
+                {#if !hasDeliverableQuest && !hasInstantDeliverableQuest && $gameState.newQuestCount > 0}
+                  <span class="badge new-quest">{$gameState.newQuestCount}件</span>
+                {:else if !hasDeliverableQuest && !hasInstantDeliverableQuest && availableQuestCount > 0}
+                  <span class="badge available-quest">{availableQuestCount}件</span>
+                {/if}
+              </div>
+            {/if}
+          </button>
+        {/if}
+      {/each}
+    </div>
+  </div>
 </div>
 
 <style>
   .action-menu {
     padding: 1.5rem;
+    padding-bottom: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
-  h3 {
-    color: #c9a959;
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-    text-align: center;
+  .actions-bottom {
+    margin-top: auto;
   }
 
   .actions {
