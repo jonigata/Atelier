@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { RestEventDef, ResolvedReward } from '$lib/data/restEvents';
   import AnimatedGauge from './common/AnimatedGauge.svelte';
+  import ContinueMarker from './common/ContinueMarker.svelte';
   import StampRush from './common/StampRush.svelte';
 
   import { onMount } from 'svelte';
@@ -109,7 +110,7 @@
       </div>
     {/if}
 
-    <p class="hint">クリック または Enter で続ける</p>
+    <p class="hint"><ContinueMarker /></p>
     </div>
   </div>
 </div>

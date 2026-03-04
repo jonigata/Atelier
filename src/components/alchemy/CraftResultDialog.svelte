@@ -35,6 +35,7 @@
 
   import { onMount } from 'svelte';
   import { skipPresentation } from '$lib/stores/game';
+  import ContinueMarker from '../common/ContinueMarker.svelte';
 
   function onVideoEnded() {
     phase = 'reveal';
@@ -110,7 +111,7 @@
         <source src="/movies/craft.mp4" type="video/mp4" />
       </video>
       <p class="brewing-text">調合中...</p>
-      <p class="skip-hint" class:visible={mounted}>クリック または Enter でスキップ</p>
+      {#if mounted}<p class="skip-hint"><ContinueMarker /></p>{/if}
     </div>
   {/if}
 
@@ -245,7 +246,7 @@
 
       <!-- フッター -->
       <div class="dialog-footer" class:visible={phase === 'done'}>
-        <span class="hint-text">クリック または Enter で閉じる</span>
+        <ContinueMarker />
       </div>
     </div>
   {/if}

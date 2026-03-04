@@ -4,6 +4,7 @@
   import { executeRest } from '$lib/services/restSequence';
   import type { RestEventDef, ResolvedReward } from '$lib/data/restEvents';
   import RestEventDialog from './RestEventDialog.svelte';
+  import ContinueMarker from './common/ContinueMarker.svelte';
 
   export let onBack: () => void;
 
@@ -118,7 +119,7 @@
           <source src="/movies/rest.mp4" type="video/mp4" />
         </video>
         <div class="video-text">休息中...</div>
-        <div class="video-hint" class:visible={canSkipVideo}>クリック または Enter でスキップ</div>
+        {#if canSkipVideo}<div class="video-hint"><ContinueMarker /></div>{/if}
       </div>
     {/if}
   </div>

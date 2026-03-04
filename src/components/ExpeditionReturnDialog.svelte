@@ -3,6 +3,7 @@
   import { resolveExpeditionReturn } from '$lib/services/presentation';
   import { getItem } from '$lib/data/items';
   import StampRush from './common/StampRush.svelte';
+  import ContinueMarker from './common/ContinueMarker.svelte';
   import type { OwnedItem } from '$lib/models/types';
 
   $: data = $gameState.pendingExpeditionReturn;
@@ -97,7 +98,7 @@
           </div>
         </div>
 
-        <p class="hint">クリック または Enter で続ける</p>
+        <p class="hint"><ContinueMarker /></p>
       </div>
     </div>
   </div>

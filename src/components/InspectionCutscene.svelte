@@ -4,6 +4,7 @@
   import { playInspectionFanfare } from '$lib/stores/bgm';
   import PopIn from './common/PopIn.svelte';
   import StampRush from './common/StampRush.svelte';
+  import ContinueMarker from './common/ContinueMarker.svelte';
   import type { InspectionCutsceneData } from '$lib/models/types';
 
   let visible = false;
@@ -310,7 +311,7 @@
         >
           <source src="/movies/inspection.mp4" type="video/mp4" />
         </video>
-        <p class="skip-hint">クリックでスキップ</p>
+        <p class="skip-hint"><ContinueMarker /></p>
       </div>
     {/if}
 

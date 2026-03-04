@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { LevelUpInfo } from '$lib/stores/game';
   import { onMount } from 'svelte';
+  import ContinueMarker from './common/ContinueMarker.svelte';
 
   export let levelUpInfo: LevelUpInfo;
   export let onClose: () => void;
@@ -63,7 +64,7 @@
 
     <!-- フッター -->
     <div class="dialog-footer">
-      <span class="hint-text">クリック または Enter で閉じる</span>
+      <ContinueMarker />
     </div>
   </div>
 </div>

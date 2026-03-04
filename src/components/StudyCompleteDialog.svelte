@@ -3,6 +3,7 @@
   import { recipes } from '$lib/data/recipes';
   import { getItemIcon, handleIconError } from '$lib/data/items';
   import { gameState } from '$lib/stores/game';
+  import ContinueMarker from './common/ContinueMarker.svelte';
 
   export let book: RecipeBookDef;
   /** 習得したレシピID配列 */
@@ -105,10 +106,10 @@
     {/if}
 
     <div class="dialog-footer">
-      <span class="hint-text">クリック または Enter で{currentIndex + 1 >= total ? '閉じる' : '次へ'}</span>
+      <ContinueMarker />
       {#if total > 1 && currentIndex + 1 < total}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <span class="skip-btn" on:click|stopPropagation={skipAll} role="button" tabindex="0">スキップ ▸▸</span>
+        <span class="skip-btn" on:click|stopPropagation={skipAll} role="button" tabindex="0">スキップ</span>
       {/if}
     </div>
   </div>

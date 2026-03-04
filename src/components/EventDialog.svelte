@@ -9,6 +9,7 @@
   import AnimatedGauge from './common/AnimatedGauge.svelte';
   import AchievementCategoryIcon from './common/AchievementCategoryIcon.svelte';
   import StampRush from './common/StampRush.svelte';
+  import ContinueMarker from './common/ContinueMarker.svelte';
   import type { NarrativeLine } from '$lib/models/types';
 
   function getLineText(line: NarrativeLine): string {
@@ -269,7 +270,7 @@
             </div>
           {/if}
           <div class="rewards-footer">
-            <span class="hint-text">クリック または Enter で閉じる</span>
+            <ContinueMarker />
           </div>
         </div>
       {:else}
@@ -358,7 +359,7 @@
           </div>
         </div>
         <div class="continue-hint">
-          <span class="hint-text">クリック または Enter で続ける</span>
+          <ContinueMarker />
           <div class="hint-right">
             <span class="progress">{currentLine + 1} / {dialogue.lines.length}{hasRewards ? ' + 報酬' : ''}</span>
             {#if dialogue.lines.length > 1 || hasRewards}

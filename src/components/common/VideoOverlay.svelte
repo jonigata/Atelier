@@ -6,6 +6,7 @@
   let canSkip = false;
 
   import { onMount } from 'svelte';
+  import ContinueMarker from './ContinueMarker.svelte';
 
   onMount(() => {
     const timer = setTimeout(() => {
@@ -40,7 +41,7 @@
     {#if text}
       <div class="video-text">{text}</div>
     {/if}
-    <div class="video-hint" class:visible={canSkip}>クリック または Enter でスキップ</div>
+    {#if canSkip}<div class="video-hint"><ContinueMarker /></div>{/if}
   </div>
 </div>
 
