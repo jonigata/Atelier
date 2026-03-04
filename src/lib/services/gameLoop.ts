@@ -28,6 +28,7 @@ import { expeditionFlavors, pickRandom } from '$lib/data/flavorTexts';
 import { getExpeditionDropsMult, getExpeditionRareBonus } from '$lib/services/equipmentEffects';
 import { getBuildingExpeditionBonus } from '$lib/services/buildingEffects';
 import { getHelperExpeditionDropBonus, getHelperExpeditionRareBonus } from '$lib/services/helperEffects';
+import { incrementExpeditionCount } from '$lib/stores/stats';
 import { getItem as getItemDef } from '$lib/data/items';
 import type { OwnedItem, MorningEvent, GameState, ExpeditionReturnData } from '$lib/models/types';
 import { autoSave } from '$lib/services/saveLoad';
@@ -224,6 +225,7 @@ function checkExpeditionReturn(): ExpeditionReturnData | null {
 
     // 採取隊をクリア
     setExpedition(null);
+    incrementExpeditionCount();
 
     return { areaId: area.id, areaName: area.name, items };
   }

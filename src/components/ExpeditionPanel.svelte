@@ -1,7 +1,6 @@
 <script lang="ts">
   import { gameState, addMessage, addMoney, setExpedition } from '$lib/stores/game';
   import { showDialogueAndWait } from '$lib/services/presentation';
-  import { incrementExpeditionCount } from '$lib/stores/stats';
   import { getAllAreas } from '$lib/data/areas';
   import { getItem } from '$lib/data/items';
   import type { AreaDef } from '$lib/models/types';
@@ -63,7 +62,6 @@
       startDay: $gameState.day,
       duration,
     });
-    incrementExpeditionCount();
     addMessage(
       `採取隊を「${area.name}」に派遣しました（${duration}日間、費用: ${totalCost}G）`
     );

@@ -1,6 +1,5 @@
 import { get } from 'svelte/store';
 import { gameState, learnRecipesFromBook, addBook, consumeStamina, addMessage, markInventoryOpened } from '$lib/stores/game';
-import { incrementExpeditionCount } from '$lib/stores/stats';
 import { endTurn, startActionPhase } from './gameLoop';
 import { processActionComplete, resolveDialogue } from './presentation';
 import { executeQuestDelivery } from './quest';
@@ -918,7 +917,6 @@ async function tryDispatchBestExpedition(state: GameState): Promise<boolean> {
     expedition,
   }));
 
-  incrementExpeditionCount();
   log('expedition', 'success', `採取隊を${area.name}に派遣 (${best.duration}日, ${cost}G, スコア${Math.floor(best.score)})`);
   await processActionComplete();
   return true;
