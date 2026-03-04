@@ -125,20 +125,22 @@
 <style>
   .quest-card {
     padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: #1e1e38;
     border: 1px solid #3a3a5a;
     border-radius: 6px;
     border-left: 3px solid #2196f3;
   }
 
   .quest-card.urgent {
-    border-left-color: #ff9800;
-    background: rgba(255, 152, 0, 0.05);
+    border-color: #ff9800;
+    border-left-width: 3px;
+    background: #241e18;
   }
 
   .quest-card.ready {
-    border-left-color: #4caf50;
-    background: rgba(76, 175, 80, 0.08);
+    border-color: #4caf50;
+    border-left-width: 3px;
+    background: #1a2518;
   }
 
   .quest-card.clickable {
