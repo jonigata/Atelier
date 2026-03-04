@@ -11,6 +11,7 @@
   import type { ActionType, ActiveQuest, QuestDef } from '$lib/models/types';
 
   export let onSelect: (action: ActionType) => void;
+  export let villageBgImage: string = '/images/village/village_1.png';
 
   function canDeliverQuest(quest: ActiveQuest): boolean {
     const remaining = quest.requiredQuantity - quest.deliveredCount;
@@ -108,28 +109,34 @@
 </script>
 
 <div class="action-menu">
-  {#if inspectionKnown && nextInspection && daysUntilInspection !== null}
-    <InspectionTracker inspection={nextInspection} values={inspectionValues} expValues={inspectionExpValues} daysUntil={daysUntilInspection} firstReveal={inspectionFirstReveal} />
-  {/if}
+  <div class="village-area" style="background-image: url({villageBgImage})">
+    <div class="village-content">
+      {#if inspectionKnown && nextInspection && daysUntilInspection !== null}
+        <InspectionTracker inspection={nextInspection} values={inspectionValues} expValues={inspectionExpValues} daysUntil={daysUntilInspection} firstReveal={inspectionFirstReveal} />
+      {/if}
 
-  <div class="actions-bottom">
-    <ObjectivesSection onQuestClick={handleQuestClick} questsFirst={true} />
+      <div class="village-bottom">
+        <ObjectivesSection onQuestClick={handleQuestClick} questsFirst={true} />
 
-    {#if merchantInTown}
-      <div class="special-actions">
-        <button
-          class="action-btn merchant-btn"
-          on:click={() => onSelect('traveling_merchant')}
-        >
-          <img class="icon" src="/images/characters/marco/marco-face-smug.png" alt="マルコ" />
-          <div class="merchant-info">
-            <span class="label">旅商人マルコ <span class="merchant-days">あと{merchantDaysLeft}日</span></span>
-            <span class="description">マルコの行商を覗く</span>
+        {#if merchantInTown}
+          <div class="special-actions">
+            <button
+              class="action-btn merchant-btn"
+              on:click={() => onSelect('traveling_merchant')}
+            >
+              <img class="icon" src="/images/characters/marco/marco-face-smug.png" alt="マルコ" />
+              <div class="merchant-info">
+                <span class="label">旅商人マルコ <span class="merchant-days">あと{merchantDaysLeft}日</span></span>
+                <span class="description">マルコの行商を覗く</span>
+              </div>
+            </button>
           </div>
-        </button>
+        {/if}
       </div>
-    {/if}
+    </div>
+  </div>
 
+  <div class="actions-section">
     <div class="actions">
       {#each actionStates as action}
         {#if action.isLocked}
@@ -174,15 +181,35 @@
 
 <style>
   .action-menu {
-    padding: 1.5rem;
-    padding-bottom: 1rem;
     flex: 1;
     display: flex;
     flex-direction: column;
   }
 
-  .actions-bottom {
+  .village-area {
+    flex: 1;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .village-content {
+    position: relative;
+    z-index: 1;
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .village-bottom {
     margin-top: auto;
+  }
+
+  .actions-section {
+    padding: 0.75rem 1rem 1rem;
+    background: #3b2a1a;
   }
 
   .actions {

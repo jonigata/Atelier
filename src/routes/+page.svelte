@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { gameState, markInventoryOpened, skipPresentation } from '$lib/stores/game';
+  import { gameState, markInventoryOpened, skipPresentation, villageLevel } from '$lib/stores/game';
   import { initializeGame } from '$lib/services/gameLoop';
   import { autoLoad, clearAutoSave, saveIndicator } from '$lib/services/saveLoad';
   import { initializeActiveGoalTracking } from '$lib/services/achievement';
@@ -27,6 +27,19 @@
   import type { ActionType } from '$lib/models/types';
 
   let selectedAction: ActionType | null = null;
+
+  function getVillageImage(level: number): string {
+    const ratio = level / 30;
+    if (ratio >= 0.85) return '/images/village/village_7.png';
+    if (ratio >= 0.70) return '/images/village/village_6.png';
+    if (ratio >= 0.55) return '/images/village/village_5.png';
+    if (ratio >= 0.40) return '/images/village/village_4.png';
+    if (ratio >= 0.25) return '/images/village/village_3.png';
+    if (ratio >= 0.10) return '/images/village/village_2.png';
+    return '/images/village/village_1.png';
+  }
+
+  $: villageBgImage = getVillageImage($villageLevel);
   let initialAlbumTab: 'items' | 'achievements' | 'scores' | 'ranking' = 'items';
 
   // エンディングに移行したらselectedActionをリセット（リタイア→再開時に前の画面が残る問題を防止）
@@ -111,7 +124,7 @@
         <MorningPanel />
       {:else if $gameState.phase === 'action'}
         {#if selectedAction === null}
-          <ActionMenu onSelect={handleActionSelect} />
+          <ActionMenu onSelect={handleActionSelect} {villageBgImage} />
         {:else}
           <ActionPanel action={selectedAction} onBack={handleBackToMenu} {initialAlbumTab} />
         {/if}
