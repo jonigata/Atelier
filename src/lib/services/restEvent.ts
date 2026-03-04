@@ -26,6 +26,9 @@ function pickRandom<T>(arr: T[]): T {
  * 条件チェック（special イベント用の追加条件含む）
  */
 function checkCondition(event: RestEventDef, state: GameState): boolean {
+  // レアイベントは「知識の扉」クリア（レシピ習得済み）まで出現しない
+  if (event.weight <= 1 && state.knownRecipes.length === 0) return false;
+
   // 定義上の condition
   if (event.condition && !event.condition(state)) return false;
 
