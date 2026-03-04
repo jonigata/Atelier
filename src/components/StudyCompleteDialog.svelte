@@ -51,6 +51,12 @@
     }, 120);
   }
 
+  // 全スキップ
+  function skipAll() {
+    stopTimer();
+    onClose();
+  }
+
   function stopTimer() {
     if (timer) {
       clearTimeout(timer);
@@ -100,6 +106,10 @@
 
     <div class="dialog-footer">
       <span class="hint-text">クリック または Enter で{currentIndex + 1 >= total ? '閉じる' : '次へ'}</span>
+      {#if total > 1 && currentIndex + 1 < total}
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <span class="skip-btn" on:click|stopPropagation={skipAll} role="button" tabindex="0">スキップ ▸▸</span>
+      {/if}
     </div>
   </div>
 </div>
@@ -262,5 +272,21 @@
   .hint-text {
     font-size: 0.85rem;
     color: #6a6a8a;
+  }
+
+  .skip-btn {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #a0a0b0;
+    cursor: pointer;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    transition: all 0.2s;
+  }
+
+  .skip-btn:hover {
+    color: #f4e4bc;
+    background: rgba(255, 255, 255, 0.1);
   }
 </style>
