@@ -3,6 +3,7 @@
   import { calcExpForLevel, calcExpProgress } from '$lib/data/balance';
   import MoneyIndicator from './MoneyIndicator.svelte';
   import ConfigDialog from './ConfigDialog.svelte';
+  import ProgressDial from './common/ProgressDial.svelte';
 
   export let onScoreClick: (() => void) | undefined = undefined;
 
@@ -10,6 +11,10 @@
 
   $: staminaRatio = $gameState.stamina / $gameState.maxStamina;
   $: staminaClass = staminaRatio <= 0.2 ? 'critical' : staminaRatio <= 0.5 ? 'low' : '';
+
+  $: alchemyExpPct = Math.min(100, (calcExpProgress($gameState.alchemyExp) / $expForNextLevel) * 100);
+  $: reputationExpPct = Math.min(100, (calcExpProgress($gameState.reputationExp) / calcExpForLevel($reputationLevel)) * 100);
+  $: villageExpPct = Math.min(100, (calcExpProgress($gameState.villageExp) / calcExpForLevel($villageLevel)) * 100);
 </script>
 
 <div class="hud">
@@ -42,36 +47,6 @@
       </div>
     </div>
 
-    <div class="hud-section stats-section">
-      <div class="stat-item">
-        <div class="stat-header">
-          <span class="stat-label">錬金術</span>
-          <span class="stat-value">Lv.{$alchemyLevel}</span>
-        </div>
-        <div class="exp-bar">
-          <div class="exp-fill" style="width: {Math.min(100, (calcExpProgress($gameState.alchemyExp) / $expForNextLevel) * 100)}%"></div>
-        </div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-header">
-          <span class="stat-label">名声</span>
-          <span class="stat-value reputation">Lv.{$reputationLevel}</span>
-        </div>
-        <div class="exp-bar">
-          <div class="exp-fill reputation-fill" style="width: {Math.min(100, (calcExpProgress($gameState.reputationExp) / calcExpForLevel($reputationLevel)) * 100)}%"></div>
-        </div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-header">
-          <span class="stat-label">村発展</span>
-          <span class="stat-value village">Lv.{$villageLevel}</span>
-        </div>
-        <div class="exp-bar">
-          <div class="exp-fill village-fill" style="width: {Math.min(100, (calcExpProgress($gameState.villageExp) / calcExpForLevel($villageLevel)) * 100)}%"></div>
-        </div>
-      </div>
-    </div>
-
     <div class="hud-section character-section">
       <div class="stat-item stamina {staminaClass}">
         <div class="stat-header">
@@ -83,6 +58,12 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="hud-row sub-row">
+    <ProgressDial value={alchemyExpPct} label="錬金術" level={$alchemyLevel} color="#9370db" size={160} />
+    <ProgressDial value={reputationExpPct} label="名声" level={$reputationLevel} color="#e0c080" size={160} />
+    <ProgressDial value={villageExpPct} label="村発展" level={$villageLevel} color="#81c784" size={160} />
   </div>
 
 </div>
@@ -204,12 +185,11 @@
     color: #a89060;
   }
 
-  .stats-section {
-    display: flex;
-    flex: 2;
-    gap: 0.75rem;
-    padding-left: 0.75rem;
-    border-left: 1px solid rgba(139, 105, 20, 0.5);
+  .sub-row {
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 0.25rem 0.75rem 0.4rem;
+    border-top: 1px solid rgba(139, 105, 20, 0.3);
   }
 
   .character-section {
@@ -244,11 +224,6 @@
     font-weight: bold;
   }
 
-  .stat-value.village {
-    color: #81c784;
-  }
-
-  .exp-bar,
   .stamina-bar {
     width: 100%;
     height: 5px;
@@ -256,24 +231,6 @@
     border-radius: 2px;
     overflow: hidden;
     position: relative;
-  }
-
-  .exp-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #6a5acd, #9370db);
-    transition: width 0.3s ease;
-  }
-
-  .exp-fill.village-fill {
-    background: linear-gradient(90deg, #388e3c, #81c784);
-  }
-
-  .exp-fill.reputation-fill {
-    background: linear-gradient(90deg, #c9a959, #e0c080);
-  }
-
-  .stat-value.reputation {
-    color: #e0c080;
   }
 
   .stamina-fill {
@@ -306,11 +263,6 @@
   }
 
   @media (max-width: 600px) {
-    .stats-section {
-      padding-left: 0.5rem;
-      gap: 0.5rem;
-    }
-
     .character-section {
       padding-left: 0.5rem;
     }
