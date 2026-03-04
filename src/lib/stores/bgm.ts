@@ -2,7 +2,16 @@ import { writable, get } from 'svelte/store';
 import { gameState } from '$lib/stores/game';
 import { selectBgmTrack, getTrackFile, type BgmTrack } from '$lib/services/bgmSelector';
 
-export const bgmEnabled = writable(true);
+const STORAGE_KEY = 'bgmEnabled';
+function loadBgmEnabled(): boolean {
+  if (typeof localStorage === 'undefined') return true;
+  const v = localStorage.getItem(STORAGE_KEY);
+  return v === null ? true : v === 'true';
+}
+export const bgmEnabled = writable(loadBgmEnabled());
+if (typeof localStorage !== 'undefined') {
+  bgmEnabled.subscribe((v) => localStorage.setItem(STORAGE_KEY, String(v)));
+}
 
 let audio: HTMLAudioElement | null = null;
 let currentTrack: BgmTrack | null = null;
