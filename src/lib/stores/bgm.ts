@@ -90,6 +90,7 @@ function unsuppressBgm() {
   if (!bgmSuppressed) return;
   bgmSuppressed = false;
   if (audio && get(bgmEnabled)) {
+    audio.volume = 0.3;
     audio.play().catch(() => {});
   }
 }
@@ -117,6 +118,7 @@ export function initBgm() {
   const unsubEnabled = bgmEnabled.subscribe((enabled) => {
     if (!audio || bgmSuppressed) return;
     if (enabled) {
+      audio.volume = 0.3;
       audio.play().catch(() => {});
     } else {
       audio.pause();
