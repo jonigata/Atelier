@@ -133,15 +133,11 @@
     <div class="actions">
       {#each actionStates as action}
         {#if action.isLocked}
-          <div class="action-wrapper">
           <button class="action-btn locked" disabled>
             <img class="lock-icon" src="/icons/actions/locked.png" alt="ロック中" />
             <span class="lock-label">???</span>
           </button>
-          <span class="description">&nbsp;</span>
-          </div>
         {:else}
-          <div class="action-wrapper">
           <button
             class="action-btn"
             class:newly-unlocked={action.isNewlyUnlocked}
@@ -170,8 +166,6 @@
               </div>
             {/if}
           </button>
-          <span class="description">{action.description}</span>
-          </div>
         {/if}
       {/each}
     </div>
@@ -285,25 +279,6 @@
        2px  4px 20px rgba(0, 0, 0, 0.6);
   }
 
-  .action-wrapper {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .action-wrapper > .action-btn {
-    flex: 0 0 auto;
-  }
-
-  .description {
-    font-size: 0.55rem;
-    line-height: 1.2;
-    color: #aaa;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: center;
-    padding: 0.15rem 0;
-  }
 
   .badge {
     position: absolute;
