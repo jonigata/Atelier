@@ -292,6 +292,7 @@ export type GamePhase =
 // 朝のイベント（Union型で型安全に）
 export type MorningEvent =
   | { type: 'expedition_return'; message: string; data: OwnedItem[] }
+  | { type: 'building_items'; message: string }
   | { type: 'new_quest'; message: string }
   | { type: 'quest_expired'; message: string }
   | { type: 'merchant_arrival'; message: string }

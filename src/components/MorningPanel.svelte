@@ -10,6 +10,7 @@
     <h3>お知らせ</h3>
     {#each $gameState.morningEvents as event}
       <div class="event" class:expedition={event.type === 'expedition_return'}
+           class:building={event.type === 'building_items'}
            class:quest={event.type === 'new_quest'}
            class:expired={event.type === 'quest_expired'}
            class:merchant-arrival={event.type === 'merchant_arrival'}
@@ -17,6 +18,8 @@
         >
         {#if event.type === 'expedition_return'}
           <span class="icon">📦</span>
+        {:else if event.type === 'building_items'}
+          <span class="icon">🏠</span>
         {:else if event.type === 'new_quest'}
           <span class="icon">📜</span>
         {:else if event.type === 'quest_expired'}
@@ -77,6 +80,10 @@
 
   .event.expedition {
     border-left: 3px solid #4caf50;
+  }
+
+  .event.building {
+    border-left: 3px solid #00acc1;
   }
 
   .event.quest {

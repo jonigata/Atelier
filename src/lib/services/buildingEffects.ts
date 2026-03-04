@@ -167,6 +167,6 @@ export function processBuildingMorningItems(): void {
   if (generatedItems.length > 0) {
     const msg = `施設から入手: ${generatedItems.join('、')}`;
     addMessage(msg);
-    addMorningEvent({ type: 'expedition_return', message: msg, data: [] });
+    addMorningEvent({ type: 'building_items', message: msg });
   }
 }
