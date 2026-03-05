@@ -4,12 +4,11 @@
   import { items } from '$lib/data/items';
   import { recipes } from '$lib/data/recipes';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
+  import CardCarousel from './common/CardCarousel.svelte';
   import ContinueMarker from './common/ContinueMarker.svelte';
   import type { AchievementDef, AchievementCondition, ActiveQuest } from '$lib/models/types';
 
   let selectedGoal: AchievementDef | null = null;
-  let goalPage = 0;
-  let questPage = 0;
 
   export let onQuestClick: (quest: ActiveQuest) => void;
   export let questsFirst: boolean = false;
@@ -124,12 +123,6 @@
   })();
 
   $: goalsFirst = !questsFirst;
-  $: totalGoalPages = Math.ceil(activeGoals.length / 2);
-  $: totalQuestPages = Math.ceil($gameState.activeQuests.length / 2);
-
-  // ページがはみ出ないようにクランプ
-  $: if (goalPage >= totalGoalPages) goalPage = Math.max(0, totalGoalPages - 1);
-  $: if (questPage >= totalQuestPages) questPage = Math.max(0, totalQuestPages - 1);
 
 </script>
 
@@ -138,102 +131,69 @@
     {#if questsFirst && $gameState.activeQuests.length > 0}
       <div class="objectives-group">
         <h5>受注中の依頼</h5>
-        <div class="carousel-wrapper">
-          <div class="carousel-track" style="transform: translateX(-{questPage * 100}%)">
-            {#each $gameState.activeQuests as quest}
-              <div class="carousel-item">
-                <ActiveQuestCard {quest} onClick={onQuestClick} />
-              </div>
-            {/each}
-          </div>
-        </div>
-        {#if totalQuestPages > 1}
-          <div class="carousel-dots">
-            {#each Array(totalQuestPages) as _, i}
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <span class="dot" class:active={questPage === i} on:click={() => questPage = i}></span>
-            {/each}
-          </div>
-        {/if}
+        <CardCarousel itemsPerPage={3} itemCount={$gameState.activeQuests.length}>
+          {#each $gameState.activeQuests as quest}
+            <div>
+              <ActiveQuestCard {quest} onClick={onQuestClick} compact />
+            </div>
+          {/each}
+        </CardCarousel>
       </div>
     {/if}
 
     {#if activeGoals.length > 0}
       <div class="objectives-group">
         <h5>現在の目標</h5>
-        <div class="carousel-wrapper">
-          <div class="carousel-track" style="transform: translateX(-{goalPage * 100}%)">
-            {#each activeGoals as goal}
-              {@const progressPercent = getAchievementProgress(goal.id)}
-              {@const condDetails = getConditionDetails(goal)}
-              <div class="carousel-item">
-                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <!-- svelte-ignore a11y-no-static-element-interactions -->
-                <div
-                  class="objective-item achievement clickable"
-                  class:important={goal.important}
-                  on:click={() => selectedGoal = goal}
-                >
-                  <div class="objective-bg-icon" style="background-image: url('/icons/achievements/{goal.category}.png')"></div>
-                  <div class="objective-content">
-                    <div class="objective-header">
-                      <span class="objective-title">{goal.title}</span>
-                    </div>
-                    <div class="objective-hint">{@html goal.hint}</div>
-                  </div>
-                  <div class="detail-conditions">
-                    {#each condDetails as cond}
-                      <div class="condition-row" class:met={cond.met}>
-                        <span class="condition-check">{cond.met ? '✓' : '○'}</span>
-                        <span class="condition-label">{cond.label}</span>
-                        <span class="condition-value">{cond.current} / {cond.target}</span>
-                      </div>
-                    {/each}
-                  </div>
-                  {#if progressPercent > 0}
-                    <div class="progress-bar">
-                      <div class="progress-fill" style="width: {progressPercent}%"></div>
-                    </div>
-                  {/if}
-                </div>
-              </div>
-            {/each}
-          </div>
-        </div>
-        {#if totalGoalPages > 1}
-          <div class="carousel-dots">
-            {#each Array(totalGoalPages) as _, i}
+        <CardCarousel itemsPerPage={2} itemCount={activeGoals.length}>
+          {#each activeGoals as goal}
+            {@const progressPercent = getAchievementProgress(goal.id)}
+            {@const condDetails = getConditionDetails(goal)}
+            <div>
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <span class="dot" class:active={goalPage === i} on:click={() => goalPage = i}></span>
-            {/each}
-          </div>
-        {/if}
+              <div
+                class="objective-item achievement clickable"
+                class:important={goal.important}
+                on:click={() => selectedGoal = goal}
+              >
+                <div class="objective-bg-icon" style="background-image: url('/icons/achievements/{goal.category}.png')"></div>
+                <div class="objective-content">
+                  <div class="objective-header">
+                    <span class="objective-title">{goal.title}</span>
+                  </div>
+                  <div class="objective-hint">{@html goal.hint}</div>
+                </div>
+                <div class="detail-conditions">
+                  {#each condDetails as cond}
+                    <div class="condition-row" class:met={cond.met}>
+                      <span class="condition-check">{cond.met ? '✓' : '○'}</span>
+                      <span class="condition-label">{cond.label}</span>
+                      <span class="condition-value">{cond.current} / {cond.target}</span>
+                    </div>
+                  {/each}
+                </div>
+                {#if progressPercent > 0}
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: {progressPercent}%"></div>
+                  </div>
+                {/if}
+              </div>
+            </div>
+          {/each}
+        </CardCarousel>
       </div>
     {/if}
 
     {#if goalsFirst && $gameState.activeQuests.length > 0}
       <div class="objectives-group">
         <h5>受注中の依頼</h5>
-        <div class="carousel-wrapper">
-          <div class="carousel-track" style="transform: translateX(-{questPage * 100}%)">
-            {#each $gameState.activeQuests as quest}
-              <div class="carousel-item">
-                <ActiveQuestCard {quest} onClick={onQuestClick} />
-              </div>
-            {/each}
-          </div>
-        </div>
-        {#if totalQuestPages > 1}
-          <div class="carousel-dots">
-            {#each Array(totalQuestPages) as _, i}
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <span class="dot" class:active={questPage === i} on:click={() => questPage = i}></span>
-            {/each}
-          </div>
-        {/if}
+        <CardCarousel itemsPerPage={3} itemCount={$gameState.activeQuests.length}>
+          {#each $gameState.activeQuests as quest}
+            <div>
+              <ActiveQuestCard {quest} onClick={onQuestClick} compact />
+            </div>
+          {/each}
+        </CardCarousel>
       </div>
     {/if}
   </div>
@@ -311,42 +271,6 @@
       -2px 2px 4px rgba(0, 0, 0, 1),
       0 0 12px rgba(0, 0, 0, 1),
       0 0 24px rgba(0, 0, 0, 0.8);
-  }
-
-  .carousel-wrapper {
-    overflow: hidden;
-  }
-
-  .carousel-track {
-    display: flex;
-    transition: transform 0.3s ease;
-  }
-
-  .carousel-item {
-    flex: 0 0 50%;
-    min-width: 0;
-    padding: 0 0.25rem;
-    box-sizing: border-box;
-  }
-
-  .carousel-dots {
-    display: flex;
-    justify-content: center;
-    gap: 0.4rem;
-    margin-top: 0.4rem;
-  }
-
-  .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.25);
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-
-  .dot.active {
-    background: #c9a959;
   }
 
   .objective-item {

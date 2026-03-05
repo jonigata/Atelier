@@ -290,11 +290,24 @@
 
   /* コンパクトモード */
   .quest-card.compact {
-    padding: 0.5rem 0.75rem;
+    padding: 0.4rem 0.5rem;
+  }
+
+  .quest-card.compact .quest-main {
+    gap: 0.4rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .quest-card.compact .quest-client {
+    font-size: 0.65rem;
   }
 
   .quest-card.compact .quest-title {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
+  }
+
+  .quest-card.compact .quest-header {
+    margin-bottom: 0.2rem;
   }
 
   .quest-card.compact .days-bar-container {
@@ -302,6 +315,27 @@
   }
 
   .quest-card.compact .days-label {
+    font-size: 0.6rem;
+  }
+
+  .quest-card.compact .quest-requirement {
+    gap: 0.3rem;
+    margin-bottom: 0.2rem;
+    font-size: 0.75rem;
+  }
+
+  .quest-card.compact .item-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .quest-card.compact .quest-footer {
+    font-size: 0.7rem;
+    gap: 0.3rem;
+  }
+
+  .quest-card.compact .ready-badge {
+    padding: 0.1rem 0.35rem;
     font-size: 0.65rem;
   }
 
