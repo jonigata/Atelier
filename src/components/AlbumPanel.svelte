@@ -393,21 +393,23 @@
   /* タブバー */
   .tab-bar {
     display: flex;
+    flex-wrap: nowrap;
     gap: 0;
     margin-bottom: 1rem;
     border-bottom: 2px solid #3a3a5a;
   }
 
   .tab {
-    padding: 0.5rem 1.25rem;
+    padding: 0.5rem 0.75rem;
     background: transparent;
     border: none;
     border-bottom: 2px solid transparent;
     color: var(--text-dim);
-    font-size: 1rem;
+    font-size: 0.85rem;
     cursor: pointer;
     margin-bottom: -2px;
     transition: all 0.2s;
+    white-space: nowrap;
   }
 
   .tab:hover {
