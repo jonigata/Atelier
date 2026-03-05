@@ -512,8 +512,8 @@
     height: calc(var(--app-height) - 12rem);
     background: #1e1e36;
     border: none;
-    border-right: 1px solid #4a4a6a;
-    color: #808090;
+    border-right: 1px solid var(--border-default);
+    color: var(--text-dim);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -568,7 +568,7 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 1.2rem;
-    color: #f4e4bc;
+    color: var(--text-heading);
     margin: 0 0 0.75rem 0;
   }
 
@@ -580,7 +580,7 @@
 
   h4 {
     font-size: 1rem;
-    color: #c9a959;
+    color: var(--accent-gold);
     margin: 0 0 0.25rem 0;
   }
 
@@ -612,9 +612,9 @@
     width: 40px;
     height: 36px;
     background: rgba(255, 255, 255, 0.1);
-    border: 2px solid #4a4a6a;
-    border-radius: 6px;
-    color: #e0e0f0;
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-body);
     font-size: 1.2rem;
     font-weight: bold;
     cursor: pointer;
@@ -625,13 +625,13 @@
 
   .qty-num-btn:hover:not(:disabled) {
     background: rgba(201, 169, 89, 0.3);
-    border-color: #c9a959;
+    border-color: var(--accent-gold);
   }
 
   .qty-num-btn.selected {
     background: rgba(201, 169, 89, 0.4);
-    border-color: #c9a959;
-    color: #f4e4bc;
+    border-color: var(--accent-gold);
+    color: var(--text-heading);
     box-shadow: 0 0 6px rgba(201, 169, 89, 0.3);
   }
 
@@ -641,14 +641,14 @@
   }
 
   .qty-max {
-    color: #808090;
+    color: var(--text-dim);
     font-size: 1rem;
   }
 
   .quantity-hint {
     margin: 0.25rem 0 0 0;
     font-size: 1rem;
-    color: #a0a0b0;
+    color: var(--text-sub);
   }
 
   .days-total {

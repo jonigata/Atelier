@@ -210,7 +210,7 @@
     .filter((b): b is { def: BuildingDef; level: number } => b !== null);
 </script>
 
-<div class="inventory-panel">
+<div class="inventory-panel panel">
   <div class="inventory-header">
     <span class="total-count">所持アイテム: {totalItems}個</span>
 
@@ -269,7 +269,7 @@
           </div>
           <div class="item-details">
             <span class="item-category">{CATEGORY_NAMES[item.category as keyof typeof CATEGORY_NAMES] || item.category}</span>
-            <span class="item-quality" class:high={item.quality >= 70} class:low={item.quality < 30}>
+            <span class="item-quality" class:quality-high={item.quality >= 70} class:quality-low={item.quality < 30}>
               品質 {item.quality}
             </span>
           </div>
@@ -287,7 +287,7 @@
             <span class="item-name">{item.name}</span>
             <span class="item-count">×{item.count}</span>
             <span class="item-category">{CATEGORY_NAMES[item.category as keyof typeof CATEGORY_NAMES] || item.category}</span>
-            <span class="item-quality-summary" class:high={item.avgQuality >= 70} class:low={item.avgQuality < 30}>
+            <span class="item-quality-summary" class:quality-high={item.avgQuality >= 70} class:quality-low={item.avgQuality < 30}>
               平均 {item.avgQuality}
               {#if item.minQuality !== item.maxQuality}
                 <span class="quality-range">({item.minQuality}~{item.maxQuality})</span>
@@ -298,7 +298,7 @@
             <div class="item-breakdown-list">
               {#each item.items.sort((a, b) => b.quality - a.quality) as ownedItem}
                 <div class="item-detail-row">
-                  <span class="detail-quality" class:high={ownedItem.quality >= 70} class:low={ownedItem.quality < 30}>
+                  <span class="detail-quality" class:quality-high={ownedItem.quality >= 70} class:quality-low={ownedItem.quality < 30}>
                     品質 {ownedItem.quality}
                   </span>
                   {#if ownedItem.origin}
@@ -403,12 +403,6 @@
   }
 
 
-  h2 {
-    font-size: 1.5rem;
-    color: #f4e4bc;
-    margin-bottom: 1rem;
-  }
-
   .inventory-header {
     display: flex;
     justify-content: space-between;
@@ -418,12 +412,12 @@
     margin-bottom: 1rem;
     padding: 0.75rem;
     background: rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
+    border-radius: var(--radius-md);
   }
 
   .total-count {
     font-size: 1rem;
-    color: #c9a959;
+    color: var(--accent-gold);
   }
 
   .controls {
@@ -441,12 +435,12 @@
 
   label {
     font-size: 1rem;
-    color: #a0a0b0;
+    color: var(--text-sub);
   }
 
   .control-label {
     font-size: 1rem;
-    color: #a0a0b0;
+    color: var(--text-sub);
   }
 
   .empty-inventory {
@@ -457,13 +451,13 @@
   }
 
   .empty-inventory p {
-    color: #e0e0f0;
+    color: var(--text-body);
     margin: 0.5rem 0;
   }
 
   .hint {
     font-size: 1rem;
-    color: #a0a0b0 !important;
+    color: var(--text-sub) !important;
   }
 
   .item-grid {
@@ -473,11 +467,6 @@
   }
 
   .item-card {
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #4a4a6a;
-    border-radius: 6px;
-    transition: all 0.2s;
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
@@ -497,11 +486,6 @@
     flex-shrink: 0;
   }
 
-  .item-card:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: #6a6a8a;
-  }
-
   .item-header {
     display: flex;
     justify-content: space-between;
@@ -511,12 +495,12 @@
 
   .item-name {
     font-weight: bold;
-    color: #e0e0f0;
+    color: var(--text-body);
   }
 
   .item-count {
-    background: #c9a959;
-    color: #1a1a2e;
+    background: var(--accent-gold);
+    color: var(--bg-dark);
     padding: 0.1rem 0.4rem;
     border-radius: 3px;
     font-size: 0.8rem;
@@ -530,19 +514,11 @@
   }
 
   .item-category {
-    color: #808090;
+    color: var(--text-dim);
   }
 
   .item-quality {
-    color: #a0a0b0;
-  }
-
-  .item-quality.high {
-    color: #81c784;
-  }
-
-  .item-quality.low {
-    color: #ff6b6b;
+    color: var(--text-sub);
   }
 
   /* 詳細表示トグル */
@@ -552,7 +528,7 @@
     gap: 0.4rem;
     cursor: pointer;
     font-size: 1rem;
-    color: #a0a0b0;
+    color: var(--text-sub);
   }
 
   .detail-toggle input {
@@ -567,14 +543,14 @@
   }
 
   .item-row {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #4a4a6a;
-    border-radius: 6px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
     overflow: hidden;
   }
 
   .item-row.expanded {
-    border-color: #6a6a8a;
+    border-color: var(--border-hover);
   }
 
   .item-main {
@@ -585,19 +561,19 @@
     padding: 0.75rem 1rem;
     background: transparent;
     border: none;
-    color: #e0e0f0;
+    color: var(--text-body);
     cursor: pointer;
     text-align: left;
     font-size: 1rem;
   }
 
   .item-main:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-subtle);
   }
 
   .expand-icon {
     font-size: 0.7rem;
-    color: #808090;
+    color: var(--text-dim);
     width: 1rem;
     flex-shrink: 0;
   }
@@ -608,8 +584,8 @@
   }
 
   .item-main .item-count {
-    background: #c9a959;
-    color: #1a1a2e;
+    background: var(--accent-gold);
+    color: var(--bg-dark);
     padding: 0.1rem 0.5rem;
     border-radius: 3px;
     font-size: 1rem;
@@ -617,29 +593,21 @@
   }
 
   .item-main .item-category {
-    color: #808090;
+    color: var(--text-dim);
     font-size: 1rem;
     min-width: 4rem;
   }
 
   .item-quality-summary {
-    color: #a0a0b0;
+    color: var(--text-sub);
     font-size: 1rem;
     min-width: 6rem;
     text-align: right;
   }
 
-  .item-quality-summary.high {
-    color: #81c784;
-  }
-
-  .item-quality-summary.low {
-    color: #ff6b6b;
-  }
-
   .quality-range {
     font-size: 1rem;
-    color: #808090;
+    color: var(--text-dim);
     margin-left: 0.25rem;
   }
 
@@ -649,7 +617,7 @@
     gap: 0.25rem;
     padding: 0.5rem 1rem 0.75rem;
     background: rgba(0, 0, 0, 0.2);
-    border-top: 1px solid #3a3a5a;
+    border-top: 1px solid var(--border-default);
   }
 
   .item-detail-row {
@@ -666,22 +634,14 @@
 
   .detail-quality {
     font-size: 1rem;
-    color: #a0a0b0;
+    color: var(--text-sub);
     min-width: 4rem;
     flex-shrink: 0;
   }
 
-  .detail-quality.high {
-    color: #81c784;
-  }
-
-  .detail-quality.low {
-    color: #ff6b6b;
-  }
-
   .detail-origin {
     font-size: 1rem;
-    color: #808090;
+    color: var(--text-dim);
     flex-shrink: 0;
   }
 
@@ -694,7 +654,7 @@
   /* 所持機材セクション */
   .equipment-section {
     margin-top: 1.5rem;
-    border-top: 1px solid #4a4a6a;
+    border-top: 1px solid var(--border-default);
     padding-top: 1rem;
   }
 
@@ -721,7 +681,7 @@
   }
 
   .equip-card:hover {
-    border-color: #6a6a8a;
+    border-color: var(--border-hover);
   }
 
   .equip-card.rare {
@@ -753,7 +713,7 @@
     font-weight: bold;
     letter-spacing: 0.05em;
     background: rgba(232, 168, 64, 0.85);
-    color: #1a1a2e;
+    color: var(--bg-dark);
     padding: 0.1rem 0.4rem;
     border-radius: 3px;
   }
@@ -767,12 +727,12 @@
 
   .equip-category-label {
     font-size: 0.7rem;
-    color: #808090;
+    color: var(--text-dim);
   }
 
   .equip-name {
     font-weight: bold;
-    color: #e0e0f0;
+    color: var(--text-body);
     font-size: 1rem;
     line-height: 1.2;
   }
@@ -798,7 +758,7 @@
     font-size: 0.7rem;
     font-weight: bold;
     background: rgba(201, 169, 89, 0.2);
-    color: #c9a959;
+    color: var(--accent-gold);
     padding: 0.1rem 0.4rem;
     border-radius: 3px;
   }

@@ -80,8 +80,8 @@
     display: flex;
     flex-direction: column;
     background: linear-gradient(135deg, #2c1810 0%, #4a2c17 100%);
-    border-bottom: 3px solid #8b6914;
-    color: #f4e4bc;
+    border-bottom: 3px solid var(--accent-gold-dark);
+    color: var(--text-heading);
   }
 
   .hud-row {
@@ -154,7 +154,7 @@
   .money-section .money-value {
     font-size: 1.3rem;
     font-weight: bold;
-    color: #ffd700;
+    color: var(--accent-yellow);
     text-align: right;
   }
 
@@ -219,7 +219,7 @@
 
   .stat-label {
     font-size: 0.85rem;
-    color: #c9a959;
+    color: var(--accent-gold);
   }
 
   .stat-value {

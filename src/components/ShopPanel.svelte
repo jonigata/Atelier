@@ -294,7 +294,7 @@
   }
 </script>
 
-<div class="shop-panel">
+<div class="shop-panel panel">
   <div class="shop-header">
     <div class="money-display">
       所持金: <span class="amount">{$gameState.money.toLocaleString()}G</span>
@@ -302,21 +302,21 @@
 
     <div class="tabs">
       <button
-        class="tab"
+        class="tab-btn"
         class:active={activeTab === 'buy'}
         on:click={() => (activeTab = 'buy')}
       >
         購入
       </button>
       <button
-        class="tab"
+        class="tab-btn"
         class:active={activeTab === 'sell'}
         on:click={() => (activeTab = 'sell')}
       >
         売却
       </button>
       <button
-        class="tab"
+        class="tab-btn"
         class:active={activeTab === 'parttime'}
         on:click={() => (activeTab = 'parttime')}
       >
@@ -485,7 +485,7 @@
     {/if}
     <div class="item-list">
       {#if Object.keys(groupedInventory).length === 0}
-        <p class="empty">売却できるアイテムがありません</p>
+        <p class="empty-state">売却できるアイテムがありません</p>
       {:else}
         {#each Object.entries(groupedInventory) as [itemId, items]}
           {@const def = getItem(itemId)}
@@ -510,7 +510,7 @@
               <div class="sell-cards">
                 {#each items as item}
                   <div class="sell-card">
-                    <span class="sell-card-quality" class:high={item.quality >= 70} class:low={item.quality < 30}>品質 {item.quality}</span>
+                    <span class="sell-card-quality" class:quality-high={item.quality >= 70} class:quality-low={item.quality < 30}>品質 {item.quality}</span>
                     <span class="sell-card-price">{getSellPrice(item)}G</span>
                     <button class="sell-btn" on:click={() => sellItem(item)}>売却</button>
                   </div>
@@ -561,60 +561,30 @@
     padding-bottom: 5rem;
   }
 
-
-  h2 {
-    font-size: 1.5rem;
-    color: #f4e4bc;
-    margin-bottom: 1rem;
-  }
-
-  h3 {
+  /* Shop用タブはサイズが大きい */
+  .shop-panel :global(.tab-btn) {
+    padding: 0.75rem;
     font-size: 1rem;
-    color: #c9a959;
-    margin: 0;
-  }
-
-  h4 {
-    font-size: 1rem;
-    color: #c9a959;
-    margin-bottom: 0.5rem;
   }
 
   .money-display {
     padding: 0.75rem 1rem;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 6px;
-    color: #e0e0f0;
+    background: var(--surface-dark);
+    border-radius: var(--radius-md);
+    color: var(--text-body);
     margin-bottom: 1rem;
   }
 
   .amount {
     font-size: 1.2rem;
     font-weight: bold;
-    color: #c9a959;
+    color: var(--accent-gold);
   }
 
   .tabs {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 0;
-  }
-
-  .tab {
-    flex: 1;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid #4a4a6a;
-    border-radius: 6px;
-    color: #a0a0b0;
-    cursor: pointer;
-    font-size: 1rem;
-  }
-
-  .tab.active {
-    border-color: #c9a959;
-    color: #f4e4bc;
-    background: rgba(201, 169, 89, 0.2);
   }
 
   .item-list {
@@ -624,8 +594,9 @@
   }
 
   .section-header {
+    margin: 0;
     padding-top: 0.5rem;
-    border-top: 1px solid #4a4a6a;
+    border-top: 1px solid var(--border-default);
   }
 
   .shop-item {
@@ -633,9 +604,9 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #4a4a6a;
-    border-radius: 6px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
   }
 
   .equip-grid {
@@ -647,7 +618,7 @@
   .equip-card {
     display: flex;
     flex-direction: column;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-subtle);
     border: 1px solid #ff980050;
     border-radius: 8px;
     overflow: hidden;
@@ -655,7 +626,7 @@
   }
 
   .equip-card:hover {
-    border-color: #ff9800;
+    border-color: var(--accent-orange);
   }
 
   .equip-card.rare {
@@ -674,7 +645,7 @@
     position: relative;
     width: 100%;
     aspect-ratio: 4 / 3;
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--surface-dark);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -695,7 +666,7 @@
     font-weight: bold;
     letter-spacing: 0.05em;
     background: rgba(232, 168, 64, 0.85);
-    color: #1a1a2e;
+    color: var(--bg-dark);
     padding: 0.1rem 0.4rem;
     border-radius: 3px;
   }
@@ -724,7 +695,7 @@
   }
 
   .recipe-count {
-    color: #c9a959;
+    color: var(--accent-gold);
     font-size: 1rem;
   }
 
@@ -768,8 +739,8 @@
     font-size: 0.65rem;
     font-weight: bold;
     border-radius: 3px;
-    color: #1a1a2e;
-    background: #ff9800;
+    color: var(--bg-dark);
+    background: var(--accent-orange);
   }
 
   .item-info {
@@ -781,7 +752,7 @@
   }
 
   .item-name {
-    color: #e0e0f0;
+    color: var(--text-body);
     font-weight: bold;
     display: flex;
     align-items: center;
@@ -795,7 +766,7 @@
   }
 
   .item-desc {
-    color: #808090;
+    color: var(--text-dim);
     font-size: 1rem;
   }
 
@@ -807,7 +778,7 @@
   }
 
   .item-price {
-    color: #c9a959;
+    color: var(--accent-gold);
     font-weight: bold;
     white-space: nowrap;
   }
@@ -818,10 +789,10 @@
     justify-content: center;
     width: 4rem;
     height: 2rem;
-    background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
+    background: linear-gradient(135deg, var(--accent-gold-dark) 0%, var(--accent-gold) 100%);
     border: none;
-    border-radius: 4px;
-    color: #1a1a2e;
+    border-radius: var(--radius-sm);
+    color: var(--bg-dark);
     font-weight: bold;
     font-size: 1rem;
     cursor: pointer;
@@ -842,18 +813,12 @@
     font-size: 1rem;
   }
 
-  .empty {
-    color: #808090;
-    text-align: center;
-    padding: 2rem;
-  }
-
   /* 売却グループ */
   .sell-group {
     padding: 0.75rem;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid transparent;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
   }
 
   .sell-group-header {
@@ -877,10 +842,10 @@
     justify-content: center;
     padding: 0.35rem 0.75rem;
     white-space: nowrap;
-    background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
+    background: linear-gradient(135deg, var(--accent-gold-dark) 0%, var(--accent-gold) 100%);
     border: none;
-    border-radius: 4px;
-    color: #1a1a2e;
+    border-radius: var(--radius-sm);
+    color: var(--bg-dark);
     font-weight: bold;
     font-size: 1rem;
     cursor: pointer;
@@ -904,25 +869,17 @@
     padding: 0.3rem 0.5rem;
     background: rgba(0, 0, 0, 0.25);
     border: 1px solid #3a3a5a;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     white-space: nowrap;
   }
 
   .sell-card-quality {
-    color: #a0a0b0;
+    color: var(--text-sub);
     font-size: 0.85rem;
   }
 
-  .sell-card-quality.high {
-    color: #81c784;
-  }
-
-  .sell-card-quality.low {
-    color: #ff6b6b;
-  }
-
   .sell-card-price {
-    color: #81c784;
+    color: var(--accent-green);
     font-weight: bold;
     font-size: 0.85rem;
   }
@@ -1002,7 +959,7 @@
 
   .deals-talk-name {
     font-size: 1rem;
-    color: #c9a959;
+    color: var(--accent-gold);
     font-weight: bold;
   }
 
@@ -1014,7 +971,7 @@
 
   .deals-talk-dismiss {
     font-size: 0.65rem;
-    color: #808090;
+    color: var(--text-dim);
     align-self: flex-end;
     flex-shrink: 0;
   }
@@ -1022,7 +979,7 @@
   /* バーゲン＆高価買取 */
   .deals-banner {
     padding: 0.5rem 0.75rem;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     margin-bottom: 0.75rem;
     font-size: 1rem;
     display: flex;
@@ -1039,7 +996,7 @@
   .premium-banner {
     background: rgba(50, 200, 50, 0.12);
     border: 1px solid rgba(100, 200, 100, 0.3);
-    color: #81c784;
+    color: var(--accent-green);
   }
 
   .deals-icon {
@@ -1087,7 +1044,7 @@
     font-size: 1rem;
     background: rgba(255, 255, 255, 0.08);
     padding: 0.15rem 0.5rem 0.15rem 0.25rem;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
   }
 
   .deals-item-icon {
@@ -1118,7 +1075,7 @@
 
   .original-price {
     text-decoration: line-through;
-    color: #808090;
+    color: var(--text-dim);
     font-size: 1rem;
     font-weight: normal;
   }
@@ -1138,7 +1095,7 @@
   /* アルバイト確認（タブ内埋め込み） */
   .parttime-confirm {
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid #4a4a6a;
+    border: 1px solid var(--border-default);
     border-radius: 8px;
     padding: 1.25rem;
   }
@@ -1168,15 +1125,15 @@
   .parttime-confirm-name {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #c9a959;
+    color: var(--accent-gold);
     padding-bottom: 0.3rem;
-    border-bottom: 1px solid #4a4a6a;
+    border-bottom: 1px solid var(--border-default);
   }
 
   .parttime-confirm-message {
     font-size: 1.05rem;
     line-height: 1.7;
-    color: #e0e0f0;
+    color: var(--text-body);
   }
 
   .parttime-confirm-buttons {
@@ -1189,7 +1146,7 @@
     flex: 1;
     max-width: 160px;
     padding: 0.7rem 1.5rem;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
@@ -1201,9 +1158,9 @@
   }
 
   .confirm-btn.ok {
-    background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
+    background: linear-gradient(135deg, var(--accent-gold-dark) 0%, var(--accent-gold) 100%);
     border: none;
-    color: #1a1a2e;
+    color: var(--bg-dark);
   }
 
   .confirm-btn.ok:hover {
@@ -1217,12 +1174,12 @@
 
   .confirm-btn.cancel {
     background: transparent;
-    border: 1px solid #6a6a8a;
-    color: #a0a0b0;
+    border: 1px solid var(--border-hover);
+    color: var(--text-sub);
   }
 
   .confirm-btn.cancel:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-subtle);
     border-color: #8a8aaa;
     color: #c0c0d0;
   }

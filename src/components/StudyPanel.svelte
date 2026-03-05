@@ -119,7 +119,7 @@
   }
 </script>
 
-<div class="study-panel">
+<div class="study-panel panel">
   <p>本を選んで読みます。{selectedBook ? getStudyDays(selectedBook) : 1}日経過・体力{STAMINA.STUDY_COST}消費します。</p>
   <p class="known-recipes">
     習得済みレシピ: {$gameState.knownRecipes.length}個 / 錬金術Lv: {calcLevelFromExp($gameState.alchemyExp)}
@@ -174,7 +174,7 @@
   {/if}
 
   <button
-    class="action-btn"
+    class="btn-action"
     on:click={handleStudy}
     disabled={!canStudy}
   >
@@ -202,19 +202,12 @@
   .study-panel {
   }
 
-
-  h2 {
-    font-size: 1.5rem;
-    color: #f4e4bc;
-    margin-bottom: 1rem;
-  }
-
   .hint {
-    color: #a0a0b0;
+    color: var(--text-sub);
   }
 
   p {
-    color: #e0e0f0;
+    color: var(--text-body);
   }
 
   .known-recipes {
@@ -222,39 +215,21 @@
     margin: 1rem 0;
     padding: 0.75rem;
     background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
   }
 
-  .action-btn {
-    padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
-    border: none;
-    border-radius: 6px;
-    color: #1a1a2e;
-    font-weight: bold;
-    cursor: pointer;
+  .btn-action {
     margin-top: 1rem;
   }
 
-  .action-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(201, 169, 89, 0.4);
-  }
-
-  .action-btn:disabled {
+  .btn-action:disabled {
     background: #4a4a5a;
-    color: #808090;
-    cursor: not-allowed;
+    color: var(--text-dim);
+    opacity: 1;
   }
 
   .recipe-list {
     margin: 1rem 0;
-  }
-
-  .recipe-list h3 {
-    font-size: 1rem;
-    color: #c9a959;
-    margin-bottom: 0.5rem;
   }
 
   .recipe-item {
@@ -263,10 +238,10 @@
     width: 100%;
     padding: 0.75rem 1rem;
     margin-bottom: 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #4a4a6a;
-    border-radius: 6px;
-    color: #e0e0f0;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-body);
     cursor: pointer;
     transition: all 0.2s;
     text-align: left;
@@ -289,14 +264,14 @@
   }
 
   .detail-label {
-    color: #808090;
+    color: var(--text-dim);
   }
 
   .ingredient {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-hover);
     padding: 0.2rem 0.5rem;
     border-radius: 3px;
     color: #c0c0d0;
@@ -314,18 +289,18 @@
 
   .book-description {
     font-size: 1rem;
-    color: #a0a0b0;
+    color: var(--text-sub);
     margin-top: 0.25rem;
   }
 
   .recipe-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: #6a6a8a;
+    background: var(--surface-hover);
+    border-color: var(--border-hover);
   }
 
   .recipe-item.selected {
     background: rgba(201, 169, 89, 0.2);
-    border-color: #c9a959;
+    border-color: var(--accent-gold);
   }
 
   .recipe-name {
@@ -344,14 +319,14 @@
 
   .recipe-info {
     font-size: 1rem;
-    color: #a0a0b0;
+    color: var(--text-sub);
     margin-left: auto;
   }
 
   .no-recipes {
     padding: 1rem;
     background: rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     margin: 1rem 0;
   }
 
@@ -364,8 +339,8 @@
     font-size: 1rem;
     margin-top: 1rem;
     padding: 0.6rem 0.8rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-left: 3px solid #6a6a8a;
+    background: var(--surface-subtle);
+    border-left: 3px solid var(--border-hover);
     border-radius: 2px;
   }
 

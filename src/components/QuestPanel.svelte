@@ -274,17 +274,17 @@
   $: deliverableCount = $gameState.activeQuests.filter((quest) => canDeliver(quest)).length;
 </script>
 
-<div class="quest-panel">
+<div class="quest-panel panel">
   <div class="tabs">
     <button
-      class="tab"
+      class="tab-btn"
       class:active={activeTab === 'available'}
       on:click={() => (activeTab = 'available')}
     >
       掲示板 ({$gameState.availableQuests.length})
     </button>
     <button
-      class="tab"
+      class="tab-btn"
       class:active={activeTab === 'active'}
       on:click={() => (activeTab = 'active')}
     >
@@ -298,7 +298,7 @@
   {#if activeTab === 'available'}
     <div class="quest-list">
       {#if $gameState.availableQuests.length === 0}
-        <p class="empty">現在受注可能な依頼はありません</p>
+        <p class="empty-state">現在受注可能な依頼はありません</p>
       {:else}
         {#each $gameState.availableQuests as quest}
           {@const itemDef = getItem(quest.requiredItemId)}
@@ -389,7 +389,7 @@
   {:else}
     <div class="quest-list">
       {#if $gameState.activeQuests.length === 0}
-        <p class="empty">受注中の依頼はありません</p>
+        <p class="empty-state">受注中の依頼はありません</p>
       {:else}
         {#each $gameState.activeQuests as quest (quest.id)}
           <ActiveQuestCard {quest} compact showDeliverButton={true} onDeliver={deliverQuest} onCancel={cancelQuest} />
@@ -403,34 +403,14 @@
   .quest-panel {
   }
 
-
-  h2 {
-    font-size: 1.5rem;
-    color: #f4e4bc;
-    margin-bottom: 1rem;
-  }
-
   .tabs {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
   }
 
-  .tab {
-    flex: 1;
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid #4a4a6a;
-    border-radius: 6px;
-    color: #a0a0b0;
-    cursor: pointer;
+  .tab-btn {
     font-size: 0.8rem;
-  }
-
-  .tab.active {
-    border-color: #c9a959;
-    color: #f4e4bc;
-    background: rgba(201, 169, 89, 0.2);
   }
 
   .badge {
@@ -441,7 +421,7 @@
     height: 1.25rem;
     padding: 0 0.4rem;
     margin-left: 0.5rem;
-    background: #4caf50;
+    background: var(--accent-green-dark);
     border-radius: 10px;
     font-size: 0.75rem;
     font-weight: bold;
@@ -454,11 +434,8 @@
     gap: 0.4rem;
   }
 
-  .empty {
+  .empty-state {
     grid-column: 1 / -1;
-    color: #808090;
-    text-align: center;
-    padding: 2rem;
   }
 
   .quest-item {
@@ -466,9 +443,9 @@
     display: flex;
     flex-direction: column;
     padding: 0.3rem 0.4rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid #4a4a6a;
-    border-radius: 6px;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
     gap: 0.05rem;
   }
 
@@ -506,7 +483,7 @@
 
   .quest-client {
     font-size: 0.5rem;
-    color: #a0a0b0;
+    color: var(--text-sub);
   }
 
   .quest-header {
@@ -517,12 +494,11 @@
   .quest-title {
     font-size: 0.7rem;
     font-weight: bold;
-    color: #f4e4bc;
+    color: var(--text-heading);
   }
 
-
   .quest-desc {
-    color: #a0a0b0;
+    color: var(--text-sub);
     font-size: 0.55rem;
     margin: 0;
     margin-bottom: 0.15rem;
@@ -542,7 +518,7 @@
   }
 
   .requirement {
-    color: #e0e0f0;
+    color: var(--text-body);
     display: flex;
     align-items: center;
     gap: 0.2rem;
@@ -566,7 +542,6 @@
     line-height: 1.2;
   }
 
-
   .requirement-sub {
     display: flex;
     gap: 0.3rem;
@@ -584,11 +559,11 @@
 
   .owned-count {
     font-size: 0.6rem;
-    color: #808090;
+    color: var(--text-dim);
   }
 
   .owned-count.enough {
-    color: #4caf50;
+    color: var(--accent-green-dark);
   }
 
   .item-icon-small.silhouette {
@@ -597,7 +572,7 @@
   }
 
   .deadline {
-    color: #a0a0b0;
+    color: var(--text-sub);
   }
 
   .quest-rewards {
@@ -617,22 +592,22 @@
   }
 
   .detail-label {
-    color: #808090;
+    color: var(--text-dim);
     font-size: 0.55rem;
   }
 
   .reward-money {
-    color: #c9a959;
+    color: var(--accent-gold);
     font-weight: bold;
     font-size: 0.65rem;
   }
 
   .reward-rep {
-    color: #81c784;
+    color: var(--accent-green);
   }
 
   .reward-dev {
-    color: #64b5f6;
+    color: var(--accent-blue);
   }
 
   .ready-badge {
@@ -679,10 +654,10 @@
   .accept-btn {
     flex: 1;
     padding: 0.3rem;
-    background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
+    background: linear-gradient(135deg, var(--accent-gold-dark) 0%, var(--accent-gold) 100%);
     border: none;
-    border-radius: 6px;
-    color: #1a1a2e;
+    border-radius: var(--radius-md);
+    color: var(--bg-dark);
     font-weight: bold;
     font-size: 0.7rem;
     cursor: pointer;
@@ -702,7 +677,7 @@
     padding: 0.3rem;
     background: linear-gradient(135deg, #1a6b3c 0%, #2ecc71 100%);
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     color: #fff;
     font-weight: bold;
     font-size: 0.7rem;

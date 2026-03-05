@@ -83,7 +83,7 @@
   }
 </script>
 
-<div class="expedition-panel">
+<div class="expedition-panel panel">
   {#if expeditionActive}
     <div class="status-box">
       <h3>派遣中</h3>
@@ -154,7 +154,7 @@
             所持金: {$gameState.money}G {#if !canAfford}(不足){/if}
           </p>
         </div>
-        <button class="dispatch-btn" on:click={dispatch} disabled={!canAfford}>
+        <button class="btn-action" on:click={dispatch} disabled={!canAfford}>
           派遣する
         </button>
       </div>
@@ -166,21 +166,14 @@
   .expedition-panel {
   }
 
-
-  h2 {
-    font-size: 1.5rem;
-    color: #f4e4bc;
-    margin-bottom: 1rem;
-  }
-
-  h3 {
-    font-size: 1.1rem;
-    color: #c9a959;
-    margin-bottom: 0.75rem;
+  .btn-action {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
   }
 
   .description {
-    color: #e0e0f0;
+    color: var(--text-body);
     margin-bottom: 1.5rem;
   }
 
@@ -192,14 +185,14 @@
   }
 
   .status-box p {
-    color: #e0e0f0;
+    color: var(--text-body);
     margin: 0.5rem 0;
   }
 
   .return-info {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #81c784 !important;
+    color: var(--accent-green) !important;
   }
 
   .area-selection, .duration-selection {
@@ -217,11 +210,11 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem 1.2rem;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--surface-subtle);
     background-size: cover;
-    border: 2px solid #4a4a6a;
-    border-radius: 6px;
-    color: #e0e0f0;
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-body);
     cursor: pointer;
     text-align: left;
     position: relative;
@@ -251,7 +244,7 @@
   }
 
   .area-item:hover {
-    border-color: #6a6a8a;
+    border-color: var(--border-hover);
   }
 
   .area-item:hover::before {
@@ -275,7 +268,7 @@
   }
 
   .area-item.selected {
-    border-color: #c9a959;
+    border-color: var(--accent-gold);
   }
 
   .area-item.selected::before {
@@ -288,7 +281,7 @@
   }
 
   .area-cost {
-    color: #f4e4bc;
+    color: var(--text-heading);
     position: relative;
     z-index: 1;
     font-weight: bold;
@@ -308,10 +301,10 @@
   .duration-item {
     flex: 1;
     padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid #4a4a6a;
-    border-radius: 6px;
-    color: #e0e0f0;
+    background: var(--surface-subtle);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-body);
     cursor: pointer;
   }
 
@@ -320,7 +313,7 @@
   }
 
   .duration-item.selected {
-    border-color: #c9a959;
+    border-color: var(--accent-gold);
     background: rgba(201, 169, 89, 0.2);
   }
 
@@ -335,7 +328,7 @@
   }
 
   .summary-content p {
-    color: #e0e0f0;
+    color: var(--text-body);
     margin: 0.3rem 0;
   }
 
@@ -345,28 +338,6 @@
   }
 
   .balance.insufficient {
-    color: #ff6b6b !important;
-  }
-
-  .dispatch-btn {
-    width: 100%;
-    padding: 0.75rem;
-    background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
-    border: none;
-    border-radius: 6px;
-    color: #1a1a2e;
-    font-weight: bold;
-    font-size: 1rem;
-    cursor: pointer;
-  }
-
-  .dispatch-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(201, 169, 89, 0.4);
-  }
-
-  .dispatch-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    color: var(--accent-red) !important;
   }
 </style>

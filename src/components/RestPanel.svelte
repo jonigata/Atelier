@@ -77,7 +77,7 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
-<div class="rest-panel">
+<div class="rest-panel panel">
   <p>体力を全回復します。1日経過します。</p>
   <div class="stamina-display">
     <div class="stamina-header">
@@ -88,7 +88,7 @@
     </div>
     <div class="stamina-bar-container">
       <div
-        class="stamina-bar"
+        class="stamina-fill"
         class:high={staminaPercent >= 50}
         class:medium={staminaPercent >= 30 && staminaPercent < 50}
         class:low={staminaPercent >= 10 && staminaPercent < 30}
@@ -100,7 +100,7 @@
       <p class="fatigue-note">疲労状態では調合の成功率が低下します。</p>
     {/if}
   </div>
-  <button class="action-btn" on:click={handleRest}>
+  <button class="btn-action" on:click={handleRest}>
     休息する
   </button>
 </div>
@@ -131,22 +131,15 @@
   .rest-panel {
   }
 
-
-  h2 {
-    font-size: 1.5rem;
-    color: #f4e4bc;
-    margin-bottom: 1rem;
-  }
-
   p {
-    color: #e0e0f0;
+    color: var(--text-body);
   }
 
   .stamina-display {
     margin: 1rem 0;
     padding: 0.75rem;
     background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
   }
 
   .stamina-header {
@@ -161,8 +154,8 @@
     padding: 0.15rem 0.5rem;
     background: rgba(255, 107, 107, 0.2);
     border: 1px solid rgba(255, 107, 107, 0.5);
-    border-radius: 4px;
-    color: #ff6b6b;
+    border-radius: var(--radius-sm);
+    color: var(--accent-red);
     font-size: 1rem;
     font-weight: bold;
   }
@@ -171,59 +164,23 @@
     width: 100%;
     height: 8px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     overflow: hidden;
-  }
-
-  .stamina-bar {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.3s ease;
-  }
-
-  .stamina-bar.high {
-    background: linear-gradient(90deg, #4caf50, #81c784);
-  }
-
-  .stamina-bar.medium {
-    background: linear-gradient(90deg, #ff9800, #ffc107);
-  }
-
-  .stamina-bar.low {
-    background: linear-gradient(90deg, #ff5722, #ff9800);
-  }
-
-  .stamina-bar.critical {
-    background: linear-gradient(90deg, #f44336, #ff5722);
   }
 
   .fatigue-note {
     margin-top: 0.5rem;
     font-size: 1rem;
-    color: #ff9800;
+    color: var(--accent-orange);
   }
 
-  .action-btn {
-    padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
-    border: none;
-    border-radius: 6px;
-    color: #1a1a2e;
-    font-weight: bold;
-    cursor: pointer;
+  .btn-action {
     margin-top: 1rem;
   }
 
-  .action-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(201, 169, 89, 0.4);
-  }
-
-  .action-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  .btn-action:disabled {
     background: rgba(255, 255, 255, 0.1);
-    color: #808090;
+    color: var(--text-dim);
   }
 
   /* --- 休息シーケンス専用オーバーレイ --- */
@@ -259,7 +216,7 @@
 
   .video-text {
     font-size: 1.3rem;
-    color: #f4e4bc;
+    color: var(--text-heading);
     font-weight: bold;
     animation: textPulse 1.5s ease-in-out infinite alternate;
   }
