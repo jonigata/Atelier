@@ -337,7 +337,7 @@
                     {:else}
                       <span class="card-level upgrade">Lv.{choice.currentLevel} → Lv.{nextLevel}</span>
                       <span class="card-effect-overlay">{currentEffectDesc}</span>
-                      <span class="card-effect-arrow">→</span>
+                      <span class="card-effect-arrow">↓</span>
                       <span class="card-effect-overlay upgrade-next">{nextEffectDesc}</span>
                     {/if}
                   </div>
@@ -389,7 +389,7 @@
                     {:else}
                       <span class="card-level upgrade">Lv.{choice.currentLevel} → Lv.{nextLevel}</span>
                       <span class="card-effect-overlay">{choice.def.levelEffects[choice.currentLevel - 1].description}</span>
-                      <span class="card-effect-arrow">→</span>
+                      <span class="card-effect-arrow">↓</span>
                       <span class="card-effect-overlay upgrade-next">{choice.def.levelEffects[nextLevel - 1].description}</span>
                     {/if}
                   </div>
@@ -437,7 +437,7 @@
 
   /* ========== Dialog ========== */
   .draw-dialog {
-    max-width: 700px;
+    max-width: 950px;
     width: 95%;
     padding: 1.5rem;
   }
@@ -497,7 +497,7 @@
   /* ========== Card wrapper (slide-in + chosen/unchosen) ========== */
   .card-wrapper {
     flex: 1;
-    max-width: 200px;
+    max-width: 280px;
     min-width: 0;
     position: relative;
     opacity: 0;
@@ -659,7 +659,7 @@
   }
 
   .card-effect-overlay {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     color: #b0d0b0;
     text-align: center;
     line-height: 1.3;
@@ -670,7 +670,7 @@
   }
 
   .card-effect-arrow {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     color: #c9a959;
     line-height: 1;
   }
