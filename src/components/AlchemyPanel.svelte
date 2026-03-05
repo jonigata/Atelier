@@ -93,11 +93,12 @@
   // 選択完了したか
   $: selectionComplete = selectedItems.length === requiredItemCount;
 
-  // 素材選択が完了したら最下段までスクロール
+  // 素材選択が完了したらスクロールコンテナを最下端までスクロール
   $: if (selectionComplete && requiredItemCount > 0) {
     tick().then(() => {
-      if (craftPreviewSection) {
-        craftPreviewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      const container = craftPreviewSection?.closest('.main-panel');
+      if (container) {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
       }
     });
   }
