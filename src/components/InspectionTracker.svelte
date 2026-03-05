@@ -740,20 +740,21 @@
   }
 
   .criterion-target {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: bold;
     color: #a0a0b0;
     justify-self: end;
+    white-space: nowrap;
   }
 
   .criterion-name {
-    font-size: 12px;
+    font-size: 11px;
     color: #a89060;
     font-weight: bold;
   }
 
   .criterion-value {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: bold;
     justify-self: end;
     color: #e0dce8;
@@ -900,7 +901,8 @@
 
   .village-scene {
     width: 100%;
-    max-width: 160px;
+    max-width: 130px;
+    max-height: 60px;
     border-radius: 6px;
     overflow: hidden;
   }
