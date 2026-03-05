@@ -22,7 +22,7 @@
   {:else if itemId}
     <img class="item-icon" src={getItemIcon(itemId)} alt={name} on:error={handleIconError} />
   {/if}
-  <span class="item-name">{name}</span>
+  <span class="item-name" class:long={name.length >= 6}>{name}</span>
   {#if showDescription && def?.description}
     <span class="item-description">{def.description}</span>
   {/if}
@@ -40,7 +40,7 @@
     flex-direction: column;
     align-items: center;
     width: 155px;
-    height: 170px;
+    height: 190px;
     padding: 0.25rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid #4a4a6a;
@@ -81,6 +81,11 @@
     color: #e0e0f0;
     text-align: center;
     font-size: 0.8rem;
+    line-height: 1.1;
+  }
+
+  .item-name.long {
+    font-size: 0.65rem;
   }
 
   .item-description {

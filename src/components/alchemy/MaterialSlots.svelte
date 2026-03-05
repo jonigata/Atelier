@@ -218,7 +218,7 @@
     align-items: center;
     justify-content: center;
     width: 108px;
-    height: 119px;
+    height: 133px;
     border-radius: 4px;
     font-size: 0.75rem;
     cursor: default;
