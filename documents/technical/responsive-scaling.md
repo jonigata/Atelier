@@ -55,7 +55,11 @@
 function updateZoom() {
   const BASE_WIDTH = 960;
   const MAX_ZOOM = 1.0;
+
+  // CSS zoomをリセットして素のビューポート幅を取得
+  document.documentElement.style.zoom = '1';
   const vw = window.innerWidth;
+
   const zoom = Math.min(vw / BASE_WIDTH, MAX_ZOOM);
   document.documentElement.style.zoom = `${zoom}`;
 
@@ -64,6 +68,10 @@ function updateZoom() {
   document.documentElement.style.setProperty('--app-height', `${vh}px`);
 }
 ```
+
+初回実行後、DevToolsモバイルエミュレーションのviewport反映遅延対策として
+短時間に複数回再計算する（0ms, 80ms, 200ms, 500ms）。
+リサイズ時は `window.resize` と `visualViewport.resize` の両方を監視。
 
 ## 既存コードからの変更点
 
@@ -81,3 +89,4 @@ function updateZoom() {
 - マウス座標やクリック位置もzoomに追従する
 - `position: fixed` な要素もzoom内で正しく動作する
 - DevToolsでの確認時はzoom値を意識すること
+- コンポーネント内のサイズ指定には `rem` ではなく **`px`** を使うこと。`rem` はルートの `font-size` に依存するため、ベースフォントサイズの変更で意図しない膨張・縮小が起きる
