@@ -15,6 +15,15 @@
   $: urgency = daysUntil <= 7 ? 'red' : daysUntil <= 21 ? 'yellow' : 'green';
 
   let revealing = false;
+  let dialogKey: string | null = null;
+
+  function openDetail(key: string) {
+    dialogKey = key;
+  }
+
+  function closeDetail() {
+    dialogKey = null;
+  }
 
   onMount(() => {
     if (firstReveal) {
@@ -319,274 +328,244 @@
     </defs>
   </svg>
 
-  <div class="criteria-grid">
+  <!-- ═══ 横並びバー ═══ -->
+  <div class="criteria-row">
     {#each inspection.criteria as criterion}
-        {@const info = getCriterionInfo(criterion, values, expValues)}
-        {@const gradeUp = gradeUpAnimations[criterion.key]}
+      {@const info = getCriterionInfo(criterion, values, expValues)}
+      {@const gradeUp = gradeUpAnimations[criterion.key]}
+      <button
+        class="criterion-chip"
+        class:met={info.met}
+        class:grade-up={!!gradeUp}
+        style="{info.met ? `border-color: ${gradeColors[info.grade]}88` : ''}"
+        on:click={() => openDetail(criterion.key)}
+        on:animationend={(e) => handleGradeUpAnimEnd(e, criterion.key)}
+      >
+        {#if gradeUp}
+          <div class="grade-change-indicator">
+            <span style="color: {gradeColors[gradeUp.from]}">{gradeUp.from}</span>
+            <span class="grade-arrow">→</span>
+            <span style="color: {gradeColors[gradeUp.to]}">{gradeUp.to}</span>
+          </div>
+        {/if}
+        <span class="chip-name">{criterion.key === 'quests' ? '依頼完了' : criterion.label}</span>
+        <span class="chip-value-row">
+          <span class="chip-value">
+            {#if criterion.key === 'level' || criterion.key === 'villageDev' || criterion.key === 'reputation'}
+              Lv.{info.value}
+            {:else if criterion.key === 'quests'}
+              {info.value}件
+            {:else if criterion.key === 'album'}
+              {info.value}種
+            {:else}
+              {info.value}{criterion.unit}
+            {/if}
+          </span>
+          <span class="chip-grade" style="background: {gradeBg(info.grade)}">{info.grade}</span>
+          {#if info.met}<span class="chip-pass">PASS</span>{/if}
+        </span>
+      </button>
+    {/each}
+  </div>
 
-        <div class="criterion-slot"
-          class:grade-up={!!gradeUp}
-          on:animationend={(e) => handleGradeUpAnimEnd(e, criterion.key)}
-        >
-          {#if gradeUp}
-            <div class="grade-change-indicator">
-              <span style="color: {gradeColors[gradeUp.from]}">{gradeUp.from}</span>
-              <span class="grade-arrow">→</span>
-              <span style="color: {gradeColors[gradeUp.to]}">{gradeUp.to}</span>
-            </div>
-          {/if}
-
-        {#if criterion.key === 'level'}
-          <!-- ═══ 錬金Lv: ポーション瓶 + 等級ライン ═══ -->
-          <div class="criterion-card potion-card" style="{cardStyle(info.grade, info.met)}">
-            <div class="criterion-visual">
-            <div class="potion-container">
-              <svg viewBox="0 0 60 80" class="potion-svg">
-                <defs>
-                  <clipPath id="potion-clip">
-                    <path d="M22 18 L22 28 Q10 35 10 48 L10 65 Q10 72 18 72 L42 72 Q50 72 50 65 L50 48 Q50 35 38 28 L38 18 Z"/>
-                  </clipPath>
-                  {#if info.grade === 'S'}
-                    <linearGradient id="liquid-grad-S" x1="0" y1="1" x2="0.5" y2="0">
-                      <stop offset="0%" stop-color="#ff6b6b" />
-                      <stop offset="25%" stop-color="#ffd700" />
-                      <stop offset="50%" stop-color="#69db7c" />
-                      <stop offset="75%" stop-color="#74c0fc" />
-                      <stop offset="100%" stop-color="#da77f2" />
-                    </linearGradient>
-                  {:else}
-                    <linearGradient id="liquid-grad-{info.grade}" x1="0" y1="1" x2="0" y2="0">
-                      <stop offset="0%" stop-color={potionColor(info.grade)} />
-                      <stop offset="100%" stop-color={potionColor(info.grade)} stop-opacity="0.6" />
-                    </linearGradient>
-                  {/if}
-                </defs>
-                <!-- 瓶の輪郭 -->
-                <path d="M24 8 L24 18 L22 18 L22 28 Q10 35 10 48 L10 65 Q10 72 18 72 L42 72 Q50 72 50 65 L50 48 Q50 35 38 28 L38 18 L36 18 L36 8 Z"
-                  fill="none" stroke="rgba(200, 200, 220, 0.4)" stroke-width="1.5"/>
-                <rect x="22" y="6" width="16" height="4" rx="2" fill="rgba(200, 200, 220, 0.3)"/>
-                <!-- 液体 -->
-                <g clip-path="url(#potion-clip)">
-                  <rect x="8" y={potionLiquidY(info.progress)} width="44" height={80 - potionLiquidY(info.progress)}
-                    fill="url(#liquid-grad-{info.grade})" />
-                  <ellipse cx="30" cy={potionLiquidY(info.progress)} rx="18" ry="3"
-                    fill="rgba(255,255,255,0.15)"/>
-                  {#if info.grade === 'S'}
-                    <circle cx="20" cy={potionLiquidY(info.progress) + 8} r="2" fill="rgba(255,255,255,0.3)"/>
-                    <circle cx="35" cy={potionLiquidY(info.progress) + 14} r="1.5" fill="rgba(255,255,255,0.25)"/>
-                    <circle cx="28" cy={potionLiquidY(info.progress) + 20} r="2.5" fill="rgba(255,255,255,0.2)"/>
-                  {/if}
-                </g>
-                <path d="M16 35 Q14 50 16 65" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
-                <!-- 等級ライン（瓶の右側に目盛り） -->
-                {#each gradeList as g}
-                  {@const y = potionThresholdY(criterion, g)}
-                  <line x1="51" y1={y} x2="57" y2={y}
-                    stroke={gradeColors[g]} stroke-width="1.5" opacity="0.7"/>
-                  <text x="59" y={y + 3} font-size="7" fill={gradeColors[g]} opacity="0.8">{g}</text>
-                {/each}
-              </svg>
-              {#if info.grade !== 'D'}
-                <div class="potion-glow" style="background: radial-gradient(ellipse, {potionGlow(info.grade)}, transparent 70%)"></div>
+  <!-- ═══ 詳細ダイアログ ═══ -->
+  {#if dialogKey}
+    {@const criterion = inspection.criteria.find(c => c.key === dialogKey)}
+    {#if criterion}
+      {@const info = getCriterionInfo(criterion, values, expValues)}
+      <div class="detail-overlay" on:click={closeDetail}>
+        <div class="detail-dialog" on:click|stopPropagation>
+          <div class="dialog-header">
+            <span class="dialog-title">{criterion.label}</span>
+            <span class="dialog-value">
+              {#if criterion.key === 'level' || criterion.key === 'villageDev' || criterion.key === 'reputation'}
+                Lv.{info.value}
+              {:else if criterion.key === 'quests'}
+                {info.value}件
+              {:else if criterion.key === 'album'}
+                {info.value}種
+              {:else}
+                {info.value}{criterion.unit}
               {/if}
-            </div>
-            </div>
-            <div class="criterion-label">
-              <span class="criterion-name">錬金Lv</span>
-              <span class="criterion-value">Lv.{info.value}</span>
-              <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
-              <span class="criterion-target">目標 Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
-
-            </div>
+            </span>
+            <span class="dialog-grade" style="background: {gradeBg(info.grade)}">{info.grade}</span>
+            {#if info.met}<span class="chip-pass">PASS</span>{/if}
           </div>
 
-        {:else if criterion.key === 'quests'}
-          <!-- ═══ 依頼: 星 + 等級境界マーカー ═══ -->
-          {@const totalStars = criterion.thresholds.S}
-          {@const overlap = getStarOverlap(totalStars)}
-          <div class="criterion-card stars-card" style="{cardStyle(info.grade, info.met)}">
-            <div class="criterion-visual">
-            <div class="stars-container">
-              {#each Array(totalStars) as _, i}
-                {@const lit = i < info.value}
-                {@const boundary = isStarBoundary(i, criterion)}
-                {#if boundary}
-                  <div class="star-boundary" style="z-index: {totalStars + 1}">
-                    <div class="boundary-line" style="background: {gradeColors[boundary]}"></div>
-                  </div>
-                {/if}
-                <svg viewBox="0 0 24 24" class="quest-star" class:lit
-                  style="margin-left: {i === 0 ? 0 : overlap}px; z-index: {i}"
-                >
-                  <path d="M12 2 L15.09 8.26 L22 9.27 L17 14.14 L18.18 21.02 L12 17.77 L5.82 21.02 L7 14.14 L2 9.27 L8.91 8.26 Z"
-                    fill={lit ? getStarColor(i, criterion, info.grade) : 'rgba(255,255,255,0.06)'}
-                    stroke={lit ? getStarStroke(i, criterion, info.grade) : 'rgba(255,255,255,0.1)'}
-                    stroke-width="0.8"
-                  />
-                </svg>
-              {/each}
-            </div>
-            </div>
-            <div class="criterion-label">
-              <span class="criterion-name">依頼</span>
-              <span class="criterion-value">完了 {info.value}件</span>
-              <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
-              <span class="criterion-target">目標 {criterion.thresholds.C}～{totalStars}件</span>
-
-            </div>
-          </div>
-
-        {:else if criterion.key === 'villageDev'}
-          <!-- ═══ 村発展: 村の画像 + 等級マーカー付きバー ═══ -->
-          {@const villageImage = getVillageImage(info.value, info.maxVal)}
-          <div class="criterion-card village-card" style="{cardStyle(info.grade, info.met)}">
-            <div class="criterion-visual">
-              <div class="village-visual-inner">
-                <div class="village-scene">
-                  <img src={villageImage} alt="村の発展" class="village-img" />
+          <div class="dialog-body">
+            <div class="dialog-visual">
+              {#if criterion.key === 'level'}
+                <div class="potion-container">
+                  <svg viewBox="0 0 60 80" class="potion-svg">
+                    <defs>
+                      <clipPath id="potion-clip">
+                        <path d="M22 18 L22 28 Q10 35 10 48 L10 65 Q10 72 18 72 L42 72 Q50 72 50 65 L50 48 Q50 35 38 28 L38 18 Z"/>
+                      </clipPath>
+                      {#if info.grade === 'S'}
+                        <linearGradient id="liquid-grad-S" x1="0" y1="1" x2="0.5" y2="0">
+                          <stop offset="0%" stop-color="#ff6b6b" />
+                          <stop offset="25%" stop-color="#ffd700" />
+                          <stop offset="50%" stop-color="#69db7c" />
+                          <stop offset="75%" stop-color="#74c0fc" />
+                          <stop offset="100%" stop-color="#da77f2" />
+                        </linearGradient>
+                      {:else}
+                        <linearGradient id="liquid-grad-{info.grade}" x1="0" y1="1" x2="0" y2="0">
+                          <stop offset="0%" stop-color={potionColor(info.grade)} />
+                          <stop offset="100%" stop-color={potionColor(info.grade)} stop-opacity="0.6" />
+                        </linearGradient>
+                      {/if}
+                    </defs>
+                    <path d="M24 8 L24 18 L22 18 L22 28 Q10 35 10 48 L10 65 Q10 72 18 72 L42 72 Q50 72 50 65 L50 48 Q50 35 38 28 L38 18 L36 18 L36 8 Z"
+                      fill="none" stroke="rgba(200, 200, 220, 0.4)" stroke-width="1.5"/>
+                    <rect x="22" y="6" width="16" height="4" rx="2" fill="rgba(200, 200, 220, 0.3)"/>
+                    <g clip-path="url(#potion-clip)">
+                      <rect x="8" y={potionLiquidY(info.progress)} width="44" height={80 - potionLiquidY(info.progress)}
+                        fill="url(#liquid-grad-{info.grade})" />
+                      <ellipse cx="30" cy={potionLiquidY(info.progress)} rx="18" ry="3" fill="rgba(255,255,255,0.15)"/>
+                      {#if info.grade === 'S'}
+                        <circle cx="20" cy={potionLiquidY(info.progress) + 8} r="2" fill="rgba(255,255,255,0.3)"/>
+                        <circle cx="35" cy={potionLiquidY(info.progress) + 14} r="1.5" fill="rgba(255,255,255,0.25)"/>
+                        <circle cx="28" cy={potionLiquidY(info.progress) + 20} r="2.5" fill="rgba(255,255,255,0.2)"/>
+                      {/if}
+                    </g>
+                    <path d="M16 35 Q14 50 16 65" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+                    {#each gradeList as g}
+                      {@const y = potionThresholdY(criterion, g)}
+                      <line x1="51" y1={y} x2="57" y2={y} stroke={gradeColors[g]} stroke-width="1.5" opacity="0.7"/>
+                      <text x="59" y={y + 3} font-size="7" fill={gradeColors[g]} opacity="0.8">{g}</text>
+                    {/each}
+                  </svg>
+                  {#if info.grade !== 'D'}
+                    <div class="potion-glow" style="background: radial-gradient(ellipse, {potionGlow(info.grade)}, transparent 70%)"></div>
+                  {/if}
                 </div>
-                <div class="grade-bar">
-                  <div class="grade-bar-fill" style="width: {info.progress * 100}%; background: {info.grade === 'S' ? rainbowGrad : `linear-gradient(90deg, #4a6a3a, ${gradeColors[info.grade]})`}"></div>
-                  {#each gradeList as g}
-                    {@const pos = getThresholdRatio(criterion, g) * 100}
-                    {#if g !== 'S'}
-                      <div class="grade-marker" style="left: {pos}%">
-                        <div class="grade-marker-line" style="background: {gradeColors[g]}"></div>
-                        <span class="grade-marker-label" style="color: {gradeColors[g]}">{g}</span>
+
+              {:else if criterion.key === 'quests'}
+                {@const totalStars = criterion.thresholds.S}
+                {@const overlap = getStarOverlap(totalStars)}
+                <div class="stars-container">
+                  {#each Array(totalStars) as _, i}
+                    {@const lit = i < info.value}
+                    {@const boundary = isStarBoundary(i, criterion)}
+                    {#if boundary}
+                      <div class="star-boundary" style="z-index: {totalStars + 1}">
+                        <div class="boundary-line" style="background: {gradeColors[boundary]}"></div>
                       </div>
                     {/if}
+                    <svg viewBox="0 0 24 24" class="quest-star" class:lit
+                      style="margin-left: {i === 0 ? 0 : overlap}px; z-index: {i}">
+                      <path d="M12 2 L15.09 8.26 L22 9.27 L17 14.14 L18.18 21.02 L12 17.77 L5.82 21.02 L7 14.14 L2 9.27 L8.91 8.26 Z"
+                        fill={lit ? getStarColor(i, criterion, info.grade) : 'rgba(255,255,255,0.06)'}
+                        stroke={lit ? getStarStroke(i, criterion, info.grade) : 'rgba(255,255,255,0.1)'}
+                        stroke-width="0.8" />
+                    </svg>
                   {/each}
                 </div>
-              </div>
-            </div>
-            <div class="criterion-label">
-              <span class="criterion-name">村発展</span>
-              <span class="criterion-value">Lv.{info.value}</span>
-              <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
-              <span class="criterion-target">目標 Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
 
-            </div>
-          </div>
+              {:else if criterion.key === 'villageDev'}
+                {@const villageImage = getVillageImage(info.value, info.maxVal)}
+                <div class="village-visual-inner">
+                  <div class="village-scene">
+                    <img src={villageImage} alt="村の発展" class="village-img" />
+                  </div>
+                  <div class="grade-bar">
+                    <div class="grade-bar-fill" style="width: {info.progress * 100}%; background: {info.grade === 'S' ? rainbowGrad : `linear-gradient(90deg, #4a6a3a, ${gradeColors[info.grade]})`}"></div>
+                    {#each gradeList as g}
+                      {@const pos = getThresholdRatio(criterion, g) * 100}
+                      {#if g !== 'S'}
+                        <div class="grade-marker" style="left: {pos}%">
+                          <div class="grade-marker-line" style="background: {gradeColors[g]}"></div>
+                          <span class="grade-marker-label" style="color: {gradeColors[g]}">{g}</span>
+                        </div>
+                      {/if}
+                    {/each}
+                  </div>
+                </div>
 
-        {:else if criterion.key === 'reputation'}
-          <!-- ═══ 名声: 人々アイコン + 等級マーカー付きバー ═══ -->
-          {@const peopleCount = getPeopleCount(info.progress)}
-          <div class="criterion-card people-card" style="{cardStyle(info.grade, info.met)}">
-            <div class="criterion-visual">
-              <div class="reputation-visual-inner">
-                <div class="people-container">
-                  {#each Array(7) as _, i}
-                    <div class="person" class:active={i < peopleCount}>
-                      <svg viewBox="0 0 20 28" class="person-svg">
-                        <circle cx="10" cy="7" r="5"
-                          fill={i < peopleCount ? getPersonColor(i, info.grade) : 'rgba(255,255,255,0.08)'}
-                        />
-                        <path d="M4 28 L4 18 Q4 13 10 13 Q16 13 16 18 L16 28"
-                          fill={i < peopleCount ? getPersonColor(i, info.grade) : 'rgba(255,255,255,0.05)'}
-                          opacity={i < peopleCount ? 0.7 : 1}
-                        />
-                      </svg>
+              {:else if criterion.key === 'reputation'}
+                {@const peopleCount = getPeopleCount(info.progress)}
+                <div class="reputation-visual-inner">
+                  <div class="people-container">
+                    {#each Array(7) as _, i}
+                      <div class="person" class:active={i < peopleCount}>
+                        <svg viewBox="0 0 20 28" class="person-svg">
+                          <circle cx="10" cy="7" r="5" fill={i < peopleCount ? getPersonColor(i, info.grade) : 'rgba(255,255,255,0.08)'} />
+                          <path d="M4 28 L4 18 Q4 13 10 13 Q16 13 16 18 L16 28"
+                            fill={i < peopleCount ? getPersonColor(i, info.grade) : 'rgba(255,255,255,0.05)'}
+                            opacity={i < peopleCount ? 0.7 : 1} />
+                        </svg>
+                      </div>
+                    {/each}
+                  </div>
+                  <div class="grade-bar">
+                    <div class="grade-bar-fill" style="width: {info.progress * 100}%; background: {info.grade === 'S' ? rainbowGrad : `linear-gradient(90deg, ${gradeColors[info.grade]}88, ${gradeColors[info.grade]})`}"></div>
+                    {#each gradeList as g}
+                      {@const pos = getThresholdRatio(criterion, g) * 100}
+                      {#if g !== 'S'}
+                        <div class="grade-marker" style="left: {pos}%">
+                          <div class="grade-marker-line" style="background: {gradeColors[g]}"></div>
+                          <span class="grade-marker-label" style="color: {gradeColors[g]}">{g}</span>
+                        </div>
+                      {/if}
+                    {/each}
+                  </div>
+                </div>
+
+              {:else if criterion.key === 'album'}
+                {@const tileCount = criterion.thresholds.S}
+                {@const litCount = Math.round(info.progress * tileCount)}
+                {@const cols = getAlbumGridCols(tileCount)}
+                {@const gap = getAlbumGap(tileCount)}
+                <div class="album-grid" style="grid-template-columns: repeat({cols}, 1fr); gap: {gap}px; --album-gap: {gap}; --album-radius: {tileCount > 48 ? 1 : tileCount > 24 ? 2 : 3}px">
+                  {#each Array(tileCount) as _, i}
+                    {@const isBoundaryC = i === getAlbumGradeBoundary(criterion, 'C', tileCount) - 1}
+                    {@const isBoundaryB = i === getAlbumGradeBoundary(criterion, 'B', tileCount) - 1}
+                    {@const isBoundaryA = i === getAlbumGradeBoundary(criterion, 'A', tileCount) - 1}
+                    <div class="album-tile" class:lit={i < litCount}
+                      class:boundary-c={isBoundaryC} class:boundary-b={isBoundaryB} class:boundary-a={isBoundaryA}
+                      style="background: {getAlbumTileColor(i, litCount, criterion, tileCount, info.grade)};
+                             {i < litCount && info.grade !== 'S' ? `box-shadow: inset 0 0 4px ${getAlbumTileColor(i, litCount, criterion, tileCount, info.grade)}44` : ''}
+                             {i < litCount && info.grade === 'S' ? `box-shadow: 0 0 4px ${rainbowPalette[i % rainbowPalette.length]}66` : ''}">
+                      {#if i < litCount && tileCount <= 24}
+                        <svg viewBox="0 0 12 12" class="tile-icon">
+                          <circle cx="6" cy="4" r="2.5" fill="rgba(0,0,0,0.3)"/>
+                          <rect x="2" y="7" width="8" height="4" rx="1" fill="rgba(0,0,0,0.2)"/>
+                        </svg>
+                      {/if}
                     </div>
                   {/each}
                 </div>
-                <div class="grade-bar">
-                  <div class="grade-bar-fill" style="width: {info.progress * 100}%; background: {info.grade === 'S' ? rainbowGrad : `linear-gradient(90deg, ${gradeColors[info.grade]}88, ${gradeColors[info.grade]})`}"></div>
-                  {#each gradeList as g}
-                    {@const pos = getThresholdRatio(criterion, g) * 100}
-                    {#if g !== 'S'}
-                      <div class="grade-marker" style="left: {pos}%">
-                        <div class="grade-marker-line" style="background: {gradeColors[g]}"></div>
-                        <span class="grade-marker-label" style="color: {gradeColors[g]}">{g}</span>
-                      </div>
-                    {/if}
-                  {/each}
-                </div>
-              </div>
-            </div>
-            <div class="criterion-label">
-              <span class="criterion-name">名声</span>
-              <span class="criterion-value">Lv.{info.value}</span>
-              <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
-              <span class="criterion-target">目標 Lv.{criterion.thresholds.C}～{criterion.thresholds.S}</span>
 
-            </div>
-          </div>
-
-        {:else if criterion.key === 'album'}
-          <!-- ═══ アルバム: タイルグリッド + 等級境界線 ═══ -->
-          {@const tileCount = criterion.thresholds.S}
-          {@const litCount = Math.round(info.progress * tileCount)}
-          {@const cols = getAlbumGridCols(tileCount)}
-          {@const gap = getAlbumGap(tileCount)}
-          <div class="criterion-card album-card" style="{cardStyle(info.grade, info.met)}">
-            <div class="criterion-visual">
-              <div class="album-grid" style="grid-template-columns: repeat({cols}, 1fr); gap: {gap}px; max-width: {tileCount > 24 ? 160 : 130}px; --album-gap: {gap}; --album-radius: {tileCount > 48 ? 1 : tileCount > 24 ? 2 : 3}px">
-                {#each Array(tileCount) as _, i}
-                  {@const isBoundaryC = i === getAlbumGradeBoundary(criterion, 'C', tileCount) - 1}
-                  {@const isBoundaryB = i === getAlbumGradeBoundary(criterion, 'B', tileCount) - 1}
-                  {@const isBoundaryA = i === getAlbumGradeBoundary(criterion, 'A', tileCount) - 1}
-                  <div
-                    class="album-tile"
-                    class:lit={i < litCount}
-                    class:boundary-c={isBoundaryC}
-                    class:boundary-b={isBoundaryB}
-                    class:boundary-a={isBoundaryA}
-                    style="background: {getAlbumTileColor(i, litCount, criterion, tileCount, info.grade)};
-                           {i < litCount && info.grade !== 'S' ? `box-shadow: inset 0 0 4px ${getAlbumTileColor(i, litCount, criterion, tileCount, info.grade)}44` : ''}
-                           {i < litCount && info.grade === 'S' ? `box-shadow: 0 0 4px ${rainbowPalette[i % rainbowPalette.length]}66` : ''}"
-                  >
-                    {#if i < litCount && tileCount <= 24}
-                      <svg viewBox="0 0 12 12" class="tile-icon">
-                        <circle cx="6" cy="4" r="2.5" fill="rgba(0,0,0,0.3)"/>
-                        <rect x="2" y="7" width="8" height="4" rx="1" fill="rgba(0,0,0,0.2)"/>
-                      </svg>
-                    {/if}
+              {:else}
+                <div class="generic-visual">
+                  <div class="generic-value-big" style="color: {gradeColors[info.grade]}">{info.value}</div>
+                  <div class="grade-bar">
+                    <div class="grade-bar-fill" style="width: {info.progress * 100}%; background: {info.grade === 'S' ? rainbowGrad : `linear-gradient(90deg, ${gradeColors[info.grade]}88, ${gradeColors[info.grade]})`}"></div>
+                    {#each gradeList as g}
+                      {@const pos = getThresholdRatio(criterion, g) * 100}
+                      {#if g !== 'S'}
+                        <div class="grade-marker" style="left: {pos}%">
+                          <div class="grade-marker-line" style="background: {gradeColors[g]}"></div>
+                          <span class="grade-marker-label" style="color: {gradeColors[g]}">{g}</span>
+                        </div>
+                      {/if}
+                    {/each}
                   </div>
-                {/each}
-              </div>
-            </div>
-            <div class="criterion-label">
-              <span class="criterion-name">アルバム</span>
-              <span class="criterion-value">{info.value}種</span>
-              <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
-              <span class="criterion-target">目標 {criterion.thresholds.C}～{criterion.thresholds.S}種</span>
-
-            </div>
-          </div>
-
-        {:else}
-          <!-- ═══ 汎用: プログレスバー + 等級マーカー ═══ -->
-          <div class="criterion-card generic-card" style="{cardStyle(info.grade, info.met)}">
-            <div class="criterion-visual">
-              <div class="generic-visual">
-                <div class="generic-value-big" style="color: {gradeColors[info.grade]}">{info.value}</div>
-                <div class="grade-bar">
-                  <div class="grade-bar-fill" style="width: {info.progress * 100}%; background: {info.grade === 'S' ? rainbowGrad : `linear-gradient(90deg, ${gradeColors[info.grade]}88, ${gradeColors[info.grade]})`}"></div>
-                  {#each gradeList as g}
-                    {@const pos = getThresholdRatio(criterion, g) * 100}
-                    {#if g !== 'S'}
-                      <div class="grade-marker" style="left: {pos}%">
-                        <div class="grade-marker-line" style="background: {gradeColors[g]}"></div>
-                        <span class="grade-marker-label" style="color: {gradeColors[g]}">{g}</span>
-                      </div>
-                    {/if}
-                  {/each}
                 </div>
-              </div>
+              {/if}
             </div>
-            <div class="criterion-label">
-              <span class="criterion-name">{criterion.label}</span>
-              <span class="criterion-value">{info.value}{criterion.unit}</span>
-              <span class="grade-row"><span class="grade-badge" style="background: {gradeBg(info.grade)}">{info.grade}</span>{#if info.met}<span class="passed-chip">PASS</span>{/if}</span>
-              <span class="criterion-target">目標 {criterion.thresholds.C}～{criterion.thresholds.S}{criterion.unit}</span>
 
+            <div class="dialog-thresholds">
+              {#each gradeList as g}
+                <span class="th-entry"><span class="th-grade-badge" style="background: {gradeColors[g]}">{g}</span>{criterion.thresholds[g]}</span>
+              {/each}
             </div>
           </div>
-
-        {/if}
         </div>
-      {/each}
-    </div>
+      </div>
+    {/if}
+  {/if}
 </div>
 
 <style>
@@ -702,81 +681,183 @@
   .days-until.yellow { color: #ffd54f; }
   .days-until.red { color: #ff8a65; }
 
-  /* ── グリッドレイアウト ── */
-  .criteria-grid {
+  /* ── 横並びチップ ── */
+  .criteria-row {
     display: flex;
-    gap: 12px;
-  }
-
-  .criterion-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-    min-width: 0;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 8px;
-    padding: 12px 8px 8px;
     gap: 6px;
   }
 
-  .criterion-visual {
+  .criterion-chip {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 80px;
-    width: 100%;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
+    padding: 6px 4px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    cursor: pointer;
+    color: #e0dce8;
+    font-family: inherit;
+    text-align: center;
+    position: relative;
   }
 
-  .criterion-label {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: baseline;
-    gap: 2px 8px;
-    width: 100%;
-    max-width: 150px;
-    margin-top: 4px;
+  .criterion-chip:hover {
+    background: rgba(255, 255, 255, 0.06);
   }
 
-  .criterion-target {
-    font-size: 11px;
-    font-weight: bold;
-    color: #a0a0b0;
-    justify-self: end;
-    white-space: nowrap;
+  .criterion-chip.met {
+    background: rgba(76, 175, 80, 0.08);
   }
 
-  .criterion-name {
-    font-size: 11px;
+  .chip-name {
+    font-size: 22px;
     color: #a89060;
     font-weight: bold;
   }
 
-  .criterion-value {
-    font-size: 12px;
-    font-weight: bold;
-    justify-self: end;
-    color: #e0dce8;
-  }
-
-  .grade-badge {
+  .chip-value-row {
     display: flex;
     align-items: center;
+    gap: 6px;
     justify-content: center;
-    width: 1.3em;
-    height: 1.3em;
-    border-radius: 3px;
-    font-size: 11px;
+  }
+
+  .chip-value {
+    font-weight: bold;
+    font-size: 32px;
+  }
+
+  .chip-grade {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    font-size: 20px;
     font-weight: bold;
     color: #1a1a2e;
     line-height: 1;
   }
 
-  .grade-row {
+  .chip-pass {
+    padding: 1px 5px;
+    background: rgba(76, 175, 80, 0.25);
+    border: 1px solid rgba(76, 175, 80, 0.5);
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: bold;
+    color: #81c784;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  /* ── 詳細ダイアログ ── */
+  .detail-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
     display: flex;
     align-items: center;
+    justify-content: center;
+  }
+
+  .detail-dialog {
+    background: linear-gradient(135deg, #1e1428 0%, #28203a 100%);
+    border: 2px solid #5a4a6a;
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 700px;
+    width: 95%;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .dialog-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: #a89060;
+  }
+
+  .dialog-value {
+    font-size: 38px;
+    font-weight: bold;
+    color: #e0dce8;
+  }
+
+  .dialog-grade {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    font-size: 26px;
+    font-weight: bold;
+    color: #1a1a2e;
+    line-height: 1;
+  }
+
+  .dialog-body {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .dialog-visual {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+  }
+
+  .dialog-thresholds {
+    display: flex;
+    flex-direction: column;
     gap: 4px;
+    font-size: 28px;
+    color: #a0a0b0;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 12px 16px;
+    flex-shrink: 0;
+  }
+
+  .th-entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    line-height: 1.5;
+  }
+
+  .th-grade-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #1a1a2e;
+    line-height: 1;
+    flex-shrink: 0;
   }
 
   .passed-chip {
@@ -795,9 +876,9 @@
   .grade-bar {
     position: relative;
     width: 100%;
-    height: 6px;
+    height: 10px;
     background: rgba(255, 255, 255, 0.06);
-    border-radius: 3px;
+    border-radius: 5px;
     overflow: visible;
   }
 
@@ -818,25 +899,25 @@
   }
 
   .grade-marker-line {
-    width: 2px;
-    height: 10px;
+    width: 3px;
+    height: 16px;
     border-radius: 1px;
-    opacity: 0.6;
+    opacity: 0.7;
   }
 
   .grade-marker-label {
-    font-size: 8px;
+    font-size: 14px;
     font-weight: bold;
-    opacity: 0.7;
+    opacity: 0.8;
     line-height: 1;
-    margin-top: 1px;
+    margin-top: 2px;
   }
 
   /* ── ポーション瓶 (level) ── */
   .potion-container {
     position: relative;
-    width: 70px;
-    height: 80px;
+    height: 220px;
+    aspect-ratio: 3 / 4;
   }
 
   .potion-svg {
@@ -858,14 +939,14 @@
     justify-content: center;
     flex-wrap: wrap;
     min-height: 32px;
-    max-width: 160px;
+    width: 100%;
     padding: 4px 0;
     row-gap: 2px;
   }
 
   .quest-star {
-    width: 18px;
-    height: 18px;
+    width: 30px;
+    height: 30px;
     flex-shrink: 0;
     transition: filter 0.3s ease;
   }
@@ -877,7 +958,7 @@
   .star-boundary {
     position: relative;
     width: 0;
-    height: 18px;
+    height: 30px;
     z-index: 100;
   }
 
@@ -885,10 +966,10 @@
     position: absolute;
     left: -2px;
     top: -2px;
-    width: 2px;
-    height: 22px;
+    width: 3px;
+    height: 34px;
     border-radius: 1px;
-    opacity: 0.5;
+    opacity: 0.6;
   }
 
   /* ── 村 (villageDev) ── */
@@ -901,8 +982,6 @@
 
   .village-scene {
     width: 100%;
-    max-width: 130px;
-    max-height: 60px;
     border-radius: 6px;
     overflow: hidden;
   }
@@ -938,8 +1017,8 @@
   }
 
   .person-svg {
-    width: 18px;
-    height: 28px;
+    width: 36px;
+    height: 52px;
   }
 
   /* ── アルバム (album) ── */
@@ -947,7 +1026,6 @@
     display: grid;
     gap: 3px;
     width: 100%;
-    max-width: 130px;
   }
 
   .album-tile {
@@ -1017,14 +1095,7 @@
   }
 
   /* ── ランク変動フィードバック ── */
-  .criterion-slot {
-    flex: 1;
-    min-width: 0;
-    position: relative;
-    display: flex;
-  }
-
-  .criterion-slot.grade-up {
+  .criterion-bar.grade-up {
     animation: gradeUpGlow 2s ease-out;
   }
 
@@ -1035,7 +1106,7 @@
     100% { filter: brightness(1); }
   }
 
-  .criterion-slot.grade-up .grade-badge {
+  .criterion-bar.grade-up .bar-grade {
     animation: gradeBadgeBounce 1.5s ease-out;
   }
 
