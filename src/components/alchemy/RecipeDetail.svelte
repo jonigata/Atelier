@@ -1,6 +1,6 @@
 <script lang="ts">
   import { countAvailableIngredients, calculateSuccessRate } from '$lib/services/alchemy';
-  import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
+  import { getItem } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
   import { gameState } from '$lib/stores/game';
   import { calcLevelFromExp } from '$lib/data/balance';
@@ -8,7 +8,6 @@
   import type { RecipeDef, Ingredient } from '$lib/models/types';
 
   export let recipe: RecipeDef;
-  export let onBack: () => void;
 
   function getIngredientName(ing: Ingredient): string {
     if (ing.itemId) {
@@ -27,16 +26,11 @@
 </script>
 
 <div class="recipe-detail">
-  <button class="back-btn small" on:click={onBack}>← レシピ選択に戻る</button>
-
   <div class="detail-header">
-    <img class="detail-icon" class:silhouette={!$gameState.discoveredItems.includes(recipe.resultItemId)} src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
-    <div>
-      <h3>{recipe.name} <span class="owned-count">所持: {ownedCount}個</span></h3>
-      {#if resultItem?.description}
-        <p class="detail-description">{resultItem.description}</p>
-      {/if}
-    </div>
+    <span class="owned-count">所持: {ownedCount}個</span>
+    {#if resultItem?.description}
+      <span class="detail-description">{resultItem.description}</span>
+    {/if}
   </div>
 
   <div class="detail-info">
@@ -82,50 +76,14 @@
     gap: 1rem;
   }
 
-  .back-btn {
-    padding: 0.3rem 0.75rem;
-    font-size: 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid #4a4a6a;
-    border-radius: 4px;
-    color: #c0c0d0;
-    cursor: pointer;
-    align-self: flex-start;
-  }
-
-  .back-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
   .detail-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-  }
-
-  .detail-icon {
-    width: 56px;
-    height: 56px;
-    object-fit: contain;
-    flex-shrink: 0;
-  }
-
-  .detail-icon.silhouette {
-    filter: brightness(0) saturate(0) opacity(0.3);
-  }
-
-  h3 {
-    font-size: 1.2rem;
-    color: #f4e4bc;
-    margin: 0;
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
+    gap: 0.75rem;
   }
 
   .owned-count {
     font-size: 1rem;
-    font-weight: normal;
     color: #a0a0b0;
   }
 

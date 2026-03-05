@@ -13,6 +13,7 @@
   import type { RecipeDef, OwnedItem, Ingredient, GaugeData } from '$lib/models/types';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
 
+  import { getItemIcon, handleIconError } from '$lib/data/items';
   import RecipeList from './alchemy/RecipeList.svelte';
   import RecipeDetail from './alchemy/RecipeDetail.svelte';
   import MaterialSlots from './alchemy/MaterialSlots.svelte';
@@ -25,6 +26,7 @@
   export let onBack: (opts?: { skipMilestoneCheck?: boolean }) => void;
 
   let selectedRecipe: RecipeDef | null = null;
+  let scrollContainer: HTMLElement;
 
   // 依頼からのジャンプ: レシピを自動選択
   onMount(() => {
@@ -32,8 +34,23 @@
     if (recipeId && recipes[recipeId]) {
       selectedRecipe = recipes[recipeId];
       pendingAlchemyRecipeId.set(null);
+      // 次フレームでスクロール
+      requestAnimationFrame(() => scrollToRight());
     }
   });
+
+  function scrollToRight() {
+    if (scrollContainer && scrollContainer.children[1]) {
+      const rightPage = scrollContainer.children[1] as HTMLElement;
+      scrollContainer.scrollTo({ left: rightPage.offsetLeft, behavior: 'smooth' });
+    }
+  }
+
+  function scrollToLeft() {
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ left: 0, behavior: 'smooth' });
+    }
+  }
   let craftQuantity: number = 1;
   let selectedItems: OwnedItem[] = [];
   let craftResultData: CraftMultipleResult | null = null;
@@ -143,13 +160,18 @@
     craftQuantity = 1;
     selectedItems = [];
     craftResultData = null;
+    requestAnimationFrame(() => scrollToRight());
   }
 
   function backToRecipeList() {
-    selectedRecipe = null;
-    craftQuantity = 1;
-    selectedItems = [];
-    craftResultData = null;
+    scrollToLeft();
+    // スクロール完了後にリセット
+    setTimeout(() => {
+      selectedRecipe = null;
+      craftQuantity = 1;
+      selectedItems = [];
+      craftResultData = null;
+    }, 300);
   }
 
   function setQuantity(n: number) {
@@ -334,79 +356,100 @@
   }
 </script>
 
-<div class="alchemy-panel">
-  {#if !selectedRecipe}
-    <RecipeList recipes={availableRecipes} onSelect={selectRecipe} />
-  {:else if !canCraftSelected}
-    <RecipeDetail recipe={selectedRecipe} onBack={backToRecipeList} />
-  {:else}
-    <div class="crafting-area">
-      <button class="back-btn small" on:click={backToRecipeList}>← レシピ選択に戻る</button>
-
-      <h3>{selectedRecipe.name}を調合</h3>
-
-      <!-- 個数選択 -->
-      <div class="quantity-section">
-        <h4>作成個数</h4>
-        <div class="quantity-selector">
-          {#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as n}
-            <button
-              class="qty-num-btn"
-              class:selected={craftQuantity === n}
-              on:click={() => setQuantity(n)}
-              disabled={n > maxCraftable || n > maxWithoutInspection || selectedItems.length > 0}
-            >{n}</button>
-          {/each}
-          <span class="qty-max">/ 最大 {maxCraftable}個</span>
-        </div>
-        <p class="quantity-hint">所要日数: {formatCraftDays(getEffectiveCraftDays(selectedRecipe))} × {craftQuantity}個 = <span class="days-total" class:multi-day={craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity) >= 2}>{craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)}日</span></p>
-        {#if maxWithoutInspection === 0}
-          {@const conflictDay = getInspectionConflictForQuantity(1)}
-          <div class="inspection-warning">
-            {conflictDay}日目に査察があるため、調合できません
-          </div>
-        {:else if maxWithoutInspection < maxCraftable && maxWithoutInspection < 10}
-          {@const conflictDay = getInspectionConflictForQuantity(maxWithoutInspection + 1)}
-          <div class="inspection-warning">
-            {conflictDay}日目に査察があるため、{maxWithoutInspection + 1}個以上は調合できません
-          </div>
-        {/if}
-      </div>
-
-      {#if maxWithoutInspection > 0}
-        <MaterialSlots
-          ingredients={selectedRecipe.ingredients}
-          {selectedItems}
-          {craftQuantity}
-          {currentIngredient}
-          onUndoLast={undoLastSelection}
-          onAutoFill={autoFillAll}
-          onClear={clearSelection}
-        />
-
-        {#if !selectionComplete}
-          <ItemPicker
-            items={availableItemsForSelection}
-            {currentIngredient}
-            onSelect={selectItem}
-          />
-        {:else}
-          <CraftPreview
-            {successRate}
-            {expectedQuality}
-            {craftQuantity}
-            daysRequired={craftDaysRequired}
-            {staminaCost}
-            {totalStaminaCost}
-            currentStamina={$gameState.stamina}
-            {fatiguePenalty}
-            {fatigueLabel}
-            onCraft={executeCraft}
-          />
-        {/if}
-      {/if}
-    </div>
+<div class="alchemy-wrapper">
+  <!-- 戻るストリップ: 横スクロールの外に配置してstickyを効かせる -->
+  {#if selectedRecipe}
+    <button class="back-strip" on:click={backToRecipeList}>
+      <span class="back-strip-arrow">‹</span>
+    </button>
   {/if}
+
+  <div class="alchemy-panel" bind:this={scrollContainer}>
+    <!-- 左ページ: レシピ選択 -->
+    <div class="page page-left">
+      <RecipeList recipes={availableRecipes} onSelect={selectRecipe} />
+    </div>
+
+    <!-- 右ページ: 調合編集 -->
+    {#if selectedRecipe}
+      <div class="page page-right">
+        <div class="right-page-content">
+          <!-- タイトル: アイコン + レシピ名 -->
+          <h3 class="right-page-title">
+            <img class="title-icon" src={getItemIcon(selectedRecipe.resultItemId)} alt={selectedRecipe.name} on:error={handleIconError} />
+            {selectedRecipe.name}
+          </h3>
+
+          {#if !canCraftSelected}
+            <RecipeDetail recipe={selectedRecipe} />
+          {:else}
+            <div class="crafting-area">
+              <!-- 個数選択 -->
+              <div class="quantity-section">
+                <h4>作成個数</h4>
+                <div class="quantity-selector">
+                  {#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as n}
+                    <button
+                      class="qty-num-btn"
+                      class:selected={craftQuantity === n}
+                      on:click={() => setQuantity(n)}
+                      disabled={n > maxCraftable || n > maxWithoutInspection || selectedItems.length > 0}
+                    >{n}</button>
+                  {/each}
+                  <span class="qty-max">/ 最大 {maxCraftable}個</span>
+                </div>
+                <p class="quantity-hint">所要日数: {formatCraftDays(getEffectiveCraftDays(selectedRecipe))} × {craftQuantity}個 = <span class="days-total" class:multi-day={craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity) >= 2}>{craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)}日</span></p>
+                {#if maxWithoutInspection === 0}
+                  {@const conflictDay = getInspectionConflictForQuantity(1)}
+                  <div class="inspection-warning">
+                    {conflictDay}日目に査察があるため、調合できません
+                  </div>
+                {:else if maxWithoutInspection < maxCraftable && maxWithoutInspection < 10}
+                  {@const conflictDay = getInspectionConflictForQuantity(maxWithoutInspection + 1)}
+                  <div class="inspection-warning">
+                    {conflictDay}日目に査察があるため、{maxWithoutInspection + 1}個以上は調合できません
+                  </div>
+                {/if}
+              </div>
+
+              {#if maxWithoutInspection > 0}
+                <MaterialSlots
+                  ingredients={selectedRecipe.ingredients}
+                  {selectedItems}
+                  {craftQuantity}
+                  {currentIngredient}
+                  onUndoLast={undoLastSelection}
+                  onAutoFill={autoFillAll}
+                  onClear={clearSelection}
+                />
+
+                {#if !selectionComplete}
+                  <ItemPicker
+                    items={availableItemsForSelection}
+                    {currentIngredient}
+                    onSelect={selectItem}
+                  />
+                {:else}
+                  <CraftPreview
+                    {successRate}
+                    {expectedQuality}
+                    {craftQuantity}
+                    daysRequired={craftDaysRequired}
+                    {staminaCost}
+                    {totalStaminaCost}
+                    currentStamina={$gameState.stamina}
+                    {fatiguePenalty}
+                    {fatigueLabel}
+                    onCraft={executeCraft}
+                  />
+                {/if}
+              {/if}
+            </div>
+          {/if}
+        </div>
+      </div>
+    {/if}
+  </div>
 </div>
 
 {#if craftResultData && selectedRecipe}
@@ -428,33 +471,87 @@
 {/if}
 
 <style>
-  .alchemy-panel {
+  .alchemy-wrapper {
+    display: flex;
+    /* 親の共通paddingの横方向を上書き */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
-  .back-btn {
-    padding: 0.3rem 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid #4a4a6a;
-    border-radius: 4px;
-    color: #c0c0d0;
+  .back-strip {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    flex-shrink: 0;
+    width: 1.8rem;
+    /* HUD + subpage-header + home button bar を除いた可視領域 */
+    height: calc(var(--app-height) - 12rem);
+    background: #1e1e36;
+    border: none;
+    border-right: 1px solid #4a4a6a;
+    color: #808090;
     cursor: pointer;
-    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    z-index: 1;
   }
 
-  .back-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
+  .back-strip:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #c0c0d0;
   }
 
-  h2 {
+  .back-strip-arrow {
     font-size: 1.5rem;
-    color: #f4e4bc;
-    margin-bottom: 1rem;
+    line-height: 1;
   }
 
-  h3 {
+  .alchemy-panel {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .alchemy-panel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .page {
+    flex: 0 0 100%;
+    min-width: 0;
+    scroll-snap-align: start;
+    box-sizing: border-box;
+  }
+
+  .page-left {
+    padding: 0 1.5rem;
+  }
+
+  .right-page-content {
+    display: flex;
+    flex-direction: column;
+    padding: 0 1.5rem 0 0.75rem;
+  }
+
+  .right-page-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: 1.2rem;
     color: #f4e4bc;
-    margin: 1rem 0;
+    margin: 0 0 0.75rem 0;
+  }
+
+  .title-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
   }
 
   h4 {
@@ -545,5 +642,4 @@
     color: #ff9800;
     font-size: 1rem;
   }
-
 </style>
