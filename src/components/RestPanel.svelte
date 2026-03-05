@@ -117,7 +117,7 @@
           <source src="/movies/rest.mp4" type="video/mp4" />
         </video>
         <div class="video-text">休息中...</div>
-        {#if canSkipVideo}<div class="video-hint"><ContinueMarker /></div>{/if}
+        <div class="video-hint"><ContinueMarker visible={canSkipVideo} /></div>
       </div>
     {/if}
   </div>
@@ -266,13 +266,6 @@
 
   .video-hint {
     font-size: 0.85rem;
-    color: #6a6a8a;
-    visibility: hidden;
-  }
-
-  .video-hint.visible {
-    visibility: visible;
-    animation: fadeIn 0.3s ease-out;
   }
 
   @keyframes fadeIn {

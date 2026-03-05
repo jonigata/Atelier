@@ -111,7 +111,7 @@
         <source src="/movies/craft.mp4" type="video/mp4" />
       </video>
       <p class="brewing-text">調合中...</p>
-      {#if mounted}<p class="skip-hint"><ContinueMarker /></p>{/if}
+      <p class="skip-hint"><ContinueMarker visible={mounted} /></p>
     </div>
   {/if}
 
@@ -288,12 +288,6 @@
 
   .skip-hint {
     font-size: 0.85rem;
-    color: #6a6a8a;
-    visibility: hidden;
-  }
-
-  .skip-hint.visible {
-    visibility: visible;
   }
 
   .brewing-text {

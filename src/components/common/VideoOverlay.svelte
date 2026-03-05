@@ -41,7 +41,7 @@
     {#if text}
       <div class="video-text">{text}</div>
     {/if}
-    {#if canSkip}<div class="video-hint"><ContinueMarker /></div>{/if}
+    <div class="video-hint"><ContinueMarker visible={canSkip} /></div>
   </div>
 </div>
 
@@ -96,12 +96,5 @@
 
   .video-hint {
     font-size: 0.85rem;
-    color: #6a6a8a;
-    visibility: hidden;
-  }
-
-  .video-hint.visible {
-    visibility: visible;
-    animation: fadeIn 0.3s ease-out;
   }
 </style>
