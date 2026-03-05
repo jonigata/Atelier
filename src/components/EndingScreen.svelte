@@ -8,6 +8,7 @@
   import { get } from 'svelte/store';
   import { getNickname, saveNickname, submitScore } from '$lib/services/ranking';
   import NicknameInput from './NicknameInput.svelte';
+  import ContinueMarker from './common/ContinueMarker.svelte';
 
   type EndingType = 'true' | 'good' | 'normal' | 'mediocre' | 'fail';
 
@@ -230,7 +231,7 @@
       最初から
     </button>
     {:else}
-    <p class="click-hint">click</p>
+    <p class="continue-hint"><ContinueMarker /></p>
     {/if}
   </div>
 </div>
@@ -587,16 +588,8 @@
     margin-bottom: 1.5rem;
   }
 
-  .click-hint {
-    color: rgba(160, 160, 176, 0.6);
-    font-size: 0.85rem;
+  .continue-hint {
     margin-top: 1rem;
-    animation: blink 1.5s ease-in-out infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 1; }
   }
 
   .fade-in {
