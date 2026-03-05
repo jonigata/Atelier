@@ -17,6 +17,7 @@
   import { recipes } from '$lib/data/recipes';
   import { getQuestClient } from '$lib/data/quests';
   import { processActionComplete, processAchievementPresentation, showDialogueAndWait } from '$lib/services/presentation';
+  import { showConfirmAndWait } from '$lib/stores/confirmDialog';
   import { executeQuestDelivery } from '$lib/services/quest';
   import { checkAchievements } from '$lib/services/achievement';
   import { showDrawsForLevelUp } from '$lib/services/drawEvent';
@@ -64,15 +65,18 @@
     await processActionComplete();
   }
 
-  // 依頼をキャンセル（失敗と同じペナルティ）
-  function cancelQuest(quest: ActiveQuest) {
-    if (!confirm(`依頼「${quest.title}」をキャンセルしますか？\n失敗と同じペナルティ（名声-5）が発生します。`)) {
-      return;
-    }
+  // 依頼を取り下げ（失敗と同じペナルティ）
+  async function cancelQuest(quest: ActiveQuest) {
+    const confirmed = await showConfirmAndWait({
+      message: `依頼「${quest.title}」を取り下げますか？\n失敗と同じペナルティ（名声-5）が発生します。`,
+      confirmLabel: '取り下げる',
+      cancelLabel: '取り下げない',
+    });
+    if (!confirmed) return;
     addReputationExp(-5);
     incrementFailedQuests();
     removeActiveQuest(quest.id);
-    addMessage(`依頼「${quest.title}」をキャンセルしました。名声が下がりました。`);
+    addMessage(`依頼「${quest.title}」を取り下げました。名声が下がりました。`);
   }
 
   // 納品可能かチェック
@@ -383,7 +387,7 @@
         <p class="empty">受注中の依頼はありません</p>
       {:else}
         {#each $gameState.activeQuests as quest (quest.id)}
-          <ActiveQuestCard {quest} showDeliverButton={true} onDeliver={deliverQuest} onCancel={cancelQuest} />
+          <ActiveQuestCard {quest} compact showDeliverButton={true} onDeliver={deliverQuest} onCancel={cancelQuest} />
         {/each}
       {/if}
     </div>

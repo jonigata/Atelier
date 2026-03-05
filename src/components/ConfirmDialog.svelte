@@ -82,8 +82,8 @@
     background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
     border: 2px solid #8b7355;
     border-radius: 12px;
-    max-width: 520px;
-    width: 90%;
+    max-width: 620px;
+    width: 95%;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     overflow: hidden;
     animation: boxPopIn 0.2s ease-out;
@@ -131,7 +131,7 @@
   }
 
   .character-name {
-    font-size: 1.1rem;
+    font-size: 0.85rem;
     font-weight: bold;
     color: #c9a959;
     margin-bottom: 0.5rem;
@@ -140,7 +140,7 @@
   }
 
   .confirm-message {
-    font-size: 1.05rem;
+    font-size: 0.8rem;
     line-height: 1.7;
     color: #e0e0f0;
     white-space: pre-line;
@@ -155,10 +155,10 @@
 
   .confirm-btn {
     flex: 1;
-    max-width: 160px;
-    padding: 0.7rem 1.5rem;
+    max-width: 240px;
+    padding: 0.5rem 1.5rem;
     border-radius: 6px;
-    font-size: 1rem;
+    font-size: 0.75rem;
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.15s, box-shadow 0.15s;

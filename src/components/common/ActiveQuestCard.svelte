@@ -108,14 +108,14 @@
         disabled={!canDeliverNow}
         on:click={() => onDeliver(quest)}
       >
-        {canDeliverNow ? '納品する' : '準備中...'}
+        {canDeliverNow ? '納品' : '準備中'}
       </button>
       {#if onCancel}
         <button
           class="cancel-btn"
           on:click={() => onCancel(quest)}
         >
-          キャンセル
+          取り下げ
         </button>
       {/if}
     </div>
@@ -337,6 +337,17 @@
   .quest-card.compact .ready-badge {
     padding: 0.1rem 0.35rem;
     font-size: 0.65rem;
+  }
+
+  .quest-card.compact .quest-actions {
+    gap: 0.3rem;
+    margin-top: 0.3rem;
+  }
+
+  .quest-card.compact .deliver-btn,
+  .quest-card.compact .cancel-btn {
+    padding: 0.3rem;
+    font-size: 0.7rem;
   }
 
   /* アクションボタン群 */
