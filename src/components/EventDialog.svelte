@@ -245,8 +245,8 @@
                 <ItemCard
                   itemId={reward.itemId}
                   label={reward.text}
-                  iconUrl={reward.iconUrl}
-                  emoji={!reward.itemId && !reward.iconUrl ? (reward.type === 'money' ? '💰' : '🎁') : null}
+                  iconUrl={reward.iconUrl || (!reward.itemId && reward.type === 'money' ? '/icons/ui/coin.png' : null)}
+                  emoji={!reward.itemId && !reward.iconUrl && reward.type !== 'money' ? '🎁' : null}
                 />
               {/each}
             </div>
@@ -293,10 +293,10 @@
               </div>
             {:else if !reward.itemId}
               <div class="showcase-icon">
-                {#if reward.iconUrl}
-                  <img src={reward.iconUrl} alt="" class:wide-img={reward.type === 'unlock'} on:error={handleIconError} />
+                {#if reward.iconUrl || reward.type === 'money'}
+                  <img src={reward.iconUrl || '/icons/ui/coin.png'} alt="" class:wide-img={reward.type === 'unlock'} on:error={handleIconError} />
                 {:else}
-                  <span class="showcase-emoji">{reward.type === 'money' ? '💰' : reward.type === 'recipe' ? '📖' : '🎁'}</span>
+                  <span class="showcase-emoji">{reward.type === 'recipe' ? '📖' : '🎁'}</span>
                 {/if}
               </div>
               <div class="showcase-text">{reward.text}</div>

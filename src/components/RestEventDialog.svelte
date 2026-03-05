@@ -80,7 +80,7 @@
         {#each normalRewards as reward}
           <div class="reward-item" class:gold={reward.type === 'gold'} class:exp={reward.type === 'exp'} class:item={reward.type === 'item'}>
             <span class="reward-bullet">
-              {#if reward.type === 'gold'}💰
+              {#if reward.type === 'gold'}<img class="reward-icon" src="/icons/ui/coin.png" alt="" />
               {:else if reward.type === 'exp'}📘
               {:else}📦
               {/if}
@@ -232,6 +232,12 @@
   .reward-bullet {
     font-size: 1rem;
     flex-shrink: 0;
+  }
+
+  .reward-icon {
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: middle;
   }
 
   .reward-text {
