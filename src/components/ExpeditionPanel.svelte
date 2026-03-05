@@ -4,7 +4,7 @@
   import { getAllAreas } from '$lib/data/areas';
   import { getItem } from '$lib/data/items';
   import type { AreaDef } from '$lib/models/types';
-  import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
+
 
   export let onBack: () => void;
 
@@ -84,8 +84,6 @@
 </script>
 
 <div class="expedition-panel">
-  <h2>採取隊派遣 <ActiveEquipmentIcons prefixes={['expedition_', 'all_probability']} /></h2>
-
   {#if expeditionActive}
     <div class="status-box">
       <h3>派遣中</h3>

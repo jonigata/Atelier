@@ -6,6 +6,7 @@
   import ProgressDial from './common/ProgressDial.svelte';
 
   export let onScoreClick: (() => void) | undefined = undefined;
+  export let showSubRow: boolean = true;
 
   let showConfig = false;
 
@@ -60,11 +61,13 @@
     </div>
   </div>
 
-  <div class="hud-row sub-row">
-    <ProgressDial value={alchemyExpPct} label="錬金術" level={$alchemyLevel} color="#64b5f6" size={160} />
-    <ProgressDial value={reputationExpPct} label="名声" level={$reputationLevel} color="#ffd700" size={160} />
-    <ProgressDial value={villageExpPct} label="村発展" level={$villageLevel} color="#81c784" size={160} />
-  </div>
+  {#if showSubRow}
+    <div class="hud-row sub-row">
+      <ProgressDial value={alchemyExpPct} label="錬金術" level={$alchemyLevel} color="#64b5f6" size={160} />
+      <ProgressDial value={reputationExpPct} label="名声" level={$reputationLevel} color="#ffd700" size={160} />
+      <ProgressDial value={villageExpPct} label="村発展" level={$villageLevel} color="#81c784" size={160} />
+    </div>
+  {/if}
 
 </div>
 

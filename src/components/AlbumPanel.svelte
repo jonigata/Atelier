@@ -151,8 +151,6 @@
 </script>
 
 <div class="album-panel">
-  <h2>アルバム</h2>
-
   <!-- タブ切り替え -->
   <div class="tab-bar">
     <button class="tab" class:active={activeTab === 'items'} on:click={() => activeTab = 'items'}>

@@ -78,7 +78,6 @@
 <svelte:window on:keydown={handleKeydown} />
 
 <div class="rest-panel">
-  <h2>休息</h2>
   <p>体力を全回復します。1日経過します。</p>
   <div class="stamina-display">
     <div class="stamina-header">

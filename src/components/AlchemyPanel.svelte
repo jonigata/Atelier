@@ -20,7 +20,7 @@
   import CraftPreview from './alchemy/CraftPreview.svelte';
   import CraftResultDialog from './alchemy/CraftResultDialog.svelte';
   import LevelUpDialog from './LevelUpDialog.svelte';
-  import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
+
 
   export let onBack: (opts?: { skipMilestoneCheck?: boolean }) => void;
 
@@ -335,8 +335,6 @@
 </script>
 
 <div class="alchemy-panel">
-  <h2>調合 <ActiveEquipmentIcons prefixes={['craft_', 'material_', 'all_probability']} /></h2>
-
   {#if !selectedRecipe}
     <RecipeList recipes={availableRecipes} onSelect={selectRecipe} />
   {:else if !canCraftSelected}

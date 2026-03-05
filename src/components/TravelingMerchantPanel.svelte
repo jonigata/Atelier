@@ -58,7 +58,7 @@
 
 <div class="merchant-panel">
   <div class="merchant-header">
-    <h2>マルコの行商 ── {currentMonth}月の品揃え</h2>
+    <span class="merchant-subtitle">{currentMonth}月の品揃え</span>
     <span class="days-left">あと{merchantDaysLeft}日</span>
   </div>
 
@@ -127,10 +127,9 @@
     margin-bottom: 1rem;
   }
 
-  h2 {
-    font-size: 1.5rem;
-    color: #f4e4bc;
-    margin-bottom: 0;
+  .merchant-subtitle {
+    font-size: 1rem;
+    color: #c9a959;
   }
 
   .days-left {

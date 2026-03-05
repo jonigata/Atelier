@@ -23,9 +23,30 @@
   import ToastContainer from '../components/ToastContainer.svelte';
   import TalkBanner from '../components/TalkBanner.svelte';
   import HomeButton from '../components/common/HomeButton.svelte';
+  import ActiveEquipmentIcons from '../components/common/ActiveEquipmentIcons.svelte';
   import { initZoom } from '$lib/services/zoomController';
   import { dev } from '$app/environment';
   import type { ActionType } from '$lib/models/types';
+
+  const ACTION_TITLES: Record<ActionType, string> = {
+    alchemy: '調合',
+    quest: '依頼',
+    expedition: '採取隊派遣',
+    shop: 'ショップ',
+    inventory: 'インベントリ',
+    album: 'アルバム',
+    rest: '休息',
+    study: '勉強',
+    traveling_merchant: 'マルコの行商',
+  };
+
+  const ACTION_EQUIP_PREFIXES: Partial<Record<ActionType, string[]>> = {
+    alchemy: ['craft_', 'material_', 'all_probability'],
+    quest: ['quest_'],
+    expedition: ['expedition_', 'all_probability'],
+    shop: ['sell_', 'buy_'],
+    study: ['study_'],
+  };
 
   let selectedAction: ActionType | null = null;
 
@@ -117,10 +138,22 @@
   {#if $gameState.phase === 'ending'}
     <EndingScreen />
   {:else}
-    <HUD onScoreClick={handleScoreClick} />
+    <HUD onScoreClick={handleScoreClick} showSubRow={selectedAction === null} />
 
     <main class="main-panel">
-      <MessageLog />
+      {#if $gameState.phase === 'action' && selectedAction !== null}
+        <div class="subpage-header">
+          <h2 class="subpage-title">
+            {ACTION_TITLES[selectedAction]}
+            {#if ACTION_EQUIP_PREFIXES[selectedAction]}
+              <ActiveEquipmentIcons prefixes={ACTION_EQUIP_PREFIXES[selectedAction]} />
+            {/if}
+          </h2>
+          <MessageLog />
+        </div>
+      {:else}
+        <MessageLog />
+      {/if}
       {#if $gameState.phase === 'morning'}
         <MorningPanel />
       {:else if $gameState.phase === 'action'}
@@ -210,6 +243,26 @@
     display: flex;
     flex-direction: column;
     position: relative;
+  }
+
+  .subpage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .subpage-header :global(.log-toggle-btn) {
+    position: static;
+  }
+
+  .subpage-title {
+    font-size: 1.3rem;
+    color: #f4e4bc;
+    margin: 0;
+    display: flex;
+    align-items: center;
   }
 
   .save-indicator {

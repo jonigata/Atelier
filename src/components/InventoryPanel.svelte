@@ -211,8 +211,6 @@
 </script>
 
 <div class="inventory-panel">
-  <h2>インベントリ</h2>
-
   <div class="inventory-header">
     <span class="total-count">所持アイテム: {totalItems}個</span>
 

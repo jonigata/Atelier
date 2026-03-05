@@ -19,7 +19,7 @@
   import type { OwnedItem, ItemDef, EquipmentDef } from '$lib/models/types';
   import { isCraftedCategory } from '$lib/data/categories';
   import { recipes } from '$lib/data/recipes';
-  import ActiveEquipmentIcons from './common/ActiveEquipmentIcons.svelte';
+
 
   export let onBack: () => void;
 
@@ -296,8 +296,6 @@
 
 <div class="shop-panel">
   <div class="shop-header">
-    <h2>ショップ <ActiveEquipmentIcons prefixes={['sell_', 'buy_']} /></h2>
-
     <div class="money-display">
       所持金: <span class="amount">{$gameState.money.toLocaleString()}G</span>
     </div>
