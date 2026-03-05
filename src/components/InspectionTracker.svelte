@@ -595,8 +595,8 @@
     background: linear-gradient(135deg, rgba(30, 20, 40, 0.9) 0%, rgba(40, 30, 50, 0.9) 100%);
     border: 2px solid #4a3a5a;
     border-radius: 10px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 1rem;
+    padding: 16px 20px;
+    margin-bottom: 16px;
     transition: border-color 0.3s ease;
   }
 
@@ -638,27 +638,27 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
+    margin-bottom: 12px;
   }
 
   .tracker-title {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
   }
 
   .quarter-badge {
-    padding: 0.15rem 0.5rem;
+    padding: 2px 8px;
     background: rgba(201, 169, 89, 0.3);
     border: 1px solid #c9a959;
     border-radius: 4px;
-    font-size: 0.8rem;
+    font-size: 13px;
     font-weight: bold;
     color: #c9a959;
   }
 
   .title-text {
-    font-size: 0.95rem;
+    font-size: 15px;
     font-weight: bold;
     color: #e0e0f0;
   }
@@ -666,11 +666,11 @@
   .tracker-meta {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 12px;
   }
 
   .met-count {
-    font-size: 0.85rem;
+    font-size: 14px;
     color: #d0d0e0;
     font-weight: bold;
   }
@@ -681,11 +681,11 @@
 
   .clear-badge {
     display: inline-block;
-    padding: 0.1rem 0.6rem;
+    padding: 2px 10px;
     background: linear-gradient(135deg, rgba(76, 175, 80, 0.4), rgba(129, 199, 132, 0.3));
     border: 1.5px solid #81c784;
     border-radius: 4px;
-    font-size: 0.85rem;
+    font-size: 14px;
     font-weight: bold;
     color: #a5d6a7;
     letter-spacing: 0.15em;
@@ -694,7 +694,7 @@
   }
 
   .days-until {
-    font-size: 0.9rem;
+    font-size: 14px;
     font-weight: bold;
   }
 
@@ -705,7 +705,7 @@
   /* ── グリッドレイアウト ── */
   .criteria-grid {
     display: flex;
-    gap: 0.75rem;
+    gap: 12px;
   }
 
   .criterion-card {
@@ -717,8 +717,8 @@
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 8px;
-    padding: 0.75rem 0.5rem 0.5rem;
-    gap: 0.4rem;
+    padding: 12px 8px 8px;
+    gap: 6px;
   }
 
   .criterion-visual {
@@ -733,27 +733,27 @@
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: baseline;
-    gap: 0.15rem 0.5rem;
+    gap: 2px 8px;
     width: 100%;
     max-width: 150px;
-    margin-top: 0.25rem;
+    margin-top: 4px;
   }
 
   .criterion-target {
-    font-size: 0.8rem;
+    font-size: 13px;
     font-weight: bold;
     color: #a0a0b0;
     justify-self: end;
   }
 
   .criterion-name {
-    font-size: 0.75rem;
+    font-size: 12px;
     color: #a89060;
     font-weight: bold;
   }
 
   .criterion-value {
-    font-size: 0.8rem;
+    font-size: 13px;
     font-weight: bold;
     justify-self: end;
     color: #e0dce8;
@@ -766,7 +766,7 @@
     width: 1.3em;
     height: 1.3em;
     border-radius: 3px;
-    font-size: 0.7rem;
+    font-size: 11px;
     font-weight: bold;
     color: #1a1a2e;
     line-height: 1;
@@ -775,15 +775,15 @@
   .grade-row {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 4px;
   }
 
   .passed-chip {
-    padding: 0.05rem 0.25rem;
+    padding: 1px 4px;
     background: rgba(76, 175, 80, 0.25);
     border: 1px solid rgba(76, 175, 80, 0.5);
     border-radius: 3px;
-    font-size: 0.5rem;
+    font-size: 8px;
     font-weight: bold;
     color: #81c784;
     letter-spacing: 0.05em;
@@ -824,7 +824,7 @@
   }
 
   .grade-marker-label {
-    font-size: 0.5rem;
+    font-size: 8px;
     font-weight: bold;
     opacity: 0.7;
     line-height: 1;
@@ -858,7 +858,7 @@
     flex-wrap: wrap;
     min-height: 32px;
     max-width: 160px;
-    padding: 0.25rem 0;
+    padding: 4px 0;
     row-gap: 2px;
   }
 
@@ -894,7 +894,7 @@
   .village-visual-inner {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 4px;
     width: 100%;
   }
 
@@ -915,14 +915,14 @@
   .reputation-visual-inner {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 4px;
     width: 100%;
     align-items: center;
   }
 
   .people-container {
     display: flex;
-    gap: 0.15rem;
+    gap: 2px;
     align-items: flex-end;
     min-height: 40px;
   }
@@ -1003,13 +1003,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
     width: 100%;
     max-width: 140px;
   }
 
   .generic-value-big {
-    font-size: 1.8rem;
+    font-size: 29px;
     font-weight: bold;
     line-height: 1;
   }
@@ -1053,8 +1053,8 @@
     z-index: 10;
     display: flex;
     align-items: center;
-    gap: 0.15rem;
-    font-size: 0.85rem;
+    gap: 2px;
+    font-size: 14px;
     font-weight: bold;
     white-space: nowrap;
     animation: gradeIndicatorFloat 2s ease-out forwards;
@@ -1083,4 +1083,5 @@
     30% { transform: scale(1.05); }
     100% { transform: scale(1); text-shadow: none; }
   }
+
 </style>
