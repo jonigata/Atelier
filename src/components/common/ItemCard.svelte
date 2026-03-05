@@ -39,11 +39,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0.5rem;
+    width: 155px;
+    height: 170px;
+    padding: 0.25rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid #4a4a6a;
     border-radius: 4px;
     font-size: 1rem;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .item-card.clickable {
@@ -56,10 +60,10 @@
   }
 
   .item-icon {
-    width: 40px;
-    height: 40px;
+    width: 80px;
+    height: 80px;
     object-fit: contain;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.15rem;
   }
 
   .item-emoji {
@@ -76,6 +80,7 @@
     font-weight: bold;
     color: #e0e0f0;
     text-align: center;
+    font-size: 0.8rem;
   }
 
   .item-description {
@@ -87,7 +92,7 @@
 
   .item-quality {
     color: #a0a0b0;
-    font-size: 1rem;
+    font-size: 0.75rem;
   }
 
   .item-quality.high {

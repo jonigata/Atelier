@@ -42,7 +42,7 @@
 
 <style>
   .item-selection {
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
   }
@@ -50,7 +50,7 @@
   h4 {
     font-size: 1rem;
     color: #c9a959;
-    margin-bottom: 0.5rem;
+    margin: 0 0 0.25rem 0;
   }
 
   .available-items {

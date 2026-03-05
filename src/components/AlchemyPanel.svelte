@@ -397,14 +397,16 @@
               <div class="quantity-section">
                 <h4>作成個数</h4>
                 <div class="quantity-selector">
-                  {#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as n}
-                    <button
-                      class="qty-num-btn"
-                      class:selected={craftQuantity === n}
-                      on:click={() => setQuantity(n)}
-                      disabled={n > maxCraftable || n > maxWithoutInspection || selectedItems.length > 0}
-                    >{n}</button>
-                  {/each}
+                  <div class="qty-grid">
+                    {#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as n}
+                      <button
+                        class="qty-num-btn"
+                        class:selected={craftQuantity === n}
+                        on:click={() => setQuantity(n)}
+                        disabled={n > maxCraftable || n > maxWithoutInspection || selectedItems.length > 0}
+                      >{n}</button>
+                    {/each}
+                  </div>
                   <span class="qty-max">/ 最大 {maxCraftable}個</span>
                 </div>
                 <p class="quantity-hint">所要日数: {formatCraftDays(getEffectiveCraftDays(selectedRecipe))} × {craftQuantity}個 = <span class="days-total" class:multi-day={craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity) >= 2}>{craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)}日</span></p>
@@ -566,32 +568,36 @@
   h4 {
     font-size: 1rem;
     color: #c9a959;
-    margin-bottom: 0.5rem;
+    margin: 0 0 0.25rem 0;
   }
 
   .crafting-area {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
   }
 
   .quantity-section {
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 8px;
-    margin-bottom: 1rem;
   }
 
   .quantity-selector {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-top: 0.5rem;
+    gap: 0.75rem;
+  }
+
+  .qty-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.4rem;
   }
 
   .qty-num-btn {
     width: 40px;
-    height: 40px;
+    height: 36px;
     background: rgba(255, 255, 255, 0.1);
     border: 2px solid #4a4a6a;
     border-radius: 6px;
@@ -627,7 +633,7 @@
   }
 
   .quantity-hint {
-    margin-top: 0.5rem;
+    margin: 0.25rem 0 0 0;
     font-size: 1rem;
     color: #a0a0b0;
   }

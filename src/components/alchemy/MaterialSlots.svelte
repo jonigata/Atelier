@@ -2,6 +2,7 @@
   import { getItem } from '$lib/data/items';
   import { getCategoryName } from '$lib/data/categories';
   import { matchesIngredient } from '$lib/services/alchemy';
+  import MiniItemCard from '../common/MiniItemCard.svelte';
   import type { OwnedItem, Ingredient } from '$lib/models/types';
 
   export let ingredients: Ingredient[];
@@ -73,7 +74,7 @@
             on:click={() => isLastOverall && onUndoLast()}
             disabled={!isLastOverall}
           >
-            <span class="slot-quality">品質 {item.quality}</span>
+            <MiniItemCard itemId={item.itemId} quality={item.quality} scale={0.7} />
             {#if isLastOverall}<span class="slot-remove">×</span>{/if}
           </button>
         {/each}
@@ -119,10 +120,10 @@
   }
 
   .auto-fill-btn {
-    padding: 0.35rem 0.75rem;
-    border-radius: 5px;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-weight: bold;
     white-space: nowrap;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
@@ -216,9 +217,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-width: 60px;
-    height: 36px;
-    padding: 0.25rem 0.5rem;
+    width: 108px;
+    height: 119px;
     border-radius: 4px;
     font-size: 0.75rem;
     cursor: default;
@@ -242,9 +242,9 @@
   }
 
   .slot.filled {
-    background: rgba(76, 175, 80, 0.15);
-    border: 1px solid #4caf50;
-    color: #e0f0e0;
+    background: none;
+    border: none;
+    padding: 0;
   }
 
   .slot.filled.removable {
@@ -262,7 +262,8 @@
   }
 
   .slot-quality {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
+    line-height: 1;
   }
 
   .slot-prompt {
