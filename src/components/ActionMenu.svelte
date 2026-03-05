@@ -224,7 +224,7 @@
     align-items: center;
     justify-content: flex-end;
     gap: 0;
-    padding: 0.4rem 0.5rem;
+    padding: 0 0.2rem;
     min-height: 120px;
     background-color: #2a2a4a;
     background-size: cover;
@@ -309,14 +309,15 @@
 
   .badge {
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    padding: 0.2rem 0.5rem;
+    top: 0.2rem;
+    right: 0.2rem;
+    padding: 0.1rem 0.3rem;
     background: #ff9800;
     color: #1a1a2e;
-    font-size: 0.7rem;
+    font-size: 0.55rem;
     font-weight: bold;
-    border-radius: 4px;
+    border-radius: 3px;
+    pointer-events: none;
   }
 
   .badge.deliverable {
@@ -343,12 +344,13 @@
 
   .badge-stack {
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
+    top: 0.2rem;
+    right: 0.2rem;
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.15rem;
     align-items: flex-end;
+    pointer-events: none;
   }
 
   .badge-stack .badge {
