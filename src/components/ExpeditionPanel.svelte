@@ -165,6 +165,7 @@
 <style>
   .expedition-panel {
     padding: 1.5rem;
+    padding-bottom: 6rem;
   }
 
 
@@ -247,7 +248,7 @@
   }
 
   .area-drops {
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: #b0b0c0;
   }
 
@@ -293,7 +294,7 @@
     position: relative;
     z-index: 1;
     font-weight: bold;
-    font-size: 0.95rem;
+    font-size: 1rem;
     background: rgba(0, 0, 0, 0.6);
     padding: 0.2rem 0.6rem;
     border-radius: 4px;

@@ -117,6 +117,7 @@
 <style>
   .merchant-panel {
     padding: 1.5rem;
+    padding-bottom: 6rem;
   }
 
 
@@ -133,7 +134,7 @@
   }
 
   .days-left {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #ff9800;
     background: rgba(255, 152, 0, 0.15);
     border: 1px solid #ff9800;
@@ -258,7 +259,7 @@
 
   .slot-desc {
     color: #808090;
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
   .slot-action {
@@ -297,7 +298,7 @@
   .sold-label {
     color: #9e9e9e;
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .merchant-footer {
@@ -312,7 +313,7 @@
   .merchant-footer p {
     color: #a0a0b0;
     font-style: italic;
-    font-size: 0.9rem;
+    font-size: 1rem;
     margin: 0;
   }
 

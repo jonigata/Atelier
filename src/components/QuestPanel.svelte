@@ -393,6 +393,7 @@
 <style>
   .quest-panel {
     padding: 1.5rem;
+    padding-bottom: 6rem;
   }
 
 
@@ -483,7 +484,7 @@
   }
 
   .quest-client {
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: #a0a0b0;
   }
 
@@ -501,7 +502,7 @@
 
   .quest-desc {
     color: #a0a0b0;
-    font-size: 0.9rem;
+    font-size: 1rem;
     margin: 0;
   }
 
@@ -509,7 +510,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .requirement {
@@ -532,7 +533,7 @@
   }
 
   .owned-count {
-    font-size: 0.75rem;
+    font-size: 1rem;
     color: #808090;
   }
 

@@ -203,7 +203,7 @@
   }
 
   .recipe-description {
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: #8a8a9a;
     margin-top: 0.15rem;
     overflow: hidden;
@@ -212,7 +212,7 @@
   }
 
   .recipe-days {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #a0a0b0;
     margin-left: auto;
   }
@@ -221,7 +221,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .ingredient {
@@ -236,7 +236,7 @@
 
   .stock {
     color: #808090;
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
 
   .craft-status {

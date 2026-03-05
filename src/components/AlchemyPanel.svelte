@@ -430,6 +430,7 @@
 <style>
   .alchemy-panel {
     padding: 1.5rem;
+    padding-bottom: 6rem;
   }
 
   .back-btn {
@@ -439,7 +440,7 @@
     border-radius: 4px;
     color: #c0c0d0;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
   .back-btn:hover {
@@ -518,12 +519,12 @@
 
   .qty-max {
     color: #808090;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .quantity-hint {
     margin-top: 0.5rem;
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #a0a0b0;
   }
 
@@ -544,7 +545,7 @@
     border: 1px solid rgba(255, 152, 0, 0.5);
     border-radius: 4px;
     color: #ff9800;
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
 </style>

@@ -558,7 +558,7 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding: 0 1.5rem 1.5rem;
+    padding: 0 1.5rem 6rem;
   }
 
 
@@ -725,7 +725,7 @@
 
   .recipe-count {
     color: #c9a959;
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
 
   .book-level {
@@ -789,14 +789,14 @@
   }
 
   .owned-count {
-    font-size: 0.75rem;
+    font-size: 1rem;
     font-weight: normal;
     color: #8a8a9a;
   }
 
   .item-desc {
     color: #808090;
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
   .item-action {
@@ -838,7 +838,7 @@
   .sold-label {
     color: #9e9e9e;
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .empty {
@@ -881,7 +881,7 @@
     border-radius: 4px;
     color: #1a1a2e;
     font-weight: bold;
-    font-size: 0.8rem;
+    font-size: 1rem;
     cursor: pointer;
     flex-shrink: 0;
   }
@@ -908,7 +908,7 @@
 
   .sell-card-quality {
     color: #a0a0b0;
-    font-size: 0.85rem;
+    font-size: 1rem;
     white-space: nowrap;
   }
 
@@ -994,14 +994,14 @@
   }
 
   .deals-talk-name {
-    font-size: 0.7rem;
+    font-size: 1rem;
     color: #c9a959;
     font-weight: bold;
   }
 
   .deals-talk-text {
     color: #e8dcc8;
-    font-size: 0.95rem;
+    font-size: 1rem;
     line-height: 1.4;
   }
 
@@ -1017,7 +1017,7 @@
     padding: 0.5rem 0.75rem;
     border-radius: 6px;
     margin-bottom: 0.75rem;
-    font-size: 0.85rem;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -1045,7 +1045,7 @@
 
   .deals-remaining {
     margin-left: auto;
-    font-size: 0.8rem;
+    font-size: 1rem;
     opacity: 0.7;
     white-space: nowrap;
     flex-shrink: 0;
@@ -1077,7 +1077,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    font-size: 0.8rem;
+    font-size: 1rem;
     background: rgba(255, 255, 255, 0.08);
     padding: 0.15rem 0.5rem 0.15rem 0.25rem;
     border-radius: 4px;
@@ -1112,7 +1112,7 @@
   .original-price {
     text-decoration: line-through;
     color: #808090;
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: normal;
   }
 

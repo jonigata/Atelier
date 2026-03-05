@@ -84,7 +84,7 @@
 
   .back-btn {
     padding: 0.3rem 0.75rem;
-    font-size: 0.85rem;
+    font-size: 1rem;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid #4a4a6a;
     border-radius: 4px;
@@ -124,7 +124,7 @@
   }
 
   .owned-count {
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: normal;
     color: #a0a0b0;
   }
@@ -136,7 +136,7 @@
   }
 
   .detail-description {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #a0a0b0;
     margin-top: 0.25rem;
   }
@@ -157,7 +157,7 @@
   }
 
   .info-label {
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: #808090;
   }
 
@@ -201,7 +201,7 @@
 
   .ingredient-count {
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .ingredient-count.sufficient {
@@ -219,6 +219,6 @@
     border-radius: 8px;
     color: #ef9a9a;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 </style>

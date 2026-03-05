@@ -389,6 +389,7 @@
 <style>
   .album-panel {
     padding: 1.5rem;
+    padding-bottom: 6rem;
   }
 
 
@@ -411,7 +412,7 @@
     border: none;
     border-bottom: 2px solid transparent;
     color: #808090;
-    font-size: 0.95rem;
+    font-size: 1rem;
     cursor: pointer;
     margin-bottom: -2px;
     transition: all 0.2s;
@@ -448,12 +449,12 @@
   .rate-label {
     color: #c9a959;
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .rate-value {
     color: #e0e0f0;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .rate-bar {
@@ -474,7 +475,7 @@
   .rate-percent {
     color: #c9a959;
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .filter-group {
@@ -484,7 +485,7 @@
   }
 
   .filter-group label {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #a0a0b0;
   }
 
@@ -494,7 +495,7 @@
     border: 1px solid #4a4a6a;
     border-radius: 4px;
     color: #e0e0f0;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   /* セクション大見出し */
@@ -519,7 +520,7 @@
   }
 
   .section-count {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #a09070;
   }
 
@@ -529,7 +530,7 @@
 
   .category-title {
     width: 100%;
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: bold;
     color: #c9a959;
     margin-bottom: 0;
@@ -559,7 +560,7 @@
   }
 
   .category-count {
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: #808090;
     font-weight: normal;
   }
@@ -619,7 +620,7 @@
   .item-name {
     font-weight: bold;
     color: #e0e0f0;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .item-name.unknown {
@@ -627,7 +628,7 @@
   }
 
   .item-desc {
-    font-size: 0.75rem;
+    font-size: 1rem;
     color: #a0a0b0;
     white-space: nowrap;
     overflow: hidden;
@@ -664,7 +665,7 @@
 
   .item-max-quality {
     flex-shrink: 0;
-    font-size: 0.75rem;
+    font-size: 1rem;
     color: #a0a0b0;
     margin-left: auto;
     padding: 0.15rem 0.4rem;
@@ -720,7 +721,7 @@
   }
 
   .ach-lock {
-    font-size: 0.9rem;
+    font-size: 1rem;
     opacity: 0.4;
   }
 
@@ -740,7 +741,7 @@
   .ach-title {
     font-weight: bold;
     color: #e0e0f0;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .ach-title.unrevealed {
@@ -752,7 +753,7 @@
   }
 
   .ach-desc {
-    font-size: 0.75rem;
+    font-size: 1rem;
     color: #a0a0b0;
   }
 
@@ -762,7 +763,7 @@
   }
 
   .ach-hint {
-    font-size: 0.75rem;
+    font-size: 1rem;
     color: #908878;
   }
 
@@ -792,7 +793,7 @@
     color: #808090;
     text-align: center;
     margin-top: 1.5rem;
-    font-size: 0.9rem;
+    font-size: 1rem;
     line-height: 1.6;
   }
 </style>

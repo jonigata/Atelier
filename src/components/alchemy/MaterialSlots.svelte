@@ -122,7 +122,7 @@
     padding: 0.35rem 0.75rem;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: bold;
     white-space: nowrap;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
@@ -202,7 +202,7 @@
 
   .ingredient-progress {
     color: #a0a0b0;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .ingredient-slots {
@@ -271,7 +271,7 @@
   }
 
   .slot-empty {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .slot-remove {

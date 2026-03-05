@@ -43,7 +43,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid #4a4a6a;
     border-radius: 4px;
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
   .item-card.clickable {
@@ -79,7 +79,7 @@
   }
 
   .item-description {
-    font-size: 0.7rem;
+    font-size: 1rem;
     color: #8a8a9a;
     text-align: center;
     line-height: 1.3;
@@ -87,7 +87,7 @@
 
   .item-quality {
     color: #a0a0b0;
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
 
   .item-quality.high {
@@ -100,7 +100,7 @@
 
   .item-count {
     color: #c9a959;
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: bold;
   }
 </style>

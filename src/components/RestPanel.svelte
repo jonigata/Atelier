@@ -130,6 +130,7 @@
 <style>
   .rest-panel {
     padding: 1.5rem;
+    padding-bottom: 6rem;
   }
 
 
@@ -164,7 +165,7 @@
     border: 1px solid rgba(255, 107, 107, 0.5);
     border-radius: 4px;
     color: #ff6b6b;
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: bold;
   }
 
@@ -200,7 +201,7 @@
 
   .fatigue-note {
     margin-top: 0.5rem;
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: #ff9800;
   }
 

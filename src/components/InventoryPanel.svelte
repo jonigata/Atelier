@@ -401,6 +401,7 @@
 <style>
   .inventory-panel {
     padding: 1.5rem;
+    padding-bottom: 6rem;
   }
 
 
@@ -441,12 +442,12 @@
   }
 
   label {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #a0a0b0;
   }
 
   .control-label {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #a0a0b0;
   }
 
@@ -463,7 +464,7 @@
   }
 
   .hint {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: #a0a0b0 !important;
   }
 
@@ -527,7 +528,7 @@
   .item-details {
     display: flex;
     justify-content: space-between;
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
   .item-category {
@@ -552,7 +553,7 @@
     align-items: center;
     gap: 0.4rem;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #a0a0b0;
   }
 
@@ -589,7 +590,7 @@
     color: #e0e0f0;
     cursor: pointer;
     text-align: left;
-    font-size: 0.95rem;
+    font-size: 1rem;
   }
 
   .item-main:hover {
@@ -613,19 +614,19 @@
     color: #1a1a2e;
     padding: 0.1rem 0.5rem;
     border-radius: 3px;
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: bold;
   }
 
   .item-main .item-category {
     color: #808090;
-    font-size: 0.85rem;
+    font-size: 1rem;
     min-width: 4rem;
   }
 
   .item-quality-summary {
     color: #a0a0b0;
-    font-size: 0.9rem;
+    font-size: 1rem;
     min-width: 6rem;
     text-align: right;
   }
@@ -639,7 +640,7 @@
   }
 
   .quality-range {
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: #808090;
     margin-left: 0.25rem;
   }
@@ -666,7 +667,7 @@
   }
 
   .detail-quality {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #a0a0b0;
     min-width: 4rem;
     flex-shrink: 0;
@@ -681,13 +682,13 @@
   }
 
   .detail-origin {
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: #808090;
     flex-shrink: 0;
   }
 
   .detail-flavor {
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: #6a7a6a;
     font-style: italic;
   }
@@ -774,12 +775,12 @@
   .equip-name {
     font-weight: bold;
     color: #e0e0f0;
-    font-size: 0.95rem;
+    font-size: 1rem;
     line-height: 1.2;
   }
 
   .equip-effect {
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: #8a9a8a;
     line-height: 1.3;
   }

@@ -174,14 +174,14 @@
   }
 
   .quest-client {
-    font-size: 0.75rem;
+    font-size: 1rem;
     color: #a0a0b0;
   }
 
   .quest-title {
     font-weight: bold;
     color: #e0e0f0;
-    font-size: 0.95rem;
+    font-size: 1rem;
   }
 
   .days-bar-container {
@@ -219,7 +219,7 @@
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.4rem;
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
   .item-icon {
@@ -259,7 +259,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
 
   .reward-money {
@@ -354,7 +354,7 @@
     border-radius: 6px;
     color: white;
     font-weight: bold;
-    font-size: 0.85rem;
+    font-size: 1rem;
     cursor: pointer;
   }
 
@@ -373,7 +373,7 @@
     border: 1px solid rgba(244, 67, 54, 0.4);
     border-radius: 6px;
     color: #ef9a9a;
-    font-size: 0.8rem;
+    font-size: 1rem;
     cursor: pointer;
   }
 

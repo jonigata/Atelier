@@ -102,7 +102,7 @@
   }
 
   .preview-label {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #a0a0b0;
   }
 
@@ -138,7 +138,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .stamina-label {
@@ -156,7 +156,7 @@
 
   .stamina-current {
     color: #808090;
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
 
@@ -167,7 +167,7 @@
     border: 1px solid rgba(255, 107, 107, 0.4);
     border-radius: 4px;
     color: #ff6b6b;
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
 
 </style>

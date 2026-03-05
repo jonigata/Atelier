@@ -201,6 +201,7 @@
 <style>
   .study-panel {
     padding: 1.5rem;
+    padding-bottom: 6rem;
   }
 
 
@@ -253,7 +254,7 @@
   }
 
   .recipe-list h3 {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: #c9a959;
     margin-bottom: 0.5rem;
   }
@@ -286,7 +287,7 @@
     flex-wrap: wrap;
     gap: 0.5rem;
     align-items: center;
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
   .detail-label {
@@ -314,7 +315,7 @@
   }
 
   .book-description {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #a0a0b0;
     margin-top: 0.25rem;
   }
@@ -344,7 +345,7 @@
   }
 
   .recipe-info {
-    font-size: 0.85rem;
+    font-size: 1rem;
     color: #a0a0b0;
     margin-left: auto;
   }
@@ -362,7 +363,7 @@
 
   .study-hint {
     color: #c0c0d0;
-    font-size: 0.95rem;
+    font-size: 1rem;
     margin-top: 1rem;
     padding: 0.6rem 0.8rem;
     background: rgba(255, 255, 255, 0.05);

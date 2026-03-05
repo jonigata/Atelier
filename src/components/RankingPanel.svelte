@@ -155,7 +155,7 @@
     background: transparent;
     border: 1px solid #3a3a5a;
     color: #808090;
-    font-size: 0.9rem;
+    font-size: 1rem;
     cursor: pointer;
   }
 
@@ -207,7 +207,7 @@
 
   .my-rank-label {
     color: #c9a959;
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
   .my-rank-value {
@@ -219,7 +219,7 @@
   .my-rank-score {
     margin-left: auto;
     color: #e0e0f0;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-variant-numeric: tabular-nums;
   }
 
@@ -227,7 +227,7 @@
     color: #808090;
     text-align: center;
     padding: 2rem 0;
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .state-msg.error {
@@ -247,7 +247,7 @@
 
   .entry-count {
     color: #606080;
-    font-size: 0.8rem;
+    font-size: 1rem;
     margin-bottom: 0.5rem;
     text-align: right;
   }
@@ -310,7 +310,7 @@
   .nickname {
     color: #e0e0f0;
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -318,7 +318,7 @@
 
   .entry-meta {
     color: #707088;
-    font-size: 0.75rem;
+    font-size: 1rem;
   }
 
   .score {
@@ -339,7 +339,7 @@
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 0.15rem 1rem;
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
 
   .bd-label {
