@@ -823,6 +823,7 @@
     border-radius: 4px;
     color: #1a1a2e;
     font-weight: bold;
+    font-size: 1rem;
     cursor: pointer;
   }
 
@@ -891,25 +892,25 @@
   }
 
   .sell-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 0.4rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
   }
 
   .sell-card {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.6rem;
+    gap: 0.4rem;
+    padding: 0.3rem 0.5rem;
     background: rgba(0, 0, 0, 0.25);
     border: 1px solid #3a3a5a;
     border-radius: 4px;
+    white-space: nowrap;
   }
 
   .sell-card-quality {
     color: #a0a0b0;
-    font-size: 1rem;
-    white-space: nowrap;
+    font-size: 0.85rem;
   }
 
   .sell-card-quality.high {
@@ -923,8 +924,14 @@
   .sell-card-price {
     color: #81c784;
     font-weight: bold;
-    margin-left: auto;
-    white-space: nowrap;
+    font-size: 0.85rem;
+  }
+
+  .sell-btn {
+    width: auto;
+    height: auto;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
   }
 
   /* メルダのトーク */

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { get } from 'svelte/store';
   import { gameState, pendingAlchemyRecipeId } from '$lib/stores/game';
   import type { LevelUpInfo } from '$lib/stores/game';
@@ -56,6 +56,7 @@
   }
   let craftQuantity: number = 1;
   let selectedItems: OwnedItem[] = [];
+  let craftPreviewSection: HTMLElement;
   let craftResultData: CraftMultipleResult | null = null;
   let expGaugeData: GaugeData | null = null;
   let reputationExpGaugeData: GaugeData | null = null;
@@ -91,6 +92,15 @@
 
   // 選択完了したか
   $: selectionComplete = selectedItems.length === requiredItemCount;
+
+  // 素材選択が完了したら最下段までスクロール
+  $: if (selectionComplete && requiredItemCount > 0) {
+    tick().then(() => {
+      if (craftPreviewSection) {
+        craftPreviewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+  }
 
   // 現在選択すべき素材（機材効果適用済み）
   $: currentIngredient = (() => {
@@ -441,6 +451,7 @@
                     onSelect={selectItem}
                   />
                 {:else}
+                  <div bind:this={craftPreviewSection}>
                   <CraftPreview
                     {successRate}
                     {expectedQuality}
@@ -453,6 +464,7 @@
                     {fatigueLabel}
                     onCraft={executeCraft}
                   />
+                  </div>
                 {/if}
               {/if}
             </div>

@@ -316,16 +316,4 @@
     padding: 1rem;
   }
 
-  .message-log::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .message-log::-webkit-scrollbar-track {
-    background: #1a1a2e;
-  }
-
-  .message-log::-webkit-scrollbar-thumb {
-    background: #4a4a6a;
-    border-radius: 3px;
-  }
 </style>
