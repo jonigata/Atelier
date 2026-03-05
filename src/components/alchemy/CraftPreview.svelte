@@ -10,8 +10,10 @@
   export let fatigueLabel: string | null;
   export let onCraft: () => void;
 
-  // 調合後の体力
+  $: maxStamina = 100;
   $: afterStamina = Math.max(0, currentStamina - totalStaminaCost);
+  $: remainPct = (afterStamina / maxStamina) * 100;
+  $: costPct = (Math.min(totalStaminaCost, currentStamina) / maxStamina) * 100;
 </script>
 
 <div class="craft-action">
@@ -19,7 +21,7 @@
 
   <div class="craft-preview">
     <div class="preview-item">
-      <span class="preview-label">成功率（1個あたり）</span>
+      <span class="preview-label">成功率</span>
       <span class="preview-value success-rate" class:high={successRate >= 0.8} class:low={successRate < 0.5}>
         {Math.round(successRate * 100)}%
       </span>
@@ -36,11 +38,12 @@
 
   <div class="stamina-info">
     <div class="stamina-row">
-      <span class="stamina-label">体力消費</span>
-      <span class="stamina-value" class:over-budget={totalStaminaCost > currentStamina}>
-        {staminaCost}{#if craftQuantity > 1} × {craftQuantity} = {totalStaminaCost}{/if}
-      </span>
-      <span class="stamina-current">（{currentStamina} → {afterStamina}）</span>
+      <span class="stamina-label">体力</span>
+      <div class="stamina-gauge-track">
+        <div class="stamina-gauge-remain" style="width: {remainPct}%"></div>
+        <div class="stamina-gauge-cost" style="left: {remainPct}%; width: {costPct}%"></div>
+      </div>
+      <span class="stamina-text">{currentStamina} → {afterStamina}</span>
     </div>
     {#if fatigueLabel}
       <div class="fatigue-warning">
@@ -143,20 +146,44 @@
 
   .stamina-label {
     color: #a0a0b0;
-  }
-
-  .stamina-value {
-    color: #e0e0f0;
+    font-size: 0.85rem;
     font-weight: bold;
+    flex-shrink: 0;
   }
 
-  .stamina-value.over-budget {
-    color: #ff9800;
+  .stamina-gauge-track {
+    flex: 1;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 7px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .stamina-current {
-    color: #808090;
-    font-size: 1rem;
+  .stamina-gauge-remain {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #4a8a4a, #81c784);
+    border-radius: 6px 0 0 6px;
+  }
+
+  .stamina-gauge-cost {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #c04040, #ff6b6b);
+    box-shadow: 0 0 6px rgba(255, 107, 107, 0.4);
+  }
+
+  .stamina-text {
+    color: #e0e0f0;
+    font-size: 0.85rem;
+    font-weight: bold;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 
 
