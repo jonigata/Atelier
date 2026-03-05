@@ -304,7 +304,8 @@
           {@const itemDef = getItem(quest.requiredItemId)}
           {@const canAccept = $gameState.activeQuests.length < 3}
           {@const client = quest.clientId ? getQuestClient(quest.clientId) : undefined}
-          <div class="quest-item">
+          {@const reqLabel = `${itemDef?.name || quest.requiredItemId} ×${quest.requiredQuantity}`}
+          <div class="quest-item" class:type-quality={quest.type === 'quality'} class:type-bulk={quest.type === 'bulk'}>
             {#if quest.type !== 'deliver'}
               <span class="quest-type-float">
                 <QuestTypeIcon type={quest.type} showLabel={true} />
@@ -326,19 +327,22 @@
                   alt={itemDef?.name || quest.requiredItemId}
                   on:error={handleIconError}
                 />
-                <span class="requirement-text">
+                <span class="requirement-text" class:long={reqLabel.length > 8}>
                   {itemDef?.name || quest.requiredItemId}
                   ×{quest.requiredQuantity}
-                  {#if quest.requiredQuality}
-                    (品質{quest.requiredQuality}以上)
-                  {/if}
-                  <span class="owned-count" class:enough={$gameState.inventory.filter(item => item.itemId === quest.requiredItemId && (!quest.requiredQuality || item.quality >= quest.requiredQuality)).length >= quest.requiredQuantity}>
-                    所持: {$gameState.inventory.filter(item => item.itemId === quest.requiredItemId && (!quest.requiredQuality || item.quality >= quest.requiredQuality)).length}
+                  <span class="requirement-sub">
+                    {#if quest.requiredQuality}
+                      <span class="quality-req">品質{quest.requiredQuality}↑</span>
+                    {/if}
+                    <span class="owned-count" class:enough={$gameState.inventory.filter(item => item.itemId === quest.requiredItemId && (!quest.requiredQuality || item.quality >= quest.requiredQuality)).length >= quest.requiredQuantity}>
+                      所持: {$gameState.inventory.filter(item => item.itemId === quest.requiredItemId && (!quest.requiredQuality || item.quality >= quest.requiredQuality)).length}
+                    </span>
                   </span>
                 </span>
               </span>
             </div>
             <div class="quest-rewards">
+              <span class="detail-label">報酬:</span>
               <span class="reward-money">{quest.rewardMoney}G</span>
               {#if quest.type === 'quality'}
                 <span class="reward-rep">名声+{quest.rewardReputation}</span>
@@ -350,7 +354,8 @@
               {/if}
             </div>
             <div class="quest-bottom-row">
-              <span class="deadline">期限: {quest.deadlineDays}日</span>
+              <span class="detail-label">期限:</span>
+              <span class="deadline">{quest.deadlineDays}日</span>
               {#if canFulfill(quest)}
                 <span class="ready-badge">納品可</span>
               {:else if isRecipeUnknown(quest)}
@@ -413,13 +418,13 @@
 
   .tab {
     flex: 1;
-    padding: 0.75rem;
+    padding: 0.5rem;
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid #4a4a6a;
     border-radius: 6px;
     color: #a0a0b0;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.8rem;
   }
 
   .tab.active {
@@ -445,10 +450,8 @@
 
   .quest-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1rem;
-    max-height: calc(100vh - 280px);
-    overflow-y: auto;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
   }
 
   .empty {
@@ -461,32 +464,47 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    padding: 1rem;
+    padding: 0.3rem 0.4rem;
     background: rgba(255, 255, 255, 0.05);
-    border: 2px solid #4a4a6a;
-    border-radius: 8px;
-    gap: 0.15rem;
+    border: 1px solid #4a4a6a;
+    border-radius: 6px;
+    gap: 0.05rem;
+  }
+
+  .quest-item.type-quality {
+    background: rgba(156, 39, 176, 0.08);
+    border-color: rgba(156, 39, 176, 0.3);
+  }
+
+  .quest-item.type-bulk {
+    background: rgba(33, 150, 243, 0.08);
+    border-color: rgba(33, 150, 243, 0.3);
   }
 
   .quest-type-float {
     position: absolute;
-    top: 0.75rem;
-    right: 0.5rem;
-    padding: 0.15rem 0.4rem;
-    background: rgba(33, 150, 243, 0.3);
-    border-radius: 4px;
-    font-size: 0.75rem;
+    top: -0.35rem;
+    right: -0.25rem;
+    padding: 0.08rem 0.2rem;
+    background: rgba(33, 150, 243, 0.4);
+    border-radius: 3px;
+    font-size: 0.5rem;
     color: #90caf9;
-    line-height: 1;
+    line-height: 1.2;
+    z-index: 1;
   }
 
   .quest-type-float :global(.icon) {
-    width: 18px;
-    height: 18px;
+    width: 12px;
+    height: 12px;
+  }
+
+  .quest-type-float :global(.label) {
+    font-size: 0.5rem;
   }
 
   .quest-client {
-    font-size: 1rem;
+    font-size: 0.5rem;
     color: #a0a0b0;
   }
 
@@ -496,7 +514,7 @@
   }
 
   .quest-title {
-    font-size: 1.1rem;
+    font-size: 0.8rem;
     font-weight: bold;
     color: #f4e4bc;
   }
@@ -504,38 +522,67 @@
 
   .quest-desc {
     color: #a0a0b0;
-    font-size: 1rem;
+    font-size: 0.55rem;
     margin: 0;
+    margin-bottom: 0.15rem;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .quest-details {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 1rem;
+    gap: 0.2rem;
+    font-size: 0.7rem;
+    margin-bottom: 0.1rem;
   }
 
   .requirement {
     color: #e0e0f0;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.2rem;
   }
 
   .item-icon-small {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     object-fit: contain;
   }
 
   .requirement-text {
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
+    gap: 0;
+    line-height: 1.2;
+  }
+
+  .requirement-text.long {
+    font-size: 0.6rem;
+    line-height: 1.2;
+  }
+
+
+  .requirement-sub {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+  }
+
+  .quality-req {
+    font-size: 0.5rem;
+    color: #ce93d8;
+    background: rgba(156, 39, 176, 0.2);
+    padding: 0.08rem 0.2rem;
+    border-radius: 3px;
+    line-height: 1.2;
   }
 
   .owned-count {
-    font-size: 1rem;
+    font-size: 0.6rem;
     color: #808090;
   }
 
@@ -548,28 +595,35 @@
     opacity: 0.5;
   }
 
-  .deadline, .progress {
+  .deadline {
     color: #a0a0b0;
   }
 
   .quest-rewards {
     display: flex;
-    gap: 1rem;
-    margin-top: 0;
-    padding-top: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.1rem 0.3rem;
+    font-size: 0.6rem;
   }
 
   .quest-bottom-row {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    gap: 0.3rem;
+    margin-bottom: 0.1rem;
+    font-size: 0.6rem;
+  }
+
+  .detail-label {
+    color: #808090;
+    font-size: 0.55rem;
   }
 
   .reward-money {
     color: #c9a959;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 0.65rem;
   }
 
   .reward-rep {
@@ -581,10 +635,11 @@
   }
 
   .ready-badge {
-    padding: 0.2rem 0.5rem;
+    padding: 0.08rem 0.2rem;
     background: linear-gradient(135deg, #0097a7, #26c6da);
-    border-radius: 4px;
-    font-size: 0.75rem;
+    border-radius: 3px;
+    font-size: 0.5rem;
+    line-height: 1.2;
     font-weight: bold;
     color: #fff;
     box-shadow: 0 0 8px rgba(38, 198, 218, 0.6);
@@ -592,18 +647,20 @@
   }
 
   .badge-recipe-unknown {
-    padding: 0.2rem 0.5rem;
+    padding: 0.08rem 0.2rem;
     background: rgba(156, 39, 176, 0.2);
-    border-radius: 4px;
-    font-size: 0.7rem;
+    border-radius: 3px;
+    font-size: 0.5rem;
+    line-height: 1.2;
     color: #ce93d8;
   }
 
   .badge-material-short {
-    padding: 0.2rem 0.5rem;
+    padding: 0.08rem 0.2rem;
     background: rgba(255, 152, 0, 0.2);
-    border-radius: 4px;
-    font-size: 0.7rem;
+    border-radius: 3px;
+    font-size: 0.5rem;
+    line-height: 1.2;
     color: #ffb74d;
   }
 
@@ -614,17 +671,19 @@
 
   .quest-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.2rem;
+    margin-top: 0.1rem;
   }
 
   .accept-btn {
     flex: 1;
-    padding: 0.6rem;
+    padding: 0.3rem;
     background: linear-gradient(135deg, #8b6914 0%, #c9a959 100%);
     border: none;
     border-radius: 6px;
     color: #1a1a2e;
     font-weight: bold;
+    font-size: 0.7rem;
     cursor: pointer;
   }
 
@@ -639,12 +698,13 @@
 
   .instant-deliver-btn {
     flex: 1;
-    padding: 0.6rem;
+    padding: 0.3rem;
     background: linear-gradient(135deg, #1a6b3c 0%, #2ecc71 100%);
     border: none;
     border-radius: 6px;
     color: #fff;
     font-weight: bold;
+    font-size: 0.7rem;
     cursor: pointer;
   }
 
