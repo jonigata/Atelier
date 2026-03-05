@@ -10,6 +10,7 @@
   import { getBuilding } from '$lib/data/buildings';
   import type { HelperDef, BuildingDef } from '$lib/models/types';
   import ItemCard from './common/ItemCard.svelte';
+  import CustomSelect from './common/CustomSelect.svelte';
 
   export let onBack: () => void;
 
@@ -218,22 +219,31 @@
 
     <div class="controls">
       <div class="filter-group">
-        <label for="filter-category">カテゴリ:</label>
-        <select id="filter-category" bind:value={filterCategory}>
-          <option value="all">すべて</option>
-          {#each availableCategories as cat}
-            <option value={cat}>{CATEGORY_NAMES[cat as keyof typeof CATEGORY_NAMES] || cat}</option>
-          {/each}
-        </select>
+        <span class="control-label">カテゴリ:</span>
+        <CustomSelect
+          bind:value={filterCategory}
+          options={[
+            { value: 'all', label: 'すべて' },
+            ...availableCategories.map(cat => ({
+              value: cat,
+              label: CATEGORY_NAMES[cat as keyof typeof CATEGORY_NAMES] || cat
+            }))
+          ]}
+          label="カテゴリ"
+        />
       </div>
 
       <div class="sort-group">
-        <label for="sort-key">並び替え:</label>
-        <select id="sort-key" bind:value={sortKey}>
-          <option value="category">カテゴリ</option>
-          <option value="name">名前</option>
-          <option value="quality">品質</option>
-        </select>
+        <span class="control-label">並び替え:</span>
+        <CustomSelect
+          bind:value={sortKey}
+          options={[
+            { value: 'category', label: 'カテゴリ' },
+            { value: 'name', label: '名前' },
+            { value: 'quality', label: '品質' },
+          ]}
+          label="並び替え"
+        />
       </div>
 
       <label class="detail-toggle">
@@ -451,13 +461,9 @@
     color: #a0a0b0;
   }
 
-  select {
-    padding: 0.3rem 0.5rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid #4a4a6a;
-    border-radius: 4px;
-    color: #e0e0f0;
-    font-size: 0.9rem;
+  .control-label {
+    font-size: 0.85rem;
+    color: #a0a0b0;
   }
 
   .empty-inventory {
