@@ -253,8 +253,8 @@
     flex-shrink: 0;
   }
 
-  /* サブページパネル共通padding */
-  .main-panel > :global(:last-child) {
+  /* サブページパネル共通padding（.subpage-headerがある＝サブページ表示時のみ） */
+  .main-panel > .subpage-header ~ :global(:last-child) {
     padding: 0.75rem 1.5rem 6rem;
   }
 
