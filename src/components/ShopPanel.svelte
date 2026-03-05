@@ -551,14 +551,14 @@
 
   .shop-header {
     flex-shrink: 0;
-    padding: 1.5rem 1.5rem 0.5rem;
+    padding: 0 0 0.5rem;
   }
 
   .shop-content {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding: 0 1.5rem 6rem;
+    padding-bottom: 5rem;
   }
 
 

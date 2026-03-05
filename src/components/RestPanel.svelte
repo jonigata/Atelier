@@ -129,8 +129,6 @@
 
 <style>
   .rest-panel {
-    padding: 1.5rem;
-    padding-bottom: 6rem;
   }
 
 

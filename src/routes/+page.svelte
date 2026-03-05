@@ -249,8 +249,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.5rem 0.75rem;
+    padding: 1rem 0.75rem 0.25rem;
     flex-shrink: 0;
+  }
+
+  /* サブページパネル共通padding */
+  .main-panel > :global(:last-child) {
+    padding: 0.75rem 1.5rem 6rem;
   }
 
   .subpage-header :global(.log-toggle-btn) {
