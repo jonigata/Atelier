@@ -68,24 +68,25 @@
         <div class="recipe-header">
           <img class="recipe-icon" class:silhouette={!$gameState.discoveredItems.includes(recipe.resultItemId)} src={getItemIcon(recipe.resultItemId)} alt={recipe.name} on:error={handleIconError} />
           <div class="recipe-name-block">
-            <div class="recipe-name-row">
-              <span class="recipe-name">{recipe.name}</span>
-              {#if levelDeficit > 0}
-                <span class="level-deficit-badge">Lv.{recipe.requiredLevel} ({Math.round(successRate * 100)}%)</span>
-              {/if}
-              {#each getActiveQuestsForItem(recipe.resultItemId) as quest}
-                <span class="quest-badge active">{quest.title}({quest.requiredQuantity})</span>
-              {/each}
-              {#each getAvailableQuestsForItem(recipe.resultItemId) as quest}
-                <span class="quest-badge available">{quest.title}({quest.requiredQuantity})</span>
-              {/each}
-            </div>
+            <span class="recipe-name">{recipe.name}</span>
+            {#if levelDeficit > 0}
+              <span class="level-deficit-badge">Lv.{recipe.requiredLevel} ({Math.round(successRate * 100)}%)</span>
+            {/if}
             {#if getResultDescription(recipe)}
               <span class="recipe-description">{getResultDescription(recipe)}</span>
             {/if}
           </div>
-          <span class="recipe-days">{formatCraftDays(recipe.craftDaysTenths)}</span>
         </div>
+        {#if getActiveQuestsForItem(recipe.resultItemId).length > 0 || getAvailableQuestsForItem(recipe.resultItemId).length > 0}
+          <div class="quest-badges">
+            {#each getActiveQuestsForItem(recipe.resultItemId) as quest}
+              <span class="quest-badge active">{quest.title}({quest.requiredQuantity})</span>
+            {/each}
+            {#each getAvailableQuestsForItem(recipe.resultItemId) as quest}
+              <span class="quest-badge available">{quest.title}({quest.requiredQuantity})</span>
+            {/each}
+          </div>
+        {/if}
         <div class="recipe-ingredients">
           {#each recipe.ingredients as ing}
             {@const available = countAvailableIngredients(ing)}
@@ -94,6 +95,7 @@
               <span class="stock">({available}個)</span>
             </span>
           {/each}
+          <span class="recipe-days">{formatCraftDays(recipe.craftDaysTenths)}</span>
         </div>
         {#if reason}
           <span class="craft-status">{reason}</span>
@@ -107,7 +109,7 @@
   .recipe-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   .no-recipes {
@@ -120,8 +122,8 @@
   .recipe-item {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem;
+    gap: 0.35rem;
+    padding: 0.5rem 0.75rem;
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid #4a4a6a;
     border-radius: 8px;
@@ -153,8 +155,8 @@
   }
 
   .recipe-icon {
-    width: 40px;
-    height: 40px;
+    width: 120px;
+    height: 120px;
     object-fit: contain;
     flex-shrink: 0;
   }
@@ -170,15 +172,15 @@
     min-width: 0;
   }
 
-  .recipe-name-row {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
   .recipe-name {
     font-size: 1.1rem;
     font-weight: bold;
+  }
+
+  .quest-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
   }
 
   .quest-badge {
@@ -215,12 +217,14 @@
     font-size: 1rem;
     color: #a0a0b0;
     margin-left: auto;
+    flex-shrink: 0;
   }
 
   .recipe-ingredients {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.35rem;
     font-size: 1rem;
   }
 
