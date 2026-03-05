@@ -899,7 +899,7 @@
 
   .sell-card {
     display: inline-flex;
-    align-items: center;
+    align-items: baseline;
     gap: 0.4rem;
     padding: 0.3rem 0.5rem;
     background: rgba(0, 0, 0, 0.25);
