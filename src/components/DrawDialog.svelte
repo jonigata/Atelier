@@ -731,19 +731,4 @@
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
   }
 
-  /* ========== Mobile ========== */
-  @media (max-width: 600px) {
-    .cards {
-      flex-direction: column;
-      align-items: center;
-    }
-    .card-wrapper {
-      max-width: 100%;
-      width: 100%;
-    }
-    .card-flip-container {
-      aspect-ratio: auto;
-      min-height: 140px;
-    }
-  }
 </style>
