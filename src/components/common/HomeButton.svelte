@@ -3,7 +3,7 @@
 </script>
 
 <div class="home-button-bar">
-  <button class="home-btn" on:click={onClick} aria-label="ホームに戻る">
+  <button id="btn-home" class="home-btn" on:click={onClick} aria-label="ホームに戻る">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M3 12L12 3l9 9" />
       <path d="M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" />

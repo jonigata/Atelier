@@ -2,6 +2,7 @@
   import { gameState } from '$lib/stores/game';
   import { getEquipment, getEquipmentIcon } from '$lib/data/equipment';
   import type { EquipmentDef } from '$lib/models/types';
+  import ContinueMarker from './ContinueMarker.svelte';
 
   /** このパネルに関係する効果タイプのプレフィックス */
   export let prefixes: string[] = [];
@@ -27,47 +28,35 @@
     return result;
   }
 
-  /** タップ/クリックで表示するツールチップ */
-  let activeTooltip: EquipmentDef | null = null;
-  let tooltipTimer: ReturnType<typeof setTimeout> | null = null;
-  let tooltipX = 0;
-  let tooltipY = 0;
+  let activePopup: EquipmentDef | null = null;
 
-  function showTooltip(eq: EquipmentDef, event: Event) {
-    if (tooltipTimer) clearTimeout(tooltipTimer);
-
-    if (activeTooltip?.id === eq.id) {
-      activeTooltip = null;
-      return;
+  function togglePopup(eq: EquipmentDef) {
+    if (activePopup?.id === eq.id) {
+      activePopup = null;
+    } else {
+      activePopup = eq;
     }
-
-    // アイコン要素の位置からツールチップ座標を計算
-    const target = (event.currentTarget || event.target) as HTMLElement;
-    const rect = target.getBoundingClientRect();
-    tooltipX = rect.left + rect.width / 2;
-    tooltipY = rect.top - 6;
-    activeTooltip = eq;
-
-    tooltipTimer = setTimeout(() => { activeTooltip = null; }, 3000);
   }
 
-  function hideTooltip() {
-    if (tooltipTimer) clearTimeout(tooltipTimer);
-    activeTooltip = null;
+  function closePopup() {
+    activePopup = null;
+  }
+
+  function handleOverlayKeydown(e: KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+      e.preventDefault();
+      closePopup();
+    }
   }
 </script>
-
-<svelte:window on:scroll={hideTooltip} />
 
 {#if relevantEquipment.length > 0}
   <span class="active-equip-icons">
     {#each relevantEquipment as eq}
-      <span
+      <button
         class="equip-icon-wrap"
-        on:click|stopPropagation={(e) => showTooltip(eq, e)}
-        on:pointerenter={(e) => showTooltip(eq, e)}
-        on:pointerleave={hideTooltip}
-        role="img"
+        class:active={activePopup?.id === eq.id}
+        on:click|stopPropagation={() => togglePopup(eq)}
         aria-label="{eq.name}：{eq.effectDescription}"
       >
         <img
@@ -78,18 +67,34 @@
         {#if eq.rarity === 'rare'}
           <span class="mini-rare-dot"></span>
         {/if}
-      </span>
+      </button>
     {/each}
   </span>
 {/if}
 
-{#if activeTooltip}
-  <div
-    class="equip-tooltip-fixed"
-    style="left:{tooltipX}px;top:{tooltipY}px"
-  >
-    <strong>{activeTooltip.name}</strong>
-    <span class="equip-tooltip-desc">{activeTooltip.effectDescription}</span>
+{#if activePopup}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div class="equip-popup-overlay" on:click={closePopup} on:keydown={handleOverlayKeydown}>
+    <div class="equip-popup" on:click|stopPropagation>
+      <div class="equip-popup-header">
+        <img
+          class="equip-popup-icon"
+          src={getEquipmentIcon(activePopup.id)}
+          alt={activePopup.name}
+        />
+        <div class="equip-popup-title">
+          <strong class="equip-popup-name">{activePopup.name}</strong>
+          {#if activePopup.rarity === 'rare'}
+            <span class="equip-popup-rare">レア</span>
+          {/if}
+        </div>
+      </div>
+      <p class="equip-popup-desc">{activePopup.effectDescription}</p>
+      <div class="equip-popup-footer">
+        <ContinueMarker />
+      </div>
+    </div>
   </div>
 {/if}
 
@@ -97,78 +102,121 @@
   .active-equip-icons {
     display: inline-flex;
     align-items: center;
-    gap: 3px;
-    margin-left: 0.5rem;
+    gap: 8px;
+    margin-left: 12px;
     vertical-align: middle;
   }
 
   .equip-icon-wrap {
     position: relative;
     display: inline-flex;
-    width: 22px;
-    height: 22px;
-    border-radius: 3px;
-    border: 1px solid rgba(76, 175, 80, 0.4);
-    background: rgba(0, 0, 0, 0.3);
-    cursor: help;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    border: 2px solid rgba(76, 175, 80, 0.5);
+    background: rgba(0, 0, 0, 0.4);
+    cursor: pointer;
     flex-shrink: 0;
-    -webkit-tap-highlight-color: transparent;
+    padding: 4px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .equip-icon-wrap:hover, .equip-icon-wrap.active {
+    border-color: rgba(76, 175, 80, 0.8);
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
   }
 
   .equip-mini-icon {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 2px;
+    border-radius: 7px;
   }
 
   .mini-rare-dot {
     position: absolute;
-    top: 1px;
-    right: 1px;
-    width: 5px;
-    height: 5px;
+    top: 3px;
+    right: 3px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: #e8a840;
-    box-shadow: 0 0 3px rgba(232, 168, 64, 0.6);
+    box-shadow: 0 0 5px rgba(232, 168, 64, 0.6);
     pointer-events: none;
   }
 
-  .equip-tooltip-fixed {
+  .equip-popup-overlay {
     position: fixed;
-    transform: translate(-50%, -100%);
-    background: rgba(20, 20, 40, 0.95);
-    border: 1px solid rgba(76, 175, 80, 0.6);
-    border-radius: 5px;
-    padding: 0.35rem 0.5rem;
-    white-space: nowrap;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
     z-index: 1200;
-    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .equip-popup {
+    background: #1e1e36;
+    border: 2px solid rgba(76, 175, 80, 0.6);
+    border-radius: 14px;
+    padding: 28px 32px 20px;
+    min-width: 360px;
+    max-width: 500px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    gap: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
   }
 
-  .equip-tooltip-fixed::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: rgba(76, 175, 80, 0.6);
+  .equip-popup-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
   }
 
-  .equip-tooltip-fixed strong {
-    font-size: 0.75rem;
+  .equip-popup-icon {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid rgba(76, 175, 80, 0.4);
+    background: rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+  }
+
+  .equip-popup-title {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .equip-popup-name {
+    font-size: 28px;
     color: #e0e0f0;
     line-height: 1.2;
   }
 
-  .equip-tooltip-desc {
-    font-size: 0.7rem;
+  .equip-popup-rare {
+    font-size: 16px;
+    color: #e8a840;
+    background: rgba(232, 168, 64, 0.15);
+    border: 1px solid rgba(232, 168, 64, 0.4);
+    border-radius: 4px;
+    padding: 2px 8px;
+    align-self: flex-start;
+  }
+
+  .equip-popup-desc {
+    font-size: 24px;
     color: #81c784;
-    line-height: 1.2;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .equip-popup-footer {
+    text-align: center;
+    padding-top: 4px;
   }
 </style>

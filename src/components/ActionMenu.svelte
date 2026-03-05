@@ -146,6 +146,7 @@
           </button>
         {:else}
           <button
+            id="action-{action.type}"
             class="action-btn"
             class:newly-unlocked={action.isNewlyUnlocked}
             on:click={() => onSelect(action.type)}
