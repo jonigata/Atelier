@@ -455,6 +455,7 @@
   }
 
   .empty {
+    grid-column: 1 / -1;
     color: #808090;
     text-align: center;
     padding: 2rem;
