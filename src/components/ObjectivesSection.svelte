@@ -248,7 +248,7 @@
     gap: 0.5rem;
     margin-bottom: 1rem;
     background: rgba(0, 0, 0, 0.5);
-    padding: 0.6rem 0.75rem;
+    padding: 0.6rem 0.4rem;
     border-radius: 8px;
   }
 
