@@ -1939,7 +1939,7 @@ export const questTemplates: QuestDef[] = [
   // --- イリーナ（師匠・手紙） ---
   {
     id: 'quest_irina_essence',
-    title: '精霊エッセンスを送りなさい',
+    title: '精霊エッセンスを送れ',
     description: '精霊素材を扱えるようになりましたか。一つ送ってごらんなさい',
     completionMessage: '精霊の声を聞けるようになったのね。……成長しましたね',
     type: 'quality',
@@ -1969,7 +1969,7 @@ export const questTemplates: QuestDef[] = [
   },
   {
     id: 'quest_irina_tools',
-    title: '工具を見れば腕がわかります',
+    title: '工具で腕前を見せなさい',
     description: 'あなたの作った工具を見せてください。腕前の確認です',
     completionMessage: '丁寧な仕事です。道具を大切にする術師は、よい術師になります',
     type: 'quality',

@@ -515,7 +515,7 @@
   }
 
   .quest-title {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     font-weight: bold;
     color: #f4e4bc;
   }
