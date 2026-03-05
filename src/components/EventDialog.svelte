@@ -20,6 +20,18 @@
     return typeof line === 'string' ? 'neutral' : line.expression;
   }
 
+  function getLineSpeaker(line: NarrativeLine): string | undefined {
+    return typeof line === 'string' ? undefined : line.speaker;
+  }
+
+  function getLineSpeakerTitle(line: NarrativeLine): string | undefined {
+    return typeof line === 'string' ? undefined : line.speakerTitle;
+  }
+
+  function getLineFaceId(line: NarrativeLine): string | undefined {
+    return typeof line === 'string' ? undefined : line.faceId;
+  }
+
   function getFaceImageUrl(faceId: string | undefined, expression: string): string | undefined {
     if (!faceId) return undefined;
     return `/images/characters/${faceId}/${faceId}-face-${expression}.png`;
@@ -83,6 +95,12 @@
     stampRushItems = [];
     stopTimer();
   }
+
+  // 行単位の話者情報（currentLine が変わるたびに再計算）
+  $: currentLineData = dialogue?.lines[currentLine];
+  $: activeFaceId = (currentLineData ? getLineFaceId(currentLineData) : undefined) ?? dialogue?.characterFaceId;
+  $: activeSpeaker = (currentLineData ? getLineSpeaker(currentLineData) : undefined) ?? dialogue?.characterName ?? '';
+  $: activeSpeakerTitle = (currentLineData ? getLineSpeakerTitle(currentLineData) : undefined) ?? dialogue?.characterTitle ?? '';
 
   // スキップモードが変わったときの処理
   $: if (dialogue && $skipPresentation && !closing) {
@@ -342,16 +360,16 @@
             </div>
           </div>
         {/if}
-        <div class="dialogue-body" class:has-face={!!dialogue.characterFaceId}>
-          {#if dialogue.characterFaceId}
+        <div class="dialogue-body" class:has-face={!!activeFaceId}>
+          {#if activeFaceId}
             <div class="face-column">
-              <img class="character-face" src={getFaceImageUrl(dialogue.characterFaceId, getLineExpression(dialogue.lines[currentLine]))} alt={dialogue.characterName} />
+              <img class="character-face" src={getFaceImageUrl(activeFaceId, getLineExpression(dialogue.lines[currentLine]))} alt={activeSpeaker} />
             </div>
           {/if}
           <div class="text-column">
             <div class="character-info">
-              <span class="character-name">{dialogue.characterName}</span>
-              <span class="character-title">{dialogue.characterTitle}</span>
+              <span class="character-name">{activeSpeaker}</span>
+              <span class="character-title">{activeSpeakerTitle}</span>
             </div>
             <div class="dialogue-text">
               {getLineText(dialogue.lines[currentLine])}
@@ -701,7 +719,7 @@
   }
 
   .showcase-icon img.wide-img {
-    width: min(400px, 80vw);
+    width: 400px;
     height: auto;
     max-height: 200px;
     object-fit: cover;
@@ -730,7 +748,7 @@
   }
 
   .showcase-gauge {
-    width: min(400px, 85vw);
+    width: 600px;
   }
 
   .showcase-counter {

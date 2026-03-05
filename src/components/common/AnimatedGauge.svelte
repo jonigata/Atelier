@@ -99,7 +99,7 @@
   }
 
   .gauge-label-col {
-    min-width: 4.5em;
+    min-width: 70px;
     flex-shrink: 0;
     text-align: right;
   }
@@ -153,7 +153,7 @@
     font-size: 0.85rem;
     font-weight: bold;
     color: #e0e0f0;
-    width: 7em;
+    white-space: nowrap;
     text-align: right;
     flex-shrink: 0;
   }
