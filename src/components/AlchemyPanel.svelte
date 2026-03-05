@@ -35,7 +35,10 @@
       selectedRecipe = recipes[recipeId];
       pendingAlchemyRecipeId.set(null);
       // 次フレームでスクロール
-      requestAnimationFrame(() => scrollToRight());
+      requestAnimationFrame(() => {
+        scrollToRight();
+        setTimeout(() => { showBackStrip = true; }, 300);
+      });
     }
   });
 
@@ -160,10 +163,16 @@
     craftQuantity = 1;
     selectedItems = [];
     craftResultData = null;
-    requestAnimationFrame(() => scrollToRight());
+    requestAnimationFrame(() => {
+      scrollToRight();
+      setTimeout(() => { showBackStrip = true; }, 300);
+    });
   }
 
+  let showBackStrip = false;
+
   function backToRecipeList() {
+    showBackStrip = false;
     scrollToLeft();
     // スクロール完了後にリセット
     setTimeout(() => {
@@ -358,7 +367,7 @@
 
 <div class="alchemy-wrapper">
   <!-- 戻るストリップ: 横スクロールの外に配置してstickyを効かせる -->
-  {#if selectedRecipe}
+  {#if showBackStrip}
     <button class="back-strip" on:click={backToRecipeList}>
       <span class="back-strip-arrow">‹</span>
     </button>
@@ -473,16 +482,16 @@
 <style>
   .alchemy-wrapper {
     display: flex;
+    position: relative;
     /* 親の共通paddingの横方向を上書き */
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
 
   .back-strip {
-    position: sticky;
+    position: absolute;
+    left: 0;
     top: 0;
-    align-self: flex-start;
-    flex-shrink: 0;
     width: 1.8rem;
     /* HUD + subpage-header + home button bar を除いた可視領域 */
     height: calc(var(--app-height) - 12rem);
@@ -495,7 +504,7 @@
     align-items: center;
     justify-content: center;
     padding: 0;
-    z-index: 1;
+    z-index: 2;
   }
 
   .back-strip:hover {
@@ -536,7 +545,7 @@
   .right-page-content {
     display: flex;
     flex-direction: column;
-    padding: 0 1.5rem 0 0.75rem;
+    padding: 0 1.5rem 0 2.2rem;
   }
 
   .right-page-title {
