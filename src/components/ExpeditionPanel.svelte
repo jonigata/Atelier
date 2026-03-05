@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { gameState, addMessage, addMoney, setExpedition } from '$lib/stores/game';
   import { showDialogueAndWait } from '$lib/services/presentation';
   import { getAllAreas } from '$lib/data/areas';
@@ -30,6 +31,16 @@
 
   let selectedArea: AreaDef | null = null;
   let selectedDuration: number = 3;
+  let summarySection: HTMLElement;
+
+  function scrollToBottom() {
+    tick().then(() => {
+      const container = summarySection?.closest('.main-panel');
+      if (container) {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      }
+    });
+  }
 
   $: expeditionActive = $gameState.expedition !== null;
   $: returnDay = expeditionActive
@@ -75,7 +86,7 @@
       lines: [
         { text: `「${area.name}」か。${duration}日で戻る`, expression: 'determined' },
         { text: lines.ren, expression: 'neutral' },
-        { text: `フィー「${lines.fee}」`, expression: 'neutral' },
+        { text: lines.fee, expression: 'happy', speaker: 'フィー', speakerTitle: '冒険者・斥候', faceId: 'fee' },
       ],
     });
 
@@ -136,7 +147,7 @@
             <button
               class="duration-item"
               class:selected={selectedDuration === d}
-              on:click={() => (selectedDuration = d)}
+              on:click={() => { selectedDuration = d; scrollToBottom(); }}
             >
               {d}日間
             </button>
@@ -144,7 +155,7 @@
         </div>
       </div>
 
-      <div class="summary">
+      <div class="summary" bind:this={summarySection}>
         <h3>派遣内容</h3>
         <div class="summary-content">
           <p>派遣先: {selectedArea.name}</p>

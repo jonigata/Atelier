@@ -327,8 +327,14 @@ export interface RewardDisplay {
   gaugeData?: GaugeData;
 }
 
-// ダイアログ1行分（文字列 or 表情付き）
-export type NarrativeLine = string | { text: string; expression: string };
+// ダイアログ1行分（文字列 or 表情付き / 行単位の話者切り替え対応）
+export type NarrativeLine = string | {
+  text: string;
+  expression: string;
+  speaker?: string;       // 行単位の話者名（省略時はダイアログの characterName）
+  speakerTitle?: string;  // 行単位の肩書き（省略時はダイアログの characterTitle）
+  faceId?: string;        // 行単位の顔画像ID（省略時はダイアログの characterFaceId）
+};
 
 export interface EventDialogue {
   characterName: string;

@@ -229,7 +229,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
       'あんたがこの村の錬金術師か。俺はレン、こいつはフィー。冒険者をやってる',
       '面白い村があると聞いてな。錬金術師がいるなら素材の需要もあるだろ？',
       '森の奥まで行ける。金は貰うが、悪い取引にはならないさ',
-      'フィー「よろしくねー！ 珍しいもの見つけたら教えるから！」',
+      { text: 'よろしくねー！ 珍しいもの見つけたら教えるから！', expression: 'happy', speaker: 'フィー', speakerTitle: '冒険者・斥候', faceId: 'fee' },
     ],
     conditions: [{ type: 'village_development', target: 2 }],
     reward: {
@@ -249,8 +249,8 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     narrative: 'character_trial',
     narrativeCharacter: { name: 'レン', title: '冒険者' },
     narrativeLines: [
-      'フィー「これ、帰り道で見つけたの！ おまけだよー」',
-      'レン「……見込みがあるな。次も頼んでくれ」',
+      { text: 'これ、帰り道で見つけたの！ おまけだよー', expression: 'happy', speaker: 'フィー', speakerTitle: '冒険者・斥候', faceId: 'fee' },
+      { text: '……見込みがあるな。次も頼んでくれ', expression: 'neutral' },
     ],
     conditions: [{ type: 'expedition_count', target: 1 }],
     reward: {
