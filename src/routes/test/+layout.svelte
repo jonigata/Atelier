@@ -11,3 +11,15 @@
 </script>
 
 {@render children()}
+
+<style>
+  :global(html) {
+    font-size: 30px;
+  }
+
+  :global(body) {
+    margin: 0;
+    padding: 0;
+    background: #0a0a14;
+  }
+</style>

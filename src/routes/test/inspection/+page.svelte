@@ -98,25 +98,22 @@
 
 <style>
   .test-page {
-    max-width: 700px;
-    margin: 2rem auto;
-    padding: 1rem;
+    max-width: 960px;
     color: #e0e0f0;
     background: #1a1a2e;
-    min-height: 100vh;
   }
 
   h2 {
     color: #c9a959;
-    margin-bottom: 1.5rem;
+    margin-bottom: 16px;
   }
 
   .controls {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    padding: 1rem;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 12px;
     background: rgba(255,255,255,0.05);
     border-radius: 8px;
   }
@@ -124,23 +121,23 @@
   label {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 12px;
   }
 
   label span {
-    min-width: 180px;
-    font-size: 0.9rem;
+    min-width: 140px;
+    font-size: 14px;
     font-weight: bold;
   }
 
   select {
     flex: 1;
-    padding: 0.4rem;
+    padding: 6px;
     background: #2a2a3e;
     color: #e0e0f0;
     border: 1px solid #4a4a6a;
     border-radius: 4px;
-    font-size: 0.9rem;
+    font-size: 14px;
   }
 
   input[type="range"] {
@@ -149,17 +146,17 @@
   }
 
   .reveal-controls {
-    margin-bottom: 1rem;
+    margin-bottom: 12px;
   }
 
   .reveal-btn {
-    padding: 0.6rem 1.2rem;
+    padding: 8px 16px;
     background: linear-gradient(135deg, #8b6914, #c9a959);
     border: none;
     border-radius: 6px;
     color: #1a1a2e;
     font-weight: bold;
-    font-size: 0.95rem;
+    font-size: 15px;
     cursor: pointer;
   }
 
@@ -168,9 +165,6 @@
   }
 
   .preview {
-    padding: 1rem;
-    background: rgba(0,0,0,0.3);
-    border-radius: 8px;
-    min-height: 200px;
+    padding: 0 0.5rem;
   }
 </style>
