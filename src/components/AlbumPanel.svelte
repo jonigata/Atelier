@@ -151,11 +151,7 @@
 </script>
 
 <div class="album-panel">
-  <button class="back-btn" on:click={onBack}>← 戻る</button>
-  <h2>
-    <img class="title-icon" src="/icons/actions/album.png" alt="" on:error={handleIconError} />
-    アルバム
-  </h2>
+  <h2>アルバム</h2>
 
   <!-- タブ切り替え -->
   <div class="tab-bar">
@@ -397,35 +393,12 @@
     padding: 1.5rem;
   }
 
-  .back-btn {
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid #4a4a6a;
-    border-radius: 4px;
-    color: #c0c0d0;
-    cursor: pointer;
-    margin-bottom: 1rem;
-  }
-
-  .back-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
 
   h2 {
     font-size: 1.5rem;
     color: #f4e4bc;
     margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
   }
-
-  .title-icon {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-  }
-
   /* タブバー */
   .tab-bar {
     display: flex;

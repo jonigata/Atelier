@@ -296,8 +296,7 @@
 
 <div class="shop-panel">
   <div class="shop-header">
-    <button class="back-btn" on:click={onBack}>← 戻る</button>
-    <h2>🏪 ショップ <ActiveEquipmentIcons prefixes={['sell_', 'buy_']} /></h2>
+    <h2>ショップ <ActiveEquipmentIcons prefixes={['sell_', 'buy_']} /></h2>
 
     <div class="money-display">
       所持金: <span class="amount">{$gameState.money.toLocaleString()}G</span>
@@ -564,19 +563,6 @@
     padding: 0 1.5rem 1.5rem;
   }
 
-  .back-btn {
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid #4a4a6a;
-    border-radius: 4px;
-    color: #c0c0d0;
-    cursor: pointer;
-    margin-bottom: 1rem;
-  }
-
-  .back-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
 
   h2 {
     font-size: 1.5rem;

@@ -335,8 +335,7 @@
 </script>
 
 <div class="alchemy-panel">
-  <button class="back-btn" on:click={() => onBack()}>← 戻る</button>
-  <h2>⚗️ 調合 <ActiveEquipmentIcons prefixes={['craft_', 'material_', 'all_probability']} /></h2>
+  <h2>調合 <ActiveEquipmentIcons prefixes={['craft_', 'material_', 'all_probability']} /></h2>
 
   {#if !selectedRecipe}
     <RecipeList recipes={availableRecipes} onSelect={selectRecipe} />
@@ -436,17 +435,12 @@
   }
 
   .back-btn {
-    padding: 0.5rem 1rem;
+    padding: 0.3rem 0.75rem;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid #4a4a6a;
     border-radius: 4px;
     color: #c0c0d0;
     cursor: pointer;
-    margin-bottom: 1rem;
-  }
-
-  .back-btn.small {
-    padding: 0.3rem 0.75rem;
     font-size: 0.85rem;
   }
 

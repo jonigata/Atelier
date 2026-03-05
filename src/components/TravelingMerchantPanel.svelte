@@ -57,7 +57,6 @@
 </script>
 
 <div class="merchant-panel">
-  <button class="back-btn" on:click={onBack}>← 戻る</button>
   <div class="merchant-header">
     <h2>マルコの行商 ── {currentMonth}月の品揃え</h2>
     <span class="days-left">あと{merchantDaysLeft}日</span>
@@ -120,19 +119,6 @@
     padding: 1.5rem;
   }
 
-  .back-btn {
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid #4a4a6a;
-    border-radius: 4px;
-    color: #c0c0d0;
-    cursor: pointer;
-    margin-bottom: 1rem;
-  }
-
-  .back-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
 
   .merchant-header {
     display: flex;

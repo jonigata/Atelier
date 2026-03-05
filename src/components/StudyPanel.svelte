@@ -120,8 +120,7 @@
 </script>
 
 <div class="study-panel">
-  <button class="back-btn" on:click={onBack}>← 戻る</button>
-  <h2>📚 勉強 <ActiveEquipmentIcons prefixes={['study_']} /></h2>
+  <h2>勉強 <ActiveEquipmentIcons prefixes={['study_']} /></h2>
   <p>本を選んで読みます。{selectedBook ? getStudyDays(selectedBook) : 1}日経過・体力{STAMINA.STUDY_COST}消費します。</p>
   <p class="known-recipes">
     習得済みレシピ: {$gameState.knownRecipes.length}個 / 錬金術Lv: {calcLevelFromExp($gameState.alchemyExp)}
@@ -205,19 +204,6 @@
     padding: 1.5rem;
   }
 
-  .back-btn {
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid #4a4a6a;
-    border-radius: 4px;
-    color: #c0c0d0;
-    cursor: pointer;
-    margin-bottom: 1rem;
-  }
-
-  .back-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
 
   h2 {
     font-size: 1.5rem;

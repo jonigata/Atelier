@@ -22,6 +22,7 @@
   import SaveLoadSidebar from '../components/SaveLoadSidebar.svelte';
   import ToastContainer from '../components/ToastContainer.svelte';
   import TalkBanner from '../components/TalkBanner.svelte';
+  import HomeButton from '../components/common/HomeButton.svelte';
   import { initZoom } from '$lib/services/zoomController';
   import { dev } from '$app/environment';
   import type { ActionType } from '$lib/models/types';
@@ -134,6 +135,10 @@
     {#if $gameState.phase === 'action' && selectedAction === null}
       <TalkBanner />
     {/if}
+
+    {#if $gameState.phase === 'action' && selectedAction !== null}
+      <HomeButton onClick={() => handleBackToMenu()} />
+    {/if}
   {/if}
 
   <!-- 日数経過フィードバック -->
@@ -188,6 +193,7 @@
   }
 
   .game-container {
+    position: relative;
     height: var(--app-height, 100vh);
     display: flex;
     flex-direction: column;

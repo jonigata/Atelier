@@ -78,8 +78,7 @@
 <svelte:window on:keydown={handleKeydown} />
 
 <div class="rest-panel">
-  <button class="back-btn" on:click={onBack}>← 戻る</button>
-  <h2>😴 休息</h2>
+  <h2>休息</h2>
   <p>体力を全回復します。1日経過します。</p>
   <div class="stamina-display">
     <div class="stamina-header">
@@ -134,19 +133,6 @@
     padding: 1.5rem;
   }
 
-  .back-btn {
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid #4a4a6a;
-    border-radius: 4px;
-    color: #c0c0d0;
-    cursor: pointer;
-    margin-bottom: 1rem;
-  }
-
-  .back-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
 
   h2 {
     font-size: 1.5rem;
