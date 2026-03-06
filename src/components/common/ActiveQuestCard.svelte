@@ -45,59 +45,71 @@
 <div
   class="quest-card"
   class:compact
-  class:urgent={daysLeft <= 3}
+  class:type-quality={quest.type === 'quality'}
+  class:type-bulk={quest.type === 'bulk'}
   class:ready={canDeliverNow}
+  class:urgent={daysLeft <= 3 && !canDeliverNow}
   class:clickable={onClick !== null}
   on:click={() => onClick?.(quest)}
   role={onClick ? 'button' : undefined}
   tabindex={onClick ? 0 : undefined}
 >
-  <div class="quest-main">
-    {#if quest.type !== 'deliver'}
-      <div class="quest-type-area">
-        <QuestTypeIcon type={quest.type} size="medium" />
-      </div>
-    {/if}
-    <div class="quest-content">
-      <div class="quest-header">
-        {#if client}
-          <span class="quest-client">{client.name}</span>
-        {/if}
-        <span class="quest-title">{quest.title}</span>
-      </div>
+  {#if quest.type !== 'deliver'}
+    <span class="quest-type-float">
+      <QuestTypeIcon type={quest.type} showLabel={true} />
+    </span>
+  {/if}
 
-      <div class="days-bar-container">
-        <div
-          class="days-bar"
-          style="width: {Math.max(0, Math.min(100, (daysLeft / quest.deadlineDays) * 100))}%; --danger-level: {dangerLevel}"
-        ></div>
-        <span class="days-label">残り{daysLeft}日</span>
-      </div>
-    </div>
+  {#if client}
+    <div class="quest-client">{client.name}（{client.title}）</div>
+  {/if}
+
+  <div class="quest-header">
+    <span class="quest-title">{quest.title}</span>
   </div>
 
-  <div class="quest-requirement">
-    <img
-      class="item-icon"
-      class:silhouette={!$gameState.craftedItems.includes(quest.requiredItemId)}
-      src={getItemIcon(quest.requiredItemId)}
-      alt=""
-      on:error={handleIconError}
-    />
-    <span class="item-name">{itemDef?.name || quest.requiredItemId}</span>
-    {#if quest.requiredQuality}
-      <span class="quality-req">品質{quest.requiredQuality}↑</span>
-    {/if}
-    <span class="quantity" class:complete={matchingCount >= quest.requiredQuantity}>
-      {matchingCount}/{quest.requiredQuantity}
+  <div class="days-bar-container">
+    <div
+      class="days-bar"
+      style="width: {Math.max(0, Math.min(100, (daysLeft / quest.deadlineDays) * 100))}%; --danger-level: {dangerLevel}"
+    ></div>
+    <span class="days-label">残り{daysLeft}日</span>
+  </div>
+
+  <div class="quest-details">
+    <span class="requirement">
+      <img
+        class="item-icon"
+        class:silhouette={!$gameState.craftedItems.includes(quest.requiredItemId)}
+        src={getItemIcon(quest.requiredItemId)}
+        alt={itemDef?.name || quest.requiredItemId}
+        on:error={handleIconError}
+      />
+      <span class="requirement-text">
+        {itemDef?.name || quest.requiredItemId}
+        ×{quest.requiredQuantity}
+        <span class="requirement-sub">
+          {#if quest.requiredQuality}
+            <span class="quality-req">品質{quest.requiredQuality}↑</span>
+          {/if}
+          <span class="owned-count" class:enough={matchingCount >= quest.requiredQuantity}>
+            所持: {matchingCount}
+          </span>
+        </span>
+      </span>
     </span>
   </div>
 
-  <div class="quest-footer">
+  <div class="quest-rewards">
+    <span class="detail-label">報酬:</span>
     <span class="reward-money">{quest.rewardMoney}G</span>
-    <span class="reward-rep">名声+{quest.rewardReputation}</span>
-    {#if canDeliverNow && !showDeliverButton}
-      <span class="ready-badge">納品可</span>
+    {#if quest.type === 'quality'}
+      <span class="reward-rep">名声+{quest.rewardReputation}</span>
+    {:else if quest.type === 'bulk'}
+      <span class="reward-dev">村発展+{quest.rewardReputation}</span>
+    {:else}
+      <span class="reward-rep">名声+{Math.floor(quest.rewardReputation / 2)}</span>
+      <span class="reward-dev">村発展+{Math.floor(quest.rewardReputation / 2)}</span>
     {/if}
   </div>
 
@@ -119,28 +131,43 @@
         </button>
       {/if}
     </div>
+  {:else if canDeliverNow}
+    <div class="quest-bottom-row">
+      <span class="ready-badge">納品可</span>
+    </div>
   {/if}
 </div>
 
 <style>
   .quest-card {
-    padding: 0.75rem 1rem;
-    background: #1e1e38;
-    border: 1px solid #3a3a5a;
-    border-radius: 6px;
-    border-left: 3px solid #2196f3;
-  }
-
-  .quest-card.urgent {
-    border-color: #ff9800;
-    border-left-width: 3px;
-    background: #241e18;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 0.3rem 0.4rem;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    gap: 0.05rem;
   }
 
   .quest-card.ready {
-    border-color: #4caf50;
-    border-left-width: 3px;
-    background: #1a2518;
+    border-color: rgba(76, 175, 80, 0.5);
+    background: rgba(76, 175, 80, 0.06);
+  }
+
+  .quest-card.urgent {
+    border-color: rgba(255, 152, 0, 0.5);
+    background: rgba(255, 152, 0, 0.06);
+  }
+
+  .quest-card.type-quality:not(.ready):not(.urgent) {
+    background: rgba(156, 39, 176, 0.08);
+    border-color: rgba(156, 39, 176, 0.3);
+  }
+
+  .quest-card.type-bulk:not(.ready):not(.urgent) {
+    background: rgba(33, 150, 243, 0.08);
+    border-color: rgba(33, 150, 243, 0.3);
   }
 
   .quest-card.clickable {
@@ -149,47 +176,53 @@
 
   .quest-card.clickable:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: #6a6a8a;
   }
 
-  .quest-main {
-    display: flex;
-    gap: 0.75rem;
-    margin-bottom: 0.5rem;
+  .quest-type-float {
+    position: absolute;
+    top: -0.35rem;
+    right: -0.25rem;
+    padding: 0.08rem 0.2rem;
+    background: rgba(33, 150, 243, 0.4);
+    border-radius: 3px;
+    font-size: 0.5rem;
+    color: #90caf9;
+    line-height: 1.2;
+    z-index: 1;
   }
 
-  .quest-type-area {
-    flex-shrink: 0;
+  .quest-type-float :global(.icon) {
+    width: 12px;
+    height: 12px;
+  }
+
+  .quest-type-float :global(.label) {
+    font-size: 0.5rem;
+  }
+
+  .quest-client {
+    font-size: 0.5rem;
+    color: var(--text-sub);
+  }
+
+  .quest-header {
     display: flex;
     align-items: center;
   }
 
-  .quest-content {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .quest-header {
-    margin-bottom: 0.4rem;
-  }
-
-  .quest-client {
-    font-size: 1rem;
-    color: #a0a0b0;
-  }
-
   .quest-title {
+    font-size: 0.7rem;
     font-weight: bold;
-    color: #e0e0f0;
-    font-size: 1rem;
+    color: var(--text-heading);
   }
 
   .days-bar-container {
     position: relative;
-    height: 1.25rem;
+    height: 1.1rem;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 4px;
     overflow: hidden;
+    margin-bottom: 0.1rem;
   }
 
   .days-bar {
@@ -208,23 +241,30 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 0.75rem;
+    font-size: 0.6rem;
     font-weight: bold;
     color: #fff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
-  .quest-requirement {
+  .quest-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    font-size: 0.7rem;
+    margin-bottom: 0.1rem;
+  }
+
+  .requirement {
+    color: var(--text-body);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.4rem;
-    font-size: 1rem;
+    gap: 0.2rem;
   }
 
   .item-icon {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     object-fit: contain;
   }
 
@@ -233,50 +273,76 @@
     opacity: 0.5;
   }
 
-  .item-name {
-    color: #e0e0f0;
+  .requirement-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    line-height: 1.2;
+  }
+
+  .requirement-sub {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
   }
 
   .quality-req {
-    padding: 0.1rem 0.3rem;
-    background: rgba(156, 39, 176, 0.3);
-    border-radius: 3px;
-    font-size: 0.7rem;
+    font-size: 0.5rem;
     color: #ce93d8;
+    background: rgba(156, 39, 176, 0.2);
+    padding: 0.08rem 0.2rem;
+    border-radius: 3px;
+    line-height: 1.2;
   }
 
-  .quantity {
-    color: #a0a0b0;
-    margin-left: auto;
+  .owned-count {
+    font-size: 0.6rem;
+    color: var(--text-dim);
   }
 
-  .quantity.complete {
-    color: #4caf50;
-    font-weight: bold;
+  .owned-count.enough {
+    color: var(--accent-green-dark);
   }
 
-  .quest-footer {
+  .quest-rewards {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
+    gap: 0.1rem 0.3rem;
+    font-size: 0.6rem;
+  }
+
+  .detail-label {
+    color: var(--text-dim);
+    font-size: 0.55rem;
   }
 
   .reward-money {
-    color: #c9a959;
+    color: var(--accent-gold);
     font-weight: bold;
+    font-size: 0.65rem;
   }
 
   .reward-rep {
-    color: #81c784;
+    color: var(--accent-green);
+  }
+
+  .reward-dev {
+    color: var(--accent-blue);
+  }
+
+  .quest-bottom-row {
+    display: flex;
+    align-items: center;
+    margin-top: 0.1rem;
   }
 
   .ready-badge {
-    margin-left: auto;
-    padding: 0.2rem 0.5rem;
+    padding: 0.08rem 0.2rem;
     background: linear-gradient(135deg, #0097a7, #26c6da);
-    border-radius: 4px;
-    font-size: 0.75rem;
+    border-radius: 3px;
+    font-size: 0.5rem;
+    line-height: 1.2;
     font-weight: bold;
     color: #fff;
     box-shadow: 0 0 8px rgba(38, 198, 218, 0.6);
@@ -288,84 +354,22 @@
     50% { box-shadow: 0 0 14px rgba(38, 198, 218, 0.9); }
   }
 
-  /* コンパクトモード */
-  .quest-card.compact {
-    padding: 0.4rem 0.5rem;
-  }
-
-  .quest-card.compact .quest-main {
-    gap: 0.4rem;
-    margin-bottom: 0.3rem;
-  }
-
-  .quest-card.compact .quest-client {
-    font-size: 0.65rem;
-  }
-
-  .quest-card.compact .quest-title {
-    font-size: 0.75rem;
-  }
-
-  .quest-card.compact .quest-header {
-    margin-bottom: 0.2rem;
-  }
-
-  .quest-card.compact .days-bar-container {
-    height: 1rem;
-  }
-
-  .quest-card.compact .days-label {
-    font-size: 0.6rem;
-  }
-
-  .quest-card.compact .quest-requirement {
-    gap: 0.3rem;
-    margin-bottom: 0.2rem;
-    font-size: 0.75rem;
-  }
-
-  .quest-card.compact .item-icon {
-    width: 28px;
-    height: 28px;
-  }
-
-  .quest-card.compact .quest-footer {
-    font-size: 0.7rem;
-    gap: 0.3rem;
-  }
-
-  .quest-card.compact .ready-badge {
-    padding: 0.1rem 0.35rem;
-    font-size: 0.65rem;
-  }
-
-  .quest-card.compact .quest-actions {
-    gap: 0.3rem;
-    margin-top: 0.3rem;
-  }
-
-  .quest-card.compact .deliver-btn,
-  .quest-card.compact .cancel-btn {
-    padding: 0.3rem;
-    font-size: 0.7rem;
-  }
-
   /* アクションボタン群 */
   .quest-actions {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    gap: 0.2rem;
+    margin-top: 0.1rem;
   }
 
   .deliver-btn {
     flex: 1;
-    padding: 0.5rem;
+    padding: 0.3rem;
     background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     color: white;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 0.7rem;
     cursor: pointer;
   }
 
@@ -379,17 +383,22 @@
   }
 
   .cancel-btn {
-    padding: 0.5rem 0.75rem;
+    padding: 0.3rem 0.5rem;
     background: rgba(244, 67, 54, 0.15);
     border: 1px solid rgba(244, 67, 54, 0.4);
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     color: #ef9a9a;
-    font-size: 1rem;
+    font-size: 0.7rem;
     cursor: pointer;
   }
 
   .cancel-btn:hover {
     background: rgba(244, 67, 54, 0.3);
     color: #ffcdd2;
+  }
+
+  /* コンパクトモード（現在は通常モードと同じ） */
+  .quest-card.compact {
+    padding: 0.3rem 0.4rem;
   }
 </style>
