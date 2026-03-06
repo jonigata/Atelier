@@ -221,7 +221,7 @@
             after={reputationExpGaugeData.after}
             max={reputationExpGaugeData.max}
             label={reputationExpGaugeData.label}
-            text="+{result.totalReputationExpGained} 名声Exp"
+            text="+{result.totalReputationExpGained} Exp"
             color="green"
             segments={reputationExpGaugeData.segments}
             subtext={reputationExpGaugeData.subtext ?? ''}
@@ -238,7 +238,7 @@
             after={staminaGaugeData.after}
             max={staminaGaugeData.max}
             label={staminaGaugeData.label}
-            text="-{staminaGaugeData.before - staminaGaugeData.after}"
+            text="{staminaGaugeData.after} / {staminaGaugeData.max}"
             color="orange"
           />
         {/if}
@@ -307,7 +307,7 @@
     border: 3px solid #4a4a6a;
     border-radius: 16px;
     padding: 2rem;
-    max-width: 420px;
+    max-width: 500px;
     width: 90%;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     animation: resultReveal 0.5s ease-out;

@@ -7,7 +7,7 @@ import { getAllEquipment } from '$lib/data/equipment';
 import { getHelper } from '$lib/data/helpers';
 import type { GameState } from '$lib/models/types';
 import { isCraftedCategory } from '$lib/data/categories';
-import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments } from '$lib/data/balance';
+import { buildExpGaugeData } from '$lib/data/balance';
 
 export interface DrawInfos {
   village: LevelUpInfo | null;
@@ -205,21 +205,10 @@ function attachExpGaugeData(
   totalBefore: number,
   totalAfter: number,
 ): void {
-  const levelBefore = calcLevelFromExp(totalBefore);
-  const levelAfter = calcLevelFromExp(totalAfter);
-  const progressBefore = calcExpProgress(totalBefore);
-  const progressAfter = calcExpProgress(totalAfter);
-  const max = calcExpForLevel(levelBefore);
-  const leveledUp = levelAfter > levelBefore;
-  reward.gaugeData = {
-    before: progressBefore,
-    after: leveledUp ? max : progressAfter,
-    max,
-    label: `Lv.${levelBefore}`,
-    segments: leveledUp
-      ? buildExpGaugeSegments(levelBefore, progressBefore, levelAfter, progressAfter)
-      : undefined,
-  };
+  const type = expField === 'reputationExp' ? 'reputation' as const
+    : expField === 'villageExp' ? 'village' as const
+    : 'alchemy' as const;
+  reward.gaugeData = buildExpGaugeData(type, totalBefore, totalAfter);
   reward.gaugeColor = color;
 }
 

@@ -610,7 +610,7 @@
     border: 3px solid #c9a959;
     border-radius: 16px;
     padding: 2rem 2.5rem;
-    max-width: 500px;
+    max-width: 540px;
     width: 90%;
     box-shadow:
       0 0 40px rgba(201, 169, 89, 0.3),

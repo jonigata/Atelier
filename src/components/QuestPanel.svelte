@@ -21,7 +21,7 @@
   import { executeQuestDelivery } from '$lib/services/quest';
   import { checkAchievements } from '$lib/services/achievement';
   import { showDrawsForLevelUp } from '$lib/services/drawEvent';
-  import { calcLevelFromExp, calcExpProgress, calcExpForLevel, buildExpGaugeSegments } from '$lib/data/balance';
+  import { buildExpGaugeData } from '$lib/data/balance';
   import { get } from 'svelte/store';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
   import QuestTypeIcon from './common/QuestTypeIcon.svelte';
@@ -109,58 +109,28 @@
 
     // ゲージ用: 変更前の状態を保存
     const stateBefore = get(gameState);
-    const repLevelBefore = calcLevelFromExp(stateBefore.reputationExp);
-    const repExpBefore = calcExpProgress(stateBefore.reputationExp);
-    const repExpMax = calcExpForLevel(repLevelBefore);
-    const vilLevelBefore = calcLevelFromExp(stateBefore.villageExp);
-    const vilExpBefore = calcExpProgress(stateBefore.villageExp);
-    const vilExpMax = calcExpForLevel(vilLevelBefore);
 
     // 共通納品ロジック
     const { finalMoney, finalReputation, finalDevelopment, reputationDrawInfo, villageDrawInfo } = executeQuestDelivery(quest, itemsToConsume);
 
     // ゲージ用: 変更後の状態を取得
     const stateAfter = get(gameState);
-    const repLevelAfter = calcLevelFromExp(stateAfter.reputationExp);
-    const vilLevelAfter = calcLevelFromExp(stateAfter.villageExp);
-
-    // 完了ダイアログを表示
-    const repProgressAfter = calcExpProgress(stateAfter.reputationExp);
-    const vilProgressAfter = calcExpProgress(stateAfter.villageExp);
-    const repLeveledUp = repLevelAfter > repLevelBefore;
-    const vilLeveledUp = vilLevelAfter > vilLevelBefore;
 
     const structuredRewards: RewardDisplay[] = [
       { text: `${finalMoney.toLocaleString()} G`, type: 'money' },
     ];
     if (finalReputation > 0) {
       structuredRewards.push({
-        text: `名声Exp +${finalReputation}`,
+        text: `+${finalReputation} Exp`,
         type: 'reputation',
-        gaugeData: {
-          before: repExpBefore,
-          after: repLeveledUp ? repExpMax : repProgressAfter,
-          max: repExpMax,
-          label: `Lv.${repLevelBefore}`,
-          segments: repLeveledUp
-            ? buildExpGaugeSegments(repLevelBefore, repExpBefore, repLevelAfter, repProgressAfter)
-            : undefined,
-        },
+        gaugeData: buildExpGaugeData('reputation', stateBefore.reputationExp, stateAfter.reputationExp),
       });
     }
     if (finalDevelopment > 0) {
       structuredRewards.push({
-        text: `村発展Exp +${finalDevelopment}`,
+        text: `+${finalDevelopment} Exp`,
         type: 'villageDevelopment',
-        gaugeData: {
-          before: vilExpBefore,
-          after: vilLeveledUp ? vilExpMax : vilProgressAfter,
-          max: vilExpMax,
-          label: `Lv.${vilLevelBefore}`,
-          segments: vilLeveledUp
-            ? buildExpGaugeSegments(vilLevelBefore, vilExpBefore, vilLevelAfter, vilProgressAfter)
-            : undefined,
-        },
+        gaugeData: buildExpGaugeData('village', stateBefore.villageExp, stateAfter.villageExp),
       });
     }
 

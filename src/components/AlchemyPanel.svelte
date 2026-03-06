@@ -8,7 +8,7 @@
   import { showDrawAndWait } from '$lib/services/drawEvent';
   import { recipes } from '$lib/data/recipes';
   import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient, calculateStaminaCost, calculateFatiguePenalty, getFatigueLabel, getInspectionConflict } from '$lib/services/alchemy';
-  import { calcExpForLevel, calcLevelFromExp, calcExpProgress, buildExpGaugeSegments } from '$lib/data/balance';
+  import { calcLevelFromExp, buildExpGaugeData } from '$lib/data/balance';
   import { getEffectiveCraftDays, getEffectiveIngredientCount, craftDaysToActual, formatCraftDays } from '$lib/services/equipmentEffects';
   import type { RecipeDef, OwnedItem, Ingredient, GaugeData } from '$lib/models/types';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
@@ -259,52 +259,17 @@
 
     // ゲージ用にbefore値をキャプチャ
     const stateBefore = get(gameState);
-    const levelBefore = calcLevelFromExp(stateBefore.alchemyExp);
-    const expBefore = calcExpProgress(stateBefore.alchemyExp);
-    const expMax = calcExpForLevel(levelBefore);
-    const repLevelBefore = calcLevelFromExp(stateBefore.reputationExp);
-    const repExpBefore = calcExpProgress(stateBefore.reputationExp);
-    const repExpMax = calcExpForLevel(repLevelBefore);
     const staminaBefore = stateBefore.stamina;
 
     const result = craftBatch(selectedRecipe.id, selectedItems, craftQuantity);
 
     craftResultData = result;
 
-    // 経験値ゲージデータを構築
     const stateAfter = get(gameState);
-    const levelAfter = calcLevelFromExp(stateAfter.alchemyExp);
-    const progressAfter = calcExpProgress(stateAfter.alchemyExp);
-    const leveledUp = levelAfter > levelBefore;
-    expGaugeData = {
-      before: expBefore,
-      after: leveledUp ? expMax : progressAfter,
-      max: expMax,
-      label: `Lv.${levelBefore}`,
-      segments: leveledUp
-        ? buildExpGaugeSegments(levelBefore, expBefore, levelAfter, progressAfter)
-        : undefined,
-    };
-
-    // 名声経験値ゲージデータを構築
-    if (result.totalReputationExpGained > 0) {
-      const repLevelAfter = calcLevelFromExp(stateAfter.reputationExp);
-      const repProgressAfter = calcExpProgress(stateAfter.reputationExp);
-      const repLeveledUp = repLevelAfter > repLevelBefore;
-      reputationExpGaugeData = {
-        before: repExpBefore,
-        after: repLeveledUp ? repExpMax : repProgressAfter,
-        max: repExpMax,
-        label: `名声 Lv.${repLevelBefore}`,
-        segments: repLeveledUp
-          ? buildExpGaugeSegments(repLevelBefore, repExpBefore, repLevelAfter, repProgressAfter, '名声 Lv.')
-          : undefined,
-      };
-    } else {
-      reputationExpGaugeData = null;
-    }
-
-    // 体力ゲージデータを構築
+    expGaugeData = buildExpGaugeData('alchemy', stateBefore.alchemyExp, stateAfter.alchemyExp);
+    reputationExpGaugeData = result.totalReputationExpGained > 0
+      ? buildExpGaugeData('reputation', stateBefore.reputationExp, stateAfter.reputationExp)
+      : null;
     staminaGaugeData = {
       before: staminaBefore,
       after: stateAfter.stamina,

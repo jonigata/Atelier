@@ -220,6 +220,9 @@
 
   .btn-action {
     margin-top: 1rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .btn-action:disabled {

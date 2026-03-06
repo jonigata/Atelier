@@ -271,3 +271,41 @@ export function buildExpGaugeSegments(
 
   return segments;
 }
+
+/**
+ * 経験値タイプごとのラベルプレフィックス
+ */
+export type ExpType = 'alchemy' | 'reputation' | 'village';
+
+const EXP_LABEL_PREFIX: Record<ExpType, string> = {
+  alchemy: '錬金 Lv.',
+  reputation: '名声 Lv.',
+  village: '村 Lv.',
+};
+
+/**
+ * 経験値ゲージ用データを構築する共通関数
+ * totalBefore/totalAfter は累計経験値（進捗ではなく）
+ */
+export function buildExpGaugeData(
+  type: ExpType,
+  totalBefore: number,
+  totalAfter: number,
+): import('$lib/models/types').GaugeData {
+  const labelPrefix = EXP_LABEL_PREFIX[type];
+  const levelBefore = calcLevelFromExp(totalBefore);
+  const levelAfter = calcLevelFromExp(totalAfter);
+  const progressBefore = calcExpProgress(totalBefore);
+  const progressAfter = calcExpProgress(totalAfter);
+  const max = calcExpForLevel(levelBefore);
+  const leveledUp = levelAfter > levelBefore;
+  return {
+    before: progressBefore,
+    after: leveledUp ? max : progressAfter,
+    max,
+    label: `${labelPrefix}${levelBefore}`,
+    segments: leveledUp
+      ? buildExpGaugeSegments(levelBefore, progressBefore, levelAfter, progressAfter, labelPrefix)
+      : undefined,
+  };
+}

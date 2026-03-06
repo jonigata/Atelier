@@ -95,13 +95,14 @@
   .gauge-row {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   .gauge-label-col {
-    min-width: 70px;
+    width: 100px;
     flex-shrink: 0;
     text-align: right;
+    white-space: nowrap;
   }
 
   .gauge-label {
@@ -155,6 +156,7 @@
     color: #e0e0f0;
     white-space: nowrap;
     text-align: right;
+    width: 100px;
     flex-shrink: 0;
   }
 
