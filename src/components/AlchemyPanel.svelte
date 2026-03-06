@@ -98,7 +98,7 @@
   // 素材選択が完了したらスクロールコンテナを最下端までスクロール
   $: if (selectionComplete && requiredItemCount > 0) {
     tick().then(() => {
-      const container = craftPreviewSection?.closest('.main-panel');
+      const container = craftPreviewSection?.closest('.page-right');
       if (container) {
         container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
       }
@@ -467,9 +467,11 @@
   .alchemy-wrapper {
     display: flex;
     position: relative;
-    /* 親の共通paddingの横方向を上書き */
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    /* 親の共通paddingを上書き（各ページが独立スクロールするため） */
+    padding: 0 !important;
   }
 
   .back-strip {
@@ -520,6 +522,8 @@
     min-width: 0;
     scroll-snap-align: start;
     box-sizing: border-box;
+    overflow-y: auto;
+    padding-bottom: 6rem;
   }
 
   .page-left {
