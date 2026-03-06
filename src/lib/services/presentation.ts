@@ -231,6 +231,9 @@ export async function processAchievementPresentation(achievementId: string): Pro
 export async function processActionComplete(): Promise<void> {
   const state = get(gameState);
 
+  // エンディング中はアチーブメント処理を行わない
+  if (state.phase === 'ending') return;
+
   // 既にダイアログ表示中なら何もしない
   if (state.tutorialProgress.pendingDialogue) return;
   if (state.achievementProgress.pendingReward) return;

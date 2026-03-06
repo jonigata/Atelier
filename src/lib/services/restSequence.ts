@@ -62,6 +62,10 @@ export async function executeRest(ui: RestSequenceUI): Promise<void> {
 	// フェードイン中に背景が透けるのを防ぐ
 	await endTurn(1);
 
+	// endTurn内でエンディングに移行した場合はleaveしない
+	// （processActionComplete が ending 中に走るのを防ぐ）
+	if (get(gameState).phase === 'ending') return;
+
 	// endTurn内でDayTransition完了→setPhase('morning')済み
 	// RestPanelはphase変更で既にアンマウントされているが、念のためleave
 	ui.leave();

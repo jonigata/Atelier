@@ -16,11 +16,14 @@
   let backdrop = false;
   let playingVideo = false;
   let canSkipVideo = false;
+  let resting = false;
   let restEvent: { event: RestEventDef; rewards: ResolvedReward[] } | null = null;
   let eventDialogResolver: (() => void) | null = null;
   let videoResolver: (() => void) | null = null;
 
   function handleRest() {
+    if (resting) return;
+    resting = true;
     executeRest({
       showBackdrop() {
         backdrop = true;
