@@ -324,7 +324,10 @@ export interface RewardDisplay {
   itemId?: string;  // アイコン表示用（アイテム報酬の場合）
   iconUrl?: string; // カスタムアイコンURL（アクションアンロック等）
   type: 'money' | 'item' | 'reputation' | 'recipe' | 'unlock' | 'exp' | 'villageDevelopment';
-  gaugeData?: GaugeData;
+  /** ExpGauge用: 経験値種別と累計before/after */
+  expType?: import('$lib/data/balance').ExpType;
+  totalBefore?: number;
+  totalAfter?: number;
 }
 
 // ダイアログ1行分（文字列 or 表情付き / 行単位の話者切り替え対応）

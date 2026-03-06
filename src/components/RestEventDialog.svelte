@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { RestEventDef, ResolvedReward } from '$lib/data/restEvents';
-  import AnimatedGauge from './common/AnimatedGauge.svelte';
+  import ExpGauge from './common/ExpGauge.svelte';
   import ContinueMarker from './common/ContinueMarker.svelte';
   import StampRush from './common/StampRush.svelte';
 
@@ -14,10 +14,10 @@
 
   // ゲージ付きEXP報酬とそれ以外を分離（HUDと同じ順序: 錬金術→名声→村発展）
   const expOrder: Record<string, number> = { alchemyExp: 0, reputationExp: 1, villageExp: 2 };
-  $: gaugeRewards = rewards.filter(r => r.gaugeData).sort((a, b) =>
+  $: gaugeRewards = rewards.filter(r => r.expType).sort((a, b) =>
     (expOrder[a.apply.type] ?? 99) - (expOrder[b.apply.type] ?? 99)
   );
-  $: normalRewards = rewards.filter(r => !r.gaugeData);
+  $: normalRewards = rewards.filter(r => !r.expType);
 
   // スタンプ演出用：アイテム報酬を抽出
   $: stampRushItems = normalRewards
@@ -94,17 +94,8 @@
     {#if gaugeRewards.length > 0}
       <div class="gauge-rewards">
         {#each gaugeRewards as reward}
-          {#if reward.gaugeData}
-            <AnimatedGauge
-              before={reward.gaugeData.before}
-              after={reward.gaugeData.after}
-              max={reward.gaugeData.max}
-              label={reward.gaugeData.label}
-              text={reward.description}
-              color={reward.gaugeColor ?? 'blue'}
-              segments={reward.gaugeData.segments}
-              subtext={reward.gaugeData.subtext ?? ''}
-            />
+          {#if reward.expType && reward.totalBefore != null && reward.totalAfter != null}
+            <ExpGauge type={reward.expType} totalBefore={reward.totalBefore} totalAfter={reward.totalAfter} />
           {/if}
         {/each}
       </div>

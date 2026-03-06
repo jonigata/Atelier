@@ -9,7 +9,7 @@ import {
   learnRecipe,
 } from '$lib/stores/game';
 import type { LevelUpInfo } from '$lib/stores/game';
-import { calcLevelFromExp, buildExpGaugeData } from '$lib/data/balance';
+import { calcLevelFromExp } from '$lib/data/balance';
 import { completeAchievement, clearPendingReward, isAchievementCompleted } from '$lib/stores/achievements';
 import { unlockAction } from '$lib/stores/tutorial';
 import {
@@ -507,7 +507,9 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
     structured.push({
       text: `+${reward.exp} Exp`,
       type: 'exp',
-      gaugeData: buildExpGaugeData('alchemy', state.alchemyExp, state.alchemyExp + reward.exp),
+      expType: 'alchemy',
+      totalBefore: state.alchemyExp,
+      totalAfter: state.alchemyExp + reward.exp,
     });
   }
 
@@ -515,7 +517,9 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
     structured.push({
       text: `+${reward.reputationExp} Exp`,
       type: 'reputation',
-      gaugeData: buildExpGaugeData('reputation', state.reputationExp, state.reputationExp + reward.reputationExp),
+      expType: 'reputation',
+      totalBefore: state.reputationExp,
+      totalAfter: state.reputationExp + reward.reputationExp,
     });
   }
 
@@ -523,7 +527,9 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
     structured.push({
       text: `+${reward.villageExp} Exp`,
       type: 'villageDevelopment',
-      gaugeData: buildExpGaugeData('village', state.villageExp, state.villageExp + reward.villageExp),
+      expType: 'village',
+      totalBefore: state.villageExp,
+      totalAfter: state.villageExp + reward.villageExp,
     });
   }
 

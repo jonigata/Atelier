@@ -6,7 +6,7 @@
   import { skipOpening } from '$lib/services/gameLoop';
   import { handleIconError } from '$lib/data/items';
   import ItemCard from './common/ItemCard.svelte';
-  import AnimatedGauge from './common/AnimatedGauge.svelte';
+  import ExpGauge from './common/ExpGauge.svelte';
   import AchievementCategoryIcon from './common/AchievementCategoryIcon.svelte';
   import StampRush from './common/StampRush.svelte';
   import ContinueMarker from './common/ContinueMarker.svelte';
@@ -37,16 +37,6 @@
     return `/images/characters/${faceId}/${faceId}-face-${expression}.png`;
   }
 
-  type GaugeColor = 'gold' | 'blue' | 'green';
-  function getGaugeColor(type: string): GaugeColor {
-    switch (type) {
-      case 'reputation': return 'gold';
-      case 'exp': return 'blue';
-      case 'villageDevelopment': return 'green';
-      default: return 'blue';
-    }
-  }
-
   let currentLine = 0;
   let showingRewards = false;
   let closing = false;
@@ -74,8 +64,8 @@
   $: isQuestReward = dialogue?.rewardsTitle === '依頼達成！';
 
   // 依頼報酬用：ゲージと通常を分離
-  $: gaugeRewards = dialogue?.structuredRewards?.filter(r => r.gaugeData) ?? [];
-  $: normalRewards = dialogue?.structuredRewards?.filter(r => !r.gaugeData) ?? [];
+  $: gaugeRewards = dialogue?.structuredRewards?.filter(r => r.expType) ?? [];
+  $: normalRewards = dialogue?.structuredRewards?.filter(r => !r.expType) ?? [];
   // ショーケース用：全報酬リスト
   $: allRewards = dialogue?.structuredRewards ?? [];
 
@@ -272,17 +262,8 @@
           {#if gaugeRewards.length > 0}
             <div class="gauge-rewards">
               {#each gaugeRewards as reward}
-                {#if reward.gaugeData}
-                  <AnimatedGauge
-                    before={reward.gaugeData.before}
-                    after={reward.gaugeData.after}
-                    max={reward.gaugeData.max}
-                    label={reward.gaugeData.label}
-                    text={reward.text}
-                    color={getGaugeColor(reward.type)}
-                    segments={reward.gaugeData.segments}
-                    subtext={reward.gaugeData.subtext ?? ''}
-                  />
+                {#if reward.expType && reward.totalBefore != null && reward.totalAfter != null}
+                  <ExpGauge type={reward.expType} totalBefore={reward.totalBefore} totalAfter={reward.totalAfter} />
                 {/if}
               {/each}
             </div>
@@ -296,18 +277,9 @@
         {#if showcaseIndex < allRewards.length}
           {@const reward = allRewards[showcaseIndex]}
           <div class="showcase" class:phase-in={showcasePhase === 'in'} class:phase-out={showcasePhase === 'out'}>
-            {#if reward.gaugeData}
+            {#if reward.expType && reward.totalBefore != null && reward.totalAfter != null}
               <div class="showcase-gauge">
-                <AnimatedGauge
-                  before={reward.gaugeData.before}
-                  after={reward.gaugeData.after}
-                  max={reward.gaugeData.max}
-                  label={reward.gaugeData.label}
-                  text={reward.text}
-                  color={getGaugeColor(reward.type)}
-                  segments={reward.gaugeData.segments}
-                  subtext={reward.gaugeData.subtext ?? ''}
-                />
+                <ExpGauge type={reward.expType} totalBefore={reward.totalBefore} totalAfter={reward.totalAfter} />
               </div>
             {:else if !reward.itemId}
               <div class="showcase-icon">

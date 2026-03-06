@@ -21,7 +21,7 @@
   import { executeQuestDelivery } from '$lib/services/quest';
   import { checkAchievements } from '$lib/services/achievement';
   import { showDrawsForLevelUp } from '$lib/services/drawEvent';
-  import { buildExpGaugeData } from '$lib/data/balance';
+
   import { get } from 'svelte/store';
   import ActiveQuestCard from './common/ActiveQuestCard.svelte';
   import QuestTypeIcon from './common/QuestTypeIcon.svelte';
@@ -123,14 +123,18 @@
       structuredRewards.push({
         text: `+${finalReputation} Exp`,
         type: 'reputation',
-        gaugeData: buildExpGaugeData('reputation', stateBefore.reputationExp, stateAfter.reputationExp),
+        expType: 'reputation',
+        totalBefore: stateBefore.reputationExp,
+        totalAfter: stateAfter.reputationExp,
       });
     }
     if (finalDevelopment > 0) {
       structuredRewards.push({
         text: `+${finalDevelopment} Exp`,
         type: 'villageDevelopment',
-        gaugeData: buildExpGaugeData('village', stateBefore.villageExp, stateAfter.villageExp),
+        expType: 'village',
+        totalBefore: stateBefore.villageExp,
+        totalAfter: stateAfter.villageExp,
       });
     }
 

@@ -19,9 +19,10 @@ export interface ResolvedReward {
     amount?: number;
     quality?: number;
   };
-  // ゲージアニメーション用データ（applyRestEventRewards で設定される）
-  gaugeData?: import('$lib/models/types').GaugeData;
-  gaugeColor?: 'gold' | 'blue' | 'green';
+  // ExpGauge用（applyRestEventRewards で設定される）
+  expType?: import('$lib/data/balance').ExpType;
+  totalBefore?: number;
+  totalAfter?: number;
 }
 
 export interface RestEventDef {

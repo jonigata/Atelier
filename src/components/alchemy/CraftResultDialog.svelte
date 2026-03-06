@@ -1,16 +1,22 @@
 <script lang="ts">
   import { getItem } from '$lib/data/items';
   import AnimatedGauge from '../common/AnimatedGauge.svelte';
+  import ExpGauge from '../common/ExpGauge.svelte';
   import StampRush from '../common/StampRush.svelte';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
   import type { GaugeData } from '$lib/models/types';
 
   export let result: CraftMultipleResult;
   export let recipeName: string;
-  export let expGaugeData: GaugeData | null = null;
-  export let reputationExpGaugeData: GaugeData | null = null;
+  export let alchemyExpBefore: number = 0;
+  export let alchemyExpAfter: number = 0;
+  export let reputationExpBefore: number = 0;
+  export let reputationExpAfter: number = 0;
   export let staminaGaugeData: GaugeData | null = null;
   export let onClose: () => void;
+
+  $: hasAlchemyExp = alchemyExpAfter > alchemyExpBefore;
+  $: hasReputationExp = reputationExpAfter > reputationExpBefore;
 
   $: allSuccess = result.failCount === 0 && result.successCount > 0;
   $: allFail = result.successCount === 0;
@@ -199,38 +205,11 @@
             <span class="summary-value success-text">{result.successCount}個</span>
           </div>
         {/if}
-        {#if expGaugeData}
-          <AnimatedGauge
-            before={expGaugeData.before}
-            after={expGaugeData.after}
-            max={expGaugeData.max}
-            label={expGaugeData.label}
-            text="+{result.totalExpGained} Exp"
-            color="blue"
-            segments={expGaugeData.segments}
-          />
-        {:else}
-          <div class="exp-row">
-            <span class="exp-label">獲得経験値</span>
-            <span class="exp-value">+{result.totalExpGained} Exp</span>
-          </div>
+        {#if hasAlchemyExp}
+          <ExpGauge type="alchemy" totalBefore={alchemyExpBefore} totalAfter={alchemyExpAfter} />
         {/if}
-        {#if reputationExpGaugeData}
-          <AnimatedGauge
-            before={reputationExpGaugeData.before}
-            after={reputationExpGaugeData.after}
-            max={reputationExpGaugeData.max}
-            label={reputationExpGaugeData.label}
-            text="+{result.totalReputationExpGained} Exp"
-            color="green"
-            segments={reputationExpGaugeData.segments}
-            subtext={reputationExpGaugeData.subtext ?? ''}
-          />
-        {:else if result.totalReputationExpGained > 0}
-          <div class="exp-row">
-            <span class="exp-label">名声経験値</span>
-            <span class="exp-value">+{result.totalReputationExpGained} 名声Exp</span>
-          </div>
+        {#if hasReputationExp}
+          <ExpGauge type="reputation" totalBefore={reputationExpBefore} totalAfter={reputationExpAfter} />
         {/if}
         {#if staminaGaugeData}
           <AnimatedGauge

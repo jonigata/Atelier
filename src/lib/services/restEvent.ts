@@ -7,7 +7,7 @@ import { getAllEquipment } from '$lib/data/equipment';
 import { getHelper } from '$lib/data/helpers';
 import type { GameState } from '$lib/models/types';
 import { isCraftedCategory } from '$lib/data/categories';
-import { buildExpGaugeData } from '$lib/data/balance';
+
 
 export interface DrawInfos {
   village: LevelUpInfo | null;
@@ -196,20 +196,20 @@ export function resolveRestEventRewards(event: RestEventDef): ResolvedReward[] {
 }
 
 /**
- * EXP報酬にゲージアニメーション用データを付与する
+ * EXP報酬にExpGauge用データを付与する
  */
 function attachExpGaugeData(
   reward: ResolvedReward,
   expField: 'alchemyExp' | 'reputationExp' | 'villageExp',
-  color: 'blue' | 'gold' | 'green',
   totalBefore: number,
   totalAfter: number,
 ): void {
   const type = expField === 'reputationExp' ? 'reputation' as const
     : expField === 'villageExp' ? 'village' as const
     : 'alchemy' as const;
-  reward.gaugeData = buildExpGaugeData(type, totalBefore, totalAfter);
-  reward.gaugeColor = color;
+  reward.expType = type;
+  reward.totalBefore = totalBefore;
+  reward.totalAfter = totalAfter;
 }
 
 /**
@@ -258,7 +258,7 @@ export function applyRestEventRewards(event: RestEventDef, rewards: ResolvedRewa
           const before = get(gameState).alchemyExp;
           addExp(a.amount);
           const after = get(gameState).alchemyExp;
-          attachExpGaugeData(reward, 'alchemyExp', 'blue', before, after);
+          attachExpGaugeData(reward, 'alchemyExp', before, after);
         }
         break;
       }
@@ -267,7 +267,7 @@ export function applyRestEventRewards(event: RestEventDef, rewards: ResolvedRewa
           const before = get(gameState).reputationExp;
           reputation = addReputationExp(a.amount) ?? reputation;
           const after = get(gameState).reputationExp;
-          attachExpGaugeData(reward, 'reputationExp', 'gold', before, after);
+          attachExpGaugeData(reward, 'reputationExp', before, after);
         }
         break;
       }
@@ -276,7 +276,7 @@ export function applyRestEventRewards(event: RestEventDef, rewards: ResolvedRewa
           const before = get(gameState).villageExp;
           village = addVillageExp(a.amount) ?? village;
           const after = get(gameState).villageExp;
-          attachExpGaugeData(reward, 'villageExp', 'green', before, after);
+          attachExpGaugeData(reward, 'villageExp', before, after);
         }
         break;
       }

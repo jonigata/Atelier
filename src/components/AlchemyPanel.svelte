@@ -8,7 +8,7 @@
   import { showDrawAndWait } from '$lib/services/drawEvent';
   import { recipes } from '$lib/data/recipes';
   import { craftBatch, getMatchingItems, countAvailableIngredients, calculateSuccessRate, calculateExpectedQuality, matchesIngredient, calculateStaminaCost, calculateFatiguePenalty, getFatigueLabel, getInspectionConflict } from '$lib/services/alchemy';
-  import { calcLevelFromExp, buildExpGaugeData } from '$lib/data/balance';
+  import { calcLevelFromExp } from '$lib/data/balance';
   import { getEffectiveCraftDays, getEffectiveIngredientCount, craftDaysToActual, formatCraftDays } from '$lib/services/equipmentEffects';
   import type { RecipeDef, OwnedItem, Ingredient, GaugeData } from '$lib/models/types';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
@@ -58,8 +58,10 @@
   let selectedItems: OwnedItem[] = [];
   let craftPreviewSection: HTMLElement;
   let craftResultData: CraftMultipleResult | null = null;
-  let expGaugeData: GaugeData | null = null;
-  let reputationExpGaugeData: GaugeData | null = null;
+  let alchemyExpBefore = 0;
+  let alchemyExpAfter = 0;
+  let reputationExpBefore = 0;
+  let reputationExpAfter = 0;
   let staminaGaugeData: GaugeData | null = null;
   let levelUpData: LevelUpInfo | null = null;
 
@@ -266,10 +268,10 @@
     craftResultData = result;
 
     const stateAfter = get(gameState);
-    expGaugeData = buildExpGaugeData('alchemy', stateBefore.alchemyExp, stateAfter.alchemyExp);
-    reputationExpGaugeData = result.totalReputationExpGained > 0
-      ? buildExpGaugeData('reputation', stateBefore.reputationExp, stateAfter.reputationExp)
-      : null;
+    alchemyExpBefore = stateBefore.alchemyExp;
+    alchemyExpAfter = stateAfter.alchemyExp;
+    reputationExpBefore = stateBefore.reputationExp;
+    reputationExpAfter = stateAfter.reputationExp;
     staminaGaugeData = {
       before: staminaBefore,
       after: stateAfter.stamina,
@@ -445,8 +447,10 @@
   <CraftResultDialog
     result={craftResultData}
     recipeName={selectedRecipe.name}
-    {expGaugeData}
-    {reputationExpGaugeData}
+    {alchemyExpBefore}
+    {alchemyExpAfter}
+    {reputationExpBefore}
+    {reputationExpAfter}
     {staminaGaugeData}
     onClose={closeCraftResult}
   />
