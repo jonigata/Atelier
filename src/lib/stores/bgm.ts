@@ -60,6 +60,8 @@ function crossfadeTo(track: BgmTrack) {
 export function playInspectionFanfare(grade: string) {
   stopInspectionFanfare();
 
+  if (!get(bgmEnabled)) return;
+
   // BGMを抑制
   bgmSuppressed = true;
   if (audio) audio.pause();
