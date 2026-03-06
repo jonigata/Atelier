@@ -659,8 +659,9 @@
   }
 
   .rewards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 0.5rem;
     margin-bottom: 1.5rem;
   }
@@ -674,7 +675,7 @@
   .gauge-rewards {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.25rem;
     margin-bottom: 1.5rem;
   }
 

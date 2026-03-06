@@ -541,6 +541,9 @@
 
   /* === サマリー === */
   .summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
     padding: 0.75rem 1rem;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 8px;
