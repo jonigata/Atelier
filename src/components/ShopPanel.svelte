@@ -296,10 +296,6 @@
 
 <div class="shop-panel panel">
   <div class="shop-header">
-    <div class="money-display">
-      所持金: <span class="amount">{$gameState.money.toLocaleString()}G</span>
-    </div>
-
     <div class="tabs">
       <button
         class="tab-btn"
@@ -551,7 +547,6 @@
 
   .shop-header {
     flex-shrink: 0;
-    padding: 0 0 0.5rem;
   }
 
   .shop-content {
@@ -565,20 +560,6 @@
   .shop-panel :global(.tab-btn) {
     padding: 0.75rem;
     font-size: 1rem;
-  }
-
-  .money-display {
-    padding: 0.75rem 1rem;
-    background: var(--surface-dark);
-    border-radius: var(--radius-md);
-    color: var(--text-body);
-    margin-bottom: 1rem;
-  }
-
-  .amount {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--accent-gold);
   }
 
   .tabs {
