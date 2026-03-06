@@ -163,53 +163,57 @@
     </div>
 
     {#if revealStep >= 1}
-    <div class="stats fade-in">
-      <h3>{$gameState.day}日目の成績</h3>
-      <div class="stat-grid">
-        <div class="stat highlight">
-          <span class="label">村発展度</span>
-          <span class="value">Lv.{$villageLevel}</span>
-        </div>
-        <div class="stat">
-          <span class="label">錬金術レベル</span>
-          <span class="value">Lv.{$alchemyLevel}</span>
-        </div>
-        <div class="stat">
-          <span class="label">名声</span>
-          <span class="value">Lv.{$reputationLevel}</span>
-        </div>
-        <div class="stat">
-          <span class="label">所持金</span>
-          <span class="value">{$gameState.money.toLocaleString()} G</span>
-        </div>
-        <div class="stat">
-          <span class="label">達成依頼</span>
-          <span class="value">{$gameState.completedQuestCount}件</span>
-        </div>
-        <div class="stat">
-          <span class="label">調合回数</span>
-          <span class="value">{$gameState.stats.totalCraftCount}回</span>
+    <div class="columns fade-in">
+      <div class="stats">
+        <h3>{$gameState.day}日目の成績</h3>
+        <div class="stat-grid">
+          <div class="stat highlight">
+            <span class="label">村発展度</span>
+            <span class="value">Lv.{$villageLevel}</span>
+          </div>
+          <div class="stat">
+            <span class="label">錬金術レベル</span>
+            <span class="value">Lv.{$alchemyLevel}</span>
+          </div>
+          <div class="stat">
+            <span class="label">名声</span>
+            <span class="value">Lv.{$reputationLevel}</span>
+          </div>
+          <div class="stat">
+            <span class="label">所持金</span>
+            <span class="value">{$gameState.money.toLocaleString()} G</span>
+          </div>
+          <div class="stat">
+            <span class="label">達成依頼</span>
+            <span class="value">{$gameState.completedQuestCount}件</span>
+          </div>
+          <div class="stat">
+            <span class="label">調合回数</span>
+            <span class="value">{$gameState.stats.totalCraftCount}回</span>
+          </div>
         </div>
       </div>
+
+      {#if revealStep >= 2}
+      <div class="stats fade-in">
+        <div class="score-breakdown no-border">
+          <h4>スコア内訳</h4>
+          <div class="breakdown-grid">
+            <span class="bd-label">所持金</span><span class="bd-value">{$scoreBreakdown.money.toLocaleString()}</span>
+            <span class="bd-label">所持品</span><span class="bd-value">{$scoreBreakdown.inventory.toLocaleString()}</span>
+            <span class="bd-label">レベル</span><span class="bd-value">{$scoreBreakdown.levels.toLocaleString()}</span>
+            <span class="bd-label">依頼達成</span><span class="bd-value">{$scoreBreakdown.quests.toLocaleString()}</span>
+            <span class="bd-label">アルバム</span><span class="bd-value">{$scoreBreakdown.album.toLocaleString()}</span>
+            <span class="bd-label">調合実績</span><span class="bd-value">{$scoreBreakdown.crafting.toLocaleString()}</span>
+            <span class="bd-label">建物・助手</span><span class="bd-value">{$scoreBreakdown.buildings.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+      {/if}
     </div>
     {/if}
 
     {#if revealStep >= 2}
-    <div class="stats fade-in">
-      <div class="score-breakdown">
-        <h4>スコア内訳</h4>
-        <div class="breakdown-grid">
-          <span class="bd-label">所持金</span><span class="bd-value">{$scoreBreakdown.money.toLocaleString()}</span>
-          <span class="bd-label">所持品</span><span class="bd-value">{$scoreBreakdown.inventory.toLocaleString()}</span>
-          <span class="bd-label">レベル</span><span class="bd-value">{$scoreBreakdown.levels.toLocaleString()}</span>
-          <span class="bd-label">依頼達成</span><span class="bd-value">{$scoreBreakdown.quests.toLocaleString()}</span>
-          <span class="bd-label">アルバム</span><span class="bd-value">{$scoreBreakdown.album.toLocaleString()}</span>
-          <span class="bd-label">調合実績</span><span class="bd-value">{$scoreBreakdown.crafting.toLocaleString()}</span>
-          <span class="bd-label">建物・助手</span><span class="bd-value">{$scoreBreakdown.buildings.toLocaleString()}</span>
-        </div>
-      </div>
-    </div>
-
     <div class="ranking-area fade-in">
       {#if rankingState === 'idle'}
         <button class="ranking-btn" on:click|stopPropagation={openRankingInput}>ランキングに登録</button>
@@ -240,47 +244,49 @@
   <div class="content">
     <h1>召還されました</h1>
 
-    <div class="ending-card">
-      <h2>GAME OVER</h2>
-      <p class="description">{$gameState.gameOverReason}</p>
-    </div>
-
     <div class="final-score">
       <span class="final-score-label">SCORE</span>
       <span class="final-score-value">{$scoreBreakdown.total.toLocaleString()}</span>
       <span class="final-score-unit">pt</span>
     </div>
 
-    <div class="stats">
-      <h3>{$gameState.day}日目の成績</h3>
-      <div class="stat-grid">
-        <div class="stat highlight">
-          <span class="label">村発展度</span>
-          <span class="value">Lv.{$villageLevel}</span>
-        </div>
-        <div class="stat">
-          <span class="label">錬金術レベル</span>
-          <span class="value">Lv.{$alchemyLevel}</span>
-        </div>
-        <div class="stat">
-          <span class="label">名声</span>
-          <span class="value">Lv.{$reputationLevel}</span>
-        </div>
-        <div class="stat">
-          <span class="label">達成依頼</span>
-          <span class="value">{$gameState.completedQuestCount}件</span>
-        </div>
+    <div class="columns">
+      <div class="ending-card">
+        <h2>GAME OVER</h2>
+        <p class="description">{$gameState.gameOverReason}</p>
       </div>
-      <div class="score-breakdown">
-        <h4>スコア内訳</h4>
-        <div class="breakdown-grid">
-          <span class="bd-label">所持金</span><span class="bd-value">{$scoreBreakdown.money.toLocaleString()}</span>
-          <span class="bd-label">所持品</span><span class="bd-value">{$scoreBreakdown.inventory.toLocaleString()}</span>
-          <span class="bd-label">レベル</span><span class="bd-value">{$scoreBreakdown.levels.toLocaleString()}</span>
-          <span class="bd-label">依頼達成</span><span class="bd-value">{$scoreBreakdown.quests.toLocaleString()}</span>
-          <span class="bd-label">アルバム</span><span class="bd-value">{$scoreBreakdown.album.toLocaleString()}</span>
-          <span class="bd-label">調合実績</span><span class="bd-value">{$scoreBreakdown.crafting.toLocaleString()}</span>
-          <span class="bd-label">建物・助手</span><span class="bd-value">{$scoreBreakdown.buildings.toLocaleString()}</span>
+
+      <div class="stats">
+        <h3>{$gameState.day}日目の成績</h3>
+        <div class="stat-grid">
+          <div class="stat highlight">
+            <span class="label">村発展度</span>
+            <span class="value">Lv.{$villageLevel}</span>
+          </div>
+          <div class="stat">
+            <span class="label">錬金術レベル</span>
+            <span class="value">Lv.{$alchemyLevel}</span>
+          </div>
+          <div class="stat">
+            <span class="label">名声</span>
+            <span class="value">Lv.{$reputationLevel}</span>
+          </div>
+          <div class="stat">
+            <span class="label">達成依頼</span>
+            <span class="value">{$gameState.completedQuestCount}件</span>
+          </div>
+        </div>
+        <div class="score-breakdown">
+          <h4>スコア内訳</h4>
+          <div class="breakdown-grid">
+            <span class="bd-label">所持金</span><span class="bd-value">{$scoreBreakdown.money.toLocaleString()}</span>
+            <span class="bd-label">所持品</span><span class="bd-value">{$scoreBreakdown.inventory.toLocaleString()}</span>
+            <span class="bd-label">レベル</span><span class="bd-value">{$scoreBreakdown.levels.toLocaleString()}</span>
+            <span class="bd-label">依頼達成</span><span class="bd-value">{$scoreBreakdown.quests.toLocaleString()}</span>
+            <span class="bd-label">アルバム</span><span class="bd-value">{$scoreBreakdown.album.toLocaleString()}</span>
+            <span class="bd-label">調合実績</span><span class="bd-value">{$scoreBreakdown.crafting.toLocaleString()}</span>
+            <span class="bd-label">建物・助手</span><span class="bd-value">{$scoreBreakdown.buildings.toLocaleString()}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -314,55 +320,61 @@
   <div class="content">
     <h1>1年間が終了しました</h1>
 
-    <div class="ending-card">
-      <h2>{ending.title}</h2>
-      <p class="description">{ending.description}</p>
-    </div>
-
     <div class="final-score">
       <span class="final-score-label">SCORE</span>
       <span class="final-score-value">{$scoreBreakdown.total.toLocaleString()}</span>
       <span class="final-score-unit">pt</span>
     </div>
 
-    <div class="stats">
-      <h3>最終成績</h3>
-      <div class="stat-grid">
-        <div class="stat highlight">
-          <span class="label">村発展度</span>
-          <span class="value">Lv.{$villageLevel}</span>
-        </div>
-        <div class="stat">
-          <span class="label">錬金術レベル</span>
-          <span class="value">Lv.{$alchemyLevel}</span>
-        </div>
-        <div class="stat">
-          <span class="label">名声</span>
-          <span class="value">Lv.{$reputationLevel}</span>
-        </div>
-        <div class="stat">
-          <span class="label">所持金</span>
-          <span class="value">{$gameState.money.toLocaleString()} G</span>
-        </div>
-        <div class="stat">
-          <span class="label">達成依頼</span>
-          <span class="value">{$gameState.completedQuestCount}件</span>
-        </div>
-        <div class="stat">
-          <span class="label">調合回数</span>
-          <span class="value">{$gameState.stats.totalCraftCount}回</span>
+    <div class="columns">
+      <div class="col-left">
+        <div class="ending-card">
+          <h2>{ending.title}</h2>
+          <p class="description">{ending.description}</p>
         </div>
       </div>
-      <div class="score-breakdown">
-        <h4>スコア内訳</h4>
-        <div class="breakdown-grid">
-          <span class="bd-label">所持金</span><span class="bd-value">{$scoreBreakdown.money.toLocaleString()}</span>
-          <span class="bd-label">所持品</span><span class="bd-value">{$scoreBreakdown.inventory.toLocaleString()}</span>
-          <span class="bd-label">レベル</span><span class="bd-value">{$scoreBreakdown.levels.toLocaleString()}</span>
-          <span class="bd-label">依頼達成</span><span class="bd-value">{$scoreBreakdown.quests.toLocaleString()}</span>
-          <span class="bd-label">アルバム</span><span class="bd-value">{$scoreBreakdown.album.toLocaleString()}</span>
-          <span class="bd-label">調合実績</span><span class="bd-value">{$scoreBreakdown.crafting.toLocaleString()}</span>
-          <span class="bd-label">建物・助手</span><span class="bd-value">{$scoreBreakdown.buildings.toLocaleString()}</span>
+
+      <div class="col-right">
+        <div class="stats">
+          <h3>最終成績</h3>
+          <div class="stat-grid">
+            <div class="stat highlight">
+              <span class="label">村発展度</span>
+              <span class="value">Lv.{$villageLevel}</span>
+            </div>
+            <div class="stat">
+              <span class="label">錬金術レベル</span>
+              <span class="value">Lv.{$alchemyLevel}</span>
+            </div>
+            <div class="stat">
+              <span class="label">名声</span>
+              <span class="value">Lv.{$reputationLevel}</span>
+            </div>
+            <div class="stat">
+              <span class="label">所持金</span>
+              <span class="value">{$gameState.money.toLocaleString()} G</span>
+            </div>
+            <div class="stat">
+              <span class="label">達成依頼</span>
+              <span class="value">{$gameState.completedQuestCount}件</span>
+            </div>
+            <div class="stat">
+              <span class="label">調合回数</span>
+              <span class="value">{$gameState.stats.totalCraftCount}回</span>
+            </div>
+          </div>
+          <div class="score-breakdown">
+            <h4>スコア内訳</h4>
+            <div class="breakdown-grid">
+              <span class="bd-label">所持金</span><span class="bd-value">{$scoreBreakdown.money.toLocaleString()}</span>
+              <span class="bd-label">所持品</span><span class="bd-value">{$scoreBreakdown.inventory.toLocaleString()}</span>
+              <span class="bd-label">レベル</span><span class="bd-value">{$scoreBreakdown.levels.toLocaleString()}</span>
+              <span class="bd-label">依頼達成</span><span class="bd-value">{$scoreBreakdown.quests.toLocaleString()}</span>
+              <span class="bd-label">アルバム</span><span class="bd-value">{$scoreBreakdown.album.toLocaleString()}</span>
+              <span class="bd-label">調合実績</span><span class="bd-value">{$scoreBreakdown.crafting.toLocaleString()}</span>
+              <span class="bd-label">建物・助手</span><span class="bd-value">{$scoreBreakdown.buildings.toLocaleString()}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -400,12 +412,13 @@
 
 <style>
   .ending-screen {
-    min-height: 100%;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    padding: 1.5rem 2rem;
     background: linear-gradient(135deg, #1a1a2e 0%, #2a2a4e 100%);
+    overflow-y: auto;
   }
 
   .ending-screen.provisional {
@@ -439,22 +452,42 @@
   }
 
   .content {
-    max-width: 600px;
+    max-width: 900px;
+    width: 100%;
     text-align: center;
   }
 
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+
+  .col-left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .col-right {
+    display: flex;
+    flex-direction: column;
+  }
+
   h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
     color: #c9a959;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
 
   .ending-card {
     background: rgba(0, 0, 0, 0.4);
     border: 2px solid #c9a959;
     border-radius: 12px;
-    padding: 2rem;
-    margin-bottom: 2rem;
+    padding: 1.5rem;
+    margin-bottom: 0;
+    flex: 1;
   }
 
   .true .ending-card {
@@ -481,8 +514,8 @@
   .stats {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0;
   }
 
   h3 {
@@ -511,7 +544,7 @@
   }
 
   .stat.highlight .value {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: #c9a959;
   }
 
@@ -531,7 +564,7 @@
     align-items: baseline;
     justify-content: center;
     gap: 0.5rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .final-score-label {
@@ -541,21 +574,27 @@
   }
 
   .final-score-value {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: bold;
     color: #f0c040;
     text-shadow: 0 0 20px rgba(240, 192, 64, 0.4);
   }
 
   .final-score-unit {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #c9a959;
   }
 
   .score-breakdown {
-    margin-top: 1rem;
-    padding-top: 1rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .score-breakdown.no-border {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
   }
 
   .score-breakdown h4 {
@@ -585,7 +624,7 @@
   .provisional-note {
     color: #a0a0b0;
     font-size: 0.9rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .continue-hint {
@@ -619,7 +658,7 @@
   }
 
   .ranking-area {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .ranking-btn {
