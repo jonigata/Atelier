@@ -199,7 +199,6 @@
 
   .village-content {
     position: relative;
-    z-index: 1;
     padding: 1.5rem 0.5rem;
     height: 100%;
     display: flex;
