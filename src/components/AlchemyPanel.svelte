@@ -523,11 +523,11 @@
     scroll-snap-align: start;
     box-sizing: border-box;
     overflow-y: auto;
-    padding-bottom: 6rem;
+    padding-bottom: 8rem;
   }
 
   .page-left {
-    padding: 0 1.5rem;
+    padding: 0 1.5rem 8rem;
   }
 
   .right-page-content {

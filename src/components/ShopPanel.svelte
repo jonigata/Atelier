@@ -543,6 +543,8 @@
     flex-direction: column;
     height: 100%;
     overflow: hidden;
+    /* 親の共通padding(6rem bottom)を上書き — ホームボタンはオーバーレイなので専用スペース不要 */
+    padding-bottom: 0 !important;
   }
 
   .shop-header {
@@ -553,7 +555,7 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding-bottom: 5rem;
+    padding-bottom: 7rem;
   }
 
   /* Shop用タブはサイズが大きい */
