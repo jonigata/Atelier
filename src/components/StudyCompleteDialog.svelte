@@ -107,9 +107,9 @@
 
     <div class="dialog-footer">
       <ContinueMarker />
-      {#if total > 1 && currentIndex + 1 < total}
+      {#if total > 1}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <span class="skip-btn" on:click|stopPropagation={skipAll} role="button" tabindex="0">スキップ</span>
+        <span class="skip-btn" class:invisible={currentIndex + 1 >= total} on:click|stopPropagation={currentIndex + 1 < total ? skipAll : undefined} role="button" tabindex="0">スキップ</span>
       {/if}
     </div>
   </div>
@@ -284,6 +284,11 @@
     padding: 0.2rem 0.6rem;
     border-radius: 3px;
     transition: all 0.2s;
+  }
+
+  .skip-btn.invisible {
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .skip-btn:hover {
