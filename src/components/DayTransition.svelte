@@ -148,6 +148,8 @@
   }
 
   .transition-content {
+    position: absolute;
+    top: 55%;
     display: flex;
     flex-direction: column;
     align-items: center;
