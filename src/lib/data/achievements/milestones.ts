@@ -24,7 +24,7 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     conditions: [{ type: 'craft_count', target: 10 }],
     reward: { money: 200, reputationExp: 5 },
     priority: 110,
-    prerequisite: ['ach_rival_intro'],
+    prerequisite: ['ach_inspection_intro'],
   },
 
   ach_craft_50: {
@@ -122,7 +122,7 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
       originLabel: '村人たちからの感謝の品',
     },
     priority: 210,
-    prerequisite: ['ach_rival_intro'],
+    prerequisite: ['ach_inspection_intro'],
   },
 
   ach_quest_15: {
@@ -296,7 +296,7 @@ export const milestoneAchievements: Record<string, AchievementDef> = {
     conditions: [{ type: 'level', target: 15 }],
     reward: { money: 300, recipes: ['bomb_01'] },
     priority: 510,
-    prerequisite: ['ach_rival_intro'],
+    prerequisite: ['ach_inspection_intro'],
   },
 
   ach_level_30: {

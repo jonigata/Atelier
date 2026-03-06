@@ -158,7 +158,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
   ach_inspection_intro: {
     id: 'ach_inspection_intro',
     title: '試験の代価',
-    description: '査察官から査察制度の説明を受けた',
+    description: '査察官とライバル錬金術師に出会った',
     hint: '',
     category: 'tutorial',
     narrative: 'patron_support',
@@ -169,33 +169,16 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
       '制度を説明します。組合は定期的に査察を行い、1年後に最終査察で認定を判断します',
       '依頼の実績、錬金術の腕前、村への貢献……すべてが評価対象です',
       '実績なき者は召還。それだけのことです。……精励を期待します',
+      { text: 'ああ、君がここの担当か。僕はヴィクト、隣村に派遣された錬金術師だ', speaker: 'ヴィクト', speakerTitle: 'ライバル錬金術師', faceId: 'vict', expression: 'default' },
+      { text: 'イリーナ先生の弟子だって？ ふうん……まぁ、お互い頑張ろうじゃないか', speaker: 'ヴィクト', speakerTitle: 'ライバル錬金術師', faceId: 'vict', expression: 'default' },
+      { text: 'もっとも、僕はもう工房の整備も終わってるけどね', speaker: 'ヴィクト', speakerTitle: 'ライバル錬金術師', faceId: 'vict', expression: 'smug' },
+      { text: '次の査察で会おう。……楽しみにしてるよ', speaker: 'ヴィクト', speakerTitle: 'ライバル錬金術師', faceId: 'vict', expression: 'default' },
     ],
     conditions: [],
     reward: {},
     priority: 42,
     prerequisite: ['ach_first_complete'],
     triggerOnMorning: true,
-  },
-
-  ach_rival_intro: {
-    id: 'ach_rival_intro',
-    title: '同期の錬金術師',
-    description: 'ライバル錬金術師ヴィクトに出会った',
-    hint: '',
-    category: 'tutorial',
-    narrative: 'rival_pressure',
-    narrativeCharacter: { name: 'ヴィクト', title: 'ライバル錬金術師' },
-    eventImage: 'inspection_intro',
-    narrativeLines: [
-      'ああ、君がここの担当か。僕はヴィクト、隣村に派遣された錬金術師だ',
-      'イリーナ先生の弟子だって？ ふうん……まぁ、お互い頑張ろうじゃないか',
-      { text: 'もっとも、僕はもう工房の整備も終わってるけどね', expression: 'smug' },
-      '次の査察で会おう。……楽しみにしてるよ',
-    ],
-    conditions: [],
-    reward: {},
-    priority: 43,
-    prerequisite: ['ach_inspection_intro'],
   },
 
   ach_q1_goal_reminder: {
@@ -213,7 +196,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     conditions: [],
     reward: {},
     priority: 44,
-    prerequisite: ['ach_rival_intro'],
+    prerequisite: ['ach_inspection_intro'],
   },
 
   ach_adventurer_arrival: {
