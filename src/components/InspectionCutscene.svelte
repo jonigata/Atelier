@@ -466,7 +466,7 @@
   .inspection-backdrop {
     position: fixed;
     inset: 0;
-    z-index: var(--z-cutscene);
+    z-index: var(--z-backdrop);
     background: #000;
     pointer-events: all;
   }

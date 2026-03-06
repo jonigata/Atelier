@@ -52,6 +52,7 @@
 		--z-panel: 100;
 		--z-indicator: 500;
 		--z-toast: 800;
+		--z-backdrop: 900;
 		--z-modal: 1000;
 		--z-cutscene: 1100;
 		--z-debug: 9000;
