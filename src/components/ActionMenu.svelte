@@ -116,29 +116,28 @@
         <InspectionTracker inspection={nextInspection} values={inspectionValues} expValues={inspectionExpValues} daysUntil={daysUntilInspection} firstReveal={inspectionFirstReveal} />
       {/if}
 
-      <div class="village-bottom">
-        <ObjectivesSection onQuestClick={handleQuestClick} questsFirst={true} />
-
-        {#if merchantInTown}
-          <div class="special-actions">
-            <button
-              class="action-btn merchant-btn"
-              on:click={() => onSelect('traveling_merchant')}
-            >
-              <img class="icon" src="/images/characters/marco/marco-face-smug.png" alt="マルコ" />
-              <div class="merchant-info">
-                <span class="label">旅商人マルコ <span class="merchant-days">あと{merchantDaysLeft}日</span></span>
-                <span class="description">マルコの行商を覗く</span>
-              </div>
-            </button>
-          </div>
-        {/if}
-      </div>
+    </div>
+    <div class="village-bottom-overlay">
+      <ObjectivesSection onQuestClick={handleQuestClick} questsFirst={true} />
+      <TalkBanner />
+      {#if merchantInTown}
+        <div class="special-actions">
+          <button
+            class="action-btn merchant-btn"
+            on:click={() => onSelect('traveling_merchant')}
+          >
+            <img class="icon" src="/images/characters/marco/marco-face-smug.png" alt="マルコ" />
+            <div class="merchant-info">
+              <span class="label">旅商人マルコ <span class="merchant-days">あと{merchantDaysLeft}日</span></span>
+              <span class="description">マルコの行商を覗く</span>
+            </div>
+          </button>
+        </div>
+      {/if}
     </div>
   </div>
 
   <div class="actions-section">
-    <TalkBanner />
     <div class="actions">
       {#each actionStates as action}
         {#if action.isLocked}
@@ -207,8 +206,21 @@
     flex-direction: column;
   }
 
-  .village-bottom {
-    margin-top: auto;
+  .village-bottom-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    padding: 0 0.5rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .village-bottom-overlay :global(.objectives-section) {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   .actions-section {
