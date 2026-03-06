@@ -426,7 +426,7 @@
     background: linear-gradient(180deg, #2a2a3e 0%, #1a1a2e 100%);
     border: 2px solid #8b7355;
     border-radius: 12px;
-    padding: 1.5rem 2rem;
+    padding: 0.5rem 1rem;
     max-width: 700px;
     width: 90%;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -494,14 +494,13 @@
 
   .dialogue-body {
     display: flex;
-    gap: 1.25rem;
-    min-height: 120px;
+    gap: 0.5rem;
   }
 
   .face-column {
     flex-shrink: 0;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .character-face {
@@ -521,14 +520,14 @@
   .character-info {
     display: flex;
     align-items: baseline;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.5rem;
+    gap: 0.5rem;
+    margin-bottom: 0.2rem;
+    padding-bottom: 0.2rem;
     border-bottom: 1px solid #4a4a6a;
   }
 
   .character-name {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: bold;
     color: #c9a959;
   }
@@ -539,18 +538,19 @@
   }
 
   .dialogue-text {
-    font-size: 1.1rem;
-    line-height: 1.8;
+    font-size: 0.95rem;
+    line-height: 1.7;
     color: #e0e0f0;
-    flex: 1;
+    height: calc(0.95rem * 1.7 * 3);
+    overflow-y: auto;
   }
 
   .continue-hint {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 1.25rem;
-    padding-top: 0.75rem;
+    margin-top: 0.25rem;
+    padding-top: 0.25rem;
     border-top: 1px solid #4a4a6a;
   }
 
