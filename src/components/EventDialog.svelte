@@ -241,11 +241,9 @@
       {#if isQuestReward}
         <!-- 依頼報酬：ボックス形式（従来通り） -->
         <div class="rewards-screen quest-reward">
-          <div class="rewards-header">
-            <span class="rewards-title">{dialogue.rewardsTitle}</span>
-            {#if dialogue.achievementTitle}
-              <span class="achievement-subtitle">{dialogue.achievementTitle}</span>
-            {/if}
+          <div class="rewards-header quest-reward-header">
+            <span class="quest-badge">達成</span>
+            <span class="quest-reward-title">{dialogue.achievementTitle || dialogue.rewardsTitle}</span>
           </div>
           {#if normalRewards.length > 0}
             <div class="rewards-grid">
@@ -324,8 +322,10 @@
               </div>
             {/if}
             <div class="achievement-info">
-              <span class="achievement-badge">達成</span>
-              <span class="achievement-title">{dialogue.achievementTitle}</span>
+              <div class="achievement-title-row">
+                <span class="achievement-badge">達成</span>
+                <span class="achievement-title">{dialogue.achievementTitle}</span>
+              </div>
               {#if dialogue.achievementDescription}
                 <span class="achievement-description">{dialogue.achievementDescription}</span>
               {/if}
@@ -438,6 +438,12 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+  }
+
+  .achievement-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .achievement-badge {
@@ -598,13 +604,30 @@
       0 8px 32px rgba(0, 0, 0, 0.5);
   }
 
-  .quest-reward .rewards-title {
-    color: #7ab8f5;
-    text-shadow: 0 0 15px rgba(122, 184, 245, 0.4);
+  .quest-reward-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
   }
 
-  .quest-reward .achievement-subtitle {
-    color: #5a8abf;
+  .quest-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #4a7ab5 0%, #7ab8f5 50%, #4a7ab5 100%);
+    color: #1a1a2e;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .quest-reward-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #7ab8f5;
+    text-shadow: 0 0 15px rgba(122, 184, 245, 0.4);
   }
 
   @keyframes rewardPopIn {
@@ -617,19 +640,6 @@
     margin-bottom: 1.5rem;
   }
 
-  .rewards-title {
-    display: block;
-    font-size: 1.6rem;
-    font-weight: bold;
-    color: #ffd700;
-    text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-    margin-bottom: 0.5rem;
-  }
-
-  .achievement-subtitle {
-    font-size: 1rem;
-    color: #c9a959;
-  }
 
   .rewards-grid {
     display: flex;
