@@ -8,6 +8,7 @@
   import { recipes } from '$lib/data/recipes';
   import InspectionTracker from './InspectionTracker.svelte';
   import ObjectivesSection from './ObjectivesSection.svelte';
+  import TalkBanner from './TalkBanner.svelte';
   import type { ActionType, ActiveQuest, QuestDef } from '$lib/models/types';
 
   export let onSelect: (action: ActionType) => void;
@@ -137,6 +138,7 @@
   </div>
 
   <div class="actions-section">
+    <TalkBanner />
     <div class="actions">
       {#each actionStates as action}
         {#if action.isLocked}

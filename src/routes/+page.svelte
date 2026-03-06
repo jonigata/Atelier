@@ -21,7 +21,7 @@
   import DebugPanel from '../components/DebugPanel.svelte';
   import SaveLoadSidebar from '../components/SaveLoadSidebar.svelte';
   import ToastContainer from '../components/ToastContainer.svelte';
-  import TalkBanner from '../components/TalkBanner.svelte';
+
   import HomeButton from '../components/common/HomeButton.svelte';
   import ActiveEquipmentIcons from '../components/common/ActiveEquipmentIcons.svelte';
   import { initZoom } from '$lib/services/zoomController';
@@ -165,9 +165,6 @@
       {/if}
     </main>
 
-    {#if $gameState.phase === 'action' && selectedAction === null}
-      <TalkBanner />
-    {/if}
 
     {#if $gameState.phase === 'action' && selectedAction !== null}
       <HomeButton onClick={() => handleBackToMenu()} />
