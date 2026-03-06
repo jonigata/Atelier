@@ -71,6 +71,15 @@
     return { value, grade, met, progress, maxVal };
   }
 
+  // ── 次のランク情報 ──
+  function getNextGradeInfo(criterion: InspectionCriterion, currentGrade: InspectionGrade): { grade: InspectionGrade; threshold: number } | null {
+    const order: InspectionGrade[] = ['D', 'C', 'B', 'A', 'S'];
+    const idx = order.indexOf(currentGrade);
+    if (idx >= order.length - 1) return null; // Already S
+    const nextGrade = order[idx + 1] as 'C' | 'B' | 'A' | 'S';
+    return { grade: nextGrade, threshold: criterion.thresholds[nextGrade] };
+  }
+
   $: allMet = inspection.criteria.every((c) => getCriterionInfo(c, values, expValues).met);
 
   $: metCount = inspection.criteria.filter((c) => getCriterionInfo(c, values, expValues).met).length;
@@ -333,6 +342,7 @@
     {#each inspection.criteria as criterion}
       {@const info = getCriterionInfo(criterion, values, expValues)}
       {@const gradeUp = gradeUpAnimations[criterion.key]}
+      {@const nextInfo = getNextGradeInfo(criterion, info.grade)}
       <button
         class="criterion-chip"
         class:met={info.met}
@@ -364,6 +374,23 @@
           <span class="chip-grade" style="background: {gradeBg(info.grade)}">{info.grade}</span>
           {#if info.met}<span class="chip-pass">PASS</span>{/if}
         </span>
+        {#if nextInfo}
+          <span class="chip-next">
+            <span class="chip-next-label">次は</span>
+            <span class="chip-next-grade" style="background: {gradeBg(nextInfo.grade)}">{nextInfo.grade}</span>
+            <span class="chip-next-threshold">
+              {#if criterion.key === 'level' || criterion.key === 'villageDev' || criterion.key === 'reputation'}
+                Lv.{nextInfo.threshold}
+              {:else if criterion.key === 'quests'}
+                {nextInfo.threshold}件
+              {:else if criterion.key === 'album'}
+                {nextInfo.threshold}種
+              {:else}
+                {nextInfo.threshold}{criterion.unit}
+              {/if}
+            </span>
+          </span>
+        {/if}
       </button>
     {/each}
   </div>
@@ -754,6 +781,38 @@
     color: #81c784;
     letter-spacing: 0.05em;
     line-height: 1;
+  }
+
+  .chip-next {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 20px;
+    opacity: 0.6;
+    line-height: 1;
+  }
+
+  .chip-next-label {
+    color: #888;
+    font-size: 16px;
+  }
+
+  .chip-next-grade {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #1a1a2e;
+    line-height: 1;
+  }
+
+  .chip-next-threshold {
+    color: #b0b0c0;
+    font-weight: bold;
   }
 
   /* ── 詳細ダイアログ ── */
