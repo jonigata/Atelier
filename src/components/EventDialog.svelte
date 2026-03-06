@@ -444,6 +444,7 @@
 
   .event-image {
     width: 100%;
+    aspect-ratio: 4 / 3;
     display: block;
     border-bottom: 2px solid #8b7355;
   }
