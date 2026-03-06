@@ -129,7 +129,7 @@
     width: 280px;
     background: rgba(15, 15, 25, 0.95);
     border-right: 1px solid #333;
-    z-index: 100;
+    z-index: var(--z-panel);
     display: flex;
     flex-direction: column;
     overflow-y: auto;

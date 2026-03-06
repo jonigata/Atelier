@@ -35,7 +35,7 @@
     transform: translateX(-50%);
     width: 100%;
     max-width: 960px;
-    z-index: 800;
+    z-index: var(--z-toast);
     display: flex;
     flex-direction: column;
     align-items: flex-end;

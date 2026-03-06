@@ -424,7 +424,7 @@
     border: 2px solid #666;
     font-size: 1.2rem;
     cursor: pointer;
-    z-index: 9999;
+    z-index: calc(var(--z-debug) + 1);
   }
 
   .debug-toggle:hover {
@@ -443,7 +443,7 @@
     padding: 1rem;
     color: #ddd;
     font-size: 0.85rem;
-    z-index: 9998;
+    z-index: var(--z-debug);
     overflow-y: auto;
   }
 

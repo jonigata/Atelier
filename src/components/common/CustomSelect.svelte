@@ -132,7 +132,7 @@
     border: 1px solid #5a5a7a;
     border-radius: 6px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    z-index: 100;
+    z-index: var(--z-panel);
     max-height: none;
   }
 

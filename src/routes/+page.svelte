@@ -277,7 +277,7 @@
     font-size: 0.75rem;
     border-radius: 4px;
     pointer-events: none;
-    z-index: 500;
+    z-index: var(--z-indicator);
     animation: saveFlash 1.5s ease-out forwards;
   }
 

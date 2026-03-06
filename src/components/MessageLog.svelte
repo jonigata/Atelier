@@ -180,7 +180,7 @@
   .log-overlay {
     position: fixed;
     inset: 0;
-    z-index: 100;
+    z-index: var(--z-panel);
     background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: flex-start;

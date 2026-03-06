@@ -401,7 +401,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: var(--z-modal);
     cursor: pointer;
     user-select: none;
     animation: overlayFadeIn 0.2s ease-out;

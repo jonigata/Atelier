@@ -466,7 +466,7 @@
   .inspection-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 999;
+    z-index: var(--z-cutscene);
     background: #000;
     pointer-events: all;
   }
@@ -480,7 +480,7 @@
     width: 100%;
     max-width: 960px;
     margin: 0 auto;
-    z-index: 1050;
+    z-index: var(--z-cutscene);
     display: flex;
     align-items: center;
     justify-content: center;

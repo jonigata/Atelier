@@ -53,7 +53,7 @@
     flex-direction: column;
     align-items: center;
     pointer-events: none;
-    z-index: 100;
+    z-index: var(--z-panel);
   }
 
   .change-item {

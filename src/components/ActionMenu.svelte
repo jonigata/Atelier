@@ -210,7 +210,6 @@
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 2;
     padding: 0 0.5rem 0.5rem;
     display: flex;
     flex-direction: column;

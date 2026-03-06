@@ -47,6 +47,14 @@
 		--radius-sm: 4px;
 		--radius-md: 6px;
 		--radius-lg: 8px;
+
+		/* z-index layers (see documents/technical/z-index-layers.md) */
+		--z-panel: 100;
+		--z-indicator: 500;
+		--z-toast: 800;
+		--z-modal: 1000;
+		--z-cutscene: 1100;
+		--z-debug: 9000;
 	}
 
 	:global(*) {
