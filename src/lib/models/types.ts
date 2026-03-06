@@ -555,6 +555,7 @@ export interface AchievementDef {
   autoComplete?: boolean;  // ゲーム開始時に自動達成
   important?: boolean;  // HUDに目標として表示するか
   triggerOnMorning?: boolean;  // 条件を満たした次の朝に発動
+  fallbackDay?: number;  // 前提アチーブメント未達でもこの日以降なら強制発動
   eventImage?: string;  // イベントCG画像ID（static/images/events/{id}.png）
 }
 

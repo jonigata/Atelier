@@ -179,6 +179,7 @@ export const tutorialAchievements: Record<string, AchievementDef> = {
     priority: 42,
     prerequisite: ['ach_first_complete'],
     triggerOnMorning: true,
+    fallbackDay: 7,
   },
 
   ach_q1_goal_reminder: {

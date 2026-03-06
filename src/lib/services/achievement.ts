@@ -141,11 +141,14 @@ function isAchievementEligible(achievement: AchievementDef, state: GameState): b
     return false;
   }
 
-  // 前提アチーブメントが未達成ならスキップ
+  // 前提アチーブメントが未達成ならスキップ（fallbackDay以降は前提を無視）
   if (achievement.prerequisite) {
-    for (const prereqId of achievement.prerequisite) {
-      if (!state.achievementProgress.completed.includes(prereqId)) {
-        return false;
+    const fallback = achievement.fallbackDay != null && state.day >= achievement.fallbackDay;
+    if (!fallback) {
+      for (const prereqId of achievement.prerequisite) {
+        if (!state.achievementProgress.completed.includes(prereqId)) {
+          return false;
+        }
       }
     }
   }
