@@ -218,6 +218,7 @@
     width: 90vw;
     border-radius: 12px;
     box-shadow: 0 0 40px rgba(201, 169, 89, 0.2);
+    pointer-events: none;
   }
 
   .video-text {
