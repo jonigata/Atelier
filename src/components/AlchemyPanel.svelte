@@ -13,7 +13,8 @@
   import type { RecipeDef, OwnedItem, Ingredient, GaugeData } from '$lib/models/types';
   import type { CraftMultipleResult } from '$lib/services/alchemy';
 
-  import { getItemIcon, handleIconError } from '$lib/data/items';
+  import { getItem, getItemIcon, handleIconError } from '$lib/data/items';
+  import { getCategoryName } from '$lib/data/categories';
   import RecipeList from './alchemy/RecipeList.svelte';
   import RecipeDetail from './alchemy/RecipeDetail.svelte';
   import MaterialSlots from './alchemy/MaterialSlots.svelte';
@@ -83,6 +84,20 @@
         )
       )
     : 0;
+
+  // 材料アイテムの所持数一覧（作成個数パネルに表示用）
+  $: materialStock = selectedRecipe
+    ? selectedRecipe.ingredients.map((ing) => {
+        const label = ing.itemId
+          ? (getItem(ing.itemId)?.name ?? ing.itemId)
+          : ing.category
+            ? getCategoryName(ing.category)
+            : '???';
+        const needed = getEffectiveIngredientCount(ing.quantity);
+        const owned = countAvailableIngredients(ing);
+        return { label, needed, owned };
+      })
+    : [];
 
   // 1個あたりの必要素材数（機材効果適用済み）
   $: itemsPerCraft = selectedRecipe
@@ -371,23 +386,38 @@
             <RecipeDetail recipe={selectedRecipe} />
           {:else}
             <div class="crafting-area">
-              <!-- 個数選択 -->
+              <!-- 個数選択 + 材料所持数 -->
               <div class="quantity-section">
-                <h4>作成個数</h4>
-                <div class="quantity-selector">
-                  <div class="qty-grid">
-                    {#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as n}
-                      <button
-                        class="qty-num-btn"
-                        class:selected={craftQuantity === n}
-                        on:click={() => setQuantity(n)}
-                        disabled={n > maxCraftable || n > maxWithoutInspection || selectedItems.length > 0}
-                      >{n}</button>
-                    {/each}
+                <div class="quantity-row">
+                  <div class="quantity-left">
+                    <h4>作成個数</h4>
+                    <div class="quantity-selector">
+                      <div class="qty-grid">
+                        {#each [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as n}
+                          <button
+                            class="qty-num-btn"
+                            class:selected={craftQuantity === n}
+                            on:click={() => setQuantity(n)}
+                            disabled={n > maxCraftable || n > maxWithoutInspection || selectedItems.length > 0}
+                          >{n}</button>
+                        {/each}
+                      </div>
+                      <span class="qty-max">/ 最大 {maxCraftable}個</span>
+                    </div>
+                    <p class="quantity-hint">所要日数: {formatCraftDays(getEffectiveCraftDays(selectedRecipe))} × {craftQuantity}個 = <span class="days-total" class:multi-day={craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity) >= 2}>{craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)}日</span></p>
                   </div>
-                  <span class="qty-max">/ 最大 {maxCraftable}個</span>
+                  <div class="material-stock">
+                    <h4>材料の所持数</h4>
+                    <table class="stock-table">
+                      {#each materialStock as mat}
+                        <tr>
+                          <td class="stock-name">{mat.label}</td>
+                          <td class="stock-count" class:stock-short={mat.owned < mat.needed}>{mat.owned}</td>
+                        </tr>
+                      {/each}
+                    </table>
+                  </div>
                 </div>
-                <p class="quantity-hint">所要日数: {formatCraftDays(getEffectiveCraftDays(selectedRecipe))} × {craftQuantity}個 = <span class="days-total" class:multi-day={craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity) >= 2}>{craftDaysToActual(getEffectiveCraftDays(selectedRecipe) * craftQuantity)}日</span></p>
                 {#if maxWithoutInspection === 0}
                   {@const conflictDay = getInspectionConflictForQuantity(1)}
                   <div class="inspection-warning">
@@ -569,6 +599,49 @@
     border-radius: 8px;
   }
 
+  .quantity-row {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .quantity-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .material-stock {
+    flex-shrink: 0;
+    min-width: 5rem;
+  }
+
+  .stock-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .stock-table td {
+    padding: 0.15rem 0.3rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .stock-name {
+    color: var(--text-sub);
+    font-size: 0.65rem;
+  }
+
+  .stock-count {
+    color: var(--text-heading);
+    text-align: right;
+    font-weight: bold;
+  }
+
+  .stock-count.stock-short {
+    color: #ff6b6b;
+  }
+
   .quantity-selector {
     display: flex;
     align-items: center;
@@ -578,17 +651,17 @@
   .qty-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 0.4rem;
+    gap: 0.5rem;
   }
 
   .qty-num-btn {
-    width: 52px;
-    height: 48px;
+    width: 56px;
+    height: 52px;
     background: rgba(255, 255, 255, 0.1);
     border: 2px solid var(--border-default);
     border-radius: var(--radius-md);
     color: var(--text-body);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: bold;
     cursor: pointer;
     display: flex;
