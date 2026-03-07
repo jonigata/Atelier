@@ -362,7 +362,7 @@
         {#each ownedHelperDefs as { def, level }}
           <div class="equip-card">
             <div class="equip-img-wrap">
-              <img class="equip-icon" src="/images/helpers/{def.id}.png" alt={def.name} />
+              <img class="equip-icon" src="/images/helpers/{def.id}.webp" alt={def.name} />
             </div>
             <div class="equip-info">
               <span class="equip-category-label">{def.species}</span>
@@ -384,7 +384,7 @@
         {#each ownedBuildingDefs as { def, level }}
           <div class="equip-card">
             <div class="equip-img-wrap">
-              <img class="equip-icon" src="/images/buildings/{def.id}.png" alt={def.name} />
+              <img class="equip-icon" src="/images/buildings/{def.id}.webp" alt={def.name} />
             </div>
             <div class="equip-info">
               <span class="equip-name">{def.name}</span>

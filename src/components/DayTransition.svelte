@@ -79,7 +79,7 @@
     class:fade-in={fading === 'in'}
     class:fade-out={fading === 'out'}
   >
-    <img class="title-logo" class:visible={showText} src="/images/title-logo.png" alt="コレットの村おこし工房" />
+    <img class="title-logo" class:visible={showText} src="/images/title-logo.webp" alt="コレットの村おこし工房" />
     <div class="transition-content" class:visible={showText}>
       {#if daysAdvanced > 0}
         <div class="days-passed">

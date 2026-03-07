@@ -128,7 +128,7 @@
     {#each stamps as s (s.id)}
       <img
         class="stamp"
-        src="/icons/materials/{selectedItem}.png"
+        src="/icons/materials/{selectedItem}.webp"
         alt=""
         style="
           left: calc(50% + {s.x}px);

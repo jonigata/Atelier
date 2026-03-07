@@ -5,7 +5,7 @@
   export let size: 'small' | 'medium' | 'large' = 'medium';
 
   function getIconPath(category: AchievementCategory): string {
-    return `/icons/achievements/${category}.png`;
+    return `/icons/achievements/${category}.webp`;
   }
 
   function getLabel(category: AchievementCategory): string {

@@ -330,7 +330,7 @@
     <div class="deals-talk" on:click={dismissDealsTalk}>
       <img
         class="deals-talk-face"
-        src="/images/characters/melda/melda-face-happy.png"
+        src="/images/characters/melda/melda-face-happy.webp"
         alt="メルダ"
       />
       <div class="deals-talk-bubble">
@@ -523,7 +523,7 @@
     <!-- アルバイト確認（タブ内埋め込み） -->
     <div class="parttime-confirm">
       <div class="parttime-confirm-body">
-        <img class="parttime-confirm-face" src="/images/characters/melda/melda-face-happy.png" alt="メルダ" />
+        <img class="parttime-confirm-face" src="/images/characters/melda/melda-face-happy.webp" alt="メルダ" />
         <div class="parttime-confirm-text">
           <span class="parttime-confirm-name">メルダ</span>
           <span class="parttime-confirm-message">今日もお手伝いしてくれるの？ 報酬は{partTimeEarnings}Gよ。1日かかるけどどうする？</span>

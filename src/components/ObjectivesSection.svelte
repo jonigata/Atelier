@@ -156,7 +156,7 @@
                 class:important={goal.important}
                 on:click={() => selectedGoal = goal}
               >
-                <div class="objective-bg-icon" style="background-image: url('/icons/achievements/{goal.category}.png')"></div>
+                <div class="objective-bg-icon" style="background-image: url('/icons/achievements/{goal.category}.webp')"></div>
                 <div class="objective-content">
                   <div class="objective-header">
                     <span class="objective-title">{goal.title}</span>

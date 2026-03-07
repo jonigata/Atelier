@@ -12,7 +12,7 @@
   import type { ActionType, ActiveQuest, QuestDef } from '$lib/models/types';
 
   export let onSelect: (action: ActionType) => void;
-  export let villageBgImage: string = '/images/village/village_1.png';
+  export let villageBgImage: string = '/images/village/village_1.webp';
 
   function canDeliverQuest(quest: ActiveQuest): boolean {
     const remaining = quest.requiredQuantity - quest.deliveredCount;
@@ -71,7 +71,7 @@
   ];
 
   function getActionBanner(type: ActionType): string {
-    return `/images/actions/${type}.png`;
+    return `/images/actions/${type}.webp`;
   }
 
   $: merchantInTown = isMerchantVisiting($gameState.day);
@@ -126,7 +126,7 @@
             class="action-btn merchant-btn"
             on:click={() => onSelect('traveling_merchant')}
           >
-            <img class="icon" src="/images/characters/marco/marco-face-smug.png" alt="マルコ" />
+            <img class="icon" src="/images/characters/marco/marco-face-smug.webp" alt="マルコ" />
             <div class="merchant-info">
               <span class="label">旅商人マルコ <span class="merchant-days">あと{merchantDaysLeft}日</span></span>
               <span class="description">マルコの行商を覗く</span>
@@ -142,7 +142,7 @@
       {#each actionStates as action}
         {#if action.isLocked}
           <button class="action-btn locked" disabled>
-            <img class="lock-icon" src="/icons/actions/locked.png" alt="ロック中" />
+            <img class="lock-icon" src="/icons/actions/locked.webp" alt="ロック中" />
             <span class="lock-label">???</span>
           </button>
         {:else}
@@ -395,7 +395,7 @@
     min-height: auto;
     padding: 1rem 1.25rem;
     border-color: #ff9800 !important;
-    background-image: url(/images/actions/traveling_merchant.png) !important;
+    background-image: url(/images/actions/traveling_merchant.webp) !important;
     background-size: cover;
     background-position: center;
     animation: merchantPulse 3s ease-in-out infinite;

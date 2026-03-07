@@ -52,7 +52,7 @@
   <div class="monologue-panel">
     <img
       class="face"
-      src="/images/characters/heroine/heroine-face-{activeMonologue.expression}.png"
+      src="/images/characters/heroine/heroine-face-{activeMonologue.expression}.webp"
       alt="コレット"
     />
     <div class="bubble">

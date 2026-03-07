@@ -1129,16 +1129,16 @@ export function getItem(id: string): ItemDef | undefined {
 }
 
 // フォールバック画像のパス
-const FALLBACK_ICON = '/icons/materials/fallback.png';
+const FALLBACK_ICON = '/icons/materials/fallback.webp';
 
 export function getItemIcon(id: string): string {
-  return `/icons/materials/${id}.png`;
+  return `/icons/materials/${id}.webp`;
 }
 
 // 画像読み込みエラー時のフォールバック処理用
 export function handleIconError(event: Event): void {
   const img = event.target as HTMLImageElement;
-  if (img && !img.src.endsWith('unknown.png')) {
+  if (img && !img.src.endsWith('unknown.webp')) {
     img.src = FALLBACK_ICON;
   }
 }

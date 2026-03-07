@@ -126,7 +126,7 @@
               class="area-item"
               class:selected={selectedArea?.id === area.id}
               on:click={() => selectArea(area)}
-              style="background-image: url(/images/areas/{area.id}.png); background-position: {areaBgPosition[area.id] ?? 'center'}"
+              style="background-image: url(/images/areas/{area.id}.webp); background-position: {areaBgPosition[area.id] ?? 'center'}"
             >
               <div class="area-info">
                 <span class="area-name">{area.name}</span>

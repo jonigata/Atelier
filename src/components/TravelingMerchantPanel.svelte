@@ -35,7 +35,7 @@
         return {
           name: book?.name ?? '???',
           description: book?.description ?? '',
-          icon: '/icons/actions/study.png',
+          icon: '/icons/actions/study.webp',
           typeLabel: 'レシピ本',
         };
       }
@@ -68,7 +68,7 @@
 
   {#if lineup && lineup.slots.length > 0}
     <div class="merchant-message">
-      <img class="marco-face" src="/images/characters/marco/marco-face-happy.png" alt="マルコ" on:error={handleIconError} />
+      <img class="marco-face" src="/images/characters/marco/marco-face-happy.webp" alt="マルコ" on:error={handleIconError} />
       <p>「やあやあ先生！ 今月もいい品を持ってきたよ」</p>
     </div>
 
@@ -106,7 +106,7 @@
     </div>
 
     <div class="merchant-footer">
-      <img class="marco-face-small" src="/images/characters/marco/marco-face-smug.png" alt="マルコ" on:error={handleIconError} />
+      <img class="marco-face-small" src="/images/characters/marco/marco-face-smug.webp" alt="マルコ" on:error={handleIconError} />
       <p>「全部は持っていけないだろう？ よーく選びな」</p>
     </div>
   {:else}

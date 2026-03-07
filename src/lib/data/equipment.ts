@@ -615,5 +615,5 @@ export function getEquipmentByRarity(rarity: EquipmentRarity): EquipmentDef[] {
 }
 
 export function getEquipmentIcon(id: string): string {
-  return `/images/equipments/${id}.png`;
+  return `/images/equipments/${id}.webp`;
 }

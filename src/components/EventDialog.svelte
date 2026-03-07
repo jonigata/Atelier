@@ -34,7 +34,7 @@
 
   function getFaceImageUrl(faceId: string | undefined, expression: string): string | undefined {
     if (!faceId) return undefined;
-    return `/images/characters/${faceId}/${faceId}-face-${expression}.png`;
+    return `/images/characters/${faceId}/${faceId}-face-${expression}.webp`;
   }
 
   let currentLine = 0;
@@ -251,7 +251,7 @@
                 <ItemCard
                   itemId={reward.itemId}
                   label={reward.text}
-                  iconUrl={reward.iconUrl || (!reward.itemId && reward.type === 'money' ? '/icons/ui/coin.png' : null)}
+                  iconUrl={reward.iconUrl || (!reward.itemId && reward.type === 'money' ? '/icons/ui/coin.webp' : null)}
                   emoji={!reward.itemId && !reward.iconUrl && reward.type !== 'money' ? '🎁' : null}
                 />
               {/each}
@@ -282,7 +282,7 @@
             {:else if !reward.itemId}
               <div class="showcase-icon">
                 {#if reward.iconUrl || reward.type === 'money'}
-                  <img src={reward.iconUrl || '/icons/ui/coin.png'} alt="" class:wide-img={reward.type === 'unlock'} on:error={handleIconError} />
+                  <img src={reward.iconUrl || '/icons/ui/coin.webp'} alt="" class:wide-img={reward.type === 'unlock'} on:error={handleIconError} />
                 {:else}
                   <span class="showcase-emoji">{reward.type === 'recipe' ? '📖' : '🎁'}</span>
                 {/if}

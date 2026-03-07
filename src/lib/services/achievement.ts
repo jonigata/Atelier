@@ -581,7 +581,7 @@ function getStructuredRewards(achievement: AchievementDef, pickedEquipment?: Equ
       structured.push({
         text: `「${label}」解放`,
         type: 'unlock',
-        iconUrl: `/images/actions/${action}.png`,
+        iconUrl: `/images/actions/${action}.webp`,
       });
     }
   }

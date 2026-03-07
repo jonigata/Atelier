@@ -6,7 +6,7 @@
   export let showLabel: boolean = false;
 
   function getIconPath(type: QuestType): string {
-    return `/icons/quests/${type}.png`;
+    return `/icons/quests/${type}.webp`;
   }
 
   function getLabel(type: QuestType): string {

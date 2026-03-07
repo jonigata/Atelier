@@ -73,7 +73,7 @@
   <div class="overlay" on:click={handleClick} role="button" tabindex="-1">
     <div class="dialog">
       <div class="event-image-container">
-        <img class="event-image" src="/images/areas/{data.areaId}.png" alt={data.areaName} />
+        <img class="event-image" src="/images/areas/{data.areaId}.webp" alt={data.areaName} />
         <div class="image-overlay"></div>
       </div>
 

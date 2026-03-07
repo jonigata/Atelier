@@ -213,7 +213,7 @@
           pendingGreeting = {
             characterName: def.name,
             characterTitle: def.species,
-            eventImage: `/images/helpers/${def.id}.png`,
+            eventImage: `/images/helpers/${def.id}.webp`,
             lines: [def.greetings[currentLevel]],
           };
         }
@@ -317,13 +317,13 @@
               >
                 <!-- 裏面 -->
                 <div class="card-face card-back facility-back">
-                  <img class="card-back-img" src="/images/cards/facility-back.png" alt="" />
+                  <img class="card-back-img" src="/images/cards/facility-back.webp" alt="" />
                 </div>
                 <!-- 表面 -->
                 <div class="card-face card-front facility-card">
                   <img
                     class="card-building-img"
-                    src="/images/buildings/{choice.def.id}.png"
+                    src="/images/buildings/{choice.def.id}.webp"
                     alt={choice.def.name}
                   />
                   <div class="building-card-info">
@@ -369,13 +369,13 @@
               >
                 <!-- 裏面 -->
                 <div class="card-face card-back helper-back">
-                  <img class="card-back-img" src="/images/cards/helper-back.png" alt="" />
+                  <img class="card-back-img" src="/images/cards/helper-back.webp" alt="" />
                 </div>
                 <!-- 表面 -->
                 <div class="card-face card-front helper-card">
                   <img
                     class="card-helper-img"
-                    src="/images/helpers/{choice.def.id}.png"
+                    src="/images/helpers/{choice.def.id}.webp"
                     alt={choice.def.name}
                   />
                   <div class="helper-card-info">

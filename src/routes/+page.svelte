@@ -52,13 +52,13 @@
 
   function getVillageImage(level: number): string {
     const ratio = level / 30;
-    if (ratio >= 0.85) return '/images/village/village_7.png';
-    if (ratio >= 0.70) return '/images/village/village_6.png';
-    if (ratio >= 0.55) return '/images/village/village_5.png';
-    if (ratio >= 0.40) return '/images/village/village_4.png';
-    if (ratio >= 0.25) return '/images/village/village_3.png';
-    if (ratio >= 0.10) return '/images/village/village_2.png';
-    return '/images/village/village_1.png';
+    if (ratio >= 0.85) return '/images/village/village_7.webp';
+    if (ratio >= 0.70) return '/images/village/village_6.webp';
+    if (ratio >= 0.55) return '/images/village/village_5.webp';
+    if (ratio >= 0.40) return '/images/village/village_4.webp';
+    if (ratio >= 0.25) return '/images/village/village_3.webp';
+    if (ratio >= 0.10) return '/images/village/village_2.webp';
+    return '/images/village/village_1.webp';
   }
 
   $: villageBgImage = getVillageImage($villageLevel);
