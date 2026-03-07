@@ -306,21 +306,23 @@
 
   .quest-rewards {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
-    gap: 0.1rem 0.3rem;
-    font-size: 0.6rem;
+    gap: 0.1rem 0.2rem;
+    font-size: 0.5rem;
+    white-space: nowrap;
   }
 
   .detail-label {
     color: var(--text-dim);
-    font-size: 0.55rem;
+    font-size: 0.5rem;
+    flex-shrink: 0;
   }
 
   .reward-money {
     color: var(--accent-gold);
     font-weight: bold;
-    font-size: 0.65rem;
+    font-size: 0.55rem;
   }
 
   .reward-rep {

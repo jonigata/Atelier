@@ -553,28 +553,30 @@
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    gap: 0.1rem 0.25rem;
-    font-size: 0.55rem;
+    gap: 0.1rem 0.2rem;
+    font-size: 0.5rem;
     overflow: hidden;
+    white-space: nowrap;
   }
 
   .quest-bottom-row {
     display: flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0.2rem;
     margin-bottom: 0.1rem;
-    font-size: 0.6rem;
+    font-size: 0.5rem;
   }
 
   .detail-label {
     color: var(--text-dim);
-    font-size: 0.55rem;
+    font-size: 0.5rem;
+    flex-shrink: 0;
   }
 
   .reward-money {
     color: var(--accent-gold);
     font-weight: bold;
-    font-size: 0.65rem;
+    font-size: 0.55rem;
   }
 
   .reward-rep {
