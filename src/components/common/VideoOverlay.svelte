@@ -7,6 +7,7 @@
 
   import { onMount } from 'svelte';
   import ContinueMarker from './ContinueMarker.svelte';
+  import CanvasVideo from './CanvasVideo.svelte';
 
   onMount(() => {
     const timer = setTimeout(() => {
@@ -34,19 +35,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div class="video-overlay" class:clickable={canSkip} on:click={handleSkip} role="button" tabindex="-1">
   <div class="video-container">
-    <!-- svelte-ignore a11y_media_has_caption -->
-    <video
-      class="video-player"
-      autoplay
-      muted
-      playsinline
-      disablepictureinpicture
-      controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
-      on:ended={onEnd}
-      on:contextmenu|preventDefault
-    >
-      <source {src} type="video/mp4" />
-    </video>
+    <CanvasVideo {src} class="video-player" onEnded={onEnd} />
     {#if text}
       <div class="video-text">{text}</div>
     {/if}

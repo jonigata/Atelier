@@ -42,6 +42,7 @@
   import { onMount } from 'svelte';
   import { skipPresentation } from '$lib/stores/game';
   import ContinueMarker from '../common/ContinueMarker.svelte';
+  import CanvasVideo from '../common/CanvasVideo.svelte';
 
   function onVideoEnded() {
     phase = 'reveal';
@@ -112,10 +113,7 @@
   <!-- 醸造中: 動画 -->
   {#if phase === 'brewing'}
     <div class="brewing-effect">
-      <!-- svelte-ignore a11y_media_has_caption -->
-      <video class="craft-video" autoplay muted on:ended={onVideoEnded}>
-        <source src="/movies/craft.mp4" type="video/mp4" />
-      </video>
+      <CanvasVideo src="/movies/craft.mp4" class="craft-video" onEnded={onVideoEnded} />
       <p class="brewing-text">調合中...</p>
       <p class="skip-hint"><ContinueMarker visible={mounted} /></p>
     </div>

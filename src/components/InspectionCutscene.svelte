@@ -5,6 +5,7 @@
   import PopIn from './common/PopIn.svelte';
   import StampRush from './common/StampRush.svelte';
   import ContinueMarker from './common/ContinueMarker.svelte';
+  import CanvasVideo from './common/CanvasVideo.svelte';
   import type { InspectionCutsceneData } from '$lib/models/types';
 
   let visible = false;
@@ -20,7 +21,7 @@
   let revealedCriteria = 0;
   let showGrade = false;
   let gradeStamped = false;
-  let videoEl: HTMLVideoElement | null = null;
+  let videoEl: CanvasVideo | null = null;
 
 
   // パーティクル（座標はコンテナ内の%）
@@ -298,19 +299,14 @@
   >
     <!-- ムービー -->
     {#if phase === 'movie'}
-      <!-- svelte-ignore a11y_media_has_caption -->
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <div class="movie-wrap" on:click={skipMovie} role="button" tabindex="-1">
-        <video
+        <CanvasVideo
+          src="/movies/inspection.mp4"
           class="inspection-movie"
-          autoplay
-          muted
-          playsinline
           bind:this={videoEl}
-          on:ended={onMovieEnded}
-        >
-          <source src="/movies/inspection.mp4" type="video/mp4" />
-        </video>
+          onEnded={onMovieEnded}
+        />
         <p class="skip-hint"><ContinueMarker /></p>
       </div>
     {/if}

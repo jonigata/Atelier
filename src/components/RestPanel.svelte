@@ -5,6 +5,7 @@
   import type { RestEventDef, ResolvedReward } from '$lib/data/restEvents';
   import RestEventDialog from './RestEventDialog.svelte';
   import ContinueMarker from './common/ContinueMarker.svelte';
+  import CanvasVideo from './common/CanvasVideo.svelte';
 
   export let onBack: () => void;
 
@@ -115,10 +116,7 @@
   <div class="rest-backdrop" class:clickable={canSkipVideo} on:click={handleVideoClick} role="button" tabindex="-1">
     {#if playingVideo}
       <div class="video-container">
-        <!-- svelte-ignore a11y_media_has_caption -->
-        <video class="video-player" autoplay muted on:ended={endVideo}>
-          <source src="/movies/rest.mp4" type="video/mp4" />
-        </video>
+        <CanvasVideo src="/movies/rest.mp4" class="video-player" onEnded={endVideo} />
         <div class="video-text">休息中...</div>
         <div class="video-hint"><ContinueMarker visible={canSkipVideo} /></div>
       </div>
