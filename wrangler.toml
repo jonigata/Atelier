@@ -7,4 +7,4 @@ assets = { directory = ".svelte-kit/cloudflare", binding = "ASSETS" }
 [[d1_databases]]
 binding = "DB"
 database_name = "atelier-ranking"
-database_id = "<wrangler d1 create 後に設定>"
+database_id = "187e1692-3420-47fe-a7d0-e180ab8c5fdd"
