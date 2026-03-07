@@ -10,7 +10,7 @@ import { isCraftedCategory } from '$lib/data/categories';
 import type { ItemDef } from '$lib/models/types';
 
 /** Mulberry32 seeded PRNG */
-function seededRandom(seed: number): () => number {
+export function seededRandom(seed: number): () => number {
   return () => {
     seed |= 0;
     seed = (seed + 0x6d2b79f5) | 0;
@@ -21,7 +21,7 @@ function seededRandom(seed: number): () => number {
 }
 
 /** seeded Fisher-Yates shuffle */
-function seededShuffle<T>(arr: T[], rng: () => number): T[] {
+export function seededShuffle<T>(arr: T[], rng: () => number): T[] {
   const result = [...arr];
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));

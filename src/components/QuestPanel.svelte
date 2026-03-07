@@ -487,7 +487,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.2rem;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     margin-bottom: 0.1rem;
   }
 
@@ -499,8 +499,8 @@
   }
 
   .item-icon-small {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     object-fit: contain;
   }
 
@@ -551,10 +551,11 @@
 
   .quest-rewards {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
-    gap: 0.1rem 0.3rem;
-    font-size: 0.6rem;
+    gap: 0.1rem 0.25rem;
+    font-size: 0.55rem;
+    overflow: hidden;
   }
 
   .quest-bottom-row {

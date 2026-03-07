@@ -582,13 +582,13 @@
   }
 
   .qty-num-btn {
-    width: 40px;
-    height: 36px;
+    width: 52px;
+    height: 48px;
     background: rgba(255, 255, 255, 0.1);
     border: 2px solid var(--border-default);
     border-radius: var(--radius-md);
     color: var(--text-body);
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-weight: bold;
     cursor: pointer;
     display: flex;

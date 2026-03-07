@@ -373,7 +373,7 @@ export function getAchievementDialogue(achievementId: string, pickedEquipment?: 
 
   // イベントCG画像パス
   const eventImage = achievement.eventImage
-    ? `/images/events/${achievement.eventImage}.png`
+    ? `/images/events/${achievement.eventImage}.webp`
     : undefined;
 
   // 顔画像IDを取得

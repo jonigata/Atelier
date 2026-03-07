@@ -563,7 +563,7 @@
   /* アイテムグリッド */
   .item-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 0.5rem;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
@@ -591,8 +591,8 @@
   }
 
   .item-icon {
-    width: 40px;
-    height: 40px;
+    width: 56px;
+    height: 56px;
     object-fit: contain;
     flex-shrink: 0;
   }
@@ -641,8 +641,8 @@
   }
 
   .icon-placeholder {
-    width: 40px;
-    height: 40px;
+    width: 56px;
+    height: 56px;
     flex-shrink: 0;
     background: rgba(255, 255, 255, 0.03);
     border: 1px dashed #4a4a5a;

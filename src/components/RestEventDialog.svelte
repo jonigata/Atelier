@@ -56,7 +56,7 @@
   <div class="dialog" class:rare={isRare} class:has-image={!!event.eventImage}>
     {#if event.eventImage}
       <div class="event-image-container">
-        <img class="event-image" src="/images/events/{event.eventImage}.png" alt={event.name} />
+        <img class="event-image" src="/images/events/{event.eventImage}.webp" alt={event.name} />
         <div class="image-overlay"></div>
       </div>
     {/if}

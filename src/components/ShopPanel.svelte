@@ -14,7 +14,7 @@
   import { shopFlavors, pickRandom } from '$lib/data/flavorTexts';
   import { getSellPriceMult, getBuyPriceMult, recordSell } from '$lib/services/equipmentEffects';
   import { getHelperBuyPriceMult, getHelperSellPriceMult } from '$lib/services/helperEffects';
-  import { getBargainItems, getPremiumPurchaseItems } from '$lib/services/shopDeals';
+  import { getBargainItems, getPremiumPurchaseItems, seededRandom, seededShuffle } from '$lib/services/shopDeals';
   import { getWeek, getDaysLeftInWeek } from '$lib/services/calendar';
   import type { OwnedItem, ItemDef, EquipmentDef } from '$lib/models/types';
   import { isCraftedCategory } from '$lib/data/categories';
@@ -83,8 +83,10 @@
   function initShopEquipment() {
     const all = getAllEquipment();
     const unowned = all.filter((e) => !$gameState.ownedEquipment.includes(e.id));
-    // シャッフルして3つ選出
-    const shuffled = [...unowned].sort(() => Math.random() - 0.5);
+    // 週番号をシードにしてシャッフル（リロードしても同じ結果になる）
+    const week = getWeek($gameState.day);
+    const rng = seededRandom(week * 48271);
+    const shuffled = seededShuffle(unowned, rng);
     const selected = shuffled.slice(0, 3);
     if (selected.length === 0) return;
     gameState.update((s) => ({
@@ -272,7 +274,7 @@
       characterName: 'メルダ',
       characterTitle: '雑貨屋の店主',
       characterFaceId: 'melda',
-      eventImage: '/images/events/part_time.png',
+      eventImage: '/images/events/part_time.webp',
       lines: [
         { text: `今日もありがとね！ はい、${partTimeEarnings}Gのお給料よ`, expression: 'happy' },
       ],
@@ -428,7 +430,7 @@
             {@const canBuy = !slot.purchased && !owned && $gameState.money >= def.price}
             <div class="equip-card" class:disabled={!canBuy && !slot.purchased && !owned} class:purchased={slot.purchased || owned} class:rare={def.rarity === 'rare'}>
               <div class="equip-img-wrap">
-                <img class="equip-card-icon" src={getEquipmentIcon(def.id)} alt={def.name} />
+                <img class="equip-card-icon" src={getEquipmentIcon(def.id)} alt={def.name} on:error={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
                 <div class="equip-badge">機材</div>
                 {#if def.rarity === 'rare'}
                   <span class="equip-rarity-tag">RARE</span>
@@ -594,7 +596,7 @@
 
   .equip-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
   }
 
@@ -756,8 +758,10 @@
   .item-action {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
     flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .item-price {

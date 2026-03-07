@@ -22,7 +22,7 @@
   <div class="hud-row main-row">
     <div class="hud-section config-section">
       <button class="config-btn" on:click={() => showConfig = true} title="設定">
-        <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+        <svg viewBox="0 0 24 24" width="44" height="44" fill="currentColor">
           <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.48.48 0 0 0 .12.61l2.03 1.58c-.05.3-.07.63-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
         </svg>
       </button>
@@ -109,10 +109,10 @@
     justify-content: center;
     background: none;
     border: 1px solid rgba(160, 128, 96, 0.4);
-    border-radius: 4px;
+    border-radius: 6px;
     color: #a08060;
     cursor: pointer;
-    padding: 0.4rem;
+    padding: 6px;
     transition: color 0.2s, border-color 0.2s, background-color 0.2s;
   }
 

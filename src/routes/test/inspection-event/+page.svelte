@@ -90,7 +90,7 @@
       characterName: '査察官',
       characterTitle: '師匠組合',
       characterFaceId: 'inspector',
-      eventImage: '/images/events/inspection_evaluation.png',
+      eventImage: '/images/events/inspection_evaluation.webp',
       lines: [
         { text: `${month}月末の定期査察を執り行います`, expression: 'neutral' },
         { text: 'それでは項目ごとに確認します', expression: 'neutral' },

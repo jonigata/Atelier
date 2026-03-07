@@ -317,7 +317,7 @@
 
     <!-- 背景: イベントCG -->
     <div class="bg-image" class:visible={phase !== 'fade-in' && phase !== 'movie'}>
-      <img src="/images/events/inspection_evaluation.png" alt="" />
+      <img src="/images/events/inspection_evaluation.webp" alt="" />
       <div class="bg-dim" />
     </div>
 

@@ -35,7 +35,16 @@
 <div class="video-overlay" class:clickable={canSkip} on:click={handleSkip} role="button" tabindex="-1">
   <div class="video-container">
     <!-- svelte-ignore a11y_media_has_caption -->
-    <video class="video-player" autoplay muted on:ended={onEnd}>
+    <video
+      class="video-player"
+      autoplay
+      muted
+      playsinline
+      disablepictureinpicture
+      controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
+      on:ended={onEnd}
+      on:contextmenu|preventDefault
+    >
       <source {src} type="video/mp4" />
     </video>
     {#if text}

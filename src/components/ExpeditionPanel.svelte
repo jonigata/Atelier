@@ -82,7 +82,7 @@
       characterName: 'レン',
       characterTitle: '冒険者',
       characterFaceId: 'ren',
-      eventImage: '/images/events/expedition_dispatch.png',
+      eventImage: '/images/events/expedition_dispatch.webp',
       lines: [
         { text: `「${area.name}」か。${duration}日で戻る`, expression: 'determined' },
         { text: lines.ren, expression: 'neutral' },
