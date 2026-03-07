@@ -52,7 +52,7 @@ export function preSelectRandomEquipment(count: number): EquipmentDef[] {
  * これらは「達成」バッジや「目標達成」トーストを表示しない
  */
 export function isStoryAchievement(achievement: AchievementDef): boolean {
-  return achievement.id.startsWith('ach_story_') || achievement.category === 'tutorial';
+  return achievement.id.startsWith('ach_story_') || achievement.id.startsWith('ach_substory_') || achievement.category === 'tutorial';
 }
 
 // 前回の発動済み目標IDを追跡

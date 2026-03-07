@@ -497,7 +497,8 @@ export type AchievementCategory =
   | 'quest'      // 依頼系
   | 'expedition' // 採取系
   | 'economy'    // 経済系
-  | 'mastery';   // 熟練系
+  | 'mastery'    // 熟練系
+  | 'substory';  // サブストーリー
 
 // アチーブメント報酬
 export interface AchievementReward {

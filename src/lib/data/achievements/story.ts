@@ -203,6 +203,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       'リーネに案内された泉の跡地で、見たこともない薬草を見つけた',
       '泉は枯れたが、土壌にはまだ不思議な成分が染み込んでいるようだ',
       'この薬草は他の場所では育たない……フォンテ村だけの固有種かもしれない',
+      '……地面に手を当てると、微かな温もりを感じた気がした。気のせいだろうか',
       '（※ 新しい採取エリア「枯泉の丘」が解放されました）',
     ],
     conditions: [
@@ -230,6 +231,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       '……おい、錬金術師。お前、もう30回も調合したのか',
       '……大したもんだ。見直したぞ',
       'ほら、これ持ってけ。うちの鍛冶場で出た端材だが、錬金術には使えるだろう',
+      '……昔、この工房にいた奴にも同じことをしたよ。あいつは……いや、やめとく',
       '……この村に、ちゃんと根を張れよ',
     ],
     conditions: [
@@ -363,6 +365,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       'よぉ先生、久しぶりだな！ 今日はとっておきを持ってきたぜ',
       'こいつは「月光の露」ってやつだ。この辺じゃまず手に入らない',
       '実はな、あんたの噂を聞いてわざわざ仕入れてきたんだ',
+      { text: '……親父が昔この村に来てた頃も、こういう珍しいモンを運んでたらしい', expression: 'neutral' },
       { text: '高くつくがね……まぁ、先生への投資ってやつさ。期待してるぜ？', expression: 'smug' },
     ],
     conditions: [
@@ -492,6 +495,7 @@ export const storyAchievements: Record<string, AchievementDef> = {
       'フォンテの泉の成分を含んだ薬草と、リーネの教えてくれた民間療法の知恵',
       'それを錬金術で昇華させた、この村でしか作れない一品',
       '「フォンテの恵み」―― これが、私の答え',
+      '……工房の隅で、猫が小さく鳴いた。まるで祝福するように',
     ],
     conditions: [
       { type: 'day', target: 280, comparison: '>=' },

@@ -2,6 +2,7 @@ import type { AchievementDef, AchievementNarrative } from '$lib/models/types';
 import { tutorialAchievements } from './tutorial';
 import { milestoneAchievements } from './milestones';
 import { storyAchievements } from './story';
+import { substoryAchievements } from './substories';
 
 // キャラクター名 → 顔画像ディレクトリ名のマッピング
 // 新しいキャラの顔画像を追加したら、ここに1行追加するだけでダイアログに表示される
@@ -45,6 +46,7 @@ export const achievements: Record<string, AchievementDef> = {
   ...tutorialAchievements,
   ...milestoneAchievements,
   ...storyAchievements,
+  ...substoryAchievements,
 };
 
 // アチーブメントをIDで取得

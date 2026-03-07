@@ -102,6 +102,7 @@
     expedition: '採取',
     economy: '経済',
     mastery: '熟練',
+    substory: 'サブストーリー',
   };
 
   const ACHIEVEMENT_CATEGORY_ORDER: AchievementCategory[] = ['alchemy', 'quest', 'expedition', 'economy', 'mastery'];
