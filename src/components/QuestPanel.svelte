@@ -421,6 +421,8 @@
     border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
     gap: 0.05rem;
+    min-width: 0;
+    overflow: hidden;
   }
 
   .quest-item.type-quality {
@@ -496,6 +498,7 @@
     display: flex;
     align-items: center;
     gap: 0.2rem;
+    min-width: 0;
   }
 
   .item-icon-small {
@@ -509,6 +512,8 @@
     flex-direction: column;
     gap: 0;
     line-height: 1.2;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .requirement-text.long {
